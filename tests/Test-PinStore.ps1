@@ -1,0 +1,47 @@
+[CmdletBinding()]
+param(
+    [string]$Compiler = (Join-Path $env:ProgramFiles 'Windhawk\Compiler\bin\clang++.exe')
+)
+
+$ErrorActionPreference = 'Stop'
+$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
+$buildRoot = Join-Path $repo 'build'
+$work = Join-Path $buildRoot ('pin-store-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $work | Out-Null
+$exe = Join-Path $work 'pin-store.exe'
+$source = Join-Path $PSScriptRoot 'pin-store.cpp'
+
+& $Compiler --target=x86_64-w64-mingw32 -std=c++23 -D_WIN32_WINNT=0x0A00 -municode -Wall -Wextra -Werror -static -o $exe $source -lruntimeobject -lole32 -loleaut32 -lshell32 -luuid
+if ($LASTEXITCODE -ne 0) { throw "Compilation failed with exit code $LASTEXITCODE" }
+
+& $exe self-test $work
+if ($LASTEXITCODE -ne 0) { throw "Pin store self-test failed with exit code $LASTEXITCODE" }
+
+$database = Join-Path $work 'concurrent\pins.json'
+$writerCount = 8
+$eventName = 'Local\ExplorerItemPinsTest-' + [guid]::NewGuid().ToString('N')
+$startEvent = [Threading.EventWaitHandle]::new($false, [Threading.EventResetMode]::ManualReset, $eventName)
+try {
+    $quotedDatabase = '"{0}"' -f $database
+    $writers = for ($i = 0; $i -lt $writerCount; ++$i) {
+        Start-Process -FilePath $exe -ArgumentList @('write', $quotedDatabase, $i, $eventName) -WindowStyle Hidden -PassThru
+    }
+    $reader = Start-Process -FilePath $exe -ArgumentList @('read', $quotedDatabase, $eventName) -WindowStyle Hidden -PassThru
+    [void]$startEvent.Set()
+    foreach ($process in @($writers) + $reader) {
+        if (-not $process.WaitForExit(15000) -or $process.ExitCode -ne 0) {
+            throw "Concurrent process $($process.Id) failed"
+        }
+    }
+} finally {
+    $startEvent.Dispose()
+}
+& $exe verify-writers $database $writerCount
+if ($LASTEXITCODE -ne 0) { throw "Concurrent writes test failed with exit code $LASTEXITCODE" }
+
+$resolvedWork = (Resolve-Path -LiteralPath $work).Path
+$resolvedBuild = (Resolve-Path -LiteralPath $buildRoot).Path
+if ([IO.Path]::GetDirectoryName($resolvedWork) -ne $resolvedBuild -or $resolvedWork -ne $work) {
+    throw "Unexpected test cleanup path: $resolvedWork"
+}
+Remove-Item -LiteralPath $resolvedWork -Recurse
