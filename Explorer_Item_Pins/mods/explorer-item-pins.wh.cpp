@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.0
+// @version         0.6.1
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 6
+// Build: 7
 
 // ==WindhawkModReadme==
 /*
@@ -1119,7 +1119,7 @@ xaml::Controls::IconElement CommandIcon(PinAction action, xaml::ElementTheme the
     } else {
         path += theme == xaml::ElementTheme::Dark ? L"contrast-standard\\theme-dark\\" : L"contrast-standard\\theme-light\\";
     }
-    path += action == PinAction::Pin ? L"PinToStartScreen.svg" : L"windows.unpinfromhome.svg";
+    path += action == PinAction::Pin ? L"PinToStartScreen.svg" : L"windows.unpinfromstartscreen.svg";
     if (GetFileAttributesW(path.c_str()) == INVALID_FILE_ATTRIBUTES) return nullptr;
     std::ranges::replace(path, L'\\', L'/');
     xaml::Media::Imaging::SvgImageSource svg;
@@ -1287,8 +1287,20 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
     controls::AppBarButton control;
     control.Name(buttonName);
     xaml::Automation::AutomationProperties::SetAutomationId(control, buttonName);
-    control.Style(placement->neighbor.Style());
+    const auto& native = placement->neighbor;
+    control.Style(native.Style());
+    control.Template(native.Template());
+    control.Width(native.Width());
+    control.MinWidth(native.MinWidth());
+    control.Height(native.Height());
+    control.MinHeight(native.MinHeight());
+    control.HorizontalAlignment(native.HorizontalAlignment());
+    control.HorizontalContentAlignment(native.HorizontalContentAlignment());
+    control.VerticalContentAlignment(native.VerticalContentAlignment());
+    control.Padding(native.Padding());
+    control.Margin(native.Margin());
     control.IsCompact(!context);
+    if (!context) control.LabelPosition(controls::CommandBarLabelPosition::Collapsed);
     auto command = std::make_shared<AttachedPinCommand>();
     command->owner = state;
     command->bar = winrt::make_weak(bar);
