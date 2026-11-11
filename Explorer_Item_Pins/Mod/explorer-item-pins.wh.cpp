@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.7
+// @version         0.6.8
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 13
+// Build: 14
 
 // ==WindhawkModReadme==
 /*
@@ -1266,19 +1266,21 @@ NavigationPin LoadNavigationPin(HIMAGELIST images, HDC dc, int width, int height
 }
 
 int ShortcutOverlaySlot() {
-    static const int slot = [] {
-        SHSTOCKICONINFO link{};
-        link.cbSize = sizeof(link);
-        Microsoft::WRL::ComPtr<IImageList> list;
-        if (FAILED(SHGetStockIconInfo(SIID_LINK, SHGSI_SYSICONINDEX, &link)) ||
-            FAILED(SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&list)))) return 0;
-        for (int i = 1; i <= 15; ++i) {
-            int index = -1;
-            if (SUCCEEDED(list->GetOverlayImage(i, &index)) && index == link.iSysImageIndex) return i;
+    static std::atomic_int slot;
+    if (const int cached = slot.load(std::memory_order_relaxed)) return cached;
+    SHSTOCKICONINFO link{};
+    link.cbSize = sizeof(link);
+    Microsoft::WRL::ComPtr<IImageList> list;
+    if (FAILED(SHGetStockIconInfo(SIID_LINK, SHGSI_SYSICONINDEX, &link)) ||
+        FAILED(SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&list)))) return 0;
+    for (int i = 1; i <= 15; ++i) {
+        int index = -1;
+        if (SUCCEEDED(list->GetOverlayImage(i, &index)) && index == link.iSysImageIndex) {
+            slot.store(i, std::memory_order_relaxed);
+            return i;
         }
-        return 0;
-    }();
-    return slot;
+    }
+    return 0;
 }
 
 RECT MeasureShortcutOverlay(IUnknown* cache, IUnknown* item, HDC dc, int width, int height) {
@@ -1398,6 +1400,7 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT
         int width = 0;
         int height = 0;
         NavigationPin pin;
+        ULONGLONG retry = 0;
     };
     static std::mutex mutex;
     static std::array<Asset, 8> assets;
@@ -1408,10 +1411,18 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT
     });
     if (asset == assets.end()) {
         asset = assets.begin() + next++ % assets.size();
-        *asset = {images, width, height, LoadNavigationPin(images, dc, width, height)};
+        *asset = {images, width, height, {}, 0};
+    }
+    if (!asset->pin.icon) {
+        const auto now = GetTickCount64();
+        if (now < asset->retry) return false;
+        asset->pin = LoadNavigationPin(images, dc, width, height);
+        if (!asset->pin.icon) {
+            asset->retry = now + 1000;
+            return false;
+        }
     }
     const auto& pin = asset->pin;
-    if (!pin.icon) return false;
     const int extent = std::min(shortcut.right - shortcut.left, shortcut.bottom - shortcut.top);
     const int nativeExtent = std::max(pin.width, pin.height);
     const int pinWidth = MulDiv(pin.width, extent, nativeExtent);

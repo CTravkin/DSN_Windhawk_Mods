@@ -612,6 +612,10 @@ void VerifyIndicator(const fs::path& root) {
     auto* pixels = static_cast<DWORD*>(buffer);
     std::fill_n(pixels, 256, 0u);
     const auto emptyIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
+    const std::unique_ptr<std::remove_pointer_t<HDC>, decltype(&DeleteDC)>
+        beforeAsset(CreateCompatibleDC(nullptr), DeleteDC);
+    Require(beforeAsset && !explorer_item_pins::DrawPinnedIndicator(images.get(), beforeAsset.get(),
+                {0, 0, 16, 16}, {0, 8, 8, 16}), "keep the stock icon while the navigation pin is unavailable");
     for (int y = 2; y < 8; ++y) std::fill_n(pixels + y * 16 + 8, 6, 0xffe600d8u);
     const auto pinIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
     DeleteObject(stateBitmap);
@@ -638,7 +642,8 @@ void VerifyIndicator(const fs::path& root) {
         const RECT icon{8, 8, 8 + size, 8 + size};
         const RECT shortcut{0, size - arrow, arrow, size};
         PatBlt(dc, 0, 0, size + 16, size + 16, WHITENESS);
-        Require(explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut), "draw the fixture badge");
+        WaitUntil([&] { return explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut); },
+                  "recover the badge when the same native image list becomes ready");
         const auto width = size + 16;
         const auto ink = explorer_item_pins::VisibleBounds(width, width, [&](size_t i) {
             return GetPixel(dc, i % width, i / width) != RGB(255, 255, 255);
