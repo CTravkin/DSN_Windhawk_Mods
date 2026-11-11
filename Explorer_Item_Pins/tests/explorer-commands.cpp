@@ -4,6 +4,7 @@
 #include <propkey.h>
 
 #include <array>
+#include <atomic>
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -20,6 +21,8 @@ using explorer_item_pins::ReadPinNames;
 using explorer_item_pins::SortViewBatch;
 using explorer_item_pins::SortWithPins;
 using explorer_item_pins::ViewSortBatch;
+using explorer_item_pins::NativeGrouping;
+using explorer_item_pins::GroupList;
 using Microsoft::WRL::ComPtr;
 namespace fs = std::filesystem;
 
@@ -212,36 +215,66 @@ BOOL TestSortHook(ViewSortBatch* batch) {
     return SortWithPins(*orderingStore, originalSort, nativeCompare, batch);
 }
 
-void InstallTestSortHook(SortViewBatch target) {
+template <typename Function>
+Function InstallTestHook(Function target, Function callback, std::span<const unsigned char> expected,
+                         size_t ripLoad = std::dynamic_extent) {
     // This process is isolated from the Explorer session. Install before
     // opening the test view and let process teardown discard the code pages.
-    constexpr unsigned char expected[]{0x48, 0x8b, 0xc4, 0x48, 0x89, 0x58, 0x08, 0x48,
-                                       0x89, 0x68, 0x10, 0x48, 0x89, 0x70, 0x18};
     auto* entry = reinterpret_cast<unsigned char*>(target);
-    Require(std::memcmp(entry, expected, sizeof(expected)) == 0, "verify the test trampoline's instruction boundaries");
+    Require(expected.size() >= 14 && std::memcmp(entry, expected.data(), expected.size()) == 0,
+            "verify the test trampoline's instruction boundaries");
     const auto jump = [](unsigned char* location, const void* targetAddress) {
         unsigned char instruction[14]{0xff, 0x25};
         std::memcpy(instruction + 6, &targetAddress, sizeof(targetAddress));
         std::memcpy(location, instruction, sizeof(instruction));
     };
-    constexpr size_t trampolineSize = sizeof(expected) + 14;
+    const size_t trampolineSize = expected.size() + 14 + (ripLoad == std::dynamic_extent ? 0 : 6);
     auto* trampoline = static_cast<unsigned char*>(VirtualAlloc(nullptr, trampolineSize,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
     Require(trampoline != nullptr, "allocate the isolated test trampoline");
-    std::memcpy(trampoline, entry, sizeof(expected));
-    jump(trampoline + sizeof(expected), entry + sizeof(expected));
+    if (ripLoad == std::dynamic_extent) {
+        std::memcpy(trampoline, entry, expected.size());
+    } else {
+        constexpr unsigned char opcode[]{0x48, 0x8b, 0x05};
+        Require(ripLoad + 7 == expected.size() && std::memcmp(entry + ripLoad, opcode, sizeof(opcode)) == 0,
+                "verify the RIP-relative load at the end of the test prologue");
+        std::int32_t displacement{};
+        std::memcpy(&displacement, entry + ripLoad + sizeof(opcode), sizeof(displacement));
+        const auto address = reinterpret_cast<std::uintptr_t>(entry + expected.size()) + displacement;
+        std::memcpy(trampoline, entry, ripLoad);
+        unsigned char load[]{0x48, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0x48, 0x8b, 0x00};
+        std::memcpy(load + 2, &address, sizeof(address));
+        std::memcpy(trampoline + ripLoad, load, sizeof(load));
+    }
+    jump(trampoline + trampolineSize - 14, entry + expected.size());
     DWORD protection = 0;
     Require(VirtualProtect(trampoline, trampolineSize, PAGE_EXECUTE_READ, &protection) != FALSE &&
             FlushInstructionCache(GetCurrentProcess(), trampoline, trampolineSize) != FALSE,
             "prepare the isolated test trampoline");
-    originalSort = reinterpret_cast<SortViewBatch>(trampoline);
-    Require(VirtualProtect(entry, sizeof(expected), PAGE_EXECUTE_READWRITE, &protection) != FALSE,
+    Require(VirtualProtect(entry, expected.size(), PAGE_EXECUTE_READWRITE, &protection) != FALSE,
             "make the sort entry writable in the test process");
-    jump(entry, reinterpret_cast<const void*>(TestSortHook));
+    jump(entry, reinterpret_cast<const void*>(callback));
     DWORD ignored = 0;
-    Require(VirtualProtect(entry, sizeof(expected), protection, &ignored) != FALSE &&
-            FlushInstructionCache(GetCurrentProcess(), entry, sizeof(expected)) != FALSE,
+    Require(VirtualProtect(entry, expected.size(), protection, &ignored) != FALSE &&
+            FlushInstructionCache(GetCurrentProcess(), entry, expected.size()) != FALSE,
             "publish the sort hook in the test process");
+    return reinterpret_cast<Function>(trampoline);
+}
+
+constexpr unsigned char sortPrologue[]{0x48, 0x8b, 0xc4, 0x48, 0x89, 0x58, 0x08, 0x48,
+                                       0x89, 0x68, 0x10, 0x48, 0x89, 0x70, 0x18};
+
+struct Layout { FOLDERVIEWMODE mode; int size; };
+constexpr std::array layouts{Layout{FVM_DETAILS, 16}, Layout{FVM_LIST, 16}, Layout{FVM_TILE, 48},
+                             Layout{FVM_CONTENT, 32}, Layout{FVM_SMALLICON, 16}, Layout{FVM_ICON, 48},
+                             Layout{FVM_ICON, 96}, Layout{FVM_ICON, 256}};
+
+void SetLayout(ExplorerView& view, const Layout& layout) {
+    Check(view.View().SetViewModeAndIconSize(layout.mode, layout.size), "switch the native view layout");
+    FOLDERVIEWMODE actualMode{};
+    int actualSize = 0;
+    Check(view.View().GetViewModeAndIconSize(&actualMode, &actualSize), "read the native view layout");
+    Require(actualMode == layout.mode && actualSize == layout.size, "the requested view layout should be active");
 }
 
 void VerifyOrdering(const fs::path& root) {
@@ -267,14 +300,10 @@ void VerifyOrdering(const fs::path& root) {
     }
     const auto& store = orderingStore.emplace(root / L"ordering-data" / L"pins.json");
     nativeCompare = native->compare;
-    InstallTestSortHook(native->sort);
+    originalSort = InstallTestHook(native->sort, TestSortHook, sortPrologue);
     ExplorerView ascending(folder, itemCount);
     ExplorerView descending(folder, itemCount);
 
-    struct Layout { FOLDERVIEWMODE mode; int size; };
-    const std::array layouts{Layout{FVM_DETAILS, 16}, Layout{FVM_LIST, 16}, Layout{FVM_TILE, 48},
-                             Layout{FVM_CONTENT, 32}, Layout{FVM_SMALLICON, 16}, Layout{FVM_ICON, 48},
-                             Layout{FVM_ICON, 96}, Layout{FVM_ICON, 256}};
     const auto setSort = [](ExplorerView& view, const PROPERTYKEY& key, SORTDIRECTION direction) {
         const SORTCOLUMN column{key, direction};
         Check(view.View().SetSortColumns(&column, 1), "set the native view's sort direction");
@@ -286,13 +315,8 @@ void VerifyOrdering(const fs::path& root) {
     const auto isPinned = [&](std::wstring_view name) { return name == names[4] || name == names[5]; };
     int verified = 0;
     for (const auto& layout : layouts) {
-        for (auto* view : {&ascending, &descending}) {
-            Check(view->View().SetViewModeAndIconSize(layout.mode, layout.size), "switch the native view layout");
-            FOLDERVIEWMODE actualMode{};
-            int actualSize = 0;
-            Check(view->View().GetViewModeAndIconSize(&actualMode, &actualSize), "read the native view layout");
-            Require(actualMode == layout.mode && actualSize == layout.size, "the requested view layout should be active");
-        }
+        SetLayout(ascending, layout);
+        SetLayout(descending, layout);
         for (const auto& property : {PKEY_ItemNameDisplay, PKEY_DateModified}) {
             setSort(ascending, property, SORT_ASCENDING);
             setSort(descending, property, SORT_DESCENDING);
@@ -340,6 +364,140 @@ void VerifyOrdering(const fs::path& root) {
     }
     std::cout << "PASS pin priority with stock order in " << verified << " native view scenarios\n";
 }
+
+NativeGrouping groupingApi{};
+std::atomic<unsigned> pinnedHeaders{};
+std::atomic<unsigned> topPinnedGroups{};
+
+HRESULT TestGroupBatch(const unsigned char* batch, void* result) {
+    return explorer_item_pins::GroupWithPins(*orderingStore, groupingApi.batch, batch, result);
+}
+
+HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, void* item, void* context, DWORD flags) {
+    return explorer_item_pins::AssignWithPins(groupingApi, category, row, item, context, flags);
+}
+
+HRESULT TestGroupInfo(explorer_item_pins::GroupInfo original, IUnknown* category, DWORD id, IUnknown** result) {
+    const auto hr = explorer_item_pins::GroupInfoWithPins(groupingApi.make, original, category, id, result);
+    if (SUCCEEDED(hr) && *result && id == explorer_item_pins::pinnedGroupId) ++pinnedHeaders;
+    return hr;
+}
+
+HRESULT TestRangeInfo(IUnknown* category, DWORD id, IUnknown** result) {
+    return TestGroupInfo(groupingApi.rangeInfo, category, id, result);
+}
+
+HRESULT TestTextInfo(IUnknown* category, DWORD id, IUnknown** result) {
+    return TestGroupInfo(groupingApi.textInfo, category, id, result);
+}
+
+HRESULT ObserveAppliedGroups(const unsigned char* view, GroupList* list, UINT* added) {
+    UINT count = 0;
+    bool pinnedFirst = false;
+    if (list && SUCCEEDED(list->GetCount(&count)) && count) {
+        const auto settings = *reinterpret_cast<IUnknown* const*>(view + 0x268);
+        if (settings) {
+            const auto first = groupingApi.ascending(settings) ? 0 : count - 1;
+            pinnedFirst = explorer_item_pins::NativeGroupId(*list, first) == explorer_item_pins::pinnedGroupId;
+        }
+    }
+    const auto hr = groupingApi.apply(view, list, added);
+    if (SUCCEEDED(hr) && pinnedFirst) ++topPinnedGroups;
+    return hr;
+}
+
+HRESULT TestApplyGroups(const unsigned char* view, GroupList* list, UINT* added) {
+    auto observed = groupingApi;
+    observed.apply = ObserveAppliedGroups;
+    return explorer_item_pins::ApplyWithPins(observed, view, list, added);
+}
+
+HRESULT TestSetGrouping(IFolderView2* view, REFPROPERTYKEY key, BOOL ascending) {
+    return explorer_item_pins::SetGroupingWithPins(*orderingStore, groupingApi.setGrouping, view, key, ascending);
+}
+
+void InstallTestGrouping(const NativeGrouping& native) {
+    constexpr unsigned char batch[]{0x48, 0x89, 0x5c, 0x24, 0x18, 0x48, 0x89, 0x74, 0x24, 0x20, 0x55, 0x57, 0x41, 0x54};
+    constexpr unsigned char assign[]{0x40, 0x53, 0x55, 0x56, 0x57, 0x48, 0x83, 0xec, 0x58, 0x48, 0x8b, 0x05, 0xc0, 0x73, 0x6d, 0x00};
+    constexpr unsigned char range[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x48, 0x83, 0xec, 0x50, 0x48, 0x8b, 0x05, 0x1d, 0xb9, 0x60, 0x00};
+    constexpr unsigned char strings[]{0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x57, 0x48, 0x83, 0xec, 0x40};
+    constexpr unsigned char apply[]{0x40, 0x55, 0x53, 0x56, 0x57, 0x41, 0x54, 0x41, 0x56, 0x41, 0x57, 0x48, 0x8b, 0xec};
+    constexpr unsigned char set[]{0x48, 0x8b, 0x89, 0x60, 0x05, 0x00, 0x00, 0x48, 0x8b, 0x01, 0x48, 0x8b, 0x40, 0x20};
+    groupingApi = native;
+    groupingApi.batch = InstallTestHook(native.batch, TestGroupBatch, batch);
+    groupingApi.assign = InstallTestHook(native.assign, TestAssignGroup, assign, 9);
+    groupingApi.rangeInfo = InstallTestHook(native.rangeInfo, TestRangeInfo, range, 12);
+    groupingApi.textInfo = InstallTestHook(native.textInfo, TestTextInfo, strings);
+    groupingApi.apply = InstallTestHook(native.apply, TestApplyGroups, apply);
+    groupingApi.setGrouping = InstallTestHook(native.setGrouping, TestSetGrouping, set);
+}
+
+void VerifyGrouping(const fs::path& root) {
+    const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    Check(storage ? S_OK : HRESULT_FROM_WIN32(GetLastError()), "load Windows.Storage.dll in the isolated test process");
+    const auto shell = GetModuleHandleW(L"Shell32.dll");
+    const auto grouping = explorer_item_pins::FindNativeGrouping(storage, shell);
+    const auto ordering = FindNativeOrdering(storage);
+    if (!grouping || !ordering) {
+        std::cout << "SKIP native grouping hooks on these Windows shell images\n";
+        return;
+    }
+    const auto& store = orderingStore.emplace(root / L"grouping-data" / L"pins.json");
+    nativeCompare = ordering->compare;
+    originalSort = InstallTestHook(ordering->sort, TestSortHook, sortPrologue);
+    InstallTestGrouping(*grouping);
+
+    const std::array<std::wstring_view, 5> names{L"Alpha folder", L"Beta.txt", L"Gamma.zip",
+                                                 L"Omega pinned folder", L"Zeta pinned.txt"};
+    const auto stock = root / L"stock";
+    const auto pinned = root / L"pinned";
+    const auto now = fs::file_time_type::clock::now();
+    for (const auto& folder : {stock, pinned}) {
+        fs::create_directories(folder / names[0]);
+        fs::create_directories(folder / names[3]);
+        for (size_t i = 0; i < names.size(); ++i) {
+            const auto path = folder / names[i];
+            if (!fs::is_directory(path)) {
+                std::ofstream(path) << i;
+                fs::resize_file(path, 1024ULL << (2 * i));
+            }
+            fs::last_write_time(path, now - std::chrono::days(i));
+        }
+    }
+    for (size_t i : {3u, 4u}) {
+        Require(store.SetPinned(pinned, {std::wstring(names[i]), {}}, true), "persist a grouping fixture pin");
+    }
+    ExplorerView reference(stock, names.size());
+    ExplorerView modified(pinned, names.size());
+
+    const auto isPinned = [&](std::wstring_view name) { return name == names[3] || name == names[4]; };
+    int passed = 0;
+    for (const auto& layout : layouts) {
+        SetLayout(reference, layout);
+        SetLayout(modified, layout);
+        for (const auto& key : {PKEY_ItemNameDisplay, PKEY_DateModified, PKEY_ItemTypeText, PKEY_Size,
+                                PKEY_DateCreated, PKEY_FileExtension}) {
+            for (BOOL ascending : {TRUE, FALSE, TRUE}) {
+                const auto before = pinnedHeaders.load();
+                const auto previouslyApplied = topPinnedGroups.load();
+                Check(reference.View().SetGroupBy(key, ascending), "group the stock view");
+                Check(modified.View().SetGroupBy(key, ascending), "group the pinned view");
+                WaitUntil([&] {
+                    if (pinnedHeaders.load() == before || topPinnedGroups.load() == previouslyApplied) return false;
+                    auto actual = modified.Items();
+                    auto expected = reference.Items();
+                    if (actual.size() != names.size() || expected.size() != names.size() ||
+                        !isPinned(actual[0]) || !isPinned(actual[1])) return false;
+                    std::erase_if(actual, isPinned);
+                    std::erase_if(expected, isPinned);
+                    return actual == expected;
+                }, "place the pinned group above the unmodified native groups in either direction");
+                ++passed;
+            }
+        }
+    }
+    std::cout << "PASS pinned group and stock order in " << passed << " native view scenarios\n";
+}
 }
 
 int wmain(int argc, wchar_t** argv) {
@@ -353,6 +511,8 @@ int wmain(int argc, wchar_t** argv) {
             std::cout << "PASS native Explorer selection, pin and unpin, rename, replacement, copy and move\n";
         } else if (mode == L"ordering") {
             VerifyOrdering(argv[1]);
+        } else if (mode == L"grouping") {
+            VerifyGrouping(argv[1]);
         } else {
             result = 2;
         }

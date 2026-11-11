@@ -17,6 +17,8 @@ if ($LASTEXITCODE -ne 0) { throw "Compilation failed with exit code $LASTEXITCOD
 if ($LASTEXITCODE -ne 0) { throw "Native Explorer commands test failed with exit code $LASTEXITCODE" }
 & $exe $work ordering
 if ($LASTEXITCODE -ne 0) { throw "Native Explorer ordering test failed with exit code $LASTEXITCODE" }
+& $exe $work grouping
+if ($LASTEXITCODE -ne 0) { throw "Native Explorer grouping test failed with exit code $LASTEXITCODE" }
 
 $resolvedWork = (Resolve-Path -LiteralPath $work).Path
 $resolvedBuild = (Resolve-Path -LiteralPath $buildRoot).Path
