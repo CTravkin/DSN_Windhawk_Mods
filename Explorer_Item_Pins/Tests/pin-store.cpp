@@ -1,4 +1,4 @@
-#include "../mods/explorer-item-pins.wh.cpp"
+#include "../Mod/explorer-item-pins.wh.cpp"
 
 #include <fstream>
 #include <iostream>

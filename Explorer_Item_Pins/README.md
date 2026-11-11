@@ -25,8 +25,8 @@ Pins are stored per Windows account in `%LOCALAPPDATA%\Explorer Item Pins\pins.j
 Run the tests from this mod directory on Windows with PowerShell and the compiler bundled with Windhawk 1.7.3.
 
 ```powershell
-pwsh -NoProfile -File .\tests\Test-PinStore.ps1
-pwsh -NoProfile -File .\tests\Test-ExplorerCommands.ps1
+pwsh -NoProfile -File .\Tests\Test-PinStore.ps1
+pwsh -NoProfile -File .\Tests\Test-ExplorerCommands.ps1
 ```
 
-The tests use temporary files under `build\`. They cover storage, concurrent access, pin operations, sorting, grouping, and indicator rendering in a native Explorer view hosted in the test process.
+The tests cover storage, concurrent access, pin operations, sorting, grouping, and indicator rendering in a native Explorer view hosted in the test process.

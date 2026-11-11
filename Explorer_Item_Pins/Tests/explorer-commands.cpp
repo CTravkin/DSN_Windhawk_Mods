@@ -1,4 +1,4 @@
-#include "../mods/explorer-item-pins.wh.cpp"
+#include "../Mod/explorer-item-pins.wh.cpp"
 
 #include <wrl/client.h>
 #include <propkey.h>
@@ -634,17 +634,34 @@ void VerifyIndicator(const fs::path& root) {
     Require(dc && surface, "create a private render target for the native view");
     const auto previous = SelectObject(dc, surface);
 
+    for (const auto& [size, arrow] : {std::pair{16, 8}, {32, 13}, {96, 19}, {256, 40}}) {
+        const RECT icon{8, 8, 8 + size, 8 + size};
+        const RECT shortcut{0, size - arrow, arrow, size};
+        PatBlt(dc, 0, 0, size + 16, size + 16, WHITENESS);
+        Require(explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut), "draw the fixture badge");
+        const auto width = size + 16;
+        const auto ink = explorer_item_pins::VisibleBounds(width, width, [&](size_t i) {
+            return GetPixel(dc, i % width, i / width) != RGB(255, 255, 255);
+        });
+        Require(ink.top == icon.top && ink.right == icon.right && ink.right - ink.left == arrow &&
+                ink.bottom - ink.top == arrow, "mirror the shortcut bounds with the visible pin pixels");
+    }
+
     int verified = 0;
     for (const auto& layout : layouts) {
         SetLayout(view, layout);
         for (bool enabled : {false, true}) {
             indicatorOn = enabled;
-            paintedIcons.clear();
-            shortcutCornerPreserved = true;
-            capturePaint = true;
-            const auto rendered = PrintWindow(window, dc, 2);
-            capturePaint = false;
-            Require(rendered && paintedIcons.size() == 4, "paint each fixture image in the native layout");
+            WaitUntil([&] {
+                paintedIcons.clear();
+                shortcutCornerPreserved = true;
+                capturePaint = true;
+                const auto rendered = PrintWindow(window, dc, 2);
+                capturePaint = false;
+                return rendered && paintedIcons.size() == 4 && (!enabled ||
+                    (paintedIcons[L"Pinned folder"] && paintedIcons[L"Pinned thumbnail.bmp"] &&
+                     paintedIcons[L"Pinned shortcut.lnk"]));
+            }, "paint each fixture image after the native overlay cache is ready");
             if (paintedIcons[L"Ordinary.txt"] || paintedIcons[L"Pinned folder"] != enabled ||
                 paintedIcons[L"Pinned thumbnail.bmp"] != enabled || paintedIcons[L"Pinned shortcut.lnk"] != enabled ||
                 !shortcutCornerPreserved) {

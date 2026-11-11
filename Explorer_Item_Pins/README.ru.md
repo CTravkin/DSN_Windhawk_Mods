@@ -25,8 +25,8 @@ Explorer Item Pins — разрабатываемый мод Windhawk для з�
 Запускай тесты из папки мода на Windows. Нужны PowerShell и компилятор из Windhawk 1.7.3.
 
 ```powershell
-pwsh -NoProfile -File .\tests\Test-PinStore.ps1
-pwsh -NoProfile -File .\tests\Test-ExplorerCommands.ps1
+pwsh -NoProfile -File .\Tests\Test-PinStore.ps1
+pwsh -NoProfile -File .\Tests\Test-ExplorerCommands.ps1
 ```
 
-Тесты используют временные файлы в `build\`. Они проверяют хранилище, одновременный доступ, операции закрепления, сортировку, группировку и отрисовку индикатора в нативном представлении Проводника, открытом в тестовом процессе.
+Тесты проверяют хранилище, одновременный доступ, операции закрепления, сортировку, группировку и отрисовку индикатора в нативном представлении Проводника, открытом в тестовом процессе.

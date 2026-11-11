@@ -4,8 +4,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$modRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
-$buildRoot = Join-Path $modRoot 'build'
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).Path
+$buildRoot = Join-Path $repoRoot 'Builds\Explorer_Item_Pins\Tests'
 $work = Join-Path $buildRoot ('explorer-commands-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work | Out-Null
 $exe = Join-Path $work 'explorer-commands.exe'

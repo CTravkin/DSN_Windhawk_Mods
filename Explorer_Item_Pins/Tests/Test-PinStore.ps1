@@ -4,8 +4,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$repo = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
-$buildRoot = Join-Path $repo 'build'
+$repoRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..\..')).Path
+$buildRoot = Join-Path $repoRoot 'Builds\Explorer_Item_Pins\Tests'
 $work = Join-Path $buildRoot ('pin-store-' + [guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $work | Out-Null
 $exe = Join-Path $work 'pin-store.exe'

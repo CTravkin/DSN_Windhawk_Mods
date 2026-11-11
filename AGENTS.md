@@ -2,6 +2,8 @@
 
 Keep root READMEs to a short description and an index of mods, following DSN Tools. Keep versioning and release conventions here.
 
+Use `Mod/` for a mod's source and `Tests/` for its checks. Keep local builds under the ignored repository `Builds/<mod directory>/`, using the display name, version and build number in artifact names.
+
 ## Versioning
 
 - Each mod has an independent version and build number. The mod's `.wh.cpp` records the version in Windhawk's numeric `@version X.Y.Z` field and the positive integer build in a `// Build: N` comment immediately after the metadata block.

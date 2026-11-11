@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.6
+// @version         0.6.7
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 12
+// Build: 13
 
 // ==WindhawkModReadme==
 /*
@@ -53,6 +53,7 @@ folders to the top of their parent folder in File Explorer.
 
 #include <windows.h>
 #include <commctrl.h>
+#include <commoncontrols.h>
 #include <roapi.h>
 #include <shlobj.h>
 #include <shlwapi.h>
@@ -63,6 +64,7 @@ folders to the top of their parent folder in File Explorer.
 #include <wrl/client.h>
 
 #include <algorithm>
+#include <array>
 #include <cstring>
 #include <filesystem>
 #include <map>
@@ -1196,36 +1198,237 @@ bool WindowHasClass(HWND window, PCWSTR expected) {
     return last.tree ? TreeView_GetImageList(last.tree, TVSIL_STATE) : nullptr;
 }
 
-bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon) {
-    const LONG side = std::min(icon.right - icon.left, icon.bottom - icon.top);
-    int width = 0, height = 0;
-    if (!images || !dc || side < 12 || !ImageList_GetIconSize(images, &width, &height)) return false;
-    const int extent = static_cast<int>(side * 3 / 4);
-    const int nativeExtent = std::max(width, height);
-    if (nativeExtent > extent) {
-        width = MulDiv(width, extent, nativeExtent);
-        height = MulDiv(height, extent, nativeExtent);
-    }
-    IMAGELISTDRAWPARAMS draw{};
-    draw.cbSize = sizeof(draw);
-    draw.himl = images;
-    draw.i = 1; // Explorer's normal pinned state in NamespaceTreeControl.
-    draw.hdcDst = dc;
-    draw.x = icon.right - width;
-    draw.y = icon.top;
-    draw.cx = width;
-    draw.cy = height;
-    draw.rgbBk = CLR_NONE;
-    draw.fStyle = ILD_TRANSPARENT | ILD_SCALE;
-    if (width <= (icon.right - icon.left) / 2 || height <= (icon.bottom - icon.top) / 2) {
-        return ImageList_DrawIndirect(&draw) != FALSE;
-    }
+constexpr int navigationPinIndex = 1;
 
-    // In the smallest views the state-image cell reaches the shortcut corner.
+RECT VisibleBounds(int width, int height, auto visible) {
+    RECT bounds{width, height, 0, 0};
+    for (LONG y = 0; y < height; ++y) {
+        for (LONG x = 0; x < width; ++x) {
+            if (!visible(static_cast<size_t>(y) * width + x)) continue;
+            bounds.left = std::min(bounds.left, x);
+            bounds.top = std::min(bounds.top, y);
+            bounds.right = std::max(bounds.right, x + 1);
+            bounds.bottom = std::max(bounds.bottom, y + 1);
+        }
+    }
+    return IsRectEmpty(&bounds) ? RECT{} : bounds;
+}
+
+using IconHandle = std::unique_ptr<std::remove_pointer_t<HICON>, decltype(&DestroyIcon)>;
+
+struct NavigationPin {
+    IconHandle icon{nullptr, DestroyIcon};
+    LONG width = 0;
+    LONG height = 0;
+};
+
+NavigationPin LoadNavigationPin(HIMAGELIST images, HDC dc, int width, int height) {
+    const IconHandle icon(ImageList_GetIcon(images, navigationPinIndex, ILD_TRANSPARENT), DestroyIcon);
+    ICONINFO info{};
+    if (!icon || !GetIconInfo(icon.get(), &info)) return {};
+    const std::unique_ptr<std::remove_pointer_t<HBITMAP>, decltype(&DeleteObject)>
+        color(info.hbmColor, DeleteObject), mask(info.hbmMask, DeleteObject);
+
+    BITMAPINFO bitmap{};
+    bitmap.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmap.bmiHeader.biWidth = width;
+    bitmap.bmiHeader.biHeight = -height;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    std::vector<DWORD> pixels(static_cast<size_t>(width) * height);
+    if (!color || GetDIBits(dc, color.get(), 0, height, pixels.data(), &bitmap, DIB_RGB_COLORS) != height) return {};
+    auto ink = VisibleBounds(width, height, [&](size_t i) { return (pixels[i] >> 24) != 0; });
+    if (IsRectEmpty(&ink)) {
+        std::vector<DWORD> transparency(pixels.size());
+        if (!mask || GetDIBits(dc, mask.get(), 0, height, transparency.data(), &bitmap, DIB_RGB_COLORS) != height) return {};
+        for (size_t i = 0; i < pixels.size(); ++i) pixels[i] = transparency[i] & 0x00ffffff ? 0 : pixels[i] | 0xff000000;
+        ink = VisibleBounds(width, height, [&](size_t i) { return (pixels[i] >> 24) != 0; });
+    }
+    if (IsRectEmpty(&ink)) return {};
+
+    // Remove the navigation cell's transparent padding before Windows scales the icon.
+    const LONG pinWidth = ink.right - ink.left, pinHeight = ink.bottom - ink.top;
+    bitmap.bmiHeader.biWidth = pinWidth;
+    bitmap.bmiHeader.biHeight = -pinHeight;
+    void* buffer = nullptr;
+    const std::unique_ptr<std::remove_pointer_t<HBITMAP>, decltype(&DeleteObject)>
+        cropped(CreateDIBSection(dc, &bitmap, DIB_RGB_COLORS, &buffer, nullptr, 0), DeleteObject);
+    const std::vector<WORD> blankMask(static_cast<size_t>((pinWidth + 15) / 16) * pinHeight);
+    const std::unique_ptr<std::remove_pointer_t<HBITMAP>, decltype(&DeleteObject)>
+        croppedMask(CreateBitmap(pinWidth, pinHeight, 1, 1, blankMask.data()), DeleteObject);
+    if (!cropped || !croppedMask) return {};
+    for (LONG y = 0; y < pinHeight; ++y) {
+        std::copy_n(pixels.data() + static_cast<size_t>(ink.top + y) * width + ink.left, pinWidth,
+                    static_cast<DWORD*>(buffer) + static_cast<size_t>(y) * pinWidth);
+    }
+    ICONINFO pinInfo{TRUE, 0, 0, croppedMask.get(), cropped.get()};
+    return {IconHandle(CreateIconIndirect(&pinInfo), DestroyIcon), pinWidth, pinHeight};
+}
+
+int ShortcutOverlaySlot() {
+    static const int slot = [] {
+        SHSTOCKICONINFO link{};
+        link.cbSize = sizeof(link);
+        Microsoft::WRL::ComPtr<IImageList> list;
+        if (FAILED(SHGetStockIconInfo(SIID_LINK, SHGSI_SYSICONINDEX, &link)) ||
+            FAILED(SHGetImageList(SHIL_SMALL, IID_PPV_ARGS(&list)))) return 0;
+        for (int i = 1; i <= 15; ++i) {
+            int index = -1;
+            if (SUCCEEDED(list->GetOverlayImage(i, &index)) && index == link.iSysImageIndex) return i;
+        }
+        return 0;
+    }();
+    return slot;
+}
+
+RECT MeasureShortcutOverlay(IUnknown* cache, IUnknown* item, HDC dc, int width, int height) {
+    const int slot = ShortcutOverlaySlot();
+    if (!slot) return {};
+
+    BITMAPINFO bitmap{};
+    bitmap.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bitmap.bmiHeader.biWidth = width;
+    bitmap.bmiHeader.biHeight = -height;
+    bitmap.bmiHeader.biPlanes = 1;
+    bitmap.bmiHeader.biBitCount = 32;
+    void* buffer = nullptr;
+    const std::unique_ptr<std::remove_pointer_t<HBITMAP>, decltype(&DeleteObject)>
+        surface(CreateDIBSection(dc, &bitmap, DIB_RGB_COLORS, &buffer, nullptr, 0), DeleteObject);
+    const std::unique_ptr<std::remove_pointer_t<HDC>, decltype(&DeleteDC)>
+        canvas(CreateCompatibleDC(dc), DeleteDC);
+    if (!surface || !canvas || !SelectObject(canvas.get(), surface.get())) return {};
+
+    // Render a stock icon with and without the shell's link overlay. The native
+    // compositor supplies the overlay footprint for this size, including rounding.
+    using DrawCachedIcon = HRESULT (*)(IUnknown*, IMAGELISTDRAWPARAMS*);
+    const auto draw = reinterpret_cast<DrawCachedIcon>((*reinterpret_cast<void***>(cache))[16]);
+    IMAGELISTDRAWPARAMS params{};
+    params.cbSize = sizeof(params);
+    params.i = SIID_DOCNOASSOC;
+    params.hdcDst = canvas.get();
+    params.cx = width;
+    params.cy = height;
+    params.rgbBk = CLR_NONE;
+    constexpr UINT nativeDrawStyle = 0x80000 | ILD_ASYNC | ILD_TRANSPARENT;
+    const UINT overlayStyle = nativeDrawStyle | INDEXTOOVERLAYMASK(slot);
+    const auto count = static_cast<size_t>(width) * height;
+    auto* pixels = static_cast<DWORD*>(buffer);
+    constexpr DWORD background = 0xff808080;
+    const auto render = [&](UINT style) {
+        std::fill_n(pixels, count, background);
+        params.fStyle = style;
+        const auto result = draw(cache, &params);
+        GdiFlush();
+        return result;
+    };
+    const auto overlayResult = render(overlayStyle);
+    constexpr HRESULT missingOverlay = 0x10;
+    if (SUCCEEDED(overlayResult) && (overlayResult & missingOverlay)) {
+        // Use Explorer's own cache-miss path when this folder has no ready link overlay.
+        using FillCachedOverlay = HRESULT (*)(IUnknown*, IUnknown*, HRESULT, DWORD, IMAGELISTDRAWPARAMS*, int*);
+        const auto fill = reinterpret_cast<FillCachedOverlay>((*reinterpret_cast<void***>(cache))[17]);
+        constexpr DWORD loadOverlayOnly = 2;
+        int state = 0;
+        if (item) fill(cache, item, overlayResult, loadOverlayOnly, &params, &state);
+        GdiFlush();
+    }
+    if (FAILED(render(nativeDrawStyle))) return {};
+    const std::vector<DWORD> plain(pixels, pixels + count);
+    if (FAILED(render(overlayStyle))) return {};
+    const auto bounds = VisibleBounds(width, height, [&](size_t i) {
+        return ((pixels[i] ^ plain[i]) & 0x00ffffff) != 0;
+    });
+    // A placeholder icon can change while the overlay is loaded asynchronously.
+    if (bounds.right > width / 2 || bounds.top < height / 2) return {};
+    return bounds;
+}
+
+RECT ShortcutOverlayBounds(const unsigned char* image, HDC dc, const RECT& icon) {
+    // DrawItemImage uses this icon cache on the verified Windows.Storage build.
+    auto* cache = *reinterpret_cast<IUnknown* const*>(image + 0x20);
+    const int width = icon.right - icon.left, height = icon.bottom - icon.top;
+    if (!cache || width <= 0 || height <= 0 || width > 1024 || height > 1024) return {};
+    struct Overlay {
+        IUnknown* cache = nullptr;
+        int width = 0;
+        int height = 0;
+        RECT bounds{};
+        ULONGLONG retry = 0;
+        unsigned attempts = 0;
+    };
+    static thread_local std::array<Overlay, 32> sizes;
+    static thread_local size_t nextSize = 0;
+    auto size = std::ranges::find_if(sizes, [&](const auto& entry) {
+        return entry.cache == cache && entry.width == width && entry.height == height;
+    });
+    if (size == sizes.end()) {
+        size = sizes.begin() + nextSize++ % sizes.size();
+        *size = {cache, width, height};
+    }
+    const auto now = GetTickCount64();
+    if (!IsRectEmpty(&size->bounds) || now < size->retry) return size->bounds;
+    auto* item = *reinterpret_cast<IUnknown* const*>(image + 0x28);
+    size->bounds = MeasureShortcutOverlay(cache, item, dc, width, height);
+    if (IsRectEmpty(&size->bounds)) {
+        constexpr DWORD retryDelay = 60;
+        const bool retrySoon = size->attempts < 2;
+        size->retry = now + (retrySoon ? retryDelay : 1000);
+        if (retrySoon) {
+            ++size->attempts;
+            const auto frame = GetActiveWindow();
+            if (WindowHasClass(frame, L"CabinetWClass")) {
+                const auto thread = GetCurrentThreadId();
+                QueueModuleWork([frame, thread] {
+                    Sleep(retryDelay);
+                    if (GetWindowThreadProcessId(frame, nullptr) == thread) {
+                        RedrawWindow(frame, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+                    }
+                });
+            }
+        }
+    }
+    return size->bounds;
+}
+
+bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT& shortcut) {
+    int width = 0, height = 0;
+    if (!images || !dc || IsRectEmpty(&shortcut) || !ImageList_GetIconSize(images, &width, &height)) return false;
+    struct Asset {
+        HIMAGELIST list = nullptr;
+        int width = 0;
+        int height = 0;
+        NavigationPin pin;
+    };
+    static std::mutex mutex;
+    static std::array<Asset, 8> assets;
+    static size_t next = 0;
+    const std::scoped_lock lock(mutex);
+    auto asset = std::ranges::find_if(assets, [&](const auto& entry) {
+        return entry.list == images && entry.width == width && entry.height == height;
+    });
+    if (asset == assets.end()) {
+        asset = assets.begin() + next++ % assets.size();
+        *asset = {images, width, height, LoadNavigationPin(images, dc, width, height)};
+    }
+    const auto& pin = asset->pin;
+    if (!pin.icon) return false;
+    const int extent = std::min(shortcut.right - shortcut.left, shortcut.bottom - shortcut.top);
+    const int nativeExtent = std::max(pin.width, pin.height);
+    const int pinWidth = MulDiv(pin.width, extent, nativeExtent);
+    const int pinHeight = MulDiv(pin.height, extent, nativeExtent);
+    // Reflect the shortcut overlay's edge offsets onto the pin's visible bounds.
+    const int x = icon.right - shortcut.left - pinWidth;
+    const int y = icon.bottom - shortcut.bottom;
+    const auto draw = [&] { return DrawIconEx(dc, x, y, pin.icon.get(), pinWidth, pinHeight, 0, nullptr, DI_NORMAL) != FALSE; };
+    const auto shortcutRight = icon.left + shortcut.right;
+    const auto shortcutTop = icon.top + shortcut.top;
+    if (x >= shortcutRight || y + pinHeight <= shortcutTop) return draw();
+
+    // Keep the shortcut corner intact in the smallest views.
     const auto saved = SaveDC(dc);
     if (!saved) return false;
-    ExcludeClipRect(dc, icon.left, icon.bottom - side / 2, icon.left + side / 2, icon.bottom);
-    const bool painted = ImageList_DrawIndirect(&draw) != FALSE;
+    ExcludeClipRect(dc, icon.left + shortcut.left, shortcutTop, shortcutRight, icon.top + shortcut.bottom);
+    const bool painted = draw();
     RestoreDC(dc, saved);
     return painted;
 }
@@ -1237,7 +1440,11 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon) {
     if (SUCCEEDED(result) && folderView && rect) {
         try {
             const auto path = ItemImagePath(image);
-            if (path && pins.Contains(store, *path)) DrawPinnedIndicator(getImages(dc), dc, *rect);
+            if (path && pins.Contains(store, *path)) {
+                if (const auto images = getImages(dc)) {
+                    DrawPinnedIndicator(images, dc, *rect, ShortcutOverlayBounds(image, dc, *rect));
+                }
+            }
         } catch (...) {
             // Keep the standard icon if a property or pin snapshot is unavailable.
         }
