@@ -295,10 +295,7 @@ void VerifyOrdering(const fs::path& root) {
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     Check(storage ? S_OK : HRESULT_FROM_WIN32(GetLastError()), "load Windows.Storage.dll in the isolated test process");
     const auto native = FindNativeOrdering(storage);
-    if (!native) {
-        std::cout << "SKIP native sort hooks on this Windows.Storage.dll build\n";
-        return;
-    }
+    Require(native.has_value(), "native sort requires a verified Windows.Storage.dll image");
     const auto& store = orderingStore.emplace(root / L"ordering-data" / L"pins.json");
     nativeCompare = native->compare;
     originalSort = InstallTestHook(native->sort, TestSortHook, sortPrologue);
@@ -439,10 +436,7 @@ void VerifyGrouping(const fs::path& root) {
     const auto shell = GetModuleHandleW(L"Shell32.dll");
     const auto grouping = explorer_item_pins::FindNativeGrouping(storage, shell);
     const auto ordering = FindNativeOrdering(storage);
-    if (!grouping || !ordering) {
-        std::cout << "SKIP native grouping hooks on these Windows shell images\n";
-        return;
-    }
+    Require(grouping && ordering, "native grouping requires verified Windows.Storage.dll and Shell32.dll images");
     const auto& store = orderingStore.emplace(root / L"grouping-data" / L"pins.json");
     nativeCompare = ordering->compare;
     originalSort = InstallTestHook(ordering->sort, TestSortHook, sortPrologue);
@@ -593,10 +587,7 @@ void VerifyIndicator(const fs::path& root) {
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     const auto frame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     const auto native = explorer_item_pins::FindNativeIndicator(storage, frame);
-    if (!native) {
-        std::cout << "SKIP native indicator renderer on these Windows shell images\n";
-        return;
-    }
+    Require(native.has_value(), "native indicator requires verified Windows.Storage.dll and ExplorerFrame.dll images");
     const auto& store = orderingStore.emplace(root / L"paint-data" / L"pins.json");
     for (const auto* name : {L"Pinned folder", L"Pinned thumbnail.bmp", L"Pinned shortcut.lnk"}) {
         Require(store.SetPinned(folder, explorer_item_pins::ReadItem(folder / name), true), "persist an indicator fixture pin");

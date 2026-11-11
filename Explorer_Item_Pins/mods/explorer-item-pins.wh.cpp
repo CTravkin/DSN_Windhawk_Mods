@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.1
+// @version         0.6.2
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 7
+// Build: 8
 
 // ==WindhawkModReadme==
 /*
@@ -484,13 +484,14 @@ struct SelectionPin {
 };
 
 // Call off the Explorer UI thread. This reads the store and may scan the folder.
-SelectionPin InspectSelection(const PinStore& store, const ExplorerSelection& selection) {
+SelectionPin InspectSelection(const PinStore& store, const ExplorerSelection& selection, bool needItemIdentity) {
     const auto pins = store.ReadFolder(selection.folder);
     const auto name = selection.item.filename().native();
     const auto exact = std::ranges::find(pins, name, &Item::name);
     if (exact != pins.end()) return {{name, {}}, *exact};
 
-    auto item = ReadItem(selection.item);
+    const bool hasIdentityPin = std::ranges::any_of(pins, [](const Item& pin) { return !pin.identity.empty(); });
+    auto item = needItemIdentity || hasIdentityPin ? ReadItem(selection.item) : Item{name, {}};
     const bool possibleRename = !item.identity.empty() &&
         std::ranges::find(pins, item.identity, &Item::identity) != pins.end();
     const bool possibleCaseMatch = std::ranges::any_of(pins, [&](const Item& pin) {
@@ -526,11 +527,11 @@ SelectionPin InspectSelection(const PinStore& store, const ExplorerSelection& se
 }  // namespace
 
 PinAction GetPinAction(const PinStore& store, const ExplorerSelection& selection) {
-    return InspectSelection(store, selection).stored ? PinAction::Unpin : PinAction::Pin;
+    return InspectSelection(store, selection, false).stored ? PinAction::Unpin : PinAction::Pin;
 }
 
 bool ApplyPinAction(const PinStore& store, const ExplorerSelection& selection, PinAction action) {
-    const auto current = InspectSelection(store, selection);
+    const auto current = InspectSelection(store, selection, action == PinAction::Pin);
     if (action == PinAction::Unpin) {
         return current.stored && store.SetPinned(selection.folder, *current.stored, false);
     }
@@ -1092,6 +1093,15 @@ std::optional<ExplorerSelection> ViewSelection(const ComPtr<IShellView>& shell) 
     return CaptureSingleSelection(*folder.Get());
 }
 
+void RefreshCommandFolder(HWND window, const fs::path& target) {
+    const auto shell = ActiveShellView(window);
+    ComPtr<IFolderView2> view;
+    ComPtr<IPersistFolder2> folder;
+    if (!shell || FAILED(shell.As(&view)) || FAILED(view->GetFolder(IID_PPV_ARGS(&folder)))) return;
+    const auto path = FileSystemFolderPath(*folder.Get());
+    if (path && CompareNames(FolderKey(*path), FolderKey(target)) == CSTR_EQUAL) shell->Refresh();
+}
+
 HWND CommandWindow(const controls::CommandBar& bar) {
     if (!bar.XamlRoot()) return nullptr;
     const auto island = bar.XamlRoot().ContentIslandEnvironment();
@@ -1168,7 +1178,36 @@ bool SameSelection(const ExplorerSelection& left, const ExplorerSelection& right
     return left.folder == right.folder && left.item == right.item;
 }
 
+double NativeIconOpacity(const controls::CommandBar& bar, bool enabled) {
+    for (const auto& commands : {bar.PrimaryCommands(), bar.SecondaryCommands()}) {
+        for (const auto& entry : commands) {
+            const auto button = entry.try_as<controls::AppBarButton>();
+            if (!button || button.Name() == buttonName || button.IsEnabled() != enabled) continue;
+            if (const auto image = button.Icon().try_as<controls::ImageIcon>()) {
+                const auto opacity = image.Opacity();
+                if (enabled || opacity < 1) return opacity;
+            }
+        }
+    }
+    return 1;
+}
+
 struct AttachedPinCommand;
+
+template <typename Job>
+bool QueueCommandWork(Job job) {
+    auto pending = std::make_unique<Job>(std::move(job));
+    auto* context = pending.release();
+    if (TrySubmitThreadpoolCallback([](PTP_CALLBACK_INSTANCE, void* raw) noexcept {
+            std::unique_ptr<Job> work(static_cast<Job*>(raw));
+            const auto apartment = RoInitialize(RO_INIT_MULTITHREADED);
+            try { (*work)(); } catch (...) {}
+            work.reset();
+            if (SUCCEEDED(apartment)) RoUninitialize();
+        }, context, nullptr)) return true;
+    delete context;
+    return false;
+}
 
 struct CommandUi {
     PinStore store;
@@ -1185,71 +1224,140 @@ struct CommandUi {
           stop(CreateEventW(nullptr, TRUE, FALSE, nullptr), CloseHandle) {}
 };
 
-struct AttachedPinCommand {
+struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     std::weak_ptr<CommandUi> owner;
     winrt::weak_ref<controls::CommandBar> bar;
     winrt::weak_ref<controls::AppBarButton> button;
+    winrt::weak_ref<controls::AppBarButton> neighbor;
     ui::Dispatching::DispatcherQueue dispatcher{nullptr};
     ui::Dispatching::DispatcherQueueTimer timer{nullptr};
     winrt::event_token click{};
+    winrt::event_token tick{};
+    winrt::event_token selectionChanged{};
     HWND window = nullptr;
     bool context = false;
     std::optional<ExplorerSelection> selected;
     PinAction action = PinAction::Pin;
     std::optional<xaml::ElementTheme> appliedTheme;
+    controls::IconElement pinIcon{nullptr};
+    controls::IconElement unpinIcon{nullptr};
     ULONGLONG lastRead = 0;
+    uint64_t readGeneration = 0;
+    bool resolving = false;
+    bool writing = false;
+    bool invokeWhenReady = false;
+
+    void Present(bool ready) {
+        const auto state = owner.lock();
+        const auto control = button.get();
+        const auto commandBar = bar.get();
+        if (!state || !state->active || !control || !commandBar) return;
+        const auto theme = commandBar.ActualTheme();
+        const auto title = CommandTitle(action, GetUserDefaultUILanguage());
+        if (appliedTheme != theme) {
+            pinIcon = CommandIcon(PinAction::Pin, theme);
+            unpinIcon = CommandIcon(PinAction::Unpin, theme);
+            appliedTheme = theme;
+        }
+        const auto& icon = action == PinAction::Pin ? pinIcon : unpinIcon;
+        if (!icon) { control.IsEnabled(false); return; }
+        if (control.Label() != title) {
+            control.Label(title);
+            xaml::Automation::AutomationProperties::SetName(control, title);
+            if (!context) controls::ToolTipService::SetToolTip(control, winrt::box_value(winrt::hstring(title)));
+        }
+        const auto opacity = NativeIconOpacity(commandBar, ready);
+        if (icon.Opacity() != opacity) icon.Opacity(opacity);
+        if (control.Icon() != icon) control.Icon(icon);
+        if (control.IsEnabled() != ready) control.IsEnabled(ready);
+    }
+
+    void FinishReading(uint64_t generation, const ExplorerSelection& target, std::optional<PinAction> result) noexcept try {
+        if (generation != readGeneration) return;
+        resolving = false;
+        const auto state = owner.lock();
+        if (!state || !state->active || writing) return;
+        const auto current = ViewSelection(ActiveShellView(window));
+        if (!current || !SameSelection(*current, target)) {
+            if (!context) Update(true);
+            return;
+        }
+        if (result) action = *result;
+        lastRead = result ? GetTickCount64() : 0;
+        Present(result.has_value());
+        if (std::exchange(invokeWhenReady, false) && result) Invoke();
+    } catch (...) {}
 
     void Update(bool force = false) noexcept try {
         const auto state = owner.lock();
         const auto control = button.get();
         if (!state || !state->active || !control) return;
         auto next = ViewSelection(ActiveShellView(window));
-        const auto commandBar = bar.get();
-        if (!commandBar) return;
-        const auto theme = commandBar.ActualTheme();
-        const auto now = GetTickCount64();
-        const bool sameSelection = (!selected && !next) || (selected && next && SameSelection(*selected, *next));
-        if (!force && appliedTheme == theme && sameSelection && (!next || now - lastRead < 1000)) return;
-        const auto nextAction = next ? GetPinAction(state->store, *next) : PinAction::Pin;
-        lastRead = now;
-        if (!force && appliedTheme == theme && sameSelection && nextAction == action) return;
-        const auto title = CommandTitle(nextAction, GetUserDefaultUILanguage());
-        const auto icon = CommandIcon(nextAction, theme);
-        if (!icon) {
-            control.IsEnabled(false);
-            return;
+        const bool same = next && selected && SameSelection(*selected, *next);
+        if (!same) {
+            selected = next;
+            lastRead = 0;
+            invokeWhenReady = false;
         }
-        control.Label(title);
-        xaml::Automation::AutomationProperties::SetName(control, title);
-        controls::ToolTipService::SetToolTip(control, winrt::box_value(winrt::hstring(title)));
-        control.Icon(icon);
-        control.IsEnabled(next.has_value());
-        action = nextAction;
-        selected = std::move(next);
-        appliedTheme = theme;
+        Present(next.has_value() && (lastRead != 0 || (!context && control.IsEnabled())));
+        if (!next || resolving || writing || (!force && lastRead && GetTickCount64() - lastRead < 1000)) return;
+        resolving = QueueCommandWork([state, weak = weak_from_this(), queue = dispatcher,
+                                      generation = ++readGeneration, target = std::move(*next)] {
+            if (!state->active) return;
+            std::optional<PinAction> result;
+            try { result = GetPinAction(state->store, target); } catch (...) {}
+            queue.TryEnqueue([weak, generation, target, result] {
+                if (const auto command = weak.lock()) command->FinishReading(generation, target, result);
+            });
+        });
     } catch (...) {
         try { if (const auto control = button.get()) control.IsEnabled(false); } catch (...) {}
     }
 
     void Invoke() noexcept try {
         const auto state = owner.lock();
-        if (!state || !state->active) return;
-        const auto view = ActiveShellView(window);
-        const auto current = ViewSelection(view);
+        if (!state || !state->active || writing) return;
+        const auto current = ViewSelection(ActiveShellView(window));
         if (!current || !selected || !SameSelection(*current, *selected)) {
             if (!context) Update(true);
             return;
         }
-        if (ApplyPinAction(state->store, *current, action)) {
-            indicatorPins.Invalidate();
-            view->Refresh();
-            SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, current->folder.c_str(), nullptr);
+        if (!lastRead) {
+            if (resolving) invokeWhenReady = true;
+            return;
         }
-        Update(true);
+        writing = QueueCommandWork([state, weak = weak_from_this(), queue = dispatcher, target = *current,
+                                    window = window, action = action] {
+            if (!state->active) return;
+            bool changed = false;
+            try { changed = ApplyPinAction(state->store, target, action); } catch (...) {}
+            if (changed) {
+                indicatorPins.Invalidate();
+                SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, target.folder.c_str(), nullptr);
+            }
+            queue.TryEnqueue([state, weak, window, folder = target.folder, changed]() noexcept {
+                if (!state->active) return;
+                try { if (changed) RefreshCommandFolder(window, folder); } catch (...) {}
+                if (const auto command = weak.lock()) {
+                    command->writing = false;
+                    command->lastRead = 0;
+                    command->Update(true);
+                }
+            });
+        });
+        if (writing) {
+            ++readGeneration;
+            resolving = false;
+        }
     } catch (...) {}
 
     void Remove() noexcept try {
-        if (timer) timer.Stop();
+        if (const auto anchor = neighbor.get()) anchor.IsEnabledChanged(selectionChanged);
+        if (timer) {
+            timer.Stop();
+            timer.Tick(tick);
+            timer = nullptr;
+        }
         const auto control = button.get();
         const auto commandBar = bar.get();
         if (!control || !commandBar) return;
@@ -1264,8 +1372,8 @@ struct AttachedPinCommand {
 void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::CommandBar& bar, bool context) noexcept try {
     if (!state->active || (context ? !state->context : !state->toolbar)) return;
     for (const auto& commands : {bar.PrimaryCommands(), bar.SecondaryCommands()}) {
-        for (const auto& command : commands) {
-            const auto element = command.try_as<controls::AppBarButton>();
+        for (uint32_t i = 0; i < commands.Size(); ++i) {
+            const auto element = commands.GetAt(i).try_as<controls::AppBarButton>();
             if (element && element.Name() == buttonName) {
                 std::shared_ptr<AttachedPinCommand> binding;
                 {
@@ -1275,8 +1383,13 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
                     });
                     if (found != state->buttons.end()) binding = *found;
                 }
-                if (binding) binding->Update(true);
-                return;
+                if (binding) {
+                    binding->Update(true);
+                    return;
+                }
+                // A previous settings load can still be removing its button.
+                commands.RemoveAt(i);
+                break;
             }
         }
     }
@@ -1308,17 +1421,26 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
     command->dispatcher = bar.DispatcherQueue();
     command->window = window;
     command->context = context;
+    control.IsEnabled(false);
     command->Update(true);
-    if (!command->appliedTheme || (context && !command->selected)) return;
+    if (!control.Icon() || (context && !command->selected)) return;
     const std::weak_ptr<AttachedPinCommand> weak = command;
     command->click = control.Click([weak](auto const&, auto const&) { if (const auto item = weak.lock()) item->Invoke(); });
     placement->items.InsertAt(placement->index, control);
 
     if (!context) {
+        command->neighbor = winrt::make_weak(native);
+        command->selectionChanged = native.IsEnabledChanged([weak](auto const&, auto const&) {
+            if (const auto item = weak.lock()) {
+                item->dispatcher.TryEnqueue([weak] {
+                    if (const auto command = weak.lock()) command->Update();
+                });
+            }
+        });
         command->timer = command->dispatcher.CreateTimer();
         command->timer.Interval(std::chrono::milliseconds(300));
         command->timer.IsRepeating(true);
-        command->timer.Tick([weak](auto const& timer, auto const&) {
+        command->tick = command->timer.Tick([weak](auto const& timer, auto const&) {
             const auto item = weak.lock();
             if (!item || !item->button.get()) { timer.Stop(); return; }
             if (GetAncestor(GetForegroundWindow(), GA_ROOTOWNER) == item->window) item->Update();
@@ -1420,8 +1542,6 @@ void WatchCommandTree(TreeConnection& connection) {
         const std::scoped_lock lock(connection.state->mutex);
         buttons.swap(connection.state->buttons);
     }
-    // The diagnostics connection owns a reference to this DLL. Cleanup can
-    // run on each window's dispatcher even after Windhawk disables the hooks.
     for (const auto& button : buttons) {
         try { button->dispatcher.TryEnqueue([button] { button->Remove(); }); } catch (...) {}
     }
@@ -1461,6 +1581,11 @@ struct CommandTapFactory : winrt::implements<CommandTapFactory, IClassFactory> {
     HRESULT STDMETHODCALLTYPE CreateInstance(IUnknown* outer, REFIID iid, void** value) noexcept override try {
         *value = nullptr;
         if (outer) return CLASS_E_NOAGGREGATION;
+        // WinUI may release its TAP or queued delegates after Windhawk
+        // unloads the mod. Their code must remain mapped until Explorer exits.
+        HMODULE module = nullptr;
+        if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_PIN,
+                                reinterpret_cast<PCWSTR>(&commandUi), &module)) return HRESULT_FROM_WIN32(GetLastError());
         return winrt::make<CommandTapSite>().as(iid, value);
     } catch (...) { return winrt::to_hresult(); }
 
@@ -1615,7 +1740,10 @@ BOOL Wh_ModInit() {
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
     const auto native = FindNativeOrdering(storage);
     const auto grouping = FindNativeGrouping(storage, GetModuleHandleW(L"Shell32.dll"));
-    if (!native || !grouping) return FALSE;
+    if (!native || !grouping) {
+        Wh_Log(L"Explorer Item Pins requires verified Windows.Storage.dll and Shell32.dll images");
+        return FALSE;
+    }
 
     try {
         nativePinStore.emplace(PinStore::DefaultPath());
