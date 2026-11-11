@@ -526,6 +526,7 @@ IconPixels SampleIcon(HDC dc, const RECT& rect) {
 IconPixels stockIcon;
 std::map<std::wstring, bool> paintedIcons;
 bool shortcutCornerPreserved = true;
+HIMAGELIST indicatorImages = nullptr;
 
 HRESULT ObserveStockImage(const unsigned char* image, HDC dc, const RECT* rect) {
     const auto result = nativeDrawImage(image, dc, rect);
@@ -539,7 +540,7 @@ HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
     const auto path = explorer_item_pins::ItemImagePath(image);
     if (!path) return nativeDrawImage(image, dc, rect);
     const auto result = explorer_item_pins::DrawWithIndicator(*orderingStore, indicatorFixture, ObserveStockImage,
-                                                              image, dc, rect, indicatorOn);
+                                                              image, dc, rect, indicatorOn, [](HDC) { return indicatorImages; });
     const auto output = SampleIcon(dc, *rect);
     const auto name = path->filename().native();
     if (name == L"Pinned shortcut.lnk") shortcutCornerPreserved &= stockIcon.left == output.left;
@@ -596,6 +597,26 @@ void VerifyIndicator(const fs::path& root) {
     WaitUntil([&] { return indicatorFixture.Contains(store, bitmap); }, "load the indicator snapshot off the paint thread");
     Require(indicatorFixture.Cached(bitmap) == true && indicatorFixture.Cached(folder / L"Ordinary.txt") == false,
             "use one snapshot for actions on both pinned and ordinary items");
+    const std::unique_ptr<std::remove_pointer_t<HIMAGELIST>, decltype(&ImageList_Destroy)>
+        images(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 0), ImageList_Destroy);
+    Require(images != nullptr, "create an isolated state image list");
+    BITMAPINFO stateImage{};
+    stateImage.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    stateImage.bmiHeader.biWidth = 16;
+    stateImage.bmiHeader.biHeight = -16;
+    stateImage.bmiHeader.biPlanes = 1;
+    stateImage.bmiHeader.biBitCount = 32;
+    void* buffer = nullptr;
+    const auto stateBitmap = CreateDIBSection(nullptr, &stateImage, DIB_RGB_COLORS, &buffer, nullptr, 0);
+    Require(stateBitmap && buffer, "create a test state bitmap");
+    auto* pixels = static_cast<DWORD*>(buffer);
+    std::fill_n(pixels, 256, 0u);
+    const auto emptyIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
+    for (int y = 2; y < 8; ++y) std::fill_n(pixels + y * 16 + 8, 6, 0xffe600d8u);
+    const auto pinIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
+    DeleteObject(stateBitmap);
+    Require(emptyIndex == 0 && pinIndex == 1, "only the stock state index should draw a visible badge");
+    indicatorImages = images.get();
     constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
     nativePaintCaller = native->folderViewCaller;
     nativeDrawImage = InstallTestHook(native->draw, TestItemImage, draw);
@@ -624,9 +645,15 @@ void VerifyIndicator(const fs::path& root) {
             const auto rendered = PrintWindow(window, dc, 2);
             capturePaint = false;
             Require(rendered && paintedIcons.size() == 4, "paint each fixture image in the native layout");
-            Require(!paintedIcons[L"Ordinary.txt"] && paintedIcons[L"Pinned folder"] == enabled &&
-                    paintedIcons[L"Pinned thumbnail.bmp"] == enabled && paintedIcons[L"Pinned shortcut.lnk"] == enabled &&
-                    shortcutCornerPreserved, "draw only pinned top corners and preserve the shortcut overlay corner");
+            if (paintedIcons[L"Ordinary.txt"] || paintedIcons[L"Pinned folder"] != enabled ||
+                paintedIcons[L"Pinned thumbnail.bmp"] != enabled || paintedIcons[L"Pinned shortcut.lnk"] != enabled ||
+                !shortcutCornerPreserved) {
+                std::cerr << "Layout " << layout.mode << " size " << layout.size << " enabled " << enabled
+                          << " ordinary " << paintedIcons[L"Ordinary.txt"] << " folder " << paintedIcons[L"Pinned folder"]
+                          << " thumbnail " << paintedIcons[L"Pinned thumbnail.bmp"] << " shortcut "
+                          << paintedIcons[L"Pinned shortcut.lnk"] << " corner " << shortcutCornerPreserved << '\n';
+                throw std::runtime_error("draw only pinned top corners and preserve the shortcut overlay corner");
+            }
             ++verified;
         }
     }

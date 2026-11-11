@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.5
+// @version         0.6.6
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
-// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
+// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 11
+// Build: 12
 
 // ==WindhawkModReadme==
 /*
@@ -52,6 +52,7 @@ folders to the top of their parent folder in File Explorer.
 // ==/WindhawkModSettings==
 
 #include <windows.h>
+#include <commctrl.h>
 #include <roapi.h>
 #include <shlobj.h>
 #include <shlwapi.h>
@@ -91,6 +92,7 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.Primitives.h>
 #include <winrt/Microsoft.UI.Xaml.Data.h>
+#include <winrt/Microsoft.UI.Xaml.Media.h>
 #include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
 #include <atomic>
 #endif
@@ -175,36 +177,38 @@ void CheckItem(const Item& item) {
     }
 }
 
-std::optional<std::string> ReadFileBytes(const fs::path& path) {
+FileHandle OpenPinFile(const fs::path& path) {
     const HANDLE raw = CreateFileW(path.c_str(), GENERIC_READ,
                                    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
                                    nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (raw == INVALID_HANDLE_VALUE) {
         const DWORD error = GetLastError();
-        if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND) return std::nullopt;
+        if (error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND) return FileHandle(nullptr, CloseHandle);
         FileError(error, "Open pin store");
     }
-    const FileHandle file(raw, CloseHandle);
+    return FileHandle(raw, CloseHandle);
+}
+
+std::string ReadFileBytes(HANDLE file) {
     LARGE_INTEGER size{};
-    if (!GetFileSizeEx(file.get(), &size)) FileError(GetLastError(), "Size pin store");
+    if (!GetFileSizeEx(file, &size)) FileError(GetLastError(), "Size pin store");
     if (size.QuadPart <= 0 || size.QuadPart > static_cast<LONGLONG>(maxStoreBytes)) {
         throw std::runtime_error("Invalid pin store size");
     }
     std::string bytes(static_cast<size_t>(size.QuadPart), '\0');
     DWORD count = 0;
-    if (!ReadFile(file.get(), bytes.data(), static_cast<DWORD>(bytes.size()), &count, nullptr)) {
+    if (!ReadFile(file, bytes.data(), static_cast<DWORD>(bytes.size()), &count, nullptr)) {
         FileError(GetLastError(), "Read pin store");
     }
     if (count != bytes.size()) throw std::runtime_error("Incomplete pin store read");
     return bytes;
 }
 
-Folders ReadFolders(const fs::path& path) {
-    const auto bytes = ReadFileBytes(path);
-    if (!bytes) return {};
+Folders ParseFolders(HANDLE file) {
+    const auto bytes = ReadFileBytes(file);
     try {
         const JsonApartment apartment;
-        const auto root = JsonFactory<JsonObject, IJsonObjectStatics>().Parse(winrt::to_hstring(*bytes));
+        const auto root = JsonFactory<JsonObject, IJsonObjectStatics>().Parse(winrt::to_hstring(bytes));
         if (root.GetNamedNumber(L"version") != formatVersion) {
             throw std::runtime_error("Unsupported pin store version");
         }
@@ -230,6 +234,11 @@ Folders ReadFolders(const fs::path& path) {
     } catch (const winrt::hresult_error&) {
         throw std::runtime_error("Cannot parse pin store JSON");
     }
+}
+
+Folders ReadFolders(const fs::path& path) {
+    const auto file = OpenPinFile(path);
+    return file ? ParseFolders(file.get()) : Folders{};
 }
 
 std::string WriteJson(const Folders& folders) {
@@ -302,8 +311,13 @@ void ReplacePinFile(const fs::path& path, std::string_view bytes) {
         if (written != bytes.size()) throw std::runtime_error("Incomplete pin store write");
         if (!FlushFileBuffers(file.get())) FileError(GetLastError(), "Flush temporary pin store");
         file.reset();
-        if (!MoveFileExW(temporary.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) {
-            FileError(GetLastError(), "Replace pin store");
+        for (DWORD delay = 5;; delay *= 2) {
+            if (MoveFileExW(temporary.c_str(), path.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) break;
+            const auto error = GetLastError();
+            if (delay > 80 || (error != ERROR_ACCESS_DENIED && error != ERROR_SHARING_VIOLATION &&
+                              error != ERROR_LOCK_VIOLATION)) FileError(error, "Replace pin store");
+            // Another process may still hold a read handle to the old snapshot.
+            Sleep(delay);
         }
     } catch (...) {
         file.reset();
@@ -356,9 +370,26 @@ public:
 
     std::vector<Item> ReadFolder(const fs::path& folder) const {
         const auto key = FolderKey(folder);
-        auto data = ReadFolders(path_);
-        const auto found = data.find(key);
-        return found != data.end() ? std::move(found->second) : std::vector<Item>{};
+        const auto file = OpenPinFile(path_);
+        if (!file) return {};
+        const auto lookup = [&](const Folders& folders) {
+            const auto found = folders.find(key);
+            return found != folders.end() ? found->second : std::vector<Item>{};
+        };
+        BY_HANDLE_FILE_INFORMATION info{};
+        if (!GetFileInformationByHandle(file.get(), &info)) return lookup(ParseFolders(file.get()));
+        const FileVersion version{info.dwVolumeSerialNumber, info.nFileIndexHigh, info.nFileIndexLow,
+                                  info.ftLastWriteTime.dwHighDateTime, info.ftLastWriteTime.dwLowDateTime,
+                                  info.nFileSizeHigh, info.nFileSizeLow};
+        {
+            const std::scoped_lock lock(cache_->mutex);
+            if (cache_->version == version) return lookup(cache_->folders);
+        }
+        auto folders = ParseFolders(file.get());
+        const std::scoped_lock lock(cache_->mutex);
+        cache_->folders = std::move(folders);
+        cache_->version = version;
+        return lookup(cache_->folders);
     }
 
     bool SetPinned(const fs::path& folder, const Item& item, bool pinned) const {
@@ -386,7 +417,19 @@ public:
     }
 
 private:
+    struct FileVersion {
+        DWORD volume, indexHigh, indexLow, writeHigh, writeLow, sizeHigh, sizeLow;
+        bool operator==(const FileVersion&) const = default;
+    };
+
+    struct ReadCache {
+        std::mutex mutex;
+        std::optional<FileVersion> version;
+        Folders folders;
+    };
+
     fs::path path_;
+    std::shared_ptr<ReadCache> cache_ = std::make_shared<ReadCache>();
 };
 
 // Resolves one visible item per stored pin. Reserve names for all pins before
@@ -1118,41 +1161,83 @@ std::optional<fs::path> ItemImagePath(const unsigned char* image) {
     return fs::path(path.pwszVal);
 }
 
-bool DrawPinnedIndicator(HDC dc, const RECT& icon) {
+bool WindowHasClass(HWND window, PCWSTR expected) {
+    wchar_t name[32]{};
+    return GetClassNameW(window, name, ARRAYSIZE(name)) && std::wstring_view(name) == expected;
+}
+
+[[maybe_unused]] HIMAGELIST NavigationPinImages(HDC dc) {
+    struct NavigationTree {
+        HWND frame = nullptr;
+        HWND tree = nullptr;
+    };
+    static thread_local NavigationTree last;
+
+    auto frame = GetAncestor(WindowFromDC(dc), GA_ROOT);
+    if (!WindowHasClass(frame, L"CabinetWClass")) frame = GetActiveWindow();
+    if (!WindowHasClass(frame, L"CabinetWClass")) {
+        frame = nullptr;
+        EnumThreadWindows(GetCurrentThreadId(), [](HWND candidate, LPARAM output) -> BOOL {
+            if (!IsWindowVisible(candidate) || !WindowHasClass(candidate, L"CabinetWClass")) return TRUE;
+            *reinterpret_cast<HWND*>(output) = candidate;
+            return FALSE;
+        }, reinterpret_cast<LPARAM>(&frame));
+    }
+    if (!frame || GetWindowThreadProcessId(frame, nullptr) != GetCurrentThreadId()) return nullptr;
+    if (last.frame != frame || !last.tree || !IsChild(frame, last.tree)) {
+        last = {frame, nullptr};
+        EnumChildWindows(frame, [](HWND child, LPARAM output) -> BOOL {
+            if (!WindowHasClass(child, WC_TREEVIEWW) ||
+                !WindowHasClass(GetParent(child), L"NamespaceTreeControl")) return TRUE;
+            *reinterpret_cast<HWND*>(output) = child;
+            return FALSE;
+        }, reinterpret_cast<LPARAM>(&last.tree));
+    }
+    return last.tree ? TreeView_GetImageList(last.tree, TVSIL_STATE) : nullptr;
+}
+
+bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon) {
     const LONG side = std::min(icon.right - icon.left, icon.bottom - icon.top);
-    if (!dc || side < 12) return false;
-    const LONG size = std::clamp(side / 3 + 4, 9L, 16L);
+    int width = 0, height = 0;
+    if (!images || !dc || side < 12 || !ImageList_GetIconSize(images, &width, &height)) return false;
+    const int extent = static_cast<int>(side * 3 / 4);
+    const int nativeExtent = std::max(width, height);
+    if (nativeExtent > extent) {
+        width = MulDiv(width, extent, nativeExtent);
+        height = MulDiv(height, extent, nativeExtent);
+    }
+    IMAGELISTDRAWPARAMS draw{};
+    draw.cbSize = sizeof(draw);
+    draw.himl = images;
+    draw.i = 1; // Explorer's normal pinned state in NamespaceTreeControl.
+    draw.hdcDst = dc;
+    draw.x = icon.right - width;
+    draw.y = icon.top;
+    draw.cx = width;
+    draw.cy = height;
+    draw.rgbBk = CLR_NONE;
+    draw.fStyle = ILD_TRANSPARENT | ILD_SCALE;
+    if (width <= (icon.right - icon.left) / 2 || height <= (icon.bottom - icon.top) / 2) {
+        return ImageList_DrawIndirect(&draw) != FALSE;
+    }
+
+    // In the smallest views the state-image cell reaches the shortcut corner.
     const auto saved = SaveDC(dc);
     if (!saved) return false;
-
-    LOGFONTW style{};
-    style.lfHeight = -size;
-    style.lfQuality = ANTIALIASED_QUALITY;
-    wcscpy_s(style.lfFaceName, L"Segoe Fluent Icons");
-    const HFONT font = CreateFontIndirectW(&style);
-    bool drawn = false;
-    if (font && SelectObject(dc, font)) {
-        SetBkMode(dc, TRANSPARENT);
-        HIGHCONTRASTW contrast{};
-        contrast.cbSize = sizeof(contrast);
-        const bool highContrast = SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
-                                  (contrast.dwFlags & HCF_HIGHCONTRASTON);
-        SetTextColor(dc, GetSysColor(highContrast ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT));
-        RECT area{icon.right - size, icon.top, icon.right, icon.top + size};
-        drawn = DrawTextW(dc, L"\uE842", 1, &area, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX) != 0;
-    }
+    ExcludeClipRect(dc, icon.left, icon.bottom - side / 2, icon.left + side / 2, icon.bottom);
+    const bool painted = ImageList_DrawIndirect(&draw) != FALSE;
     RestoreDC(dc, saved);
-    if (font) DeleteObject(font);
-    return drawn;
+    return painted;
 }
 
 [[maybe_unused]] HRESULT DrawWithIndicator(const PinStore& store, IndicatorPins& pins, DrawItemImage original,
-                                           const unsigned char* image, HDC dc, const RECT* rect, bool folderView) {
+                                           const unsigned char* image, HDC dc, const RECT* rect, bool folderView,
+                                           HIMAGELIST (*getImages)(HDC) = NavigationPinImages) {
     const auto result = original(image, dc, rect);
     if (SUCCEEDED(result) && folderView && rect) {
         try {
             const auto path = ItemImagePath(image);
-            if (path && pins.Contains(store, *path)) DrawPinnedIndicator(dc, *rect);
+            if (path && pins.Contains(store, *path)) DrawPinnedIndicator(getImages(dc), dc, *rect);
         } catch (...) {
             // Keep the standard icon if a property or pin snapshot is unavailable.
         }
@@ -1162,6 +1247,9 @@ bool DrawPinnedIndicator(HDC dc, const RECT& icon) {
 
 #if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
 IndicatorPins indicatorPins;
+#ifdef WH_MOD
+std::optional<PinStore> nativePinStore;
+#endif
 
 namespace ui = winrt::Microsoft::UI;
 namespace xaml = ui::Xaml;
@@ -1175,7 +1263,7 @@ constexpr wchar_t buttonName[] = L"ExplorerItemPinsAction";
 PCWSTR CommandTitle(PinAction action, LANGID language) {
     const bool pin = action == PinAction::Pin;
     switch (PRIMARYLANGID(language)) {
-        case LANG_RUSSIAN: return pin ? L"Закрепить в области объектов" : L"Открепить из области объектов";
+        case LANG_RUSSIAN: return pin ? L"Закрепить в области объектов" : L"Открепить в области объектов";
         case LANG_SPANISH: return pin ? L"Anclar en el panel de elementos" : L"Desanclar del panel de elementos";
         case LANG_GERMAN: return pin ? L"Im Elementbereich anheften" : L"Vom Elementbereich lösen";
         case LANG_PORTUGUESE:
@@ -1344,6 +1432,22 @@ double NativeIconOpacity(const controls::CommandBar& bar, bool enabled) {
 
 struct AttachedPinCommand;
 
+void CloseContextMenu(const controls::CommandBar& bar) noexcept try {
+    if (!bar) return;
+    const auto root = bar.XamlRoot();
+    if (!root) return;
+    using xaml::Media::VisualTreeHelper;
+    const auto popups = VisualTreeHelper::GetOpenPopupsForXamlRoot(root);
+    for (auto node = xaml::DependencyObject(bar); node; node = VisualTreeHelper::GetParent(node)) {
+        for (const auto& popup : popups) {
+            if (popup.Child() == node) {
+                popup.IsOpen(false);
+                return;
+            }
+        }
+    }
+} catch (...) {}
+
 struct ViewSelectionEvents : winrt::implements<ViewSelectionEvents, DShellFolderViewEvents> {
     std::weak_ptr<AttachedPinCommand> command;
 
@@ -1371,8 +1475,8 @@ struct CommandUi {
     std::mutex mutex;
     std::vector<std::shared_ptr<AttachedPinCommand>> buttons;
 
-    CommandUi(fs::path path, bool menu, bool bar)
-        : store(std::move(path)), context(menu), toolbar(bar),
+    CommandUi(PinStore pins, bool menu, bool bar)
+        : store(std::move(pins)), context(menu), toolbar(bar),
           stop(CreateEventW(nullptr, TRUE, FALSE, nullptr), CloseHandle) {}
 };
 
@@ -1386,6 +1490,7 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     winrt::event_token click{};
     winrt::event_token tick{};
     winrt::event_token selectionChanged{};
+    winrt::event_token themeChanged{};
     HWND window = nullptr;
     HWND observedView = nullptr;
     winrt::agile_ref<IConnectionPoint> selectionEvents;
@@ -1519,6 +1624,7 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
             if (!context) Update(true);
             return;
         }
+        if (context) CloseContextMenu(bar.get());
         writing = QueueModuleWork([state, weak = weak_from_this(), queue = dispatcher, target = *current,
                                     window = window, action = action] {
             if (!state->active) return;
@@ -1547,6 +1653,9 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     void Remove() noexcept try {
         StopObservingSelection();
         if (const auto anchor = neighbor.get()) anchor.IsEnabledChanged(selectionChanged);
+        if (!context) {
+            if (const auto commandBar = bar.get()) commandBar.ActualThemeChanged(themeChanged);
+        }
         if (timer) {
             timer.Stop();
             timer.Tick(tick);
@@ -1633,13 +1742,17 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
                 });
             }
         });
+        command->themeChanged = bar.ActualThemeChanged([weak](auto const&, auto const&) {
+            if (const auto item = weak.lock()) item->Update();
+        });
         command->timer = command->dispatcher.CreateTimer();
-        command->timer.Interval(std::chrono::milliseconds(300));
+        command->timer.Interval(std::chrono::seconds(1));
         command->timer.IsRepeating(true);
         command->tick = command->timer.Tick([weak](auto const& timer, auto const&) {
             const auto item = weak.lock();
             if (!item || !item->button.get()) { timer.Stop(); return; }
-            if (GetAncestor(GetForegroundWindow(), GA_ROOTOWNER) == item->window) item->Update();
+            if (GetAncestor(GetForegroundWindow(), GA_ROOTOWNER) == item->window &&
+                (item->selected || !item->selectionCookie || !IsWindowVisible(item->observedView))) item->Update();
         });
         command->timer.Start();
     }
@@ -1757,7 +1870,7 @@ struct CommandTapSite : winrt::implements<CommandTapSite, IObjectWithSite> {
             BSTR input = nullptr;
             if (SUCCEEDED(diagnostics->GetInitializationData(&input)) && input) {
                 const std::unique_ptr<wchar_t, decltype(&SysFreeString)> path(input, SysFreeString);
-                commandUi = std::make_shared<CommandUi>(fs::path(path.get()), true, true);
+                commandUi = std::make_shared<CommandUi>(PinStore(fs::path(path.get())), true, true);
             }
 #endif
             state = commandUi;
@@ -1789,33 +1902,61 @@ struct CommandTapFactory : winrt::implements<CommandTapFactory, IClassFactory> {
 };
 
 #ifdef WH_MOD
+void CALLBACK ExplorerWindowShown(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {}
+
+bool HasExplorerWindow() {
+    bool found = false;
+    EnumWindows([](HWND window, LPARAM output) -> BOOL {
+        DWORD process = 0;
+        GetWindowThreadProcessId(window, &process);
+        if (process != GetCurrentProcessId() || !IsWindowVisible(window) ||
+            !WindowHasClass(window, L"CabinetWClass")) return TRUE;
+        *reinterpret_cast<bool*>(output) = true;
+        return FALSE;
+    }, reinterpret_cast<LPARAM>(&found));
+    return found;
+}
+
 void ConnectCommandTree(std::shared_ptr<CommandUi>& state) {
     HMODULE self = nullptr;
     wchar_t path[MAX_PATH]{};
     if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                             reinterpret_cast<PCWSTR>(ConnectCommandTree), &self) ||
         !GetModuleFileNameW(self, path, ARRAYSIZE(path))) return;
+    const std::unique_ptr<std::remove_pointer_t<HWINEVENTHOOK>, decltype(&UnhookWinEvent)> windowEvents(
+        SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr, ExplorerWindowShown, GetCurrentProcessId(),
+                        0, WINEVENT_OUTOFCONTEXT), UnhookWinEvent);
+    const auto stop = state->stop.get();
     while (state->active) {
-        const auto framework = GetModuleHandleW(L"Microsoft.Internal.FrameworkUdk.dll");
-        const auto initialize = framework ? reinterpret_cast<decltype(&InitializeXamlDiagnosticsEx)>(
-            GetProcAddress(framework, "InitializeXamlDiagnosticsEx")) : nullptr;
-        if (initialize) {
-            for (unsigned i = 1; i <= 128 && state->active; ++i) {
-                wchar_t endpoint[64]{};
-                swprintf_s(endpoint, L"WinUIVisualDiagConnection%u", i);
-                const auto result = initialize(endpoint, GetCurrentProcessId(), L"", path, commandsTap, nullptr);
-                if (result != HRESULT_FROM_WIN32(ERROR_NOT_FOUND)) return;
+        const bool hasWindow = HasExplorerWindow();
+        if (hasWindow) {
+            const auto framework = GetModuleHandleW(L"Microsoft.Internal.FrameworkUdk.dll");
+            const auto initialize = framework ? reinterpret_cast<decltype(&InitializeXamlDiagnosticsEx)>(
+                GetProcAddress(framework, "InitializeXamlDiagnosticsEx")) : nullptr;
+            if (initialize) {
+                for (unsigned i = 1; i <= 128 && state->active; ++i) {
+                    wchar_t endpoint[64]{};
+                    swprintf_s(endpoint, L"WinUIVisualDiagConnection%u", i);
+                    const auto result = initialize(endpoint, GetCurrentProcessId(), L"", path, commandsTap, nullptr);
+                    if (result != HRESULT_FROM_WIN32(ERROR_NOT_FOUND)) return;
+                }
             }
         }
-        if (WaitForSingleObject(state->stop.get(), 500) == WAIT_OBJECT_0) return;
+        const DWORD timeout = hasWindow ? 500 : (windowEvents ? INFINITE : 1000);
+        const auto result = MsgWaitForMultipleObjectsEx(1, &stop, timeout, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+        if (result == WAIT_OBJECT_0 || result == WAIT_FAILED) return;
+        if (result == WAIT_OBJECT_0 + 1) {
+            MSG message{};
+            while (state->active && PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) DispatchMessageW(&message);
+        }
     }
 }
 
 void StartNativeCommands() noexcept try {
     const bool menu = Wh_GetIntSetting(L"contextMenu") != 0;
     const bool bar = Wh_GetIntSetting(L"commandBar") != 0;
-    if (!menu && !bar) return;
-    auto state = std::make_shared<CommandUi>(PinStore::DefaultPath(), menu, bar);
+    if ((!menu && !bar) || !nativePinStore) return;
+    auto state = std::make_shared<CommandUi>(*nativePinStore, menu, bar);
     if (!state->stop) return;
     {
         const std::scoped_lock lock(commandUiMutex);
@@ -1839,7 +1980,6 @@ void StopNativeCommands() noexcept {
 #endif
 
 #ifdef WH_MOD
-std::optional<PinStore> nativePinStore;
 SortViewBatch nativeSortOriginal = nullptr;
 CompareViewItems nativeCompare = nullptr;
 NativeGrouping nativeGrouping{};

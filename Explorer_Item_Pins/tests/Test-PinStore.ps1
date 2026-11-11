@@ -24,14 +24,20 @@ $startEvent = [Threading.EventWaitHandle]::new($false, [Threading.EventResetMode
 try {
     $quotedDatabase = '"{0}"' -f $database
     $writers = for ($i = 0; $i -lt $writerCount; ++$i) {
-        Start-Process -FilePath $exe -ArgumentList @('write', $quotedDatabase, $i, $eventName) -WindowStyle Hidden -PassThru
+        $errors = Join-Path $work "writer-$i.err"
+        $process = Start-Process -FilePath $exe -ArgumentList @('write', $quotedDatabase, $i, $eventName) -WindowStyle Hidden -RedirectStandardError $errors -PassThru
+        [pscustomobject]@{ Process = $process; Errors = $errors }
     }
-    $reader = Start-Process -FilePath $exe -ArgumentList @('read', $quotedDatabase, $eventName) -WindowStyle Hidden -PassThru
+    $errors = Join-Path $work 'reader.err'
+    $process = Start-Process -FilePath $exe -ArgumentList @('read', $quotedDatabase, $eventName) -WindowStyle Hidden -RedirectStandardError $errors -PassThru
+    $reader = [pscustomobject]@{ Process = $process; Errors = $errors }
     [void]$startEvent.Set()
-    foreach ($process in @($writers) + $reader) {
-        if (-not $process.WaitForExit(15000) -or $process.ExitCode -ne 0) {
-            throw "Concurrent process $($process.Id) failed"
-        }
+    foreach ($child in @($writers) + $reader) {
+        $process = $child.Process
+        if (-not $process.WaitForExit(15000)) { throw "Concurrent process $($process.Id) timed out" }
+        if ($process.ExitCode -eq 0) { continue }
+        $detail = ([string](Get-Content -Raw -LiteralPath $child.Errors)).Trim()
+        throw "Concurrent process $($process.Id) exited with code $($process.ExitCode). $detail"
     }
 } finally {
     $startEvent.Dispose()
