@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.2
+// @version         0.6.3
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 8
+// Build: 9
 
 // ==WindhawkModReadme==
 /*
@@ -941,6 +941,30 @@ struct NativeIndicator {
     return NativeIndicator{reinterpret_cast<DrawItemImage>(image + draw), frontend + caller};
 }
 
+template <typename Job>
+bool QueueModuleWork(Job job) {
+    struct Work {
+        HMODULE module = nullptr;
+        Job run;
+    };
+    auto work = std::make_unique<Work>(nullptr, std::move(job));
+    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS, reinterpret_cast<PCWSTR>(QueueModuleWork<Job>),
+                            &work->module)) return false;
+    auto* context = work.release();
+    if (TrySubmitThreadpoolCallback([](PTP_CALLBACK_INSTANCE callback, void* raw) noexcept {
+            std::unique_ptr<Work> work(static_cast<Work*>(raw));
+            FreeLibraryWhenCallbackReturns(callback, work->module);
+            const auto apartment = RoInitialize(RO_INIT_MULTITHREADED);
+            try { work->run(); } catch (...) {}
+            work.reset();
+            if (SUCCEEDED(apartment)) RoUninitialize();
+        }, context, nullptr)) return true;
+    const auto module = context->module;
+    delete context;
+    FreeLibrary(module);
+    return false;
+}
+
 class IndicatorPins {
 public:
     bool Contains(const PinStore& store, const fs::path& item) {
@@ -948,28 +972,71 @@ public:
         if (!parent.is_absolute() || !item.has_filename()) return false;
         const auto folder = FolderKey(parent);
         const auto now = GetTickCount64();
-        const std::scoped_lock lock(mutex_);
-        if (folders_.size() >= 64 && !folders_.contains(folder)) folders_.clear();
-        auto& entry = folders_[folder];
-        if (entry.expires <= now) {
-            entry.names = ReadPinNames(store, parent);
-            entry.expires = now + 750;
+        uint64_t request = 0;
+        bool pinned = false;
+        {
+            const std::scoped_lock lock(mutex_);
+            if (folders_.size() >= 64 && !folders_.contains(folder)) {
+                const auto evict = std::ranges::find_if(folders_, [](const auto& entry) { return !entry.second.request; });
+                if (evict == folders_.end()) return false;
+                folders_.erase(evict);
+            }
+            auto& entry = folders_[folder];
+            pinned = entry.names.contains(item.filename().native());
+            if (!entry.request && entry.expires <= now && pending_ < 4) {
+                request = entry.request = ++sequence_;
+                ++pending_;
+            }
         }
-        return entry.names.contains(item.filename().native());
+        if (request) {
+            bool submitted = false;
+            try {
+                submitted = QueueModuleWork([this, store, parent, folder, request] {
+                    std::optional<PinNames> names;
+                    try { names = ReadPinNames(store, parent); } catch (...) {}
+                    if (Complete(folder, request, std::move(names))) {
+                        SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, parent.c_str(), nullptr);
+                    }
+                });
+            } catch (...) {}
+            if (!submitted) Complete(folder, request, std::nullopt);
+        }
+        return pinned;
     }
 
-    void Invalidate() {
+    void Invalidate(const fs::path& parent) {
         const std::scoped_lock lock(mutex_);
-        folders_.clear();
+        const auto found = folders_.find(FolderKey(parent));
+        if (found != folders_.end()) {
+            found->second.expires = 0;
+            found->second.request = 0;
+        }
     }
 
 private:
+    bool Complete(const std::wstring& folder, uint64_t request, std::optional<PinNames> names) {
+        const std::scoped_lock lock(mutex_);
+        --pending_;
+        const auto found = folders_.find(folder);
+        if (found == folders_.end() || found->second.request != request) return false;
+        auto& entry = found->second;
+        entry.request = 0;
+        entry.expires = GetTickCount64() + 1000;
+        if (!names) return false;
+        const bool changed = entry.names != *names;
+        entry.names = std::move(*names);
+        return changed;
+    }
+
     struct Entry {
         PinNames names;
         ULONGLONG expires = 0;
+        uint64_t request = 0;
     };
     std::mutex mutex_;
     std::map<std::wstring, Entry, FolderLess> folders_;
+    uint64_t sequence_ = 0;
+    size_t pending_ = 0;
 };
 
 std::optional<fs::path> ItemImagePath(const unsigned char* image) {
@@ -1194,21 +1261,6 @@ double NativeIconOpacity(const controls::CommandBar& bar, bool enabled) {
 
 struct AttachedPinCommand;
 
-template <typename Job>
-bool QueueCommandWork(Job job) {
-    auto pending = std::make_unique<Job>(std::move(job));
-    auto* context = pending.release();
-    if (TrySubmitThreadpoolCallback([](PTP_CALLBACK_INSTANCE, void* raw) noexcept {
-            std::unique_ptr<Job> work(static_cast<Job*>(raw));
-            const auto apartment = RoInitialize(RO_INIT_MULTITHREADED);
-            try { (*work)(); } catch (...) {}
-            work.reset();
-            if (SUCCEEDED(apartment)) RoUninitialize();
-        }, context, nullptr)) return true;
-    delete context;
-    return false;
-}
-
 struct CommandUi {
     PinStore store;
     const bool context;
@@ -1301,7 +1353,7 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         }
         Present(next.has_value() && (lastRead != 0 || (!context && control.IsEnabled())));
         if (!next || resolving || writing || (!force && lastRead && GetTickCount64() - lastRead < 1000)) return;
-        resolving = QueueCommandWork([state, weak = weak_from_this(), queue = dispatcher,
+        resolving = QueueModuleWork([state, weak = weak_from_this(), queue = dispatcher,
                                       generation = ++readGeneration, target = std::move(*next)] {
             if (!state->active) return;
             std::optional<PinAction> result;
@@ -1326,13 +1378,13 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
             if (resolving) invokeWhenReady = true;
             return;
         }
-        writing = QueueCommandWork([state, weak = weak_from_this(), queue = dispatcher, target = *current,
+        writing = QueueModuleWork([state, weak = weak_from_this(), queue = dispatcher, target = *current,
                                     window = window, action = action] {
             if (!state->active) return;
             bool changed = false;
             try { changed = ApplyPinAction(state->store, target, action); } catch (...) {}
             if (changed) {
-                indicatorPins.Invalidate();
+                indicatorPins.Invalidate(target.folder);
                 SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, target.folder.c_str(), nullptr);
             }
             queue.TryEnqueue([state, weak, window, folder = target.folder, changed]() noexcept {

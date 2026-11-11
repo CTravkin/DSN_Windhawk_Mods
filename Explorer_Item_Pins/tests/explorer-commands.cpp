@@ -592,6 +592,8 @@ void VerifyIndicator(const fs::path& root) {
     for (const auto* name : {L"Pinned folder", L"Pinned thumbnail.bmp", L"Pinned shortcut.lnk"}) {
         Require(store.SetPinned(folder, explorer_item_pins::ReadItem(folder / name), true), "persist an indicator fixture pin");
     }
+    Require(!indicatorFixture.Contains(store, bitmap), "the first paint lookup should not wait for the pin snapshot");
+    WaitUntil([&] { return indicatorFixture.Contains(store, bitmap); }, "load the indicator snapshot off the paint thread");
     constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
     nativePaintCaller = native->folderViewCaller;
     nativeDrawImage = InstallTestHook(native->draw, TestItemImage, draw);
@@ -629,6 +631,10 @@ void VerifyIndicator(const fs::path& root) {
     SelectObject(dc, previous);
     DeleteObject(surface);
     DeleteDC(dc);
+    Require(store.SetPinned(folder, explorer_item_pins::ReadItem(bitmap), false), "remove the thumbnail's fixture pin");
+    indicatorFixture.Invalidate(folder);
+    WaitUntil([&] { return !indicatorFixture.Contains(store, bitmap); }, "apply a changed indicator snapshot");
+    Require(indicatorFixture.Contains(store, folder / L"Pinned folder"), "preserve the other indicators after a change");
     std::cout << "PASS indicator pixels and shortcut corner in " << verified << " native view scenarios\n";
 }
 }
