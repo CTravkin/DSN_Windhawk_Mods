@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.2.0
+// @version         0.3.0
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
-// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -luuid
+// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid
 // ==/WindhawkMod==
-// Build: 2
+// Build: 3
 
 // ==WindhawkModReadme==
 /*
@@ -54,16 +54,19 @@ folders to the top of their parent folder in File Explorer.
 #include <windows.h>
 #include <roapi.h>
 #include <shlobj.h>
+#include <shlwapi.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Data.Json.h>
 #include <wrl/client.h>
 
 #include <algorithm>
+#include <cstring>
 #include <filesystem>
 #include <map>
 #include <memory>
 #include <optional>
+#include <set>
 #include <span>
 #include <stdexcept>
 #include <string>
@@ -406,6 +409,27 @@ struct ExplorerSelection {
 
 enum class PinAction { Pin, Unpin };
 
+namespace {
+
+std::optional<fs::path> FileSystemFolderPath(IPersistFolder2& folder) {
+    PIDLIST_ABSOLUTE rawFolder = nullptr;
+    const HRESULT folderResult = folder.GetCurFolder(&rawFolder);
+    const std::unique_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>, decltype(&CoTaskMemFree)>
+        folderId(rawFolder, CoTaskMemFree);
+    if (FAILED(folderResult) || !folderId) return std::nullopt;
+
+    PWSTR rawName = nullptr;
+    const HRESULT nameResult = SHGetNameFromIDList(folderId.get(), SIGDN_FILESYSPATH, &rawName);
+    const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> name(rawName, CoTaskMemFree);
+    if (FAILED(nameResult) || !name) return std::nullopt;
+
+    fs::path path(name.get());
+    if (!path.is_absolute()) return std::nullopt;
+    return path;
+}
+
+}  // namespace
+
 std::optional<ExplorerSelection> CaptureSingleSelection(IFolderView2& view) {
     using Microsoft::WRL::ComPtr;
     ComPtr<IShellItemArray> selected;
@@ -422,23 +446,13 @@ std::optional<ExplorerSelection> CaptureSingleSelection(IFolderView2& view) {
 
     ComPtr<IPersistFolder2> folder;
     if (FAILED(view.GetFolder(IID_PPV_ARGS(&folder))) || !folder) return std::nullopt;
-    PIDLIST_ABSOLUTE rawFolder = nullptr;
-    const HRESULT folderResult = folder->GetCurFolder(&rawFolder);
-    const std::unique_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>, decltype(&CoTaskMemFree)>
-        folderId(rawFolder, CoTaskMemFree);
-    if (FAILED(folderResult) || !folderId) return std::nullopt;
-    PWSTR rawFolderName = nullptr;
-    const HRESULT nameResult = SHGetNameFromIDList(folderId.get(), SIGDN_FILESYSPATH, &rawFolderName);
-    const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> folderName(rawFolderName, CoTaskMemFree);
-    if (FAILED(nameResult) || !folderName) return std::nullopt;
-
+    auto folderPath = FileSystemFolderPath(*folder.Get());
     fs::path itemPath(itemName.get());
-    fs::path folderPath(folderName.get());
-    if (!itemPath.is_absolute() || !folderPath.is_absolute() || !itemPath.has_filename() ||
-        CompareNames(FolderKey(itemPath.parent_path()), FolderKey(folderPath)) != CSTR_EQUAL) {
+    if (!folderPath || !itemPath.is_absolute() || !itemPath.has_filename() ||
+        CompareNames(FolderKey(itemPath.parent_path()), FolderKey(*folderPath)) != CSTR_EQUAL) {
         return std::nullopt;
     }
-    return ExplorerSelection{std::move(folderPath), std::move(itemPath)};
+    return ExplorerSelection{std::move(*folderPath), std::move(itemPath)};
 }
 
 namespace {
@@ -502,9 +516,201 @@ bool ApplyPinAction(const PinStore& store, const ExplorerSelection& selection, P
     return !current.stored && store.SetPinned(selection.folder, current.item, true);
 }
 
+using PinNames = std::set<std::wstring, std::less<>>;
+
+PinNames ReadPinNames(const PinStore& store, const fs::path& folder) {
+    const auto pins = store.ReadFolder(folder);
+    PinNames names;
+    for (const auto& pin : pins) {
+        WIN32_FIND_DATAW found{};
+        HANDLE search = FindFirstFileW((folder / pin.name).c_str(), &found);
+        if (search == INVALID_HANDLE_VALUE) continue;
+        FindClose(search);
+        if (pin.name == found.cFileName) names.insert(pin.name);
+    }
+    if (names.size() == pins.size()) return names;
+
+    // Only a missing exact name needs enumeration and possible identity lookup.
+    const bool lookUpIdentities = std::ranges::any_of(pins, [&](const Item& pin) {
+        return !pin.identity.empty() && !names.contains(pin.name);
+    });
+    std::vector<Item> entries;
+    for (const auto& entry : fs::directory_iterator(folder)) {
+        auto name = entry.path().filename().native();
+        if (lookUpIdentities) {
+            entries.push_back(ReadItem(entry.path()));
+        } else {
+            entries.push_back({std::move(name), {}});
+        }
+    }
+    names.clear();
+    for (const auto& index : ResolvePins(pins, entries)) {
+        if (index) names.insert(std::move(entries[*index].name));
+    }
+    return names;
+}
+
+namespace {
+
+using CompareViewItems = int (*)(const void*, const void*, void*);
+
+// Layout of the synchronous merge-sort request in the supported shell binary.
+struct ViewSortBatch {
+    int count;
+    void* items;
+    int itemSize;
+    CompareViewItems compare;
+    void* compareContext;
+};
+
+static_assert(offsetof(ViewSortBatch, compare) == 0x18);
+static_assert(offsetof(ViewSortBatch, compareContext) == 0x20);
+
+using SortViewBatch = BOOL (*)(ViewSortBatch*);
+
+struct NativeOrdering {
+    SortViewBatch sort;
+    CompareViewItems compare;
+};
+
+[[maybe_unused]] std::optional<NativeOrdering> FindNativeOrdering(HMODULE storage) {
+    if (!storage) return std::nullopt;
+    const auto* image = reinterpret_cast<const unsigned char*>(storage);
+    const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
+    const auto* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(image + dos->e_lfanew);
+    if (pe->FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64) return std::nullopt;
+
+    // The private ABI and RVAs below were verified on this Windows.Storage.dll.
+    constexpr GUID supportedPdb{0x6ebed4d4, 0x5734, 0x9fc4, {0x9e, 0x3e, 0x8d, 0xe5, 0x0b, 0x33, 0x0f, 0x0f}};
+    constexpr DWORD sortRva = 0x1537e8;
+    constexpr DWORD compareRva = 0x155190;
+    const auto& debug = pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG];
+    const auto size = pe->OptionalHeader.SizeOfImage;
+    if (!debug.VirtualAddress || debug.VirtualAddress >= size || debug.Size > size - debug.VirtualAddress ||
+        sortRva >= size || compareRva >= size) return std::nullopt;
+
+    const auto* entries = reinterpret_cast<const IMAGE_DEBUG_DIRECTORY*>(image + debug.VirtualAddress);
+    for (DWORD i = 0; i < debug.Size / sizeof(*entries); ++i) {
+        const auto& entry = entries[i];
+        constexpr DWORD codeViewHeaderSize = 24;
+        if (entry.Type != IMAGE_DEBUG_TYPE_CODEVIEW || !entry.AddressOfRawData ||
+            entry.AddressOfRawData >= size || entry.SizeOfData < codeViewHeaderSize ||
+            entry.SizeOfData > size - entry.AddressOfRawData) continue;
+        const auto* data = image + entry.AddressOfRawData;
+        DWORD age = 0;
+        std::memcpy(&age, data + 20, sizeof(age));
+        if (age == 1 && std::memcmp(data, "RSDS", 4) == 0 &&
+            std::memcmp(data + 4, &supportedPdb, sizeof(supportedPdb)) == 0) {
+            return NativeOrdering{reinterpret_cast<SortViewBatch>(const_cast<unsigned char*>(image + sortRva)),
+                                  reinterpret_cast<CompareViewItems>(const_cast<unsigned char*>(image + compareRva))};
+        }
+    }
+    return std::nullopt;
+}
+
+// The native comparer gets the child PIDL through these shell interfaces.
+struct ViewCompareContext {
+    IShellFolder* folder;
+    IUnknown* itemResolver;
+};
+
+bool IsPinnedViewItem(const ViewCompareContext& view, const void* item, const PinNames& names) {
+    using Microsoft::WRL::ComPtr;
+    constexpr GUID iidPidlAccessor{0xc412bf5b, 0x91ea, 0x4904, {0xb3, 0x4a, 0x85, 0x55, 0x04, 0xfb, 0xbf, 0x0b}};
+    using Bind = HRESULT (*)(IUnknown*, const void*, IShellFolder*, IBindCtx*, REFIID, void**);
+    using GetId = PCUITEMID_CHILD (*)(IUnknown*);
+    const auto bind = reinterpret_cast<Bind>((*reinterpret_cast<void***>(view.itemResolver))[8]);
+    ComPtr<IUnknown> accessor;
+    if (FAILED(bind(view.itemResolver, item, view.folder, nullptr, iidPidlAccessor,
+                    reinterpret_cast<void**>(accessor.GetAddressOf()))) || !accessor) return false;
+    const auto getId = reinterpret_cast<GetId>((*reinterpret_cast<void***>(accessor.Get()))[3]);
+    const auto id = getId(accessor.Get());
+    if (!id) return false;
+
+    STRRET display{};
+    if (FAILED(view.folder->GetDisplayNameOf(id, SHGDN_INFOLDER | SHGDN_FORPARSING, &display))) return false;
+    PWSTR rawName = nullptr;
+    const HRESULT nameResult = StrRetToStrW(&display, id, &rawName);
+    const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> name(rawName, CoTaskMemFree);
+    if (FAILED(nameResult) || !name) return false;
+
+    const std::wstring_view path(name.get());
+    const auto separator = path.find_last_of(L"\\/");
+    const auto leaf = separator == std::wstring_view::npos ? path : path.substr(separator + 1);
+    return names.contains(leaf);
+}
+
+struct PinnedComparison {
+    CompareViewItems original;
+    ViewCompareContext* view;
+    const PinNames& names;
+
+    static int Compare(const void* left, const void* right, void* context) {
+        const auto& state = *static_cast<const PinnedComparison*>(context);
+        const bool pinnedLeft = IsPinnedViewItem(*state.view, left, state.names);
+        const bool pinnedRight = IsPinnedViewItem(*state.view, right, state.names);
+        if (pinnedLeft != pinnedRight) return pinnedLeft ? -1 : 1;
+        return state.original(left, right, state.view);
+    }
+};
+
+[[maybe_unused]] BOOL SortWithPins(const PinStore& store, SortViewBatch sort, CompareViewItems compare,
+                                  ViewSortBatch* batch) {
+    if (!batch || batch->count < 2 || batch->compare != compare || !batch->compareContext) return sort(batch);
+
+    auto* view = static_cast<ViewCompareContext*>(batch->compareContext);
+    if (!view->folder || !view->itemResolver) return sort(batch);
+    PinNames names;
+    try {
+        Microsoft::WRL::ComPtr<IPersistFolder2> folder;
+        if (SUCCEEDED(view->folder->QueryInterface(IID_PPV_ARGS(&folder))) && folder) {
+            if (const auto path = FileSystemFolderPath(*folder.Get())) names = ReadPinNames(store, *path);
+        }
+    } catch (...) {
+        // A malformed store or an inaccessible folder must leave sorting available.
+    }
+    if (names.empty()) return sort(batch);
+
+    PinnedComparison pinned{compare, view, names};
+    // The native request lives on the caller's stack. Its scratch pointer is
+    // stored immediately after these fields and must stay in the same request.
+    batch->compare = PinnedComparison::Compare;
+    batch->compareContext = &pinned;
+    const BOOL result = sort(batch);
+    batch->compareContext = view;
+    batch->compare = compare;
+    return result;
+}
+
+#ifdef WH_MOD
+std::optional<PinStore> nativePinStore;
+SortViewBatch nativeSortOriginal = nullptr;
+CompareViewItems nativeCompare = nullptr;
+
+BOOL NativeSortHook(ViewSortBatch* batch) {
+    return SortWithPins(*nativePinStore, nativeSortOriginal, nativeCompare, batch);
+}
+#endif
+
+}  // namespace
+
 }  // namespace explorer_item_pins
 
-// Keep the development build unloaded until Explorer hooks are connected.
 BOOL Wh_ModInit() {
+#ifdef WH_MOD
+    using namespace explorer_item_pins;
+    const auto native = FindNativeOrdering(GetModuleHandleW(L"Windows.Storage.dll"));
+    if (!native) return FALSE;
+
+    try {
+        nativePinStore.emplace(PinStore::DefaultPath());
+    } catch (...) {
+        return FALSE;
+    }
+    nativeCompare = native->compare;
+    return Wh_SetFunctionHook(reinterpret_cast<void*>(native->sort), reinterpret_cast<void*>(NativeSortHook),
+                              reinterpret_cast<void**>(&nativeSortOriginal));
+#else
     return FALSE;
+#endif
 }

@@ -1,7 +1,9 @@
 #include "../mods/explorer-item-pins.wh.cpp"
 
 #include <wrl/client.h>
+#include <propkey.h>
 
+#include <array>
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -12,6 +14,12 @@ using explorer_item_pins::CaptureSingleSelection;
 using explorer_item_pins::GetPinAction;
 using explorer_item_pins::PinAction;
 using explorer_item_pins::PinStore;
+using explorer_item_pins::CompareViewItems;
+using explorer_item_pins::FindNativeOrdering;
+using explorer_item_pins::ReadPinNames;
+using explorer_item_pins::SortViewBatch;
+using explorer_item_pins::SortWithPins;
+using explorer_item_pins::ViewSortBatch;
 using Microsoft::WRL::ComPtr;
 namespace fs = std::filesystem;
 
@@ -81,6 +89,28 @@ public:
 
     IFolderView2& View() { return *view_.Get(); }
 
+    std::vector<std::wstring> Items() {
+        int count = 0;
+        Check(view_->ItemCount(SVGIO_ALLVIEW, &count), "get Explorer row count");
+        ComPtr<IShellFolder> folder;
+        Check(view_->GetFolder(IID_PPV_ARGS(&folder)), "get the current shell folder");
+        std::vector<std::wstring> result;
+        for (int i = 0; i < count; ++i) {
+            PITEMID_CHILD raw = nullptr;
+            const auto itemResult = view_->Item(i, &raw);
+            const std::unique_ptr<std::remove_pointer_t<PITEMID_CHILD>, decltype(&CoTaskMemFree)>
+                item(raw, CoTaskMemFree);
+            if (FAILED(itemResult) || !item) return {};
+            STRRET display{};
+            Check(folder->GetDisplayNameOf(item.get(), SHGDN_INFOLDER | SHGDN_FORPARSING, &display),
+                  "get the Explorer item's parsing name");
+            wchar_t name[MAX_PATH]{};
+            Check(StrRetToBufW(&display, item.get(), name, ARRAYSIZE(name)), "read the Explorer item name");
+            result.push_back(fs::path(name).filename().native());
+        }
+        return result;
+    }
+
     void Select(std::wstring name) {
         ComPtr<IShellFolder> folder;
         Check(view_->GetFolder(IID_PPV_ARGS(&folder)), "get the current shell folder");
@@ -140,6 +170,8 @@ void VerifyCommands(const fs::path& root) {
     }
 
     fs::rename(report, renamed);
+    Require(ReadPinNames(store, source) == explorer_item_pins::PinNames{renamed.filename().native(), photos.filename().native()},
+            "the view pin snapshot should follow a same-folder rename");
     {
         ExplorerView view(source, 2);
         const auto file = Selected(view, renamed);
@@ -156,6 +188,8 @@ void VerifyCommands(const fs::path& root) {
             "replace the fixture file with a different filesystem object");
     fs::copy_file(renamed, target / renamed.filename());
     fs::rename(photos, target / photos.filename());
+    Require(ReadPinNames(store, source) == explorer_item_pins::PinNames{renamed.filename().native()} &&
+            ReadPinNames(store, target).empty(), "the view snapshot should retain replacement and exclude a copy and move");
     {
         ExplorerView view(source, 1);
         Require(GetPinAction(store, Selected(view, renamed)) == PinAction::Unpin,
@@ -169,15 +203,159 @@ void VerifyCommands(const fs::path& root) {
                 "the moved subfolder should be unpinned in the destination view");
     }
 }
+
+std::optional<PinStore> orderingStore;
+SortViewBatch originalSort = nullptr;
+CompareViewItems nativeCompare = nullptr;
+
+BOOL TestSortHook(ViewSortBatch* batch) {
+    return SortWithPins(*orderingStore, originalSort, nativeCompare, batch);
+}
+
+void InstallTestSortHook(SortViewBatch target) {
+    // This process is isolated from the Explorer session. Install before
+    // opening the test view and let process teardown discard the code pages.
+    constexpr unsigned char expected[]{0x48, 0x8b, 0xc4, 0x48, 0x89, 0x58, 0x08, 0x48,
+                                       0x89, 0x68, 0x10, 0x48, 0x89, 0x70, 0x18};
+    auto* entry = reinterpret_cast<unsigned char*>(target);
+    Require(std::memcmp(entry, expected, sizeof(expected)) == 0, "verify the test trampoline's instruction boundaries");
+    const auto jump = [](unsigned char* location, const void* targetAddress) {
+        unsigned char instruction[14]{0xff, 0x25};
+        std::memcpy(instruction + 6, &targetAddress, sizeof(targetAddress));
+        std::memcpy(location, instruction, sizeof(instruction));
+    };
+    constexpr size_t trampolineSize = sizeof(expected) + 14;
+    auto* trampoline = static_cast<unsigned char*>(VirtualAlloc(nullptr, trampolineSize,
+        MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
+    Require(trampoline != nullptr, "allocate the isolated test trampoline");
+    std::memcpy(trampoline, entry, sizeof(expected));
+    jump(trampoline + sizeof(expected), entry + sizeof(expected));
+    DWORD protection = 0;
+    Require(VirtualProtect(trampoline, trampolineSize, PAGE_EXECUTE_READ, &protection) != FALSE &&
+            FlushInstructionCache(GetCurrentProcess(), trampoline, trampolineSize) != FALSE,
+            "prepare the isolated test trampoline");
+    originalSort = reinterpret_cast<SortViewBatch>(trampoline);
+    Require(VirtualProtect(entry, sizeof(expected), PAGE_EXECUTE_READWRITE, &protection) != FALSE,
+            "make the sort entry writable in the test process");
+    jump(entry, reinterpret_cast<const void*>(TestSortHook));
+    DWORD ignored = 0;
+    Require(VirtualProtect(entry, sizeof(expected), protection, &ignored) != FALSE &&
+            FlushInstructionCache(GetCurrentProcess(), entry, sizeof(expected)) != FALSE,
+            "publish the sort hook in the test process");
+}
+
+void VerifyOrdering(const fs::path& root) {
+    const auto folder = root / L"ordering";
+    constexpr int itemCount = 6;
+    const std::array<std::wstring_view, itemCount> names{L"10 folder", L"20.txt", L"30.txt",
+                                                       L"60.txt", L"80 pinned folder", L"90 pinned.txt"};
+    fs::create_directories(folder / names.front());
+    fs::create_directories(folder / names[4]);
+    const auto now = fs::file_time_type::clock::now();
+    for (size_t i = 0; i < names.size(); ++i) {
+        const auto path = folder / names[i];
+        if (!fs::is_directory(path)) std::ofstream(path) << i;
+        fs::last_write_time(path, now - std::chrono::hours(1 + 2 * i));
+    }
+
+    const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    Check(storage ? S_OK : HRESULT_FROM_WIN32(GetLastError()), "load Windows.Storage.dll in the isolated test process");
+    const auto native = FindNativeOrdering(storage);
+    if (!native) {
+        std::cout << "SKIP native sort hooks on this Windows.Storage.dll build\n";
+        return;
+    }
+    const auto& store = orderingStore.emplace(root / L"ordering-data" / L"pins.json");
+    nativeCompare = native->compare;
+    InstallTestSortHook(native->sort);
+    ExplorerView ascending(folder, itemCount);
+    ExplorerView descending(folder, itemCount);
+
+    struct Layout { FOLDERVIEWMODE mode; int size; };
+    const std::array layouts{Layout{FVM_DETAILS, 16}, Layout{FVM_LIST, 16}, Layout{FVM_TILE, 48},
+                             Layout{FVM_CONTENT, 32}, Layout{FVM_SMALLICON, 16}, Layout{FVM_ICON, 48},
+                             Layout{FVM_ICON, 96}, Layout{FVM_ICON, 256}};
+    const auto setSort = [](ExplorerView& view, const PROPERTYKEY& key, SORTDIRECTION direction) {
+        const SORTCOLUMN column{key, direction};
+        Check(view.View().SetSortColumns(&column, 1), "set the native view's sort direction");
+    };
+    const auto settle = [] {
+        const auto deadline = GetTickCount64() + 160;
+        while (GetTickCount64() < deadline) Pump();
+    };
+    const auto isPinned = [&](std::wstring_view name) { return name == names[4] || name == names[5]; };
+    int verified = 0;
+    for (const auto& layout : layouts) {
+        for (auto* view : {&ascending, &descending}) {
+            Check(view->View().SetViewModeAndIconSize(layout.mode, layout.size), "switch the native view layout");
+            FOLDERVIEWMODE actualMode{};
+            int actualSize = 0;
+            Check(view->View().GetViewModeAndIconSize(&actualMode, &actualSize), "read the native view layout");
+            Require(actualMode == layout.mode && actualSize == layout.size, "the requested view layout should be active");
+        }
+        for (const auto& property : {PKEY_ItemNameDisplay, PKEY_DateModified}) {
+            setSort(ascending, property, SORT_ASCENDING);
+            setSort(descending, property, SORT_DESCENDING);
+            settle();
+            auto expectedAscending = ascending.Items();
+            auto expectedDescending = descending.Items();
+            Require(expectedAscending.size() == itemCount && expectedDescending.size() == itemCount &&
+                    expectedAscending != expectedDescending, "record distinct stock ascending and descending orders");
+            std::ranges::stable_partition(expectedAscending, isPinned);
+            std::ranges::stable_partition(expectedDescending, isPinned);
+
+            for (size_t pin : {4u, 5u}) {
+                Require(store.SetPinned(folder, {std::wstring(names[pin]), {}}, true), "save an ordering fixture pin");
+            }
+            const auto refresh = [](ExplorerView& view) {
+                ComPtr<IShellView> shellView;
+                Check(view.View().QueryInterface(IID_PPV_ARGS(&shellView)), "get the native shell view");
+                Check(shellView->Refresh(), "refresh the native sort after changing pins");
+            };
+            refresh(ascending);
+            refresh(descending);
+            try {
+                WaitUntil([&] { return ascending.Items() == expectedAscending && descending.Items() == expectedDescending; },
+                          "the two Explorer views should pin first and keep their own stock order");
+            } catch (...) {
+                const auto print = [](std::wstring_view label, const auto& rows) {
+                    std::wcerr << label;
+                    for (const auto& row : rows) std::wcerr << L" [" << row << L']';
+                    std::wcerr << L'\n';
+                };
+                print(L"Expected ascending", expectedAscending);
+                print(L"Observed ascending", ascending.Items());
+                print(L"Expected descending", expectedDescending);
+                print(L"Observed descending", descending.Items());
+                throw;
+            }
+            verified += 2;
+            for (size_t pin : {4u, 5u}) {
+                Require(store.SetPinned(folder, {std::wstring(names[pin]), {}}, false), "clear the ordering fixture pin");
+            }
+            refresh(ascending);
+            refresh(descending);
+            settle();
+        }
+    }
+    std::cout << "PASS pin priority with stock order in " << verified << " native view scenarios\n";
+}
 }
 
 int wmain(int argc, wchar_t** argv) {
-    if (argc != 2) return 2;
+    if (argc != 3) return 2;
     if (FAILED(OleInitialize(nullptr))) return 3;
     int result = 0;
     try {
-        VerifyCommands(argv[1]);
-        std::cout << "PASS native Explorer selection, pin and unpin, rename, replacement, copy and move\n";
+        const std::wstring_view mode(argv[2]);
+        if (mode == L"commands") {
+            VerifyCommands(argv[1]);
+            std::cout << "PASS native Explorer selection, pin and unpin, rename, replacement, copy and move\n";
+        } else if (mode == L"ordering") {
+            VerifyOrdering(argv[1]);
+        } else {
+            result = 2;
+        }
     } catch (const std::exception& error) {
         std::cerr << "FAIL " << error.what() << '\n';
         result = 1;
