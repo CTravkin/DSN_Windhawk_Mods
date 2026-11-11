@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.8
+// @version         0.6.9
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 14
+// Build: 15
 
 // ==WindhawkModReadme==
 /*
@@ -1168,13 +1168,7 @@ bool WindowHasClass(HWND window, PCWSTR expected) {
     return GetClassNameW(window, name, ARRAYSIZE(name)) && std::wstring_view(name) == expected;
 }
 
-[[maybe_unused]] HIMAGELIST NavigationPinImages(HDC dc) {
-    struct NavigationTree {
-        HWND frame = nullptr;
-        HWND tree = nullptr;
-    };
-    static thread_local NavigationTree last;
-
+HWND ExplorerFrameForPaint(HDC dc) {
     auto frame = GetAncestor(WindowFromDC(dc), GA_ROOT);
     if (!WindowHasClass(frame, L"CabinetWClass")) frame = GetActiveWindow();
     if (!WindowHasClass(frame, L"CabinetWClass")) {
@@ -1185,7 +1179,17 @@ bool WindowHasClass(HWND window, PCWSTR expected) {
             return FALSE;
         }, reinterpret_cast<LPARAM>(&frame));
     }
-    if (!frame || GetWindowThreadProcessId(frame, nullptr) != GetCurrentThreadId()) return nullptr;
+    return frame && GetWindowThreadProcessId(frame, nullptr) == GetCurrentThreadId() ? frame : nullptr;
+}
+
+[[maybe_unused]] HIMAGELIST NavigationPinImages(HDC dc) {
+    struct NavigationTree {
+        HWND frame = nullptr;
+        HWND tree = nullptr;
+    };
+    static thread_local NavigationTree last;
+    const auto frame = ExplorerFrameForPaint(dc);
+    if (!frame) return nullptr;
     if (last.frame != frame || !last.tree || !IsChild(frame, last.tree)) {
         last = {frame, nullptr};
         EnumChildWindows(frame, [](HWND child, LPARAM output) -> BOOL {
@@ -1197,6 +1201,28 @@ bool WindowHasClass(HWND window, PCWSTR expected) {
     }
     return last.tree ? TreeView_GetImageList(last.tree, TVSIL_STATE) : nullptr;
 }
+
+struct IndicatorRetry {
+    ULONGLONG time = 0;
+    unsigned redraws = 0;
+
+    void AfterFailure(HDC dc, ULONGLONG now) {
+        constexpr DWORD delay = 60;
+        const bool requestRedraw = redraws < 2;
+        time = now + (requestRedraw ? delay : 1000);
+        if (!requestRedraw) return;
+        ++redraws;
+        if (const auto frame = ExplorerFrameForPaint(dc)) {
+            const auto thread = GetCurrentThreadId();
+            QueueModuleWork([frame, thread] {
+                Sleep(delay);
+                if (GetWindowThreadProcessId(frame, nullptr) == thread) {
+                    RedrawWindow(frame, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_INTERNALPAINT);
+                }
+            });
+        }
+    }
+};
 
 constexpr int navigationPinIndex = 1;
 
@@ -1355,8 +1381,7 @@ RECT ShortcutOverlayBounds(const unsigned char* image, HDC dc, const RECT& icon)
         int width = 0;
         int height = 0;
         RECT bounds{};
-        ULONGLONG retry = 0;
-        unsigned attempts = 0;
+        IndicatorRetry retry{};
     };
     static thread_local std::array<Overlay, 32> sizes;
     static thread_local size_t nextSize = 0;
@@ -1368,27 +1393,10 @@ RECT ShortcutOverlayBounds(const unsigned char* image, HDC dc, const RECT& icon)
         *size = {cache, width, height};
     }
     const auto now = GetTickCount64();
-    if (!IsRectEmpty(&size->bounds) || now < size->retry) return size->bounds;
+    if (!IsRectEmpty(&size->bounds) || now < size->retry.time) return size->bounds;
     auto* item = *reinterpret_cast<IUnknown* const*>(image + 0x28);
     size->bounds = MeasureShortcutOverlay(cache, item, dc, width, height);
-    if (IsRectEmpty(&size->bounds)) {
-        constexpr DWORD retryDelay = 60;
-        const bool retrySoon = size->attempts < 2;
-        size->retry = now + (retrySoon ? retryDelay : 1000);
-        if (retrySoon) {
-            ++size->attempts;
-            const auto frame = GetActiveWindow();
-            if (WindowHasClass(frame, L"CabinetWClass")) {
-                const auto thread = GetCurrentThreadId();
-                QueueModuleWork([frame, thread] {
-                    Sleep(retryDelay);
-                    if (GetWindowThreadProcessId(frame, nullptr) == thread) {
-                        RedrawWindow(frame, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
-                    }
-                });
-            }
-        }
-    }
+    if (IsRectEmpty(&size->bounds)) size->retry.AfterFailure(dc, now);
     return size->bounds;
 }
 
@@ -1400,7 +1408,7 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT
         int width = 0;
         int height = 0;
         NavigationPin pin;
-        ULONGLONG retry = 0;
+        IndicatorRetry retry{};
     };
     static std::mutex mutex;
     static std::array<Asset, 8> assets;
@@ -1411,14 +1419,14 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT
     });
     if (asset == assets.end()) {
         asset = assets.begin() + next++ % assets.size();
-        *asset = {images, width, height, {}, 0};
+        *asset = {images, width, height, {}, {}};
     }
     if (!asset->pin.icon) {
         const auto now = GetTickCount64();
-        if (now < asset->retry) return false;
+        if (now < asset->retry.time) return false;
         asset->pin = LoadNavigationPin(images, dc, width, height);
         if (!asset->pin.icon) {
-            asset->retry = now + 1000;
+            asset->retry.AfterFailure(dc, now);
             return false;
         }
     }

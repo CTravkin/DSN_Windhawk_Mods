@@ -528,6 +528,23 @@ std::map<std::wstring, bool> paintedIcons;
 bool shortcutCornerPreserved = true;
 HIMAGELIST indicatorImages = nullptr;
 
+struct IndicatorRetryFixture {
+    HIMAGELIST images;
+    bool attempted = false;
+    bool painted = false;
+
+    static LRESULT CALLBACK Paint(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+        const auto self = reinterpret_cast<IndicatorRetryFixture*>(GetWindowLongPtrW(window, GWLP_USERDATA));
+        if (message != WM_PAINT || !self) return DefWindowProcW(window, message, wParam, lParam);
+        PAINTSTRUCT paint{};
+        const auto dc = BeginPaint(window, &paint);
+        self->painted = explorer_item_pins::DrawPinnedIndicator(self->images, dc, {0, 0, 16, 16}, {0, 8, 8, 16});
+        self->attempted = true;
+        EndPaint(window, &paint);
+        return 0;
+    }
+};
+
 HRESULT ObserveStockImage(const unsigned char* image, HDC dc, const RECT* rect) {
     const auto result = nativeDrawImage(image, dc, rect);
     stockIcon = SampleIcon(dc, *rect);
@@ -612,14 +629,30 @@ void VerifyIndicator(const fs::path& root) {
     auto* pixels = static_cast<DWORD*>(buffer);
     std::fill_n(pixels, 256, 0u);
     const auto emptyIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
-    const std::unique_ptr<std::remove_pointer_t<HDC>, decltype(&DeleteDC)>
-        beforeAsset(CreateCompatibleDC(nullptr), DeleteDC);
-    Require(beforeAsset && !explorer_item_pins::DrawPinnedIndicator(images.get(), beforeAsset.get(),
-                {0, 0, 16, 16}, {0, 8, 8, 16}), "keep the stock icon while the navigation pin is unavailable");
-    for (int y = 2; y < 8; ++y) std::fill_n(pixels + y * 16 + 8, 6, 0xffe600d8u);
-    const auto pinIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
+    {
+        // This offscreen frame receives the same invalidation as an Explorer window.
+        IndicatorRetryFixture retry{images.get()};
+        WNDCLASSW windowClass{};
+        windowClass.hInstance = GetModuleHandleW(nullptr);
+        windowClass.lpszClassName = L"CabinetWClass";
+        windowClass.lpfnWndProc = IndicatorRetryFixture::Paint;
+        Require(RegisterClassW(&windowClass) != 0, "register the isolated retry frame");
+        const std::unique_ptr<std::remove_pointer_t<HWND>, decltype(&DestroyWindow)> retryFrame(
+            CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, windowClass.lpszClassName, L"Indicator retry test",
+                            WS_OVERLAPPEDWINDOW, -10000, -10000, 80, 80, nullptr, nullptr, windowClass.hInstance, nullptr),
+            DestroyWindow);
+        Require(retryFrame != nullptr, "create the isolated retry frame");
+        SetWindowLongPtrW(retryFrame.get(), GWLP_USERDATA, reinterpret_cast<LONG_PTR>(&retry));
+        ShowWindow(retryFrame.get(), SW_SHOWNOACTIVATE);
+        SendMessageW(retryFrame.get(), WM_PAINT, 0, 0);
+        Require(retry.attempted, "deliver the first paint to the isolated retry frame");
+        Require(!retry.painted, "keep the stock icon while the navigation pin is unavailable");
+        for (int y = 2; y < 8; ++y) std::fill_n(pixels + y * 16 + 8, 6, 0xffe600d8u);
+        const auto pinIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
+        Require(emptyIndex == 0 && pinIndex == 1, "only the stock state index should draw a visible badge");
+        WaitUntil([&] { return retry.painted; }, "repaint after the same native image list becomes ready");
+    }
     DeleteObject(stateBitmap);
-    Require(emptyIndex == 0 && pinIndex == 1, "only the stock state index should draw a visible badge");
     indicatorImages = images.get();
     constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
     nativePaintCaller = native->folderViewCaller;
@@ -642,8 +675,7 @@ void VerifyIndicator(const fs::path& root) {
         const RECT icon{8, 8, 8 + size, 8 + size};
         const RECT shortcut{0, size - arrow, arrow, size};
         PatBlt(dc, 0, 0, size + 16, size + 16, WHITENESS);
-        WaitUntil([&] { return explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut); },
-                  "recover the badge when the same native image list becomes ready");
+        Require(explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut), "draw the fixture badge");
         const auto width = size + 16;
         const auto ink = explorer_item_pins::VisibleBounds(width, width, [&](size_t i) {
             return GetPixel(dc, i % width, i / width) != RGB(255, 255, 255);
