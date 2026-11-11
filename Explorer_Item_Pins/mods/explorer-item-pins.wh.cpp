@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.4
+// @version         0.6.5
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 10
+// Build: 11
 
 // ==WindhawkModReadme==
 /*
@@ -80,6 +80,8 @@ folders to the top of their parent folder in File Explorer.
 #if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
 #include <inspectable.h>
 #include <ocidl.h>
+#include <shldisp.h>
+#include <shdispid.h>
 #include <xamlom.h>
 #undef GetCurrentTime
 #include <winrt/Microsoft.UI.Content.h>
@@ -986,6 +988,28 @@ void RedrawExplorerItemIcons() {
 
 class IndicatorPins {
 public:
+    std::optional<bool> Cached(const fs::path& item) {
+        const auto folder = FolderKey(item.parent_path());
+        const std::scoped_lock lock(mutex_);
+        const auto found = folders_.find(folder);
+        if (found == folders_.end() || !found->second.ready || found->second.expires <= GetTickCount64()) return std::nullopt;
+        return found->second.names.contains(item.filename().native());
+    }
+
+    uint64_t Revision() {
+        const std::scoped_lock lock(mutex_);
+        return revision_;
+    }
+
+    std::optional<bool> Publish(const fs::path& parent, PinNames names, uint64_t revision) {
+        const auto folder = FolderKey(parent);
+        const std::scoped_lock lock(mutex_);
+        if (revision != revision_) return std::nullopt;
+        const auto entry = FindEntry(folder);
+        if (!entry) return std::nullopt;
+        return SetNames(*entry, std::move(names));
+    }
+
     bool Contains(const PinStore& store, const fs::path& item) {
         const auto parent = item.parent_path();
         if (!parent.is_absolute() || !item.has_filename()) return false;
@@ -995,16 +1019,16 @@ public:
         bool pinned = false;
         {
             const std::scoped_lock lock(mutex_);
-            if (folders_.size() >= 64 && !folders_.contains(folder)) {
-                const auto evict = std::ranges::find_if(folders_, [](const auto& entry) { return !entry.second.request; });
-                if (evict == folders_.end()) return false;
-                folders_.erase(evict);
-            }
-            auto& entry = folders_[folder];
-            pinned = entry.names.contains(item.filename().native());
-            if (!entry.request && entry.expires <= now && pending_ < 4) {
-                request = entry.request = ++sequence_;
-                ++pending_;
+            const auto entry = FindEntry(folder);
+            if (!entry) return false;
+            pinned = entry->names.contains(item.filename().native());
+            if (!entry->request && entry->expires <= now) {
+                if (pending_ < 4) {
+                    request = entry->request = ++sequence_;
+                    ++pending_;
+                } else {
+                    waitingForCapacity_ = true;
+                }
             }
         }
         if (request) {
@@ -1016,13 +1040,14 @@ public:
                     if (Complete(folder, request, std::move(names))) RedrawExplorerItemIcons();
                 });
             } catch (...) {}
-            if (!submitted) Complete(folder, request, std::nullopt);
+            if (!submitted && Complete(folder, request, std::nullopt)) RedrawExplorerItemIcons();
         }
         return pinned;
     }
 
     void Invalidate(const fs::path& parent) {
         const std::scoped_lock lock(mutex_);
+        ++revision_;
         const auto found = folders_.find(FolderKey(parent));
         if (found != folders_.end()) {
             found->second.expires = 0;
@@ -1031,29 +1056,52 @@ public:
     }
 
 private:
-    bool Complete(const std::wstring& folder, uint64_t request, std::optional<PinNames> names) {
-        const std::scoped_lock lock(mutex_);
-        --pending_;
-        const auto found = folders_.find(folder);
-        if (found == folders_.end() || found->second.request != request) return false;
-        auto& entry = found->second;
-        entry.request = 0;
-        entry.expires = GetTickCount64() + 1000;
-        if (!names) return false;
-        const bool changed = entry.names != *names;
-        entry.names = std::move(*names);
-        return changed;
-    }
-
     struct Entry {
         PinNames names;
         ULONGLONG expires = 0;
         uint64_t request = 0;
+        bool ready = false;
     };
+
+    Entry* FindEntry(const std::wstring& folder) {
+        if (const auto found = folders_.find(folder); found != folders_.end()) return &found->second;
+        if (folders_.size() >= 64) {
+            const auto evict = std::ranges::find_if(folders_, [](const auto& entry) { return !entry.second.request; });
+            if (evict == folders_.end()) return nullptr;
+            folders_.erase(evict);
+        }
+        return &folders_.try_emplace(folder).first->second;
+    }
+
+    bool SetNames(Entry& entry, PinNames names) {
+        const bool changed = entry.names != names;
+        entry.names = std::move(names);
+        entry.expires = GetTickCount64() + 1000;
+        entry.request = 0;
+        entry.ready = true;
+        return changed;
+    }
+
+    bool Complete(const std::wstring& folder, uint64_t request, std::optional<PinNames> names) {
+        const std::scoped_lock lock(mutex_);
+        --pending_;
+        const bool retryWaiting = std::exchange(waitingForCapacity_, false);
+        const auto found = folders_.find(folder);
+        if (found == folders_.end() || found->second.request != request) return retryWaiting;
+        auto& entry = found->second;
+        if (names) return SetNames(entry, std::move(*names)) || retryWaiting;
+        entry.request = 0;
+        entry.expires = GetTickCount64() + 1000;
+        entry.ready = false;
+        return retryWaiting;
+    }
+
     std::mutex mutex_;
     std::map<std::wstring, Entry, FolderLess> folders_;
     uint64_t sequence_ = 0;
+    uint64_t revision_ = 0;
     size_t pending_ = 0;
+    bool waitingForCapacity_ = false;
 };
 
 std::optional<fs::path> ItemImagePath(const unsigned char* image) {
@@ -1274,6 +1322,12 @@ bool SameSelection(const ExplorerSelection& left, const ExplorerSelection& right
     return left.folder == right.folder && left.item == right.item;
 }
 
+std::optional<PinAction> CachedPinAction(const ExplorerSelection& target) {
+    const auto cached = indicatorPins.Cached(target.item);
+    if (!cached) return std::nullopt;
+    return *cached ? PinAction::Unpin : PinAction::Pin;
+}
+
 double NativeIconOpacity(const controls::CommandBar& bar, bool enabled) {
     for (const auto& commands : {bar.PrimaryCommands(), bar.SecondaryCommands()}) {
         for (const auto& entry : commands) {
@@ -1289,6 +1343,23 @@ double NativeIconOpacity(const controls::CommandBar& bar, bool enabled) {
 }
 
 struct AttachedPinCommand;
+
+struct ViewSelectionEvents : winrt::implements<ViewSelectionEvents, DShellFolderViewEvents> {
+    std::weak_ptr<AttachedPinCommand> command;
+
+    explicit ViewSelectionEvents(std::weak_ptr<AttachedPinCommand> binding) : command(std::move(binding)) {}
+
+    HRESULT STDMETHODCALLTYPE GetTypeInfoCount(UINT* count) noexcept override {
+        *count = 0;
+        return S_OK;
+    }
+    HRESULT STDMETHODCALLTYPE GetTypeInfo(UINT, LCID, ITypeInfo**) noexcept override { return E_NOTIMPL; }
+    HRESULT STDMETHODCALLTYPE GetIDsOfNames(REFIID, LPOLESTR*, UINT, LCID, DISPID*) noexcept override {
+        return DISP_E_UNKNOWNNAME;
+    }
+    HRESULT STDMETHODCALLTYPE Invoke(DISPID member, REFIID, LCID, WORD, DISPPARAMS*, VARIANT*,
+                                     EXCEPINFO*, UINT*) noexcept override;
+};
 
 struct CommandUi {
     PinStore store;
@@ -1316,6 +1387,9 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     winrt::event_token tick{};
     winrt::event_token selectionChanged{};
     HWND window = nullptr;
+    HWND observedView = nullptr;
+    winrt::agile_ref<IConnectionPoint> selectionEvents;
+    DWORD selectionCookie = 0;
     bool context = false;
     std::optional<ExplorerSelection> selected;
     PinAction action = PinAction::Pin;
@@ -1326,7 +1400,32 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     uint64_t readGeneration = 0;
     bool resolving = false;
     bool writing = false;
-    bool invokeWhenReady = false;
+
+    void StopObservingSelection() {
+        if (const auto cookie = std::exchange(selectionCookie, 0)) {
+            if (const auto point = selectionEvents.get()) point->Unadvise(cookie);
+        }
+        selectionEvents = {};
+        observedView = nullptr;
+    }
+
+    void ObserveSelection(const ComPtr<IShellView>& view) noexcept try {
+        HWND current = nullptr;
+        if (view) view->GetWindow(&current);
+        if (context || observedView == current) return;
+        StopObservingSelection();
+        observedView = current;
+        if (!current) return;
+
+        ComPtr<IDispatch> automation;
+        ComPtr<IConnectionPointContainer> events;
+        winrt::com_ptr<IConnectionPoint> point;
+        if (FAILED(view->GetItemObject(SVGIO_BACKGROUND, IID_PPV_ARGS(&automation))) || FAILED(automation.As(&events)) ||
+            FAILED(events->FindConnectionPoint(DIID_DShellFolderViewEvents, point.put()))) return;
+        const auto sink = winrt::make_self<ViewSelectionEvents>(weak_from_this());
+        auto agile = winrt::make_agile(point);
+        if (SUCCEEDED(point->Advise(sink.get(), &selectionCookie))) selectionEvents = std::move(agile);
+    } catch (...) {}
 
     void Present(bool ready) {
         const auto state = owner.lock();
@@ -1334,13 +1433,14 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         const auto commandBar = bar.get();
         if (!state || !state->active || !control || !commandBar) return;
         const auto theme = commandBar.ActualTheme();
-        const auto title = CommandTitle(action, GetUserDefaultUILanguage());
+        const auto visibleAction = ready ? action : PinAction::Pin;
+        const auto title = CommandTitle(visibleAction, GetUserDefaultUILanguage());
         if (appliedTheme != theme) {
             pinIcon = CommandIcon(PinAction::Pin, theme);
             unpinIcon = CommandIcon(PinAction::Unpin, theme);
             appliedTheme = theme;
         }
-        const auto& icon = action == PinAction::Pin ? pinIcon : unpinIcon;
+        const auto& icon = visibleAction == PinAction::Pin ? pinIcon : unpinIcon;
         if (!icon) { control.IsEnabled(false); return; }
         if (control.Label() != title) {
             control.Label(title);
@@ -1366,28 +1466,43 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         if (result) action = *result;
         lastRead = result ? GetTickCount64() : 0;
         Present(result.has_value());
-        if (std::exchange(invokeWhenReady, false) && result) Invoke();
     } catch (...) {}
 
     void Update(bool force = false) noexcept try {
         const auto state = owner.lock();
         const auto control = button.get();
         if (!state || !state->active || !control) return;
-        auto next = ViewSelection(ActiveShellView(window));
+        const auto view = ActiveShellView(window);
+        ObserveSelection(view);
+        auto next = ViewSelection(view);
         const bool same = next && selected && SameSelection(*selected, *next);
         if (!same) {
             selected = next;
-            if (!next) action = PinAction::Pin;
             lastRead = 0;
-            invokeWhenReady = false;
+            if (next) {
+                if (const auto cached = CachedPinAction(*next)) {
+                    action = *cached;
+                    lastRead = GetTickCount64();
+                }
+            }
         }
-        Present(next.has_value() && (lastRead != 0 || (!context && control.IsEnabled())));
+        Present(next.has_value() && lastRead != 0);
         if (!next || resolving || writing || (!force && lastRead && GetTickCount64() - lastRead < 1000)) return;
         resolving = QueueModuleWork([state, weak = weak_from_this(), queue = dispatcher,
                                       generation = ++readGeneration, target = std::move(*next)] {
             if (!state->active) return;
             std::optional<PinAction> result;
-            try { result = GetPinAction(state->store, target); } catch (...) {}
+            try {
+                result = CachedPinAction(target);
+                if (!result) {
+                    const auto revision = indicatorPins.Revision();
+                    auto names = ReadPinNames(state->store, target.folder);
+                    result = names.contains(target.item.filename().native()) ? PinAction::Unpin : PinAction::Pin;
+                    const auto published = indicatorPins.Publish(target.folder, std::move(names), revision);
+                    if (!published) result = GetPinAction(state->store, target);
+                    else if (*published) RedrawExplorerItemIcons();
+                }
+            } catch (...) {}
             queue.TryEnqueue([weak, generation, target, result] {
                 if (const auto command = weak.lock()) command->FinishReading(generation, target, result);
             });
@@ -1398,14 +1513,10 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
 
     void Invoke() noexcept try {
         const auto state = owner.lock();
-        if (!state || !state->active || writing) return;
+        if (!state || !state->active || writing || !lastRead) return;
         const auto current = ViewSelection(ActiveShellView(window));
         if (!current || !selected || !SameSelection(*current, *selected)) {
             if (!context) Update(true);
-            return;
-        }
-        if (!lastRead) {
-            if (resolving) invokeWhenReady = true;
             return;
         }
         writing = QueueModuleWork([state, weak = weak_from_this(), queue = dispatcher, target = *current,
@@ -1434,6 +1545,7 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
     } catch (...) {}
 
     void Remove() noexcept try {
+        StopObservingSelection();
         if (const auto anchor = neighbor.get()) anchor.IsEnabledChanged(selectionChanged);
         if (timer) {
             timer.Stop();
@@ -1450,6 +1562,18 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         }
     } catch (...) {}
 };
+
+HRESULT STDMETHODCALLTYPE ViewSelectionEvents::Invoke(DISPID member, REFIID, LCID, WORD, DISPPARAMS*, VARIANT*,
+                                                      EXCEPINFO*, UINT*) noexcept try {
+    if (member == DISPID_SELECTIONCHANGED) {
+        if (const auto binding = command.lock()) {
+            binding->dispatcher.TryEnqueue([weak = command] {
+                if (const auto item = weak.lock()) item->Update();
+            });
+        }
+    }
+    return S_OK;
+} catch (...) { return winrt::to_hresult(); }
 
 void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::CommandBar& bar, bool context) noexcept try {
     if (!state->active || (context ? !state->context : !state->toolbar)) return;
