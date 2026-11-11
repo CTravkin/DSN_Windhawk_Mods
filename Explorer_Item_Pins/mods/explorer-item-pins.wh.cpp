@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.3
+// @version         0.6.4
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 9
+// Build: 10
 
 // ==WindhawkModReadme==
 /*
@@ -78,7 +78,6 @@ folders to the top of their parent folder in File Explorer.
 #include <vector>
 
 #if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
-#include <exdisp.h>
 #include <inspectable.h>
 #include <ocidl.h>
 #include <xamlom.h>
@@ -89,6 +88,7 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Microsoft.UI.Xaml.Automation.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Microsoft.UI.Xaml.Data.h>
 #include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
 #include <atomic>
 #endif
@@ -965,6 +965,25 @@ bool QueueModuleWork(Job job) {
     return false;
 }
 
+void RedrawExplorerItemIcons() {
+    EnumWindows([](HWND window, LPARAM) -> BOOL {
+        DWORD owner = 0;
+        GetWindowThreadProcessId(window, &owner);
+        wchar_t name[32]{};
+        if (owner != GetCurrentProcessId() || !IsWindowVisible(window) ||
+            !GetClassNameW(window, name, ARRAYSIZE(name)) || std::wstring_view(name) != L"CabinetWClass") return TRUE;
+        EnumChildWindows(window, [](HWND child, LPARAM) -> BOOL {
+            wchar_t name[32]{};
+            if (IsWindowVisible(child) && GetClassNameW(child, name, ARRAYSIZE(name)) &&
+                std::wstring_view(name) == L"SHELLDLL_DefView") {
+                RedrawWindow(child, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
+            }
+            return TRUE;
+        }, 0);
+        return TRUE;
+    }, 0);
+}
+
 class IndicatorPins {
 public:
     bool Contains(const PinStore& store, const fs::path& item) {
@@ -994,9 +1013,7 @@ public:
                 submitted = QueueModuleWork([this, store, parent, folder, request] {
                     std::optional<PinNames> names;
                     try { names = ReadPinNames(store, parent); } catch (...) {}
-                    if (Complete(folder, request, std::move(names))) {
-                        SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, parent.c_str(), nullptr);
-                    }
+                    if (Complete(folder, request, std::move(names))) RedrawExplorerItemIcons();
                 });
             } catch (...) {}
             if (!submitted) Complete(folder, request, std::nullopt);
@@ -1125,31 +1142,19 @@ PCWSTR CommandTitle(PinAction action, LANGID language) {
     return pin ? L"Pin in item pane" : L"Unpin from item pane";
 }
 
-// Explorer exposes the active tab's shell view through the browser service.
+// ShellTabWindowClass returns its borrowed IShellBrowser through this shell
+// message. Keep the pointer on the tab's owning thread.
 ComPtr<IShellView> ActiveShellView(HWND window) {
-    ComPtr<IShellWindows> windows;
-    if (FAILED(CoCreateInstance(CLSID_ShellWindows, nullptr, CLSCTX_LOCAL_SERVER, IID_PPV_ARGS(&windows)))) return {};
-    long count = 0;
-    if (FAILED(windows->get_Count(&count))) return {};
-    for (long i = 0; i < count; ++i) {
-        VARIANT index{};
-        index.vt = VT_I4;
-        index.lVal = i;
-        ComPtr<IDispatch> entry;
-        if (FAILED(windows->Item(index, &entry)) || !entry) continue;
-        ComPtr<IWebBrowserApp> browserApp;
-        SHANDLE_PTR handle = 0;
-        if (FAILED(entry.As(&browserApp)) || FAILED(browserApp->get_HWND(&handle)) ||
-            reinterpret_cast<HWND>(handle) != window) continue;
-        ComPtr<IServiceProvider> services;
-        ComPtr<IShellBrowser> browser;
+    constexpr UINT getShellBrowser = WM_USER + 7;
+    for (HWND tab = nullptr; (tab = FindWindowExW(window, tab, L"ShellTabWindowClass", nullptr));) {
+        if (!IsWindowVisible(tab) || GetWindowThreadProcessId(tab, nullptr) != GetCurrentThreadId()) continue;
+        const auto native = reinterpret_cast<IShellBrowser*>(SendMessageW(tab, getShellBrowser, 0, 0));
+        if (!native) continue;
+        const ComPtr<IShellBrowser> browser(native);
         ComPtr<IShellView> view;
         HWND viewWindow = nullptr;
-        if (SUCCEEDED(entry.As(&services)) &&
-            SUCCEEDED(services->QueryService(SID_STopLevelBrowser, IID_PPV_ARGS(&browser))) &&
-            SUCCEEDED(browser->QueryActiveShellView(&view)) && view &&
-            SUCCEEDED(view->GetWindow(&viewWindow)) && IsWindowVisible(viewWindow) &&
-            GetAncestor(viewWindow, GA_ROOT) == window) return view;
+        if (SUCCEEDED(browser->QueryActiveShellView(&view)) && view && SUCCEEDED(view->GetWindow(&viewWindow)) &&
+            IsWindowVisible(viewWindow) && IsChild(tab, viewWindow)) return view;
     }
     return {};
 }
@@ -1213,6 +1218,30 @@ struct CommandPlacement {
     uint32_t index;
     controls::AppBarButton neighbor;
 };
+
+void InheritCommandStyle(const controls::AppBarButton& command, const controls::AppBarButton& native) {
+    const std::pair<xaml::DependencyProperty, PCWSTR> properties[]{
+        {xaml::FrameworkElement::StyleProperty(), L"Style"},
+        {controls::Control::TemplateProperty(), L"Template"},
+        {controls::Control::CornerRadiusProperty(), L"CornerRadius"},
+        {xaml::FrameworkElement::WidthProperty(), L"Width"},
+        {xaml::FrameworkElement::HeightProperty(), L"Height"},
+        {xaml::FrameworkElement::MinWidthProperty(), L"MinWidth"},
+        {xaml::FrameworkElement::MinHeightProperty(), L"MinHeight"},
+        {xaml::FrameworkElement::HorizontalAlignmentProperty(), L"HorizontalAlignment"},
+        {controls::Control::HorizontalContentAlignmentProperty(), L"HorizontalContentAlignment"},
+        {controls::Control::VerticalContentAlignmentProperty(), L"VerticalContentAlignment"},
+        {controls::Control::PaddingProperty(), L"Padding"},
+        {xaml::FrameworkElement::MarginProperty(), L"Margin"},
+    };
+    for (const auto& [property, name] : properties) {
+        xaml::Data::Binding binding;
+        binding.Source(native);
+        binding.Path(xaml::PropertyPath(name));
+        binding.Mode(xaml::Data::BindingMode::OneWay);
+        command.SetBinding(property, binding);
+    }
+}
 
 std::optional<CommandPlacement> FindCommandPlacement(const controls::CommandBar& bar, bool context) {
     const auto primary = bar.PrimaryCommands();
@@ -1348,6 +1377,7 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         const bool same = next && selected && SameSelection(*selected, *next);
         if (!same) {
             selected = next;
+            if (!next) action = PinAction::Pin;
             lastRead = 0;
             invokeWhenReady = false;
         }
@@ -1436,7 +1466,7 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
                     if (found != state->buttons.end()) binding = *found;
                 }
                 if (binding) {
-                    binding->Update(true);
+                    binding->Update();
                     return;
                 }
                 // A previous settings load can still be removing its button.
@@ -1453,17 +1483,7 @@ void InsertPinCommand(const std::shared_ptr<CommandUi>& state, const controls::C
     control.Name(buttonName);
     xaml::Automation::AutomationProperties::SetAutomationId(control, buttonName);
     const auto& native = placement->neighbor;
-    control.Style(native.Style());
-    control.Template(native.Template());
-    control.Width(native.Width());
-    control.MinWidth(native.MinWidth());
-    control.Height(native.Height());
-    control.MinHeight(native.MinHeight());
-    control.HorizontalAlignment(native.HorizontalAlignment());
-    control.HorizontalContentAlignment(native.HorizontalContentAlignment());
-    control.VerticalContentAlignment(native.VerticalContentAlignment());
-    control.Padding(native.Padding());
-    control.Margin(native.Margin());
+    InheritCommandStyle(control, native);
     control.IsCompact(!context);
     if (!context) control.LabelPosition(controls::CommandBarLabelPosition::Collapsed);
     auto command = std::make_shared<AttachedPinCommand>();
