@@ -91,6 +91,7 @@ public:
     }
 
     IFolderView2& View() { return *view_.Get(); }
+    HWND Window() const { return window_.get(); }
 
     std::vector<std::wstring> Items() {
         int count = 0;
@@ -498,6 +499,147 @@ void VerifyGrouping(const fs::path& root) {
     }
     std::cout << "PASS pinned group and stock order in " << passed << " native view scenarios\n";
 }
+
+using explorer_item_pins::DrawItemImage;
+using explorer_item_pins::IndicatorPins;
+DrawItemImage nativeDrawImage = nullptr;
+const void* nativePaintCaller = nullptr;
+IndicatorPins indicatorFixture;
+bool indicatorOn = false;
+bool capturePaint = false;
+
+struct IconPixels {
+    std::array<COLORREF, 256> right{};
+    std::array<COLORREF, 64> left{};
+    bool operator==(const IconPixels&) const = default;
+};
+
+IconPixels SampleIcon(HDC dc, const RECT& rect) {
+    IconPixels pixels;
+    for (int y = 0; y < 16; ++y) {
+        for (int x = 0; x < 16; ++x) {
+            pixels.right[y * 16 + x] = GetPixel(dc, rect.right - 16 + x, rect.top + y);
+        }
+    }
+    for (int y = 0; y < 8; ++y) {
+        for (int x = 0; x < 8; ++x) {
+            pixels.left[y * 8 + x] = GetPixel(dc, rect.left + x, rect.bottom - 8 + y);
+        }
+    }
+    return pixels;
+}
+
+IconPixels stockIcon;
+std::map<std::wstring, bool> paintedIcons;
+bool shortcutCornerPreserved = true;
+
+HRESULT ObserveStockImage(const unsigned char* image, HDC dc, const RECT* rect) {
+    const auto result = nativeDrawImage(image, dc, rect);
+    stockIcon = SampleIcon(dc, *rect);
+    return result;
+}
+
+HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
+    const bool folderView = __builtin_return_address(0) == nativePaintCaller;
+    if (!capturePaint || !folderView || !rect) return nativeDrawImage(image, dc, rect);
+    const auto path = explorer_item_pins::ItemImagePath(image);
+    if (!path) return nativeDrawImage(image, dc, rect);
+    const auto result = explorer_item_pins::DrawWithIndicator(*orderingStore, indicatorFixture, ObserveStockImage,
+                                                              image, dc, rect, indicatorOn);
+    const auto output = SampleIcon(dc, *rect);
+    const auto name = path->filename().native();
+    if (name == L"Pinned shortcut.lnk") shortcutCornerPreserved &= stockIcon.left == output.left;
+    paintedIcons[name] |= stockIcon.right != output.right;
+    return result;
+}
+
+void WriteThumbnail(const fs::path& path) {
+    BITMAPFILEHEADER file{};
+    BITMAPINFOHEADER info{};
+    constexpr LONG size = 64;
+    const std::array<DWORD, size * size> pixels = [] {
+        std::array<DWORD, size * size> values{};
+        values.fill(0x00405080);
+        return values;
+    }();
+    file.bfType = 0x4d42;
+    file.bfOffBits = sizeof(file) + sizeof(info);
+    file.bfSize = file.bfOffBits + sizeof(pixels);
+    info.biSize = sizeof(info);
+    info.biWidth = size;
+    info.biHeight = size;
+    info.biPlanes = 1;
+    info.biBitCount = 32;
+    std::ofstream stream(path, std::ios::binary);
+    stream.write(reinterpret_cast<const char*>(&file), sizeof(file));
+    stream.write(reinterpret_cast<const char*>(&info), sizeof(info));
+    stream.write(reinterpret_cast<const char*>(pixels.data()), sizeof(pixels));
+    Require(stream.good(), "write the thumbnail fixture");
+}
+
+void VerifyIndicator(const fs::path& root) {
+    const auto folder = root / L"paint";
+    fs::create_directories(folder / L"Pinned folder");
+    const auto bitmap = folder / L"Pinned thumbnail.bmp";
+    WriteThumbnail(bitmap);
+    std::ofstream(folder / L"Ordinary.txt") << "ordinary";
+    ComPtr<IShellLinkW> link;
+    Check(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&link)), "create a fixture shortcut");
+    Check(link->SetPath(bitmap.c_str()), "set the fixture shortcut target");
+    ComPtr<IPersistFile> save;
+    Check(link.As(&save), "get the fixture shortcut's persistence interface");
+    Check(save->Save((folder / L"Pinned shortcut.lnk").c_str(), TRUE), "save the fixture shortcut");
+
+    const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    const auto frame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+    const auto native = explorer_item_pins::FindNativeIndicator(storage, frame);
+    if (!native) {
+        std::cout << "SKIP native indicator renderer on these Windows shell images\n";
+        return;
+    }
+    const auto& store = orderingStore.emplace(root / L"paint-data" / L"pins.json");
+    for (const auto* name : {L"Pinned folder", L"Pinned thumbnail.bmp", L"Pinned shortcut.lnk"}) {
+        Require(store.SetPinned(folder, explorer_item_pins::ReadItem(folder / name), true), "persist an indicator fixture pin");
+    }
+    constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
+    nativePaintCaller = native->folderViewCaller;
+    nativeDrawImage = InstallTestHook(native->draw, TestItemImage, draw);
+
+    ExplorerView view(folder, 4);
+    const auto window = view.Window();
+    SetWindowPos(window, nullptr, -10000, -10000, 0, 0, SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
+    ShowWindow(window, SW_SHOWNOACTIVATE);
+    RECT bounds{};
+    GetWindowRect(window, &bounds);
+    const auto screen = GetDC(window);
+    const auto dc = CreateCompatibleDC(screen);
+    const auto surface = CreateCompatibleBitmap(screen, bounds.right - bounds.left, bounds.bottom - bounds.top);
+    ReleaseDC(window, screen);
+    Require(dc && surface, "create a private render target for the native view");
+    const auto previous = SelectObject(dc, surface);
+
+    int verified = 0;
+    for (const auto& layout : layouts) {
+        SetLayout(view, layout);
+        for (bool enabled : {false, true}) {
+            indicatorOn = enabled;
+            paintedIcons.clear();
+            shortcutCornerPreserved = true;
+            capturePaint = true;
+            const auto rendered = PrintWindow(window, dc, 2);
+            capturePaint = false;
+            Require(rendered && paintedIcons.size() == 4, "paint each fixture image in the native layout");
+            Require(!paintedIcons[L"Ordinary.txt"] && paintedIcons[L"Pinned folder"] == enabled &&
+                    paintedIcons[L"Pinned thumbnail.bmp"] == enabled && paintedIcons[L"Pinned shortcut.lnk"] == enabled &&
+                    shortcutCornerPreserved, "draw only pinned top corners and preserve the shortcut overlay corner");
+            ++verified;
+        }
+    }
+    SelectObject(dc, previous);
+    DeleteObject(surface);
+    DeleteDC(dc);
+    std::cout << "PASS indicator pixels and shortcut corner in " << verified << " native view scenarios\n";
+}
 }
 
 int wmain(int argc, wchar_t** argv) {
@@ -513,6 +655,8 @@ int wmain(int argc, wchar_t** argv) {
             VerifyOrdering(argv[1]);
         } else if (mode == L"grouping") {
             VerifyGrouping(argv[1]);
+        } else if (mode == L"indicator") {
+            VerifyIndicator(argv[1]);
         } else {
             result = 2;
         }

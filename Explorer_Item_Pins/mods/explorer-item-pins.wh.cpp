@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.5.0
+// @version         0.6.0
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
-// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid
+// @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32
 // ==/WindhawkMod==
-// Build: 5
+// Build: 6
 
 // ==WindhawkModReadme==
 /*
@@ -66,6 +66,7 @@ folders to the top of their parent folder in File Explorer.
 #include <filesystem>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <set>
 #include <span>
@@ -90,7 +91,6 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Microsoft.UI.Xaml.Controls.Primitives.h>
 #include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
 #include <atomic>
-#include <mutex>
 #endif
 
 namespace explorer_item_pins {
@@ -922,7 +922,114 @@ std::optional<DWORD> NativeGroupId(GroupList& groups, UINT index) {
     return result;
 }
 
+using DrawItemImage = HRESULT (*)(const unsigned char*, HDC, const RECT*);
+
+constexpr GUID framePdb{0x468742f3, 0xd41c, 0x3441, {0xa5, 0x02, 0x2f, 0xbf, 0xfe, 0xf9, 0xa6, 0x56}};
+
+struct NativeIndicator {
+    DrawItemImage draw;
+    const void* folderViewCaller;
+};
+
+[[maybe_unused]] std::optional<NativeIndicator> FindNativeIndicator(HMODULE storage, HMODULE frame) {
+    constexpr DWORD draw = 0x16d730;
+    constexpr DWORD caller = 0xbe1ac;
+    const auto image = CheckedImage(storage, storagePdb, draw);
+    const auto frontend = CheckedImage(frame, framePdb, caller);
+    if (!image || !frontend) return std::nullopt;
+    return NativeIndicator{reinterpret_cast<DrawItemImage>(image + draw), frontend + caller};
+}
+
+class IndicatorPins {
+public:
+    bool Contains(const PinStore& store, const fs::path& item) {
+        const auto parent = item.parent_path();
+        if (!parent.is_absolute() || !item.has_filename()) return false;
+        const auto folder = FolderKey(parent);
+        const auto now = GetTickCount64();
+        const std::scoped_lock lock(mutex_);
+        if (folders_.size() >= 64 && !folders_.contains(folder)) folders_.clear();
+        auto& entry = folders_[folder];
+        if (entry.expires <= now) {
+            entry.names = ReadPinNames(store, parent);
+            entry.expires = now + 750;
+        }
+        return entry.names.contains(item.filename().native());
+    }
+
+    void Invalidate() {
+        const std::scoped_lock lock(mutex_);
+        folders_.clear();
+    }
+
+private:
+    struct Entry {
+        PinNames names;
+        ULONGLONG expires = 0;
+    };
+    std::mutex mutex_;
+    std::map<std::wstring, Entry, FolderLess> folders_;
+};
+
+std::optional<fs::path> ItemImagePath(const unsigned char* image) {
+    auto* source = *reinterpret_cast<IUnknown* const*>(image + 0x28);
+    if (!source) return std::nullopt;
+    using GetValues = HRESULT (*)(IUnknown*, DWORD, const PROPERTYKEY*, PROPVARIANT*, ULONG*);
+    const auto read = reinterpret_cast<GetValues>((*reinterpret_cast<void***>(source))[3]);
+    ULONG found = 0;
+    PROPVARIANT path{};
+    const auto clear = [](PROPVARIANT* value) { PropVariantClear(value); };
+    const std::unique_ptr<PROPVARIANT, decltype(clear)> cleanup(&path, clear);
+    if (FAILED(read(source, 0, &PKEY_ParsingPath, &path, &found)) || found != 1 ||
+        path.vt != VT_LPWSTR || !path.pwszVal) return std::nullopt;
+    return fs::path(path.pwszVal);
+}
+
+bool DrawPinnedIndicator(HDC dc, const RECT& icon) {
+    const LONG side = std::min(icon.right - icon.left, icon.bottom - icon.top);
+    if (!dc || side < 12) return false;
+    const LONG size = std::clamp(side / 3 + 4, 9L, 16L);
+    const auto saved = SaveDC(dc);
+    if (!saved) return false;
+
+    LOGFONTW style{};
+    style.lfHeight = -size;
+    style.lfQuality = ANTIALIASED_QUALITY;
+    wcscpy_s(style.lfFaceName, L"Segoe Fluent Icons");
+    const HFONT font = CreateFontIndirectW(&style);
+    bool drawn = false;
+    if (font && SelectObject(dc, font)) {
+        SetBkMode(dc, TRANSPARENT);
+        HIGHCONTRASTW contrast{};
+        contrast.cbSize = sizeof(contrast);
+        const bool highContrast = SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
+                                  (contrast.dwFlags & HCF_HIGHCONTRASTON);
+        SetTextColor(dc, GetSysColor(highContrast ? COLOR_WINDOWTEXT : COLOR_GRAYTEXT));
+        RECT area{icon.right - size, icon.top, icon.right, icon.top + size};
+        drawn = DrawTextW(dc, L"\uE842", 1, &area, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX) != 0;
+    }
+    RestoreDC(dc, saved);
+    if (font) DeleteObject(font);
+    return drawn;
+}
+
+[[maybe_unused]] HRESULT DrawWithIndicator(const PinStore& store, IndicatorPins& pins, DrawItemImage original,
+                                           const unsigned char* image, HDC dc, const RECT* rect, bool folderView) {
+    const auto result = original(image, dc, rect);
+    if (SUCCEEDED(result) && folderView && rect) {
+        try {
+            const auto path = ItemImagePath(image);
+            if (path && pins.Contains(store, *path)) DrawPinnedIndicator(dc, *rect);
+        } catch (...) {
+            // Keep the standard icon if a property or pin snapshot is unavailable.
+        }
+    }
+    return result;
+}
+
 #if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+IndicatorPins indicatorPins;
+
 namespace ui = winrt::Microsoft::UI;
 namespace xaml = ui::Xaml;
 namespace controls = xaml::Controls;
@@ -1134,6 +1241,7 @@ struct AttachedPinCommand {
             return;
         }
         if (ApplyPinAction(state->store, *current, action)) {
+            indicatorPins.Invalidate();
             view->Refresh();
             SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_PATHW | SHCNF_FLUSHNOWAIT, current->folder.c_str(), nullptr);
         }
@@ -1402,6 +1510,9 @@ std::optional<PinStore> nativePinStore;
 SortViewBatch nativeSortOriginal = nullptr;
 CompareViewItems nativeCompare = nullptr;
 NativeGrouping nativeGrouping{};
+DrawItemImage nativeImageOriginal = nullptr;
+const void* nativeFolderImageCaller = nullptr;
+HMODULE ownedExplorerFrame = nullptr;
 
 BOOL NativeSortHook(ViewSortBatch* batch) {
     return SortWithPins(*nativePinStore, nativeSortOriginal, nativeCompare, batch);
@@ -1431,10 +1542,33 @@ HRESULT NativeSetGroupingHook(IFolderView2* view, REFPROPERTYKEY key, BOOL ascen
     return SetGroupingWithPins(*nativePinStore, nativeGrouping.setGrouping, view, key, ascending);
 }
 
+HRESULT NativeImageHook(const unsigned char* image, HDC dc, const RECT* rect) {
+    return DrawWithIndicator(*nativePinStore, indicatorPins, nativeImageOriginal, image, dc, rect,
+                             __builtin_return_address(0) == nativeFolderImageCaller);
+}
+
 template <typename Function>
 bool HookFunction(Function target, Function callback, Function& original) {
     return Wh_SetFunctionHook(reinterpret_cast<void*>(target), reinterpret_cast<void*>(callback),
                               reinterpret_cast<void**>(&original));
+}
+
+void HookNativeIndicator(HMODULE storage) {
+    if (!Wh_GetIntSetting(L"pinIndicator")) return;
+    auto frame = GetModuleHandleW(L"ExplorerFrame.dll");
+    if (!frame) {
+        ownedExplorerFrame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
+        frame = ownedExplorerFrame;
+    }
+    const auto indicator = FindNativeIndicator(storage, frame);
+    if (!indicator) {
+        Wh_Log(L"The shell images do not match the verified indicator renderer");
+        return;
+    }
+    nativeFolderImageCaller = indicator->folderViewCaller;
+    if (!HookFunction(indicator->draw, NativeImageHook, nativeImageOriginal)) {
+        Wh_Log(L"Could not hook the pinned indicator renderer");
+    }
 }
 #endif
 
@@ -1457,6 +1591,9 @@ extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid
 #ifdef WH_MOD
 void Wh_ModAfterInit() { explorer_item_pins::StartNativeCommands(); }
 void Wh_ModBeforeUninit() { explorer_item_pins::StopNativeCommands(); }
+void Wh_ModUninit() {
+    if (auto frame = std::exchange(explorer_item_pins::ownedExplorerFrame, nullptr)) FreeLibrary(frame);
+}
 void Wh_ModSettingsChanged(BOOL* reload) { *reload = TRUE; }
 #endif
 
@@ -1475,13 +1612,15 @@ BOOL Wh_ModInit() {
     }
     nativeCompare = native->compare;
     nativeGrouping = *grouping;
-    return HookFunction(native->sort, NativeSortHook, nativeSortOriginal) &&
-           HookFunction(grouping->batch, NativeGroupBatchHook, nativeGrouping.batch) &&
-           HookFunction(grouping->assign, NativeAssignGroupHook, nativeGrouping.assign) &&
-           HookFunction(grouping->rangeInfo, NativeRangeInfoHook, nativeGrouping.rangeInfo) &&
-           HookFunction(grouping->textInfo, NativeTextInfoHook, nativeGrouping.textInfo) &&
-           HookFunction(grouping->apply, NativeApplyGroupsHook, nativeGrouping.apply) &&
-           HookFunction(grouping->setGrouping, NativeSetGroupingHook, nativeGrouping.setGrouping);
+    if (!HookFunction(native->sort, NativeSortHook, nativeSortOriginal) ||
+        !HookFunction(grouping->batch, NativeGroupBatchHook, nativeGrouping.batch) ||
+        !HookFunction(grouping->assign, NativeAssignGroupHook, nativeGrouping.assign) ||
+        !HookFunction(grouping->rangeInfo, NativeRangeInfoHook, nativeGrouping.rangeInfo) ||
+        !HookFunction(grouping->textInfo, NativeTextInfoHook, nativeGrouping.textInfo) ||
+        !HookFunction(grouping->apply, NativeApplyGroupsHook, nativeGrouping.apply) ||
+        !HookFunction(grouping->setGrouping, NativeSetGroupingHook, nativeGrouping.setGrouping)) return FALSE;
+    HookNativeIndicator(storage);
+    return TRUE;
 #else
     return FALSE;
 #endif

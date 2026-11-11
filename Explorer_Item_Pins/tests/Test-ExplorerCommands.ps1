@@ -11,7 +11,7 @@ New-Item -ItemType Directory -Path $work | Out-Null
 $exe = Join-Path $work 'explorer-commands.exe'
 $source = Join-Path $PSScriptRoot 'explorer-commands.cpp'
 
-& $Compiler --target=x86_64-w64-mingw32 -std=c++23 -D_WIN32_WINNT=0x0A00 -municode -Wall -Wextra -Werror -static -o $exe $source -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -luser32
+& $Compiler --target=x86_64-w64-mingw32 -std=c++23 -D_WIN32_WINNT=0x0A00 -municode -Wall -Wextra -Werror -static -o $exe $source -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -luser32 -lgdi32
 if ($LASTEXITCODE -ne 0) { throw "Compilation failed with exit code $LASTEXITCODE" }
 & $exe $work commands
 if ($LASTEXITCODE -ne 0) { throw "Native Explorer commands test failed with exit code $LASTEXITCODE" }
@@ -19,6 +19,8 @@ if ($LASTEXITCODE -ne 0) { throw "Native Explorer commands test failed with exit
 if ($LASTEXITCODE -ne 0) { throw "Native Explorer ordering test failed with exit code $LASTEXITCODE" }
 & $exe $work grouping
 if ($LASTEXITCODE -ne 0) { throw "Native Explorer grouping test failed with exit code $LASTEXITCODE" }
+& $exe $work indicator
+if ($LASTEXITCODE -ne 0) { throw "Native Explorer indicator test failed with exit code $LASTEXITCODE" }
 
 $resolvedWork = (Resolve-Path -LiteralPath $work).Path
 $resolvedBuild = (Resolve-Path -LiteralPath $buildRoot).Path
