@@ -56,6 +56,7 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Data.Json.h>
+#include <wrl/client.h>
 
 #include <algorithm>
 #include <filesystem>
@@ -67,6 +68,7 @@ folders to the top of their parent folder in File Explorer.
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <type_traits>
 #include <vector>
 
 namespace explorer_item_pins {
@@ -394,6 +396,109 @@ std::vector<std::optional<size_t>> ResolvePins(std::span<const Item> pins, std::
         return !pin.identity.empty() && pin.identity == item.identity;
     });
     return resolved;
+}
+
+struct ExplorerSelection {
+    fs::path folder;
+    fs::path item;
+};
+
+enum class PinAction { Pin, Unpin };
+
+std::optional<ExplorerSelection> CaptureSingleSelection(IFolderView2& view) {
+    using Microsoft::WRL::ComPtr;
+    ComPtr<IShellItemArray> selected;
+    if (view.GetSelection(FALSE, &selected) != S_OK || !selected) return std::nullopt;
+    DWORD count = 0;
+    if (FAILED(selected->GetCount(&count)) || count != 1) return std::nullopt;
+
+    ComPtr<IShellItem> item;
+    if (FAILED(selected->GetItemAt(0, &item)) || !item) return std::nullopt;
+    PWSTR rawItem = nullptr;
+    const HRESULT itemResult = item->GetDisplayName(SIGDN_FILESYSPATH, &rawItem);
+    const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> itemName(rawItem, CoTaskMemFree);
+    if (FAILED(itemResult) || !itemName) return std::nullopt;
+
+    ComPtr<IPersistFolder2> folder;
+    if (FAILED(view.GetFolder(IID_PPV_ARGS(&folder))) || !folder) return std::nullopt;
+    PIDLIST_ABSOLUTE rawFolder = nullptr;
+    const HRESULT folderResult = folder->GetCurFolder(&rawFolder);
+    const std::unique_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>, decltype(&CoTaskMemFree)>
+        folderId(rawFolder, CoTaskMemFree);
+    if (FAILED(folderResult) || !folderId) return std::nullopt;
+    PWSTR rawFolderName = nullptr;
+    const HRESULT nameResult = SHGetNameFromIDList(folderId.get(), SIGDN_FILESYSPATH, &rawFolderName);
+    const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> folderName(rawFolderName, CoTaskMemFree);
+    if (FAILED(nameResult) || !folderName) return std::nullopt;
+
+    fs::path itemPath(itemName.get());
+    fs::path folderPath(folderName.get());
+    if (!itemPath.is_absolute() || !folderPath.is_absolute() || !itemPath.has_filename() ||
+        CompareNames(FolderKey(itemPath.parent_path()), FolderKey(folderPath)) != CSTR_EQUAL) {
+        return std::nullopt;
+    }
+    return ExplorerSelection{std::move(folderPath), std::move(itemPath)};
+}
+
+namespace {
+
+struct SelectionPin {
+    Item item;
+    std::optional<Item> stored;
+};
+
+// Call off the Explorer UI thread. This reads the store and may scan the folder.
+SelectionPin InspectSelection(const PinStore& store, const ExplorerSelection& selection) {
+    const auto pins = store.ReadFolder(selection.folder);
+    const auto name = selection.item.filename().native();
+    const auto exact = std::ranges::find(pins, name, &Item::name);
+    if (exact != pins.end()) return {{name, {}}, *exact};
+
+    auto item = ReadItem(selection.item);
+    const bool possibleRename = !item.identity.empty() &&
+        std::ranges::find(pins, item.identity, &Item::identity) != pins.end();
+    const bool possibleCaseMatch = std::ranges::any_of(pins, [&](const Item& pin) {
+        return CompareNames(pin.name, item.name) == CSTR_EQUAL;
+    });
+    if (!possibleRename && !possibleCaseMatch) return {std::move(item), std::nullopt};
+
+    // Only an alias candidate needs a directory scan. A surviving old name
+    // or an ambiguous file identity must not bind the old record to this item.
+    std::vector<Item> entries;
+    std::optional<size_t> selectedIndex;
+    for (const auto& entry : fs::directory_iterator(selection.folder)) {
+        const auto entryName = entry.path().filename().native();
+        if (entryName == item.name) {
+            selectedIndex = entries.size();
+            entries.push_back(item);
+        } else if (possibleRename) {
+            entries.push_back(ReadItem(entry.path()));
+        } else {
+            entries.push_back({entryName, {}});
+        }
+    }
+    if (selectedIndex) {
+        const auto matches = ResolvePins(pins, entries);
+        const auto match = std::ranges::find(matches, selectedIndex);
+        if (match != matches.end()) {
+            return {std::move(item), pins[static_cast<size_t>(match - matches.begin())]};
+        }
+    }
+    return {std::move(item), std::nullopt};
+}
+
+}  // namespace
+
+PinAction GetPinAction(const PinStore& store, const ExplorerSelection& selection) {
+    return InspectSelection(store, selection).stored ? PinAction::Unpin : PinAction::Pin;
+}
+
+bool ApplyPinAction(const PinStore& store, const ExplorerSelection& selection, PinAction action) {
+    const auto current = InspectSelection(store, selection);
+    if (action == PinAction::Unpin) {
+        return current.stored && store.SetPinned(selection.folder, *current.stored, false);
+    }
+    return !current.stored && store.SetPinned(selection.folder, current.item, true);
 }
 
 }  // namespace explorer_item_pins

@@ -6,7 +6,7 @@ Explorer Item Pins is a Windhawk mod in development for pinning files and folder
 
 ## Status
 
-The current snapshot contains the pin store and item matching. Explorer commands, ordering, and the pin indicator are still in development.
+The current snapshot contains the pin store and pin/unpin operations for a single selection in a native Explorer view. The context menu, command bar, ordering, and pin indicator are still in development.
 
 ## Data exchange
 
@@ -16,10 +16,11 @@ Pins are stored per Windows account in `%LOCALAPPDATA%\Explorer Item Pins\pins.j
 
 ### Verification
 
-Run the storage tests on Windows with PowerShell and the compiler bundled with Windhawk 1.7.3.
+Run the tests from this mod directory on Windows with PowerShell and the compiler bundled with Windhawk 1.7.3.
 
 ```powershell
 pwsh -NoProfile -File .\tests\Test-PinStore.ps1
+pwsh -NoProfile -File .\tests\Test-ExplorerCommands.ps1
 ```
 
-The tests use a temporary database under `build\`. They check Unicode names, persistence, changes to files on the local volume, invalid data, and concurrent writers.
+The tests use temporary files under `build\`. They check storage, concurrent access, and pin/unpin operations against a native Explorer view hosted in the test process.
