@@ -7,13 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.1.0
+// @version         0.2.0
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -luuid
 // ==/WindhawkMod==
+// Build: 2
 
 // ==WindhawkModReadme==
 /*
