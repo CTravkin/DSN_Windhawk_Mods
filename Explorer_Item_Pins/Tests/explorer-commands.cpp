@@ -558,10 +558,10 @@ IconPixels SampleIcon(HDC dc, const RECT& rect) {
 IconPixels stockIcon;
 std::map<std::wstring, bool> paintedIcons;
 bool shortcutCornerPreserved = true;
-HIMAGELIST indicatorImages = nullptr;
 
 struct IndicatorRetryFixture {
-    HIMAGELIST images;
+    explorer_item_pins::NavigationPinCache cache;
+    bool ready = false;
     bool attempted = false;
     bool painted = false;
 
@@ -570,7 +570,8 @@ struct IndicatorRetryFixture {
         if (message != WM_PAINT || !self) return DefWindowProcW(window, message, wParam, lParam);
         PAINTSTRUCT paint{};
         const auto dc = BeginPaint(window, &paint);
-        self->painted = explorer_item_pins::DrawPinnedIndicator(self->images, dc, {0, 0, 16, 16}, {0, 8, 8, 16});
+        self->painted = explorer_item_pins::DrawPinnedIndicator(dc, {0, 0, 16, 16}, {0, 8, 8, 16}, self->cache,
+            [&](HDC target) { return self->ready ? explorer_item_pins::LoadNavigationPin(target) : explorer_item_pins::NavigationPin{}; });
         self->attempted = true;
         EndPaint(window, &paint);
         return 0;
@@ -590,7 +591,7 @@ HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
     const auto path = explorer_item_pins::ItemImagePath(image);
     if (!path) return nativeDrawImage(image, dc, rect);
     const auto result = explorer_item_pins::DrawWithIndicator(*orderingStore, indicatorFixture, ObserveStockImage,
-                                                              image, dc, rect, indicatorOn, [](HDC) { return indicatorImages; });
+                                                              image, dc, rect, indicatorOn);
     const auto output = SampleIcon(dc, *rect);
     const auto name = path->filename().native();
     if (name == L"Pinned shortcut.lnk") shortcutCornerPreserved &= stockIcon.left == output.left;
@@ -653,24 +654,9 @@ void VerifyIndicator(const fs::path& root) {
     WaitUntil([&] { return indicatorFixture.Contains(store, bitmap); }, "load the indicator snapshot off the paint thread");
     Require(indicatorFixture.Cached(bitmap) == true && indicatorFixture.Cached(folder / L"Ordinary.txt") == false,
             "use one snapshot for actions on both pinned and ordinary items");
-    const std::unique_ptr<std::remove_pointer_t<HIMAGELIST>, decltype(&ImageList_Destroy)>
-        images(ImageList_Create(16, 16, ILC_COLOR32 | ILC_MASK, 2, 0), ImageList_Destroy);
-    Require(images != nullptr, "create an isolated state image list");
-    BITMAPINFO stateImage{};
-    stateImage.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    stateImage.bmiHeader.biWidth = 16;
-    stateImage.bmiHeader.biHeight = -16;
-    stateImage.bmiHeader.biPlanes = 1;
-    stateImage.bmiHeader.biBitCount = 32;
-    void* buffer = nullptr;
-    const auto stateBitmap = CreateDIBSection(nullptr, &stateImage, DIB_RGB_COLORS, &buffer, nullptr, 0);
-    Require(stateBitmap && buffer, "create a test state bitmap");
-    auto* pixels = static_cast<DWORD*>(buffer);
-    std::fill_n(pixels, 256, 0u);
-    const auto emptyIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
     {
         // This offscreen frame receives the same invalidation as an Explorer window.
-        IndicatorRetryFixture retry{images.get()};
+        IndicatorRetryFixture retry;
         WNDCLASSW windowClass{};
         windowClass.hInstance = GetModuleHandleW(nullptr);
         windowClass.lpszClassName = L"CabinetWClass";
@@ -686,13 +672,9 @@ void VerifyIndicator(const fs::path& root) {
         SendMessageW(retryFrame.get(), WM_PAINT, 0, 0);
         Require(retry.attempted, "deliver the first paint to the isolated retry frame");
         Require(!retry.painted, "keep the stock icon while the navigation pin is unavailable");
-        for (int y = 2; y < 8; ++y) std::fill_n(pixels + y * 16 + 8, 6, 0xffe600d8u);
-        const auto pinIndex = ImageList_AddMasked(images.get(), stateBitmap, RGB(0, 0, 0));
-        Require(emptyIndex == 0 && pinIndex == 1, "only the stock state index should draw a visible badge");
-        WaitUntil([&] { return retry.painted; }, "repaint after the same native image list becomes ready");
+        retry.ready = true;
+        WaitUntil([&] { return retry.painted; }, "repaint after the native pin resource becomes available");
     }
-    DeleteObject(stateBitmap);
-    indicatorImages = images.get();
     constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
     constexpr unsigned char paintPrologue[]{0x40, 0x55, 0x53, 0x41, 0x57, 0x48, 0x8d, 0x6c, 0x24,
                                            0xc9, 0x48, 0x81, 0xec, 0xa0, 0x00, 0x00, 0x00};
@@ -713,17 +695,36 @@ void VerifyIndicator(const fs::path& root) {
     Require(dc && surface, "create a private render target for the native view");
     const auto previous = SelectObject(dc, surface);
 
+    explorer_item_pins::NavigationPin uniformColor{{0xff97a2a8u, 0}, 2, 1};
+    std::array<DWORD, 3> blended{};
+    Require(explorer_item_pins::ScaleNavigationPin(uniformColor, 3, 1, blended.data()), "resample a translucent edge");
+    const auto edge = blended[1];
+    const auto coverage = static_cast<BYTE>(edge >> 24);
+    Require(coverage > 32 && coverage < 224 && std::abs(static_cast<int>(static_cast<BYTE>(edge >> 16)) - 151) <= 3,
+            "keep the pin color at fractional alpha for light and dark backgrounds");
+
+    const auto nativePin = explorer_item_pins::LoadNavigationPin(dc);
+    Require(nativePin.width > 100 && nativePin.height > 100, "load the original high-resolution navigation pin from Windows");
+    const auto solid = std::ranges::find_if(nativePin.pixels, [](DWORD pixel) { return pixel >> 24 == 0xff; });
+    Require(solid != nativePin.pixels.end(), "read the navigation pin's opaque color");
+    const auto solidGreen = static_cast<BYTE>(*solid >> 8);
+
     for (const auto& [size, arrow] : {std::pair{16, 8}, {32, 13}, {96, 19}, {256, 40}}) {
         const RECT icon{8, 8, 8 + size, 8 + size};
         const RECT shortcut{0, size - arrow, arrow, size};
         PatBlt(dc, 0, 0, size + 16, size + 16, WHITENESS);
-        Require(explorer_item_pins::DrawPinnedIndicator(images.get(), dc, icon, shortcut), "draw the fixture badge");
+        Require(explorer_item_pins::DrawPinnedIndicator(dc, icon, shortcut), "draw the navigation pin resource");
         const auto width = size + 16;
         const auto ink = explorer_item_pins::VisibleBounds(width, width, [&](size_t i) {
             return GetPixel(dc, i % width, i / width) != RGB(255, 255, 255);
         });
         Require(ink.top == icon.top && ink.right == icon.right && ink.right - ink.left == arrow &&
                 ink.bottom - ink.top == arrow, "mirror the shortcut bounds with the visible pin pixels");
+        const auto smoothEdge = explorer_item_pins::VisibleBounds(width, width, [&](size_t i) {
+            const auto green = GetGValue(GetPixel(dc, i % width, i / width));
+            return green > solidGreen && green < 255;
+        });
+        Require(!IsRectEmpty(&smoothEdge), "preserve antialiased coverage while shrinking the native resource");
     }
 
     int verified = 0;
