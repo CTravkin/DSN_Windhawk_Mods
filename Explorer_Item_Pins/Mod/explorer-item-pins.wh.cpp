@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.9
+// @version         0.6.10
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 15
+// Build: 16
 
 // ==WindhawkModReadme==
 /*
@@ -645,6 +645,8 @@ struct NativeOrdering {
 // The private ABI and RVAs below are tied to the verified CodeView identities.
 constexpr GUID storagePdb{0x6ebed4d4, 0x5734, 0x9fc4, {0x9e, 0x3e, 0x8d, 0xe5, 0x0b, 0x33, 0x0f, 0x0f}};
 constexpr GUID shellPdb{0x617696ae, 0x77ca, 0x0846, {0x74, 0x3e, 0x0c, 0x34, 0x54, 0xe1, 0x7c, 0x05}};
+constexpr GUID storagePdb9974{0x63a99e08, 0xa6bc, 0x71de, {0x16, 0x8a, 0xd4, 0xf5, 0x4b, 0x00, 0x12, 0x59}};
+constexpr GUID shellPdb9974{0x64708141, 0x4aa5, 0xc991, {0xb8, 0xa9, 0x4f, 0x15, 0xc5, 0xba, 0x60, 0x02}};
 
 unsigned char* CheckedImage(HMODULE module, const GUID& expectedPdb, DWORD lastRva) {
     if (!module) return nullptr;
@@ -677,7 +679,8 @@ unsigned char* CheckedImage(HMODULE module, const GUID& expectedPdb, DWORD lastR
 [[maybe_unused]] std::optional<NativeOrdering> FindNativeOrdering(HMODULE storage) {
     constexpr DWORD sortRva = 0x1537e8;
     constexpr DWORD compareRva = 0x155190;
-    const auto image = CheckedImage(storage, storagePdb, compareRva);
+    auto image = CheckedImage(storage, storagePdb, compareRva);
+    if (!image) image = CheckedImage(storage, storagePdb9974, compareRva);
     if (!image) return std::nullopt;
     return NativeOrdering{reinterpret_cast<SortViewBatch>(image + sortRva),
                           reinterpret_cast<CompareViewItems>(image + compareRva)};
@@ -790,15 +793,18 @@ struct NativeGrouping {
 };
 
 [[maybe_unused]] std::optional<NativeGrouping> FindNativeGrouping(HMODULE storage, HMODULE shell) {
-    const auto image = CheckedImage(storage, storagePdb, 0x5bcb30);
-    const auto frontend = CheckedImage(shell, shellPdb, 0x2e8ae0);
+    const auto updated = CheckedImage(storage, storagePdb9974, 0x5bcf00);
+    const auto image = updated ? updated : CheckedImage(storage, storagePdb, 0x5bcb30);
+    const DWORD setGrouping = updated ? 0x2e8e50 : 0x2e8ae0;
+    const auto frontend = CheckedImage(shell, updated ? shellPdb9974 : shellPdb, setGrouping);
     if (!image || !frontend) return std::nullopt;
     return NativeGrouping{
         reinterpret_cast<GroupBatch>(image + 0x153e50), reinterpret_cast<AssignGroup>(image + 0x1641f0),
-        reinterpret_cast<GroupInfo>(image + 0x22fc90), reinterpret_cast<GroupInfo>(image + 0x16f0c0),
-        reinterpret_cast<ApplyGroups>(image + 0x16eab8), reinterpret_cast<SetGrouping>(frontend + 0x2e8ae0),
-        reinterpret_cast<RegisterGroup>(image + 0x1642dc), reinterpret_cast<MakeGroup>(image + 0x22fd4c),
-        reinterpret_cast<GroupDirection>(image + 0x16ec10), image + 0x248730, image + 0x5bcb30,
+        reinterpret_cast<GroupInfo>(image + (updated ? 0x22fcf0 : 0x22fc90)), reinterpret_cast<GroupInfo>(image + 0x16f0c0),
+        reinterpret_cast<ApplyGroups>(image + 0x16eab8), reinterpret_cast<SetGrouping>(frontend + setGrouping),
+        reinterpret_cast<RegisterGroup>(image + 0x1642dc), reinterpret_cast<MakeGroup>(image + (updated ? 0x22fdac : 0x22fd4c)),
+        reinterpret_cast<GroupDirection>(image + 0x16ec10), image + (updated ? 0x248790 : 0x248730),
+        image + (updated ? 0x5bcf00 : 0x5bcb30),
     };
 }
 
@@ -973,6 +979,7 @@ std::optional<DWORD> NativeGroupId(GroupList& groups, UINT index) {
 using DrawItemImage = HRESULT (*)(const unsigned char*, HDC, const RECT*);
 
 constexpr GUID framePdb{0x468742f3, 0xd41c, 0x3441, {0xa5, 0x02, 0x2f, 0xbf, 0xfe, 0xf9, 0xa6, 0x56}};
+constexpr GUID framePdb9974{0xf8886b4f, 0x52b8, 0x73ab, {0x4a, 0x57, 0x43, 0xf3, 0x89, 0x20, 0x9a, 0xce}};
 
 struct NativeIndicator {
     DrawItemImage draw;
@@ -982,8 +989,9 @@ struct NativeIndicator {
 [[maybe_unused]] std::optional<NativeIndicator> FindNativeIndicator(HMODULE storage, HMODULE frame) {
     constexpr DWORD draw = 0x16d730;
     constexpr DWORD caller = 0xbe1ac;
-    const auto image = CheckedImage(storage, storagePdb, draw);
-    const auto frontend = CheckedImage(frame, framePdb, caller);
+    const auto updated = CheckedImage(storage, storagePdb9974, draw);
+    const auto image = updated ? updated : CheckedImage(storage, storagePdb, draw);
+    const auto frontend = CheckedImage(frame, updated ? framePdb9974 : framePdb, caller);
     if (!image || !frontend) return std::nullopt;
     return NativeIndicator{reinterpret_cast<DrawItemImage>(image + draw), frontend + caller};
 }

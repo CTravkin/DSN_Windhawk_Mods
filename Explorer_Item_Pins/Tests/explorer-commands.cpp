@@ -222,7 +222,12 @@ Function InstallTestHook(Function target, Function callback, std::span<const uns
     // This process is isolated from the Explorer session. Install before
     // opening the test view and let process teardown discard the code pages.
     auto* entry = reinterpret_cast<unsigned char*>(target);
-    Require(expected.size() >= 14 && std::memcmp(entry, expected.data(), expected.size()) == 0,
+    const bool relative = ripLoad != std::dynamic_extent;
+    Require(expected.size() >= 14 && (!relative || ripLoad + 7 == expected.size()),
+            "verify the test trampoline's prologue length");
+    // The last four bytes of a RIP-relative load are a displacement that varies by image.
+    const auto fixedBytes = expected.size() - (relative ? sizeof(std::int32_t) : 0);
+    Require(std::memcmp(entry, expected.data(), fixedBytes) == 0,
             "verify the test trampoline's instruction boundaries");
     const auto jump = [](unsigned char* location, const void* targetAddress) {
         unsigned char instruction[14]{0xff, 0x25};
@@ -237,7 +242,7 @@ Function InstallTestHook(Function target, Function callback, std::span<const uns
         std::memcpy(trampoline, entry, expected.size());
     } else {
         constexpr unsigned char opcode[]{0x48, 0x8b, 0x05};
-        Require(ripLoad + 7 == expected.size() && std::memcmp(entry + ripLoad, opcode, sizeof(opcode)) == 0,
+        Require(std::memcmp(entry + ripLoad, opcode, sizeof(opcode)) == 0,
                 "verify the RIP-relative load at the end of the test prologue");
         std::int32_t displacement{};
         std::memcpy(&displacement, entry + ripLoad + sizeof(opcode), sizeof(displacement));
