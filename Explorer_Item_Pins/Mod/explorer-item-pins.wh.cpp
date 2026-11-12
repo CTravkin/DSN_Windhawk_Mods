@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.11
+// @version         0.6.12
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 17
+// Build: 18
 
 // ==WindhawkModReadme==
 /*
@@ -779,8 +779,7 @@ using GroupInfo = HRESULT (*)(IUnknown*, DWORD, IUnknown**);
 using ApplyGroups = HRESULT (*)(const unsigned char*, GroupList*, UINT*);
 using SetGrouping = HRESULT (*)(IFolderView2*, REFPROPERTYKEY, BOOL);
 using RegisterGroup = HRESULT (*)(IUnknown*, DWORD);
-using MakeGroup = HRESULT (*)(DWORD, DWORD, const PROPERTYKEY*, DWORD, IUnknown*, PCWSTR, IUnknown**);
-using GroupDirection = BOOL (*)(IUnknown*);
+using MakeGroup = HRESULT (*)(DWORD, UINT64, const PROPERTYKEY*, DWORD, IUnknown*, PCWSTR, IUnknown**);
 
 struct NativeGrouping {
     GroupBatch batch;
@@ -791,23 +790,32 @@ struct NativeGrouping {
     SetGrouping setGrouping;
     RegisterGroup remember;
     MakeGroup make;
-    GroupDirection ascending;
     const void* rangeCategory;
     const void* textCategory;
 };
 
-[[maybe_unused]] std::optional<NativeGrouping> FindNativeGrouping(HMODULE storage, HMODULE shell) {
+[[maybe_unused]] SetGrouping FindKnownSetGrouping(HMODULE shell) {
+    constexpr DWORD oldRva = 0x2e8ae0;
+    constexpr DWORD updatedRva = 0x2e8e50;
+    if (const auto image = CheckedImage(shell, shellPdb, oldRva)) {
+        return reinterpret_cast<SetGrouping>(image + oldRva);
+    }
+    if (const auto image = CheckedImage(shell, shellPdb9974, updatedRva)) {
+        return reinterpret_cast<SetGrouping>(image + updatedRva);
+    }
+    return nullptr;
+}
+
+[[maybe_unused]] std::optional<NativeGrouping> FindNativeGrouping(HMODULE storage, SetGrouping setGrouping) {
     const auto updated = CheckedImage(storage, storagePdb9974, 0x5bcf00);
     const auto image = updated ? updated : CheckedImage(storage, storagePdb, 0x5bcb30);
-    const DWORD setGrouping = updated ? 0x2e8e50 : 0x2e8ae0;
-    const auto frontend = CheckedImage(shell, updated ? shellPdb9974 : shellPdb, setGrouping);
-    if (!image || !frontend) return std::nullopt;
+    if (!image || !setGrouping) return std::nullopt;
     return NativeGrouping{
         reinterpret_cast<GroupBatch>(image + 0x153e50), reinterpret_cast<AssignGroup>(image + 0x1641f0),
         reinterpret_cast<GroupInfo>(image + (updated ? 0x22fcf0 : 0x22fc90)), reinterpret_cast<GroupInfo>(image + 0x16f0c0),
-        reinterpret_cast<ApplyGroups>(image + 0x16eab8), reinterpret_cast<SetGrouping>(frontend + setGrouping),
+        reinterpret_cast<ApplyGroups>(image + 0x16eab8), setGrouping,
         reinterpret_cast<RegisterGroup>(image + 0x1642dc), reinterpret_cast<MakeGroup>(image + (updated ? 0x22fdac : 0x22fd4c)),
-        reinterpret_cast<GroupDirection>(image + 0x16ec10), image + (updated ? 0x248790 : 0x248730),
+        image + (updated ? 0x248790 : 0x248730),
         image + (updated ? 0x5bcf00 : 0x5bcb30),
     };
 }
@@ -880,9 +888,9 @@ bool IsPinnedGroupItem(IUnknown* row, const PinNames& names) {
 [[maybe_unused]] HRESULT AssignWithPins(const NativeGrouping& api, IUnknown* category, IUnknown* row,
                                         void* item, void* context, DWORD flags) {
     const auto* names = GroupingPins::Current();
+    if (!names || names->empty() || !row) return api.assign(category, row, item, context, flags);
     const auto categoryMethod = (*reinterpret_cast<void***>(category))[6];
-    if (!names || names->empty() || !row ||
-        (categoryMethod != api.rangeCategory && categoryMethod != api.textCategory) ||
+    if ((categoryMethod != api.rangeCategory && categoryMethod != api.textCategory) ||
         !IsPinnedGroupItem(row, *names)) return api.assign(category, row, item, context, flags);
 
     using SetCategory = HRESULT (*)(IUnknown*, void*, const PROPVARIANT*, DWORD);
@@ -903,8 +911,8 @@ bool IsPinnedGroupItem(IUnknown* row, const PinNames& names) {
 
 class ReorderedGroupList final : public GroupList {
 public:
-    ReorderedGroupList(GroupList& original, UINT pinned, UINT target)
-        : original_(original), pinned_(pinned), target_(target) {}
+    ReorderedGroupList(GroupList& original, UINT pinned, UINT count)
+        : original_(original), pinned_(pinned), count_(count) {}
 
     HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** output) override {
         *output = nullptr;
@@ -916,24 +924,28 @@ public:
     ULONG STDMETHODCALLTYPE Release() override { return 1; }
     HRESULT STDMETHODCALLTYPE GetCount(UINT* count) override { return original_.GetCount(count); }
     HRESULT STDMETHODCALLTYPE GetAt(UINT index, IUnknown** group) override {
-        if (index == target_) return original_.GetAt(pinned_, group);
-        const UINT withoutPinned = index - (index > target_ ? 1 : 0);
+        if (index >= count_) return original_.GetAt(index, group);
+        // Explorer starts at either end of the array, depending on its group order.
+        if (!first_) first_ = index;
+        const UINT target = *first_;
+        if (target != 0 && target != count_ - 1) return original_.GetAt(index, group);
+        if (index == target) return original_.GetAt(pinned_, group);
+        const UINT withoutPinned = index - (index > target ? 1 : 0);
         return original_.GetAt(withoutPinned + (withoutPinned >= pinned_ ? 1 : 0), group);
     }
 
 private:
     GroupList& original_;
     UINT pinned_;
-    UINT target_;
+    UINT count_;
+    std::optional<UINT> first_;
 };
 
-std::optional<DWORD> NativeGroupId(GroupList& groups, UINT index) {
-    Microsoft::WRL::ComPtr<IUnknown> group;
-    if (FAILED(groups.GetAt(index, group.GetAddressOf())) || !group) return std::nullopt;
+std::optional<DWORD> NativeGroupId(IUnknown& group) {
     using GetId = HRESULT (*)(IUnknown*, DWORD*);
-    const auto read = reinterpret_cast<GetId>((*reinterpret_cast<void***>(group.Get()))[3]);
+    const auto read = reinterpret_cast<GetId>((*reinterpret_cast<void***>(&group))[3]);
     DWORD id = 0;
-    return SUCCEEDED(read(group.Get(), &id)) ? std::optional(id) : std::nullopt;
+    return SUCCEEDED(read(&group, &id)) ? std::optional(id) : std::nullopt;
 }
 
 [[maybe_unused]] HRESULT ApplyWithPins(const NativeGrouping& api, const unsigned char* view, GroupList* groups,
@@ -941,21 +953,22 @@ std::optional<DWORD> NativeGroupId(GroupList& groups, UINT index) {
     UINT count = 0;
     if (!groups || FAILED(groups->GetCount(&count))) return api.apply(view, groups, added);
     for (UINT i = 0; i < count; ++i) {
-        if (NativeGroupId(*groups, i) != pinnedGroupId) continue;
-
-        const auto settings = *reinterpret_cast<IUnknown* const*>(view + 0x268);
-        if (!settings) break;
-        // The native consumer reads this list in reverse when descending.
-        const UINT target = api.ascending(settings) ? 0 : count - 1;
-        if (target == i) break;
-        ReorderedGroupList reordered(*groups, i, target);
+        Microsoft::WRL::ComPtr<IUnknown> group;
+        if (FAILED(groups->GetAt(i, group.GetAddressOf())) || !group || NativeGroupId(*group.Get()) != pinnedGroupId) continue;
+        ReorderedGroupList reordered(*groups, i, count);
         return api.apply(view, &reordered, added);
     }
     return api.apply(view, groups, added);
 }
 
-[[maybe_unused]] HRESULT SetGroupingWithPins(const PinStore& store, SetGrouping original, IFolderView2* view,
+[[maybe_unused]] HRESULT SetGroupingWithPins(const PinStore& store, SetGrouping target, SetGrouping original, IFolderView2* view,
                                              REFPROPERTYKEY key, BOOL ascending) {
+    // CDefView can have multiple interface pointers. Check the public IFolderView2
+    // slot before using other methods through the pointer from the native hook.
+    constexpr size_t setGroupBySlot = 17;
+    if (!view || (*reinterpret_cast<SetGrouping* const*>(view))[setGroupBySlot] != target) {
+        return original(view, key, ascending);
+    }
     PROPERTYKEY previous{};
     BOOL previousAscending = FALSE;
     const bool flips = view->GetGroupBy(&previous, &previousAscending) == S_OK &&
@@ -981,24 +994,38 @@ std::optional<DWORD> NativeGroupId(GroupList& groups, UINT index) {
 }
 
 using DrawItemImage = HRESULT (*)(const unsigned char*, HDC, const RECT*);
+using PaintFolderImage = void (*)(void*, HDC, const RECT*, const RECT*, RECT*, RECT*);
 
 constexpr GUID framePdb{0x468742f3, 0xd41c, 0x3441, {0xa5, 0x02, 0x2f, 0xbf, 0xfe, 0xf9, 0xa6, 0x56}};
 constexpr GUID framePdb9974{0xf8886b4f, 0x52b8, 0x73ab, {0x4a, 0x57, 0x43, 0xf3, 0x89, 0x20, 0x9a, 0xce}};
 
-struct NativeIndicator {
-    DrawItemImage draw;
-    const void* folderViewCaller;
-};
-
-[[maybe_unused]] std::optional<NativeIndicator> FindNativeIndicator(HMODULE storage, HMODULE frame) {
+[[maybe_unused]] DrawItemImage FindKnownImageRenderer(HMODULE storage) {
     constexpr DWORD draw = 0x16d730;
-    constexpr DWORD caller = 0xbe1ac;
-    const auto updated = CheckedImage(storage, storagePdb9974, draw);
-    const auto image = updated ? updated : CheckedImage(storage, storagePdb, draw);
-    const auto frontend = CheckedImage(frame, updated ? framePdb9974 : framePdb, caller);
-    if (!image || !frontend) return std::nullopt;
-    return NativeIndicator{reinterpret_cast<DrawItemImage>(image + draw), frontend + caller};
+    auto image = CheckedImage(storage, storagePdb, draw);
+    if (!image) image = CheckedImage(storage, storagePdb9974, draw);
+    return image ? reinterpret_cast<DrawItemImage>(image + draw) : nullptr;
 }
+
+[[maybe_unused]] PaintFolderImage FindKnownFolderImagePaint(HMODULE frame) {
+    constexpr DWORD paint = 0xbde30;
+    auto image = CheckedImage(frame, framePdb, paint);
+    if (!image) image = CheckedImage(frame, framePdb9974, paint);
+    return image ? reinterpret_cast<PaintFolderImage>(image + paint) : nullptr;
+}
+
+class FolderImagePaintScope {
+public:
+    FolderImagePaintScope() : previous_(std::exchange(active_, true)) {}
+    ~FolderImagePaintScope() { active_ = previous_; }
+    FolderImagePaintScope(const FolderImagePaintScope&) = delete;
+    FolderImagePaintScope& operator=(const FolderImagePaintScope&) = delete;
+
+    static bool Active() { return active_; }
+
+private:
+    inline static thread_local bool active_ = false;
+    bool previous_;
+};
 
 template <typename Job>
 bool QueueModuleWork(Job job) {
@@ -2221,8 +2248,10 @@ void StopNativeCommands() noexcept {
 SortViewBatch nativeSortOriginal = nullptr;
 CompareViewItems nativeCompare = nullptr;
 NativeGrouping nativeGrouping{};
+SetGrouping nativeSetGroupingTarget = nullptr;
 DrawItemImage nativeImageOriginal = nullptr;
-const void* nativeFolderImageCaller = nullptr;
+DrawItemImage inactiveIndicatorHook = nullptr;
+PaintFolderImage nativeFolderImagePaintOriginal = nullptr;
 HMODULE ownedExplorerFrame = nullptr;
 
 BOOL NativeSortHook(ViewSortBatch* batch) {
@@ -2250,29 +2279,52 @@ HRESULT NativeApplyGroupsHook(const unsigned char* view, GroupList* groups, UINT
 }
 
 HRESULT NativeSetGroupingHook(IFolderView2* view, REFPROPERTYKEY key, BOOL ascending) {
-    return SetGroupingWithPins(*nativePinStore, nativeGrouping.setGrouping, view, key, ascending);
+    return SetGroupingWithPins(*nativePinStore, nativeSetGroupingTarget, nativeGrouping.setGrouping, view, key, ascending);
+}
+
+SetGrouping FindSetGrouping(HMODULE shell) {
+    if (const auto known = FindKnownSetGrouping(shell)) return known;
+    SetGrouping setGrouping = nullptr;
+    const WindhawkUtils::SYMBOL_HOOK hooks[]{
+        {{L"public: virtual long __cdecl CDefView::SetGroupBy(struct _tagpropertykey const &,int)"}, &setGrouping},
+    };
+    return shell && WindhawkUtils::HookSymbols(shell, hooks, std::size(hooks)) ? setGrouping : nullptr;
+}
+
+void NativeFolderImagePaintHook(void* image, HDC dc, const RECT* bounds, const RECT* clip, RECT* content, RECT* paint) {
+    const FolderImagePaintScope scope;
+    nativeFolderImagePaintOriginal(image, dc, bounds, clip, content, paint);
 }
 
 HRESULT NativeImageHook(const unsigned char* image, HDC dc, const RECT* rect) {
     return DrawWithIndicator(*nativePinStore, indicatorPins, nativeImageOriginal, image, dc, rect,
-                             __builtin_return_address(0) == nativeFolderImageCaller);
+                             FolderImagePaintScope::Active());
 }
 
 void HookNativeIndicator(HMODULE storage) {
     if (!Wh_GetIntSetting(L"pinIndicator")) return;
+    const auto draw = FindKnownImageRenderer(storage);
+    if (!draw) return;
     auto frame = GetModuleHandleW(L"ExplorerFrame.dll");
     if (!frame) {
         ownedExplorerFrame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         frame = ownedExplorerFrame;
     }
-    const auto indicator = FindNativeIndicator(storage, frame);
-    if (!indicator) {
-        Wh_Log(L"The shell images do not match the verified indicator renderer");
+    auto paint = FindKnownFolderImagePaint(frame);
+    if (!paint) {
+        const WindhawkUtils::SYMBOL_HOOK hooks[]{
+            {{L"public: virtual void __cdecl UIImage::Paint(struct HDC__ *,struct tagRECT const *,struct tagRECT const *,struct tagRECT *,struct tagRECT *)"},
+             &paint},
+        };
+        if (!frame || !WindhawkUtils::HookSymbols(frame, hooks, std::size(hooks))) return;
+    }
+    if (!WindhawkUtils::SetFunctionHook(draw, NativeImageHook, &nativeImageOriginal)) {
+        Wh_Log(L"Could not hook the pinned indicator renderer");
         return;
     }
-    nativeFolderImageCaller = indicator->folderViewCaller;
-    if (!WindhawkUtils::SetFunctionHook(indicator->draw, NativeImageHook, &nativeImageOriginal)) {
-        Wh_Log(L"Could not hook the pinned indicator renderer");
+    if (!WindhawkUtils::SetFunctionHook(paint, NativeFolderImagePaintHook, &nativeFolderImagePaintOriginal)) {
+        inactiveIndicatorHook = draw;
+        Wh_Log(L"Could not hook the folder image painter");
     }
 }
 #endif
@@ -2294,7 +2346,13 @@ extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid
 #endif
 
 #ifdef WH_MOD
-void Wh_ModAfterInit() { explorer_item_pins::StartNativeCommands(); }
+void Wh_ModAfterInit() {
+    using namespace explorer_item_pins;
+    // Windhawk allows removing hooks once Wh_ModInit has returned.
+    if (const auto target = std::exchange(inactiveIndicatorHook, nullptr);
+        target && Wh_RemoveFunctionHook(reinterpret_cast<void*>(target))) Wh_ApplyHookOperations();
+    StartNativeCommands();
+}
 void Wh_ModBeforeUninit() { explorer_item_pins::StopNativeCommands(); }
 void Wh_ModUninit() {
     if (auto frame = std::exchange(explorer_item_pins::ownedExplorerFrame, nullptr)) FreeLibrary(frame);
@@ -2308,7 +2366,8 @@ BOOL Wh_ModInit() {
     using WindhawkUtils::SetFunctionHook;
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
     const auto native = FindNativeOrdering(storage);
-    const auto grouping = FindNativeGrouping(storage, GetModuleHandleW(L"Shell32.dll"));
+    const auto grouping = native ? FindNativeGrouping(storage, FindSetGrouping(GetModuleHandleW(L"Shell32.dll")))
+                                 : std::nullopt;
     if (!native || !grouping) {
         Wh_Log(L"Explorer Item Pins requires verified Windows.Storage.dll and Shell32.dll images");
         return FALSE;
@@ -2321,6 +2380,7 @@ BOOL Wh_ModInit() {
     }
     nativeCompare = native->compare;
     nativeGrouping = *grouping;
+    nativeSetGroupingTarget = grouping->setGrouping;
     if (!SetFunctionHook(native->sort, NativeSortHook, &nativeSortOriginal) ||
         !SetFunctionHook(grouping->batch, NativeGroupBatchHook, &nativeGrouping.batch) ||
         !SetFunctionHook(grouping->assign, NativeAssignGroupHook, &nativeGrouping.assign) ||

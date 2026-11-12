@@ -369,6 +369,7 @@ void VerifyOrdering(const fs::path& root) {
 }
 
 NativeGrouping groupingApi{};
+explorer_item_pins::SetGrouping testSetGroupingTarget = nullptr;
 std::atomic<unsigned> pinnedHeaders{};
 std::atomic<unsigned> topPinnedGroups{};
 
@@ -394,18 +395,40 @@ HRESULT TestTextInfo(IUnknown* category, DWORD id, IUnknown** result) {
     return TestGroupInfo(groupingApi.textInfo, category, id, result);
 }
 
-HRESULT ObserveAppliedGroups(const unsigned char* view, GroupList* list, UINT* added) {
-    UINT count = 0;
-    bool pinnedFirst = false;
-    if (list && SUCCEEDED(list->GetCount(&count)) && count) {
-        const auto settings = *reinterpret_cast<IUnknown* const*>(view + 0x268);
-        if (settings) {
-            const auto first = groupingApi.ascending(settings) ? 0 : count - 1;
-            pinnedFirst = explorer_item_pins::NativeGroupId(*list, first) == explorer_item_pins::pinnedGroupId;
-        }
+class ObservedGroupList final : public GroupList {
+public:
+    explicit ObservedGroupList(GroupList& groups) : groups_(groups) {}
+
+    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** output) override {
+        *output = nullptr;
+        if (iid != IID_IUnknown) return E_NOINTERFACE;
+        *output = static_cast<GroupList*>(this);
+        return S_OK;
     }
-    const auto hr = groupingApi.apply(view, list, added);
-    if (SUCCEEDED(hr) && pinnedFirst) ++topPinnedGroups;
+    ULONG STDMETHODCALLTYPE AddRef() override { return 1; }
+    ULONG STDMETHODCALLTYPE Release() override { return 1; }
+    HRESULT STDMETHODCALLTYPE GetCount(UINT* count) override { return groups_.GetCount(count); }
+    HRESULT STDMETHODCALLTYPE GetAt(UINT index, IUnknown** group) override {
+        const auto result = groups_.GetAt(index, group);
+        if (!firstRead_ && SUCCEEDED(result) && *group) {
+            firstRead_ = true;
+            pinnedFirst_ = explorer_item_pins::NativeGroupId(**group) == explorer_item_pins::pinnedGroupId;
+        }
+        return result;
+    }
+    bool PinnedFirst() const { return pinnedFirst_; }
+
+private:
+    GroupList& groups_;
+    bool firstRead_ = false;
+    bool pinnedFirst_ = false;
+};
+
+HRESULT ObserveAppliedGroups(const unsigned char* view, GroupList* list, UINT* added) {
+    if (!list) return groupingApi.apply(view, list, added);
+    ObservedGroupList observed(*list);
+    const auto hr = groupingApi.apply(view, &observed, added);
+    if (SUCCEEDED(hr) && observed.PinnedFirst()) ++topPinnedGroups;
     return hr;
 }
 
@@ -416,7 +439,8 @@ HRESULT TestApplyGroups(const unsigned char* view, GroupList* list, UINT* added)
 }
 
 HRESULT TestSetGrouping(IFolderView2* view, REFPROPERTYKEY key, BOOL ascending) {
-    return explorer_item_pins::SetGroupingWithPins(*orderingStore, groupingApi.setGrouping, view, key, ascending);
+    return explorer_item_pins::SetGroupingWithPins(*orderingStore, testSetGroupingTarget,
+                                                   groupingApi.setGrouping, view, key, ascending);
 }
 
 void InstallTestGrouping(const NativeGrouping& native) {
@@ -432,6 +456,7 @@ void InstallTestGrouping(const NativeGrouping& native) {
     groupingApi.rangeInfo = InstallTestHook(native.rangeInfo, TestRangeInfo, range, 12);
     groupingApi.textInfo = InstallTestHook(native.textInfo, TestTextInfo, strings);
     groupingApi.apply = InstallTestHook(native.apply, TestApplyGroups, apply);
+    testSetGroupingTarget = native.setGrouping;
     groupingApi.setGrouping = InstallTestHook(native.setGrouping, TestSetGrouping, set);
 }
 
@@ -439,7 +464,7 @@ void VerifyGrouping(const fs::path& root) {
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     Check(storage ? S_OK : HRESULT_FROM_WIN32(GetLastError()), "load Windows.Storage.dll in the isolated test process");
     const auto shell = GetModuleHandleW(L"Shell32.dll");
-    const auto grouping = explorer_item_pins::FindNativeGrouping(storage, shell);
+    const auto grouping = explorer_item_pins::FindNativeGrouping(storage, explorer_item_pins::FindKnownSetGrouping(shell));
     const auto ordering = FindNativeOrdering(storage);
     Require(grouping && ordering, "native grouping requires verified Windows.Storage.dll and Shell32.dll images");
     const auto& store = orderingStore.emplace(root / L"grouping-data" / L"pins.json");
@@ -502,7 +527,9 @@ void VerifyGrouping(const fs::path& root) {
 using explorer_item_pins::DrawItemImage;
 using explorer_item_pins::IndicatorPins;
 DrawItemImage nativeDrawImage = nullptr;
-const void* nativePaintCaller = nullptr;
+explorer_item_pins::PaintFolderImage nativePaintFolderImage = nullptr;
+const void* previousPaintCaller = nullptr;
+bool paintScopeMatchesCaller = true;
 IndicatorPins indicatorFixture;
 bool indicatorOn = false;
 bool capturePaint = false;
@@ -557,7 +584,8 @@ HRESULT ObserveStockImage(const unsigned char* image, HDC dc, const RECT* rect) 
 }
 
 HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
-    const bool folderView = __builtin_return_address(0) == nativePaintCaller;
+    const bool folderView = explorer_item_pins::FolderImagePaintScope::Active();
+    paintScopeMatchesCaller &= folderView == (__builtin_return_address(0) == previousPaintCaller);
     if (!capturePaint || !folderView || !rect) return nativeDrawImage(image, dc, rect);
     const auto path = explorer_item_pins::ItemImagePath(image);
     if (!path) return nativeDrawImage(image, dc, rect);
@@ -568,6 +596,11 @@ HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
     if (name == L"Pinned shortcut.lnk") shortcutCornerPreserved &= stockIcon.left == output.left;
     paintedIcons[name] |= stockIcon.right != output.right;
     return result;
+}
+
+void TestPaintFolderImage(void* image, HDC dc, const RECT* bounds, const RECT* clip, RECT* content, RECT* paint) {
+    const explorer_item_pins::FolderImagePaintScope scope;
+    nativePaintFolderImage(image, dc, bounds, clip, content, paint);
 }
 
 void WriteThumbnail(const fs::path& path) {
@@ -609,8 +642,9 @@ void VerifyIndicator(const fs::path& root) {
 
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     const auto frame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-    const auto native = explorer_item_pins::FindNativeIndicator(storage, frame);
-    Require(native.has_value(), "native indicator requires verified Windows.Storage.dll and ExplorerFrame.dll images");
+    const auto renderer = explorer_item_pins::FindKnownImageRenderer(storage);
+    const auto paint = explorer_item_pins::FindKnownFolderImagePaint(frame);
+    Require(renderer && paint, "native indicator requires verified Windows.Storage.dll and ExplorerFrame.dll images");
     const auto& store = orderingStore.emplace(root / L"paint-data" / L"pins.json");
     for (const auto* name : {L"Pinned folder", L"Pinned thumbnail.bmp", L"Pinned shortcut.lnk"}) {
         Require(store.SetPinned(folder, explorer_item_pins::ReadItem(folder / name), true), "persist an indicator fixture pin");
@@ -660,8 +694,11 @@ void VerifyIndicator(const fs::path& root) {
     DeleteObject(stateBitmap);
     indicatorImages = images.get();
     constexpr unsigned char draw[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
-    nativePaintCaller = native->folderViewCaller;
-    nativeDrawImage = InstallTestHook(native->draw, TestItemImage, draw);
+    constexpr unsigned char paintPrologue[]{0x40, 0x55, 0x53, 0x41, 0x57, 0x48, 0x8d, 0x6c, 0x24,
+                                           0xc9, 0x48, 0x81, 0xec, 0xa0, 0x00, 0x00, 0x00};
+    previousPaintCaller = reinterpret_cast<const unsigned char*>(frame) + 0xbe1ac;
+    nativePaintFolderImage = InstallTestHook(paint, TestPaintFolderImage, paintPrologue);
+    nativeDrawImage = InstallTestHook(renderer, TestItemImage, draw);
 
     ExplorerView view(folder, 4);
     const auto window = view.Window();
@@ -717,6 +754,7 @@ void VerifyIndicator(const fs::path& root) {
         }
     }
     SelectObject(dc, previous);
+    Require(paintScopeMatchesCaller, "match the previous indicator call site for every renderer call");
     DeleteObject(surface);
     DeleteDC(dc);
     const auto previousRevision = indicatorFixture.Revision();
