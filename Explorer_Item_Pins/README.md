@@ -12,7 +12,7 @@ Explorer Item Pins is a Windhawk mod in development for pinning files and folder
 
 ## Platforms
 
-The current build targets Windows 11 26H2 x64 with shell DLLs from build 10.0.26100.9949.
+Tested on Windows 11 26H2 x64 (build `26300.9974`). Support for newer Explorer builds depends on available symbols and compatible internal interfaces.
 
 ## Data exchange
 
