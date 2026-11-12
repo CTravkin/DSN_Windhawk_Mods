@@ -7,21 +7,36 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.16
+// @version         1.0.0
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 22
+// Build: 23
 
 // ==WindhawkModReadme==
 /*
 # Explorer Item Pins
 
-Explorer Item Pins is a Windhawk mod in development for pinning files and
-folders to the top of their parent folder in File Explorer.
+Pin files and folders to the top of their parent folder in File Explorer.
+
+## Usage
+
+- Select one file or folder and choose **Pin in item pane** from its context
+  menu or use the pin button between **Share** and **Delete**.
+- With grouping on, pinned items appear in the first group, **Pinned**.
+- To remove a pin, select the item and choose **Unpin from item pane**.
+
+The context menu command, command bar button and pin indicator are all on by
+default. You can turn them off independently in the mod's settings.
+
+Pins are saved for each folder in `%LOCALAPPDATA%\Explorer Item Pins\pins.json`.
+Copying or moving an item to another folder does not carry its pin with it.
+
+Tested on Windows 11 26H2 x64 (build `26300.9974`). Compatibility with other
+builds depends on Explorer's internal interfaces and available symbols.
 */
 // ==/WindhawkModReadme==
 
@@ -68,8 +83,13 @@ folders to the top of their parent folder in File Explorer.
 
 #include <algorithm>
 #include <array>
+#include <atomic>
+#include <chrono>
+#include <cstdint>
 #include <cstring>
 #include <filesystem>
+#include <initializer_list>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -81,9 +101,10 @@ folders to the top of their parent folder in File Explorer.
 #include <string_view>
 #include <system_error>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
-#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+#ifndef EXPLORER_ITEM_PINS_TEST
 #include <inspectable.h>
 #include <ocidl.h>
 #include <shldisp.h>
@@ -99,7 +120,6 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Microsoft.UI.Xaml.Data.h>
 #include <winrt/Microsoft.UI.Xaml.Media.h>
 #include <winrt/Microsoft.UI.Xaml.Media.Imaging.h>
-#include <atomic>
 #endif
 
 namespace explorer_item_pins {
@@ -608,11 +628,10 @@ PinNames ReadPinNames(const PinStore& store, const fs::path& folder) {
     });
     std::vector<Item> entries;
     for (const auto& entry : fs::directory_iterator(folder)) {
-        auto name = entry.path().filename().native();
         if (lookUpIdentities) {
             entries.push_back(ReadItem(entry.path()));
         } else {
-            entries.push_back({std::move(name), {}});
+            entries.push_back({entry.path().filename().native(), {}});
         }
     }
     names.clear();
@@ -820,19 +839,32 @@ struct NativeGrouping {
     };
 }
 
-PCWSTR PinnedGroupTitle(LANGID language) {
+struct PinText {
+    PCWSTR pin;
+    PCWSTR unpin;
+    PCWSTR group;
+};
+
+PinText LocalizedPinText(LANGID language) {
     switch (PRIMARYLANGID(language)) {
-        case LANG_RUSSIAN: return L"Закрепленные";
-        case LANG_SPANISH: return L"Anclados";
-        case LANG_GERMAN: return L"Angeheftet";
+        case LANG_RUSSIAN:
+            return {L"Закрепить в области объектов", L"Открепить в области объектов", L"Закрепленные"};
+        case LANG_SPANISH:
+            return {L"Anclar en el panel de elementos", L"Desanclar del panel de elementos", L"Anclados"};
+        case LANG_GERMAN:
+            return {L"Im Elementbereich anheften", L"Vom Elementbereich lösen", L"Angeheftet"};
         case LANG_PORTUGUESE:
-            if (SUBLANGID(language) == SUBLANG_PORTUGUESE_BRAZILIAN) return L"Fixados";
+            if (SUBLANGID(language) == SUBLANG_PORTUGUESE_BRAZILIAN) {
+                return {L"Fixar no painel de itens", L"Desafixar do painel de itens", L"Fixados"};
+            }
             break;
         case LANG_CHINESE:
-            if (SUBLANGID(language) == SUBLANG_CHINESE_SIMPLIFIED) return L"已固定";
+            if (SUBLANGID(language) == SUBLANG_CHINESE_SIMPLIFIED) {
+                return {L"固定到项目窗格", L"从项目窗格取消固定", L"已固定"};
+            }
             break;
     }
-    return L"Pinned";
+    return {L"Pin in item pane", L"Unpin from item pane", L"Pinned"};
 }
 
 // A grouping worker runs synchronously inside its batch. Each view gets its
@@ -913,7 +945,7 @@ bool IsPinnedGroupItem(IUnknown* row, const PinNames& names) {
     if (FAILED(category->QueryInterface(IID_PPV_ARGS(&source))) || !source || FAILED(source->GetPropertyKey(&property))) {
         return original(category, group, output);
     }
-    return make(group, 0, &property, 0, nullptr, PinnedGroupTitle(GetUserDefaultUILanguage()), output);
+    return make(group, 0, &property, 0, nullptr, LocalizedPinText(GetUserDefaultUILanguage()).group, output);
 }
 
 class ReorderedGroupList final : public GroupList {
@@ -1058,17 +1090,22 @@ bool QueueModuleWork(Job job) {
     return false;
 }
 
+bool WindowHasClass(HWND window, PCWSTR expected) {
+    wchar_t name[32]{};
+    return GetClassNameW(window, name, ARRAYSIZE(name)) && std::wstring_view(name) == expected;
+}
+
+bool IsExplorerFolderWindow(HWND window) {
+    DWORD process = 0;
+    GetWindowThreadProcessId(window, &process);
+    return process == GetCurrentProcessId() && IsWindowVisible(window) && WindowHasClass(window, L"CabinetWClass");
+}
+
 void RedrawExplorerItemIcons() {
     EnumWindows([](HWND window, LPARAM) -> BOOL {
-        DWORD owner = 0;
-        GetWindowThreadProcessId(window, &owner);
-        wchar_t name[32]{};
-        if (owner != GetCurrentProcessId() || !IsWindowVisible(window) ||
-            !GetClassNameW(window, name, ARRAYSIZE(name)) || std::wstring_view(name) != L"CabinetWClass") return TRUE;
+        if (!IsExplorerFolderWindow(window)) return TRUE;
         EnumChildWindows(window, [](HWND child, LPARAM) -> BOOL {
-            wchar_t name[32]{};
-            if (IsWindowVisible(child) && GetClassNameW(child, name, ARRAYSIZE(name)) &&
-                std::wstring_view(name) == L"SHELLDLL_DefView") {
+            if (IsWindowVisible(child) && WindowHasClass(child, L"SHELLDLL_DefView")) {
                 RedrawWindow(child, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
             }
             return TRUE;
@@ -1207,11 +1244,6 @@ std::optional<fs::path> ItemImagePath(const unsigned char* image) {
     if (FAILED(read(source, 0, &PKEY_ParsingPath, &path, &found)) || found != 1 ||
         path.vt != VT_LPWSTR || !path.pwszVal) return std::nullopt;
     return fs::path(path.pwszVal);
-}
-
-bool WindowHasClass(HWND window, PCWSTR expected) {
-    wchar_t name[32]{};
-    return GetClassNameW(window, name, ARRAYSIZE(name)) && std::wstring_view(name) == expected;
 }
 
 HWND ExplorerFrameForPaint(HDC dc) {
@@ -1443,7 +1475,7 @@ RECT MeasureShortcutOverlay(IUnknown* cache, IUnknown* item, HDC dc, int width, 
 }
 
 RECT ShortcutOverlayBounds(const unsigned char* image, HDC dc, const RECT& icon) {
-    // DrawItemImage uses this icon cache on the verified Windows.Storage build.
+    // The verified renderer layout holds the shell icon cache at this offset.
     auto* cache = *reinterpret_cast<IUnknown* const*>(image + 0x20);
     const int width = icon.right - icon.left, height = icon.bottom - icon.top;
     if (!cache || width <= 0 || height <= 0 || width > 1024 || height > 1024) return {};
@@ -1544,26 +1576,24 @@ bool DrawPinnedIndicator(HDC dc, const RECT& icon, const RECT& shortcut) {
 }
 
 [[maybe_unused]] HRESULT DrawWithIndicator(const PinStore& store, IndicatorPins& pins, DrawItemImage original,
-                                           const unsigned char* image, HDC dc, const RECT* rect, bool folderView) {
+                                          const unsigned char* image, HDC dc, const RECT* rect, bool folderView) {
     const auto result = original(image, dc, rect);
-    if (SUCCEEDED(result) && folderView && rect) {
-        try {
-            const auto path = ItemImagePath(image);
-            if (path && pins.Contains(store, *path)) {
-                DrawPinnedIndicator(dc, *rect, ShortcutOverlayBounds(image, dc, *rect));
-            }
-        } catch (...) {
-            // Keep the standard icon if a property or pin snapshot is unavailable.
+    if (FAILED(result) || !folderView || !rect) return result;
+
+    try {
+        const auto path = ItemImagePath(image);
+        if (path && pins.Contains(store, *path)) {
+            DrawPinnedIndicator(dc, *rect, ShortcutOverlayBounds(image, dc, *rect));
         }
+    } catch (...) {
+        // Keep the standard icon if a property or pin snapshot is unavailable.
     }
     return result;
 }
 
-#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
-IndicatorPins indicatorPins;
 #ifndef EXPLORER_ITEM_PINS_TEST
+IndicatorPins indicatorPins;
 std::optional<PinStore> nativePinStore;
-#endif
 
 namespace ui = winrt::Microsoft::UI;
 namespace xaml = ui::Xaml;
@@ -1573,24 +1603,6 @@ using Microsoft::WRL::ComPtr;
 
 constexpr CLSID commandsTap{0x0489a391, 0x4585, 0x4d13, {0xa9, 0xef, 0x61, 0x7f, 0x10, 0x78, 0x9a, 0x2a}};
 constexpr wchar_t buttonName[] = L"ExplorerItemPinsAction";
-
-PCWSTR CommandTitle(PinAction action, LANGID language) {
-    const bool pin = action == PinAction::Pin;
-    switch (PRIMARYLANGID(language)) {
-        case LANG_RUSSIAN: return pin ? L"Закрепить в области объектов" : L"Открепить в области объектов";
-        case LANG_SPANISH: return pin ? L"Anclar en el panel de elementos" : L"Desanclar del panel de elementos";
-        case LANG_GERMAN: return pin ? L"Im Elementbereich anheften" : L"Vom Elementbereich lösen";
-        case LANG_PORTUGUESE:
-            if (SUBLANGID(language) == SUBLANG_PORTUGUESE_BRAZILIAN) {
-                return pin ? L"Fixar no painel de itens" : L"Desafixar do painel de itens";
-            }
-            break;
-        case LANG_CHINESE:
-            if (SUBLANGID(language) == SUBLANG_CHINESE_SIMPLIFIED) return pin ? L"固定到项目窗格" : L"从项目窗格取消固定";
-            break;
-    }
-    return pin ? L"Pin in item pane" : L"Unpin from item pane";
-}
 
 // ShellTabWindowClass returns its borrowed IShellBrowser through this shell
 // message. Keep the pointer on the tab's owning thread.
@@ -1853,7 +1865,8 @@ struct AttachedPinCommand : std::enable_shared_from_this<AttachedPinCommand> {
         if (!state || !state->active || !control || !commandBar) return;
         const auto theme = commandBar.ActualTheme();
         const auto visibleAction = ready ? action : PinAction::Pin;
-        const auto title = CommandTitle(visibleAction, GetUserDefaultUILanguage());
+        const auto text = LocalizedPinText(GetUserDefaultUILanguage());
+        const auto title = visibleAction == PinAction::Pin ? text.pin : text.unpin;
         if (appliedTheme != theme) {
             pinIcon = CommandIcon(PinAction::Pin, theme);
             unpinIcon = CommandIcon(PinAction::Unpin, theme);
@@ -2180,13 +2193,6 @@ struct CommandTapSite : winrt::implements<CommandTapSite, IObjectWithSite> {
         std::shared_ptr<CommandUi> state;
         {
             const std::scoped_lock lock(commandUiMutex);
-#ifdef EXPLORER_ITEM_PINS_VISUAL_TEST
-            BSTR input = nullptr;
-            if (SUCCEEDED(diagnostics->GetInitializationData(&input)) && input) {
-                const std::unique_ptr<wchar_t, decltype(&SysFreeString)> path(input, SysFreeString);
-                commandUi = std::make_shared<CommandUi>(PinStore(fs::path(path.get())), true, true);
-            }
-#endif
             state = commandUi;
         }
         if (!state || !state->active || !state->stop) return E_ABORT;
@@ -2215,16 +2221,13 @@ struct CommandTapFactory : winrt::implements<CommandTapFactory, IClassFactory> {
     HRESULT STDMETHODCALLTYPE LockServer(BOOL) noexcept override { return S_OK; }
 };
 
-#ifndef EXPLORER_ITEM_PINS_TEST
+// The show event wakes ConnectCommandTree while it waits for the first window.
 void CALLBACK ExplorerWindowShown(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {}
 
 bool HasExplorerWindow() {
     bool found = false;
     EnumWindows([](HWND window, LPARAM output) -> BOOL {
-        DWORD process = 0;
-        GetWindowThreadProcessId(window, &process);
-        if (process != GetCurrentProcessId() || !IsWindowVisible(window) ||
-            !WindowHasClass(window, L"CabinetWClass")) return TRUE;
+        if (!IsExplorerFolderWindow(window)) return TRUE;
         *reinterpret_cast<bool*>(output) = true;
         return FALSE;
     }, reinterpret_cast<LPARAM>(&found));
@@ -2290,7 +2293,6 @@ void StopNativeCommands() noexcept {
         SetEvent(state->stop.get());
     }
 }
-#endif
 #endif
 
 struct StorageFunctions {
@@ -2491,7 +2493,7 @@ void HookNativeIndicator(DrawItemImage draw) {
 
 }  // namespace explorer_item_pins
 
-#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+#ifndef EXPLORER_ITEM_PINS_TEST
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdll-attribute-on-redeclaration"
 extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid, REFIID iid, void** object) try {
@@ -2501,9 +2503,7 @@ extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid
     return winrt::make<CommandTapFactory>().as(iid, object);
 } catch (...) { return winrt::to_hresult(); }
 #pragma clang diagnostic pop
-#endif
 
-#ifndef EXPLORER_ITEM_PINS_TEST
 void Wh_ModAfterInit() {
     using namespace explorer_item_pins;
     // Windhawk allows removing hooks once Wh_ModInit has returned.
@@ -2519,10 +2519,7 @@ BOOL Wh_ModSettingsChanged(BOOL* reload) {
     *reload = TRUE;
     return TRUE;
 }
-#endif
-
 BOOL Wh_ModInit() {
-#ifndef EXPLORER_ITEM_PINS_TEST
     using namespace explorer_item_pins;
     using WindhawkUtils::SetFunctionHook;
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
@@ -2550,7 +2547,5 @@ BOOL Wh_ModInit() {
         !SetFunctionHook(setGrouping, NativeSetGroupingHook, &nativeGrouping.setGrouping)) return FALSE;
     HookNativeIndicator(native->draw);
     return TRUE;
-#else
-    return FALSE;
-#endif
 }
+#endif
