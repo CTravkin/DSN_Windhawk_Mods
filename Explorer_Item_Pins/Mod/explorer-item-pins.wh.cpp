@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.13
+// @version         0.6.14
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 19
+// Build: 20
 
 // ==WindhawkModReadme==
 /*
@@ -63,9 +63,7 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Windows.Data.Json.h>
 #include <wrl/client.h>
 
-#ifdef WH_MOD
 #include <windhawk_utils.h>
-#endif
 
 #include <algorithm>
 #include <array>
@@ -84,7 +82,7 @@ folders to the top of their parent folder in File Explorer.
 #include <type_traits>
 #include <vector>
 
-#if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
 #include <inspectable.h>
 #include <ocidl.h>
 #include <shldisp.h>
@@ -1518,9 +1516,9 @@ bool DrawPinnedIndicator(HIMAGELIST images, HDC dc, const RECT& icon, const RECT
     return result;
 }
 
-#if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
 IndicatorPins indicatorPins;
-#ifdef WH_MOD
+#ifndef EXPLORER_ITEM_PINS_TEST
 std::optional<PinStore> nativePinStore;
 #endif
 
@@ -2174,7 +2172,7 @@ struct CommandTapFactory : winrt::implements<CommandTapFactory, IClassFactory> {
     HRESULT STDMETHODCALLTYPE LockServer(BOOL) noexcept override { return S_OK; }
 };
 
-#ifdef WH_MOD
+#ifndef EXPLORER_ITEM_PINS_TEST
 void CALLBACK ExplorerWindowShown(HWINEVENTHOOK, DWORD, HWND, LONG, LONG, DWORD, DWORD) {}
 
 bool HasExplorerWindow() {
@@ -2252,16 +2250,6 @@ void StopNativeCommands() noexcept {
 #endif
 #endif
 
-#ifdef WH_MOD
-SortViewBatch nativeSortOriginal = nullptr;
-CompareViewItems nativeCompare = nullptr;
-NativeGrouping nativeGrouping{};
-SetGrouping nativeSetGroupingTarget = nullptr;
-DrawItemImage nativeImageOriginal = nullptr;
-DrawItemImage inactiveIndicatorHook = nullptr;
-PaintFolderImage nativeFolderImagePaintOriginal = nullptr;
-HMODULE ownedExplorerFrame = nullptr;
-
 struct StorageFunctions {
     NativeOrdering ordering;
     NativeGrouping grouping;
@@ -2306,6 +2294,7 @@ std::optional<StorageFunctions> FindStorageSymbols(HMODULE storage, SetGrouping 
     native.grouping.setGrouping = setGrouping;
     void* merge = nullptr;
     void* imageIndex = nullptr;
+    // windows.storage.dll
     const WindhawkUtils::SYMBOL_HOOK hooks[]{
         {{L"static  _DSA_MergeSort()"}, &native.ordering.sort},
         {{L"static  _DSA_MergeSort2()"}, &merge},
@@ -2358,7 +2347,7 @@ std::optional<StorageFunctions> FindStorageSymbols(HMODULE storage, SetGrouping 
     return native;
 }
 
-std::optional<StorageFunctions> FindStorageFunctions(HMODULE storage, SetGrouping setGrouping, bool indicator) {
+[[maybe_unused]] std::optional<StorageFunctions> FindStorageFunctions(HMODULE storage, SetGrouping setGrouping, bool indicator) {
     if (!storage || !setGrouping) return std::nullopt;
     if (const auto ordering = FindNativeOrdering(storage)) {
         if (const auto grouping = FindNativeGrouping(storage, setGrouping)) {
@@ -2367,6 +2356,35 @@ std::optional<StorageFunctions> FindStorageFunctions(HMODULE storage, SetGroupin
     }
     return FindStorageSymbols(storage, setGrouping, indicator);
 }
+
+[[maybe_unused]] SetGrouping FindSetGrouping(HMODULE shell) {
+    if (const auto known = FindKnownSetGrouping(shell)) return known;
+    SetGrouping setGrouping = nullptr;
+    const WindhawkUtils::SYMBOL_HOOK shell32DllHooks[]{
+        {{L"public: virtual long __cdecl CDefView::SetGroupBy(struct _tagpropertykey const &,int)"}, &setGrouping},
+    };
+    return shell && WindhawkUtils::HookSymbols(shell, shell32DllHooks, std::size(shell32DllHooks)) ? setGrouping : nullptr;
+}
+
+[[maybe_unused]] PaintFolderImage FindFolderImagePaint(HMODULE frame) {
+    if (const auto known = FindKnownFolderImagePaint(frame)) return known;
+    PaintFolderImage paint = nullptr;
+    const WindhawkUtils::SYMBOL_HOOK explorerFrameDllHooks[]{
+        {{L"public: virtual void __cdecl UIImage::Paint(struct HDC__ *,struct tagRECT const *,struct tagRECT const *,struct tagRECT *,struct tagRECT *)"},
+         &paint},
+    };
+    return frame && WindhawkUtils::HookSymbols(frame, explorerFrameDllHooks, std::size(explorerFrameDllHooks)) ? paint : nullptr;
+}
+
+#ifndef EXPLORER_ITEM_PINS_TEST
+SortViewBatch nativeSortOriginal = nullptr;
+CompareViewItems nativeCompare = nullptr;
+NativeGrouping nativeGrouping{};
+SetGrouping nativeSetGroupingTarget = nullptr;
+DrawItemImage nativeImageOriginal = nullptr;
+DrawItemImage inactiveIndicatorHook = nullptr;
+PaintFolderImage nativeFolderImagePaintOriginal = nullptr;
+HMODULE ownedExplorerFrame = nullptr;
 
 BOOL NativeSortHook(ViewSortBatch* batch) {
     return SortWithPins(*nativePinStore, nativeSortOriginal, nativeCompare, batch);
@@ -2396,15 +2414,6 @@ HRESULT NativeSetGroupingHook(IFolderView2* view, REFPROPERTYKEY key, BOOL ascen
     return SetGroupingWithPins(*nativePinStore, nativeSetGroupingTarget, nativeGrouping.setGrouping, view, key, ascending);
 }
 
-SetGrouping FindSetGrouping(HMODULE shell) {
-    if (const auto known = FindKnownSetGrouping(shell)) return known;
-    SetGrouping setGrouping = nullptr;
-    const WindhawkUtils::SYMBOL_HOOK hooks[]{
-        {{L"public: virtual long __cdecl CDefView::SetGroupBy(struct _tagpropertykey const &,int)"}, &setGrouping},
-    };
-    return shell && WindhawkUtils::HookSymbols(shell, hooks, std::size(hooks)) ? setGrouping : nullptr;
-}
-
 void NativeFolderImagePaintHook(void* image, HDC dc, const RECT* bounds, const RECT* clip, RECT* content, RECT* paint) {
     const FolderImagePaintScope scope;
     nativeFolderImagePaintOriginal(image, dc, bounds, clip, content, paint);
@@ -2422,14 +2431,8 @@ void HookNativeIndicator(DrawItemImage draw) {
         ownedExplorerFrame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
         frame = ownedExplorerFrame;
     }
-    auto paint = FindKnownFolderImagePaint(frame);
-    if (!paint) {
-        const WindhawkUtils::SYMBOL_HOOK hooks[]{
-            {{L"public: virtual void __cdecl UIImage::Paint(struct HDC__ *,struct tagRECT const *,struct tagRECT const *,struct tagRECT *,struct tagRECT *)"},
-             &paint},
-        };
-        if (!frame || !WindhawkUtils::HookSymbols(frame, hooks, std::size(hooks))) return;
-    }
+    const auto paint = FindFolderImagePaint(frame);
+    if (!paint) return;
     if (!WindhawkUtils::SetFunctionHook(draw, NativeImageHook, &nativeImageOriginal)) {
         Wh_Log(L"Could not hook the pinned indicator renderer");
         return;
@@ -2445,7 +2448,7 @@ void HookNativeIndicator(DrawItemImage draw) {
 
 }  // namespace explorer_item_pins
 
-#if defined(WH_MOD) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
+#if !defined(EXPLORER_ITEM_PINS_TEST) || defined(EXPLORER_ITEM_PINS_VISUAL_TEST)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdll-attribute-on-redeclaration"
 extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid, REFIID iid, void** object) try {
@@ -2457,7 +2460,7 @@ extern "C" __declspec(dllexport) HRESULT WINAPI DllGetClassObject(REFCLSID clsid
 #pragma clang diagnostic pop
 #endif
 
-#ifdef WH_MOD
+#ifndef EXPLORER_ITEM_PINS_TEST
 void Wh_ModAfterInit() {
     using namespace explorer_item_pins;
     // Windhawk allows removing hooks once Wh_ModInit has returned.
@@ -2469,11 +2472,14 @@ void Wh_ModBeforeUninit() { explorer_item_pins::StopNativeCommands(); }
 void Wh_ModUninit() {
     if (auto frame = std::exchange(explorer_item_pins::ownedExplorerFrame, nullptr)) FreeLibrary(frame);
 }
-void Wh_ModSettingsChanged(BOOL* reload) { *reload = TRUE; }
+BOOL Wh_ModSettingsChanged(BOOL* reload) {
+    *reload = TRUE;
+    return TRUE;
+}
 #endif
 
 BOOL Wh_ModInit() {
-#ifdef WH_MOD
+#ifndef EXPLORER_ITEM_PINS_TEST
     using namespace explorer_item_pins;
     using WindhawkUtils::SetFunctionHook;
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
