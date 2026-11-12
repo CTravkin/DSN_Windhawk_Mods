@@ -2,6 +2,8 @@
 
 Keep root READMEs to a short description and an index of mods, following DSN Tools. Keep versioning and release conventions here.
 
+Use impersonal wording in user-facing documentation and interface text. Use formal address in Russian where direct address is necessary.
+
 Use `Mod/` for a mod's source and `Tests/` for its checks. Keep local builds under the ignored repository `Builds/<mod directory>/`, using the display name, version and build number in artifact names.
 
 ## Versioning

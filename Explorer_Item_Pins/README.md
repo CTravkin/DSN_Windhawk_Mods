@@ -2,7 +2,7 @@
 
 **English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
-Explorer Item Pins is a Windhawk mod that keeps selected files and folders at the top of their parent folder in Windows File Explorer. Each folder has its own pins.
+Explorer Item Pins keeps selected files and folders at the top of their parent folder in Windows File Explorer. Each folder has its own pins.
 
 ## Features
 

@@ -20,7 +20,7 @@
 /*
 # Explorer Item Pins
 
-Pin files and folders to the top of their parent folder in File Explorer.
+Explorer Item Pins keeps selected files and folders at the top of their parent folder in File Explorer.
 
 ## Usage
 
@@ -30,7 +30,7 @@ Pin files and folders to the top of their parent folder in File Explorer.
 - To remove a pin, select the item and choose **Unpin from item pane**.
 
 The context menu command, command bar button and pin indicator are all on by
-default. You can turn them off independently in the mod's settings.
+default. Each can be turned off independently in the mod's settings.
 
 Pins are saved for each folder in `%LOCALAPPDATA%\Explorer Item Pins\pins.json`.
 Copying or moving an item to another folder does not carry its pin with it.
