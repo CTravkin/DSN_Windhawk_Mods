@@ -5,6 +5,7 @@
 
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <type_traits>
@@ -18,6 +19,7 @@ using explorer_item_pins::PinStore;
 using explorer_item_pins::CompareViewItems;
 using explorer_item_pins::FindNativeOrdering;
 using explorer_item_pins::ReadPinNames;
+using explorer_item_pins::ReadItem;
 using explorer_item_pins::SortViewBatch;
 using explorer_item_pins::SortWithPins;
 using explorer_item_pins::ViewSortBatch;
@@ -209,11 +211,57 @@ void VerifyCommands(const fs::path& root) {
 }
 
 std::optional<PinStore> orderingStore;
+explorer_item_pins::IndicatorPins orderingPins;
 SortViewBatch originalSort = nullptr;
 CompareViewItems nativeCompare = nullptr;
 
+explorer_item_pins::PinNamesSnapshot TestFolderPins(const fs::path& folder) {
+    return orderingPins.Snapshot(*orderingStore, folder);
+}
+
+void WaitForFolderPins(const fs::path& folder, const explorer_item_pins::PinNames& expected) {
+    orderingPins.Invalidate(folder);
+    WaitUntil([&] {
+        const auto names = TestFolderPins(folder);
+        return names && *names == expected && orderingPins.Cached(folder / L"probe").has_value();
+    }, "resolve the expected folder pins off the calling thread");
+}
+
+void VerifyFolderSnapshots(const fs::path& root) {
+    const auto folder = root / L"snapshot-folder";
+    fs::create_directories(folder);
+    const auto& store = orderingStore.emplace(root / L"snapshot-data" / L"pins.json");
+    const auto missing = folder / L"Deleted.txt";
+    const auto current = folder / L"Before rename.txt";
+    const auto renamed = folder / L"After rename.txt";
+    std::ofstream(missing) << "deleted pin";
+    std::ofstream(current) << "renamed pin";
+    for (const auto& path : {missing, current}) {
+        Require(store.SetPinned(folder, ReadItem(path), true), "persist a folder snapshot fixture pin");
+    }
+    fs::remove(missing);
+
+    Require(!TestFolderPins(folder), "the first folder lookup should schedule work and return immediately");
+    WaitForFolderPins(folder, {current.filename().native()});
+    const auto snapshot = TestFolderPins(folder);
+    WaitForFolderPins(folder, {current.filename().native()});
+    Require(TestFolderPins(folder) == snapshot, "reuse a negative identity lookup for an unchanged folder");
+
+    fs::rename(current, renamed);
+    fs::last_write_time(folder, fs::file_time_type::clock::now() + std::chrono::seconds(2));
+    WaitForFolderPins(folder, {renamed.filename().native()});
+    std::cout << "PASS asynchronous folder snapshots, cached missing pins and rename invalidation\n";
+
+    std::atomic_bool completed = false;
+    const bool submitted = explorer_item_pins::QueueModuleWork([&] { completed = true; });
+    explorer_item_pins::moduleWork.Stop();
+    Require(submitted && completed && !explorer_item_pins::QueueModuleWork([] {}),
+            "drain module work and reject new submissions during unload");
+    std::cout << "PASS background work drained on unload\n";
+}
+
 BOOL TestSortHook(ViewSortBatch* batch) {
-    return SortWithPins(*orderingStore, originalSort, nativeCompare, batch);
+    return SortWithPins(TestFolderPins, originalSort, nativeCompare, batch);
 }
 
 template <typename Function>
@@ -334,6 +382,7 @@ void VerifyOrdering(const fs::path& root) {
             for (size_t pin : {4u, 5u}) {
                 Require(store.SetPinned(folder, {std::wstring(names[pin]), {}}, true), "save an ordering fixture pin");
             }
+            WaitForFolderPins(folder, {std::wstring(names[4]), std::wstring(names[5])});
             const auto refresh = [](ExplorerView& view) {
                 ComPtr<IShellView> shellView;
                 Check(view.View().QueryInterface(IID_PPV_ARGS(&shellView)), "get the native shell view");
@@ -360,6 +409,7 @@ void VerifyOrdering(const fs::path& root) {
             for (size_t pin : {4u, 5u}) {
                 Require(store.SetPinned(folder, {std::wstring(names[pin]), {}}, false), "clear the ordering fixture pin");
             }
+            WaitForFolderPins(folder, {});
             refresh(ascending);
             refresh(descending);
             settle();
@@ -374,7 +424,7 @@ std::atomic<unsigned> pinnedHeaders{};
 std::atomic<unsigned> topPinnedGroups{};
 
 HRESULT TestGroupBatch(const unsigned char* batch, void* result) {
-    return explorer_item_pins::GroupWithPins(*orderingStore, groupingApi.batch, batch, result);
+    return explorer_item_pins::GroupWithPins(TestFolderPins, groupingApi.batch, batch, result);
 }
 
 HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, void* item, IShellFolder2* context, DWORD flags) {
@@ -439,7 +489,7 @@ HRESULT TestApplyGroups(const unsigned char* view, GroupList* list, UINT* added)
 }
 
 HRESULT TestSetGrouping(IFolderView2* view, REFPROPERTYKEY key, BOOL ascending) {
-    return explorer_item_pins::SetGroupingWithPins(*orderingStore, testSetGroupingTarget,
+    return explorer_item_pins::SetGroupingWithPins(TestFolderPins, testSetGroupingTarget,
                                                    groupingApi.setGrouping, view, key, ascending);
 }
 
@@ -492,6 +542,7 @@ void VerifyGrouping(const fs::path& root) {
     for (size_t i : {3u, 4u}) {
         Require(store.SetPinned(pinned, {std::wstring(names[i]), {}}, true), "persist a grouping fixture pin");
     }
+    WaitForFolderPins(pinned, {std::wstring(names[3]), std::wstring(names[4])});
     ExplorerView reference(stock, names.size());
     ExplorerView modified(pinned, names.size());
 
@@ -758,12 +809,9 @@ void VerifyIndicator(const fs::path& root) {
     Require(paintScopeMatchesCaller, "match the previous indicator call site for every renderer call");
     DeleteObject(surface);
     DeleteDC(dc);
-    const auto previousRevision = indicatorFixture.Revision();
     Require(store.SetPinned(folder, explorer_item_pins::ReadItem(bitmap), false), "remove the thumbnail's fixture pin");
     indicatorFixture.Invalidate(folder);
-    Require(!indicatorFixture.Cached(bitmap) &&
-            !indicatorFixture.Publish(folder, {L"Pinned thumbnail.bmp"}, previousRevision),
-            "reject an older command snapshot after a pin change");
+    Require(!indicatorFixture.Cached(bitmap), "invalidate the cached action after a pin change");
     WaitUntil([&] { return !indicatorFixture.Contains(store, bitmap); }, "apply a changed indicator snapshot");
     Require(indicatorFixture.Contains(store, folder / L"Pinned folder"), "preserve the other indicators after a change");
     std::cout << "PASS indicator pixels and shortcut corner in " << verified << " native view scenarios\n";
@@ -775,10 +823,12 @@ int wmain(int argc, wchar_t** argv) {
     if (FAILED(OleInitialize(nullptr))) return 3;
     int result = 0;
     try {
+        Require(explorer_item_pins::moduleWork.Start(), "start the module's background work queue");
         const std::wstring_view mode(argv[2]);
         if (mode == L"commands") {
             VerifyCommands(argv[1]);
             std::cout << "PASS native Explorer selection, pin and unpin, rename, replacement, copy and move\n";
+            VerifyFolderSnapshots(argv[1]);
         } else if (mode == L"ordering") {
             VerifyOrdering(argv[1]);
         } else if (mode == L"grouping") {
@@ -792,6 +842,7 @@ int wmain(int argc, wchar_t** argv) {
         std::cerr << "FAIL " << error.what() << '\n';
         result = 1;
     }
+    explorer_item_pins::moduleWork.Stop();
     OleUninitialize();
     return result;
 }

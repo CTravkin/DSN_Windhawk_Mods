@@ -9,7 +9,7 @@ Explorer Item Pins keeps selected files and folders at the top of their parent f
 | ![Dark theme with large icons and the Unpin command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Dark_Large_Icons.png) | ![Light theme with small icons, the Pinned group, and the Pin command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Light_Small_Icons.png) |
 | :---: | :---: |
 
-- **Two ways to pin.** Use the context menu or the pin button between **Share** and **Delete** on the command bar.
+- **Two ways to pin.** Use the modern context menu or the pin button between **Share** and **Delete** on the command bar.
 - **Sort and group.** Pins stay at the top in either sort direction. With grouping on, they appear in the first group, **Pinned**. Explorer's sorting still applies within the group.
 - **Pin indicator.** A pushpin appears at the upper-right corner of the file or folder icon. It follows the icon size and works with thumbnails, lists, details, tiles and content view.
 - **Interface languages.** English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
@@ -20,7 +20,7 @@ The mod requires [Windhawk](https://windhawk.net/) and Windows 11 x64 with the t
 
 ## Data exchange
 
-Pins are saved per Windows account in `%LOCALAPPDATA%\Explorer Item Pins\pins.json`. Replacing a file under the same name keeps its pin. A rename within the same folder can keep the pin when the mod can identify the original file by its file ID. Copying or moving an item to another folder does not carry its pin with it.
+Each Windows account uses a separate `pins-<SID>.json` file in the mod's Windhawk storage directory. Removing the mod removes its storage. Replacing a file under the same name keeps its pin. A rename within the same folder can keep the pin when the mod can identify the original file by its file ID. Copying or moving an item to another folder does not carry its pin with it.
 
 ## Operations
 
@@ -42,6 +42,8 @@ To update an existing local installation, edit that mod in Windhawk, replace its
 2. To remove the pin, select the item and choose **Unpin from item pane** or click the crossed-out pin on the command bar. The item returns to its usual position in the folder.
 
 In Windhawk, open the mod's **Settings** to control these options independently. All three are enabled by default.
+
+If the pin commands are missing from a File Explorer window that was already open when the mod was enabled or updated, reopen that window.
 
 | Setting | Controls |
 | --- | --- |

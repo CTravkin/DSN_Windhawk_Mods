@@ -1,4 +1,22 @@
+#include <windhawk_api.h>
+
+#include <algorithm>
+#include <string>
+
+namespace {
+std::wstring testStoragePath;
+
+size_t TestGetModStoragePath(PWSTR buffer, size_t size) {
+    if (testStoragePath.size() >= size) return 0;
+    std::copy(testStoragePath.cbegin(), testStoragePath.cend(), buffer);
+    buffer[testStoragePath.size()] = L'\0';
+    return testStoragePath.size();
+}
+}  // namespace
+
+#define Wh_GetModStoragePath TestGetModStoragePath
 #include "../Mod/explorer-item-pins.wh.cpp"
+#undef Wh_GetModStoragePath
 
 #include <fstream>
 #include <iostream>
@@ -120,11 +138,42 @@ void NativeFileSemantics(const fs::path& root) {
     Require(ResolvePins(store.ReadFolder(target),
                         std::vector{ReadItem(target / original.filename()), ReadItem(target / renamed.filename())}).empty(),
             "copying and moving actual files should not create destination pins");
+}
 
-    const auto defaultPath = PinStore::DefaultPath();
-    Require(defaultPath.is_absolute() && defaultPath.filename() == L"pins.json" &&
-                defaultPath.parent_path().filename() == L"Explorer Item Pins",
-            "the default path should use the agreed user data directory and file name");
+void DefaultStoragePath(const fs::path& root) {
+    const auto storage = root / L"Windhawk storage" / std::wstring(96, L'x') /
+                         L"ModsWritable" / L"mod-storage" / L"explorer-item-pins";
+    testStoragePath = storage.native();
+    const auto path = PinStore::DefaultPath();
+    const auto name = path.filename().native();
+    const fs::path extendedStorage(LR"(\\?\)" + storage.native());
+    Require(path.parent_path() == extendedStorage && name.starts_with(L"pins-S-1-") && name.ends_with(L".json"),
+            "the default pin file should use Windhawk storage and the account SID");
+
+    PinStore store(path);
+    Require(store.SetPinned(folderA, report, true) && fs::exists(path),
+            "pinning should persist in the default Windhawk path");
+    Require(PinStore(PinStore::DefaultPath()).ReadFolder(folderA) == std::vector{report},
+            "a new store should read the account's persisted pins");
+
+    testStoragePath = extendedStorage.native();
+    Require(PinStore::DefaultPath() == path, "an extended path should stay unchanged");
+
+    testStoragePath = LR"(\\server\share\ModsWritable\mod-storage\explorer-item-pins)";
+    Require(PinStore::DefaultPath() ==
+                fs::path(LR"(\\?\UNC\server\share\ModsWritable\mod-storage\explorer-item-pins)") / name,
+            "a network path should use the extended UNC prefix");
+
+    for (const auto invalidPath : {L"", L"relative path"}) {
+        testStoragePath = invalidPath;
+        bool failed = false;
+        try {
+            (void)PinStore::DefaultPath();
+        } catch (const std::runtime_error&) {
+            failed = true;
+        }
+        Require(failed, "an invalid Windhawk path should fail instead of selecting another directory");
+    }
 }
 
 Item ConcurrentItem(unsigned writer, unsigned index) {
@@ -147,7 +196,8 @@ int wmain(int argc, wchar_t** argv) {
             FolderSemantics(argv[2]);
             ProtectInvalidData(argv[2]);
             NativeFileSemantics(argv[2]);
-            std::cout << "PASS persistence, folder semantics, invalid data, native identities\n";
+            DefaultStoragePath(argv[2]);
+            std::cout << "PASS persistence, folder semantics, invalid data, native identities, Windhawk storage\n";
         } else if (argc == 5 && std::wstring_view(argv[1]) == L"write") {
             PinStore store(argv[2]);
             const auto writer = static_cast<unsigned>(std::stoul(argv[3]));
