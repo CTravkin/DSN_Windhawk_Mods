@@ -1,14 +1,18 @@
 # Explorer Item Pins
 
-**English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
+**English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Explorer_Item_Pins/README.ru.md)
 
 Explorer Item Pins keeps selected files and folders at the top of their parent folder in Windows File Explorer. Each folder has its own pins.
 
 ## Features
 
+| ![Dark theme with large icons and the Unpin command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Dark_Large_Icons.png) | ![Light theme with small icons, the Pinned group, and the Pin command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Light_Small_Icons.png) |
+| :---: | :---: |
+
 - **Two ways to pin.** Use the context menu or the pin button between **Share** and **Delete** on the command bar.
 - **Sort and group.** Pins stay at the top in either sort direction. With grouping on, they appear in the first group, **Pinned**. Explorer's sorting still applies within the group.
 - **Pin indicator.** A pushpin appears at the upper-right corner of the file or folder icon. It follows the icon size and works with thumbnails, lists, details, tiles and content view.
+- **Interface languages.** English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
 
 ## Platforms
 
@@ -22,8 +26,10 @@ Pins are saved per Windows account in `%LOCALAPPDATA%\Explorer Item Pins\pins.js
 
 ### Installation
 
+Install Explorer Item Pins from the Windhawk catalog. To build a local copy from source, follow these steps.
+
 1. Open Windhawk and choose **Create a New Mod**.
-2. Replace the contents of `mod.wh.cpp` with the complete [mod source](Mod/explorer-item-pins.wh.cpp).
+2. Replace the contents of `mod.wh.cpp` with the complete [mod source](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Explorer_Item_Pins/Mod/explorer-item-pins.wh.cpp).
 3. Use **Compile Mod** or `Ctrl+B` with the Windhawk sidebar open. Exit the editor and check that **Explorer Item Pins** is enabled on the Windhawk home page.
 
 To update an existing local installation, edit that mod in Windhawk, replace its source and compile it again.
