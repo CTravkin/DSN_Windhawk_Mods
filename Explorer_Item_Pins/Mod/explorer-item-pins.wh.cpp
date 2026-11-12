@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.10
+// @version         0.6.11
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 16
+// Build: 17
 
 // ==WindhawkModReadme==
 /*
@@ -62,6 +62,10 @@ folders to the top of their parent folder in File Explorer.
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Data.Json.h>
 #include <wrl/client.h>
+
+#ifdef WH_MOD
+#include <windhawk_utils.h>
+#endif
 
 #include <algorithm>
 #include <array>
@@ -2254,12 +2258,6 @@ HRESULT NativeImageHook(const unsigned char* image, HDC dc, const RECT* rect) {
                              __builtin_return_address(0) == nativeFolderImageCaller);
 }
 
-template <typename Function>
-bool HookFunction(Function target, Function callback, Function& original) {
-    return Wh_SetFunctionHook(reinterpret_cast<void*>(target), reinterpret_cast<void*>(callback),
-                              reinterpret_cast<void**>(&original));
-}
-
 void HookNativeIndicator(HMODULE storage) {
     if (!Wh_GetIntSetting(L"pinIndicator")) return;
     auto frame = GetModuleHandleW(L"ExplorerFrame.dll");
@@ -2273,7 +2271,7 @@ void HookNativeIndicator(HMODULE storage) {
         return;
     }
     nativeFolderImageCaller = indicator->folderViewCaller;
-    if (!HookFunction(indicator->draw, NativeImageHook, nativeImageOriginal)) {
+    if (!WindhawkUtils::SetFunctionHook(indicator->draw, NativeImageHook, &nativeImageOriginal)) {
         Wh_Log(L"Could not hook the pinned indicator renderer");
     }
 }
@@ -2307,6 +2305,7 @@ void Wh_ModSettingsChanged(BOOL* reload) { *reload = TRUE; }
 BOOL Wh_ModInit() {
 #ifdef WH_MOD
     using namespace explorer_item_pins;
+    using WindhawkUtils::SetFunctionHook;
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
     const auto native = FindNativeOrdering(storage);
     const auto grouping = FindNativeGrouping(storage, GetModuleHandleW(L"Shell32.dll"));
@@ -2322,13 +2321,13 @@ BOOL Wh_ModInit() {
     }
     nativeCompare = native->compare;
     nativeGrouping = *grouping;
-    if (!HookFunction(native->sort, NativeSortHook, nativeSortOriginal) ||
-        !HookFunction(grouping->batch, NativeGroupBatchHook, nativeGrouping.batch) ||
-        !HookFunction(grouping->assign, NativeAssignGroupHook, nativeGrouping.assign) ||
-        !HookFunction(grouping->rangeInfo, NativeRangeInfoHook, nativeGrouping.rangeInfo) ||
-        !HookFunction(grouping->textInfo, NativeTextInfoHook, nativeGrouping.textInfo) ||
-        !HookFunction(grouping->apply, NativeApplyGroupsHook, nativeGrouping.apply) ||
-        !HookFunction(grouping->setGrouping, NativeSetGroupingHook, nativeGrouping.setGrouping)) return FALSE;
+    if (!SetFunctionHook(native->sort, NativeSortHook, &nativeSortOriginal) ||
+        !SetFunctionHook(grouping->batch, NativeGroupBatchHook, &nativeGrouping.batch) ||
+        !SetFunctionHook(grouping->assign, NativeAssignGroupHook, &nativeGrouping.assign) ||
+        !SetFunctionHook(grouping->rangeInfo, NativeRangeInfoHook, &nativeGrouping.rangeInfo) ||
+        !SetFunctionHook(grouping->textInfo, NativeTextInfoHook, &nativeGrouping.textInfo) ||
+        !SetFunctionHook(grouping->apply, NativeApplyGroupsHook, &nativeGrouping.apply) ||
+        !SetFunctionHook(grouping->setGrouping, NativeSetGroupingHook, &nativeGrouping.setGrouping)) return FALSE;
     HookNativeIndicator(storage);
     return TRUE;
 #else
