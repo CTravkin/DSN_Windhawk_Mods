@@ -377,7 +377,7 @@ HRESULT TestGroupBatch(const unsigned char* batch, void* result) {
     return explorer_item_pins::GroupWithPins(*orderingStore, groupingApi.batch, batch, result);
 }
 
-HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, void* item, void* context, DWORD flags) {
+HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, void* item, IShellFolder2* context, DWORD flags) {
     return explorer_item_pins::AssignWithPins(groupingApi, category, row, item, context, flags);
 }
 

@@ -7,14 +7,14 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer oben in ihrem übergeordneten Ordner an.
 // @description:pt-BR Fixa arquivos e pastas no topo da pasta que os contém no Explorador de Arquivos.
 // @description:zh-CN 将文件和文件夹固定到文件资源管理器中所在文件夹的顶部。
-// @version         0.6.12
+// @version         0.6.13
 // @author          Constantine Travkin
 // @github          https://github.com/CTravkin
 // @include         explorer.exe
 // @architecture    amd64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32
 // ==/WindhawkMod==
-// Build: 18
+// Build: 19
 
 // ==WindhawkModReadme==
 /*
@@ -646,7 +646,8 @@ struct NativeOrdering {
     CompareViewItems compare;
 };
 
-// The private ABI and RVAs below are tied to the verified CodeView identities.
+// Keep offline initialization for these verified images, including builds whose
+// symbols are temporarily unavailable. Other images use Windhawk's resolver.
 constexpr GUID storagePdb{0x6ebed4d4, 0x5734, 0x9fc4, {0x9e, 0x3e, 0x8d, 0xe5, 0x0b, 0x33, 0x0f, 0x0f}};
 constexpr GUID shellPdb{0x617696ae, 0x77ca, 0x0846, {0x74, 0x3e, 0x0c, 0x34, 0x54, 0xe1, 0x7c, 0x05}};
 constexpr GUID storagePdb9974{0x63a99e08, 0xa6bc, 0x71de, {0x16, 0x8a, 0xd4, 0xf5, 0x4b, 0x00, 0x12, 0x59}};
@@ -774,7 +775,7 @@ struct GroupList : IUnknown {
 };
 
 using GroupBatch = HRESULT (*)(const unsigned char*, void*);
-using AssignGroup = HRESULT (*)(IUnknown*, IUnknown*, void*, void*, DWORD);
+using AssignGroup = HRESULT (*)(IUnknown*, IUnknown*, void*, IShellFolder2*, DWORD);
 using GroupInfo = HRESULT (*)(IUnknown*, DWORD, IUnknown**);
 using ApplyGroups = HRESULT (*)(const unsigned char*, GroupList*, UINT*);
 using SetGrouping = HRESULT (*)(IFolderView2*, REFPROPERTYKEY, BOOL);
@@ -790,8 +791,8 @@ struct NativeGrouping {
     SetGrouping setGrouping;
     RegisterGroup remember;
     MakeGroup make;
-    const void* rangeCategory;
-    const void* textCategory;
+    void* rangeCategory;
+    void* textCategory;
 };
 
 [[maybe_unused]] SetGrouping FindKnownSetGrouping(HMODULE shell) {
@@ -839,38 +840,41 @@ PCWSTR PinnedGroupTitle(LANGID language) {
 // own snapshot, including when Explorer groups the same folder in two tabs.
 class GroupingPins {
 public:
-    explicit GroupingPins(const PinNames& names) : previous_(current_) { current_ = &names; }
+    explicit GroupingPins(const PinStore& store) : store_(store), previous_(std::exchange(current_, this)) {}
     ~GroupingPins() { current_ = previous_; }
     GroupingPins(const GroupingPins&) = delete;
     GroupingPins& operator=(const GroupingPins&) = delete;
 
-    static const PinNames* Current() { return current_; }
+    static const PinNames* ForFolder(IShellFolder2* folder) {
+        if (!current_ || !folder) return nullptr;
+        if (current_->folder_.Get() != folder) current_->ReadFolder(folder);
+        return &current_->names_;
+    }
 
 private:
-    inline static thread_local const PinNames* current_ = nullptr;
-    const PinNames* previous_;
+    void ReadFolder(IShellFolder2* folder) {
+        folder_ = folder;
+        names_.clear();
+        try {
+            Microsoft::WRL::ComPtr<IPersistFolder2> source;
+            if (SUCCEEDED(folder->QueryInterface(IID_PPV_ARGS(&source))) && source) {
+                if (const auto path = FileSystemFolderPath(*source.Get())) names_ = ReadPinNames(store_, *path);
+            }
+        } catch (...) {
+            // Keep the shell's groups if the folder or store cannot be read.
+        }
+    }
+
+    inline static thread_local GroupingPins* current_ = nullptr;
+    const PinStore& store_;
+    GroupingPins* previous_;
+    Microsoft::WRL::ComPtr<IShellFolder2> folder_;
+    PinNames names_;
 };
 
 [[maybe_unused]] HRESULT GroupWithPins(const PinStore& store, GroupBatch original,
                                        const unsigned char* batch, void* result) {
-    PinNames names;
-    try {
-        // The grouping request holds the backing folder's PIDL provider here.
-        auto* owner = *reinterpret_cast<IUnknown* const*>(batch + 0x20);
-        Microsoft::WRL::ComPtr<IPersistIDList> source;
-        if (owner && SUCCEEDED(owner->QueryInterface(IID_PPV_ARGS(&source))) && source) {
-            PIDLIST_ABSOLUTE raw = nullptr;
-            const auto idResult = source->GetIDList(&raw);
-            const std::unique_ptr<std::remove_pointer_t<PIDLIST_ABSOLUTE>, decltype(&CoTaskMemFree)>
-                id(raw, CoTaskMemFree);
-            if (SUCCEEDED(idResult)) {
-                if (const auto folder = FileSystemPath(id.get())) names = ReadPinNames(store, *folder);
-            }
-        }
-    } catch (...) {
-        // Keep the shell's groups if the folder or store cannot be read.
-    }
-    const GroupingPins scope(names);
+    const GroupingPins scope(store);
     return original(batch, result);
 }
 
@@ -886,8 +890,8 @@ bool IsPinnedGroupItem(IUnknown* row, const PinNames& names) {
 }
 
 [[maybe_unused]] HRESULT AssignWithPins(const NativeGrouping& api, IUnknown* category, IUnknown* row,
-                                        void* item, void* context, DWORD flags) {
-    const auto* names = GroupingPins::Current();
+                                        void* item, IShellFolder2* context, DWORD flags) {
+    const auto* names = GroupingPins::ForFolder(context);
     if (!names || names->empty() || !row) return api.assign(category, row, item, context, flags);
     const auto categoryMethod = (*reinterpret_cast<void***>(category))[6];
     if ((categoryMethod != api.rangeCategory && categoryMethod != api.textCategory) ||
@@ -905,8 +909,12 @@ bool IsPinnedGroupItem(IUnknown* row, const PinNames& names) {
 [[maybe_unused]] HRESULT GroupInfoWithPins(MakeGroup make, GroupInfo original, IUnknown* category,
                                            DWORD group, IUnknown** output) {
     if (group != pinnedGroupId) return original(category, group, output);
-    const auto* property = reinterpret_cast<const PROPERTYKEY*>(reinterpret_cast<const unsigned char*>(category) + 0x18);
-    return make(group, 0, property, 0, nullptr, PinnedGroupTitle(GetUserDefaultUILanguage()), output);
+    Microsoft::WRL::ComPtr<IObjectWithPropertyKey> source;
+    PROPERTYKEY property{};
+    if (FAILED(category->QueryInterface(IID_PPV_ARGS(&source))) || !source || FAILED(source->GetPropertyKey(&property))) {
+        return original(category, group, output);
+    }
+    return make(group, 0, &property, 0, nullptr, PinnedGroupTitle(GetUserDefaultUILanguage()), output);
 }
 
 class ReorderedGroupList final : public GroupList {
@@ -2254,6 +2262,112 @@ DrawItemImage inactiveIndicatorHook = nullptr;
 PaintFolderImage nativeFolderImagePaintOriginal = nullptr;
 HMODULE ownedExplorerFrame = nullptr;
 
+struct StorageFunctions {
+    NativeOrdering ordering;
+    NativeGrouping grouping;
+    DrawItemImage draw;
+};
+
+bool IsStorageCode(HMODULE storage, const auto address) {
+    MEMORY_BASIC_INFORMATION region{};
+    return address && VirtualQuery(reinterpret_cast<const void*>(address), &region, sizeof(region)) &&
+           region.AllocationBase == storage && region.State == MEM_COMMIT &&
+           !(region.Protect & PAGE_GUARD) &&
+           (region.Protect & (PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY));
+}
+
+bool UsesStorageOperands(HMODULE storage, const auto address, std::initializer_list<std::string_view> operands) {
+    if (!IsStorageCode(storage, address)) return false;
+    const auto pc = reinterpret_cast<DWORD64>(address);
+    DWORD64 base = 0;
+    const auto function = RtlLookupFunctionEntry(pc, &base, nullptr);
+    if (!function || base != reinterpret_cast<DWORD64>(storage) || base + function->BeginAddress != pc ||
+        function->EndAddress <= function->BeginAddress) return false;
+
+    // Decode only the beginning of the already resolved function. Check the
+    // operands that expose its private layout, without using code to find addresses.
+    const auto size = std::min<size_t>(function->EndAddress - function->BeginAddress, 1024);
+    auto expected = operands.begin();
+    auto* code = reinterpret_cast<unsigned char*>(address);
+    constexpr size_t maxInstructionSize = 15;
+    for (size_t offset = 0; offset + maxInstructionSize <= size; ) {
+        WH_DISASM_RESULT instruction{};
+        if (!Wh_Disasm(code + offset, &instruction) || !instruction.length || instruction.length > size - offset) break;
+        if (instruction.length == expected->size() && std::memcmp(code + offset, expected->data(), instruction.length) == 0 &&
+            ++expected == operands.end()) return true;
+        offset += instruction.length;
+    }
+    return false;
+}
+
+std::optional<StorageFunctions> FindStorageSymbols(HMODULE storage, SetGrouping setGrouping, bool indicator) {
+    using namespace std::string_view_literals;
+    StorageFunctions native{};
+    native.grouping.setGrouping = setGrouping;
+    void* merge = nullptr;
+    void* imageIndex = nullptr;
+    const WindhawkUtils::SYMBOL_HOOK hooks[]{
+        {{L"static  _DSA_MergeSort()"}, &native.ordering.sort},
+        {{L"static  _DSA_MergeSort2()"}, &merge},
+        {{L"int __cdecl DVCompareColumns(struct tagITEMKEY const *,struct tagITEMKEY const *,__int64)"}, &native.ordering.compare},
+        {{L"public: virtual long __cdecl CDVCategoryQueueItem::Run(struct IServiceProvider *)"}, &native.grouping.batch},
+        {{L"public: virtual long __cdecl CBaseCategorizer::SetCategory(struct ICategorizableItem *,struct _tagpropertykey const &,struct IShellFolder2 *,enum SETCAT_FLAGS)"}, &native.grouping.assign},
+        {{L"protected: virtual long __cdecl CBaseCategorizer::OnGetCategoryDescription(unsigned long,struct ICategoryDescription * *)"}, &native.grouping.rangeInfo},
+        {{L"protected: virtual long __cdecl CDetailCategorizer::OnGetCategoryDescription(unsigned long,struct ICategoryDescription * *)"}, &native.grouping.textInfo},
+        {{L"private: long __cdecl CDefCollection::_AddUpdateGroups(struct ICategoryDescriptionArray *,int *)"}, &native.grouping.apply},
+        {{L"protected: long __cdecl CBaseCategorizer::AddCategory(unsigned long)"}, &native.grouping.remember},
+        {{L"long __cdecl CreateCategoryDescriptionWithUIntSortOrder(unsigned long,unsigned __int64,struct _tagpropertykey const &,enum CATEGORYINFO_FLAGS,struct IFilterCondition *,unsigned short *,struct ICategoryDescription * *)"}, &native.grouping.make},
+        {{L"protected: virtual long __cdecl CFilterConditionCategorizer::OnGetItemCategory(struct ICategorizableItem *,struct IShellFolder2 *,struct tagPROPVARIANT *)"}, &native.grouping.rangeCategory},
+        {{L"protected: virtual long __cdecl CDetailCategorizer::OnGetItemCategory(struct ICategorizableItem *,struct IShellFolder2 *,struct tagPROPVARIANT *)"}, &native.grouping.textCategory},
+        {{L"public: virtual long __cdecl CDefImageRenderer::Draw(struct HDC__ *,struct tagRECT const *)"}, &native.draw, nullptr, true},
+        {{L"private: int __cdecl CDefImageRenderer::_GetImageIndex(void)"}, &imageIndex, nullptr, true},
+    };
+    constexpr size_t indicatorSymbolCount = 2;
+    const auto count = std::size(hooks) - (indicator ? 0 : indicatorSymbolCount);
+    if (!WindhawkUtils::HookSymbols(storage, hooks, count)) return std::nullopt;
+
+    // Merge request count and scratch, callback and context, then the compare
+    // context's folder and item store. The store's bind method is at slot 8.
+    if (!UsesStorageOperands(storage, native.ordering.sort, {"\x8b\x29"sv, "\x48\x63\x59\x10"sv, "\x4c\x8d\x77\x28"sv}) ||
+        !UsesStorageOperands(storage, merge, {"\x48\x8b\xd9"sv, "\x48\x8b\x43\x18"sv, "\x4c\x8b\x43\x20"sv}) ||
+        !UsesStorageOperands(storage, native.ordering.compare,
+                             {"\x49\x8b\xf8"sv, "\x48\x8b\x4f\x08"sv, "\x4c\x8b\x07"sv, "\x48\x8b\x40\x40"sv})) {
+        Wh_Log(L"The Windows.Storage sort request or comparer layout has changed");
+        return std::nullopt;
+    }
+
+    // Verify the category, row and group-array calls the grouping hooks mirror.
+    constexpr auto slot3 = "\x48\x8b\x40\x18"sv;
+    if (!UsesStorageOperands(storage, native.grouping.assign, {"\x48\x8b\x40\x30"sv, "\x48\x8b\x40\x28"sv}) ||
+        !UsesStorageOperands(storage, native.grouping.rangeCategory, {slot3}) ||
+        !UsesStorageOperands(storage, native.grouping.textCategory, {slot3}) ||
+        !UsesStorageOperands(storage, native.grouping.apply, {slot3, "\x48\x8b\x40\x20"sv, slot3}) ||
+        !IsStorageCode(storage, native.grouping.remember) || !IsStorageCode(storage, native.grouping.make)) {
+        Wh_Log(L"The Windows.Storage grouping interfaces have changed");
+        return std::nullopt;
+    }
+
+    // The image services and item offsets, plus the compositor's draw/fill slots.
+    if (indicator && (!UsesStorageOperands(storage, native.draw,
+            {"\x4c\x8b\xf1"sv, "\x49\x8b\x4e\x20"sv, "\x48\x8b\x80\x80\0\0\0"sv,
+             "\x49\x8b\x56\x28"sv, "\x48\x8b\x80\x88\0\0\0"sv}) ||
+        !UsesStorageOperands(storage, imageIndex, {"\x48\x8b\x49\x28"sv, "\x48\x8b\x01"sv, slot3}))) {
+        native.draw = nullptr;
+        Wh_Log(L"The Windows.Storage indicator renderer layout has changed");
+    }
+    return native;
+}
+
+std::optional<StorageFunctions> FindStorageFunctions(HMODULE storage, SetGrouping setGrouping, bool indicator) {
+    if (!storage || !setGrouping) return std::nullopt;
+    if (const auto ordering = FindNativeOrdering(storage)) {
+        if (const auto grouping = FindNativeGrouping(storage, setGrouping)) {
+            return StorageFunctions{*ordering, *grouping, indicator ? FindKnownImageRenderer(storage) : nullptr};
+        }
+    }
+    return FindStorageSymbols(storage, setGrouping, indicator);
+}
+
 BOOL NativeSortHook(ViewSortBatch* batch) {
     return SortWithPins(*nativePinStore, nativeSortOriginal, nativeCompare, batch);
 }
@@ -2262,7 +2376,7 @@ HRESULT NativeGroupBatchHook(const unsigned char* batch, void* result) {
     return GroupWithPins(*nativePinStore, nativeGrouping.batch, batch, result);
 }
 
-HRESULT NativeAssignGroupHook(IUnknown* category, IUnknown* row, void* item, void* context, DWORD flags) {
+HRESULT NativeAssignGroupHook(IUnknown* category, IUnknown* row, void* item, IShellFolder2* context, DWORD flags) {
     return AssignWithPins(nativeGrouping, category, row, item, context, flags);
 }
 
@@ -2301,9 +2415,7 @@ HRESULT NativeImageHook(const unsigned char* image, HDC dc, const RECT* rect) {
                              FolderImagePaintScope::Active());
 }
 
-void HookNativeIndicator(HMODULE storage) {
-    if (!Wh_GetIntSetting(L"pinIndicator")) return;
-    const auto draw = FindKnownImageRenderer(storage);
+void HookNativeIndicator(DrawItemImage draw) {
     if (!draw) return;
     auto frame = GetModuleHandleW(L"ExplorerFrame.dll");
     if (!frame) {
@@ -2365,11 +2477,10 @@ BOOL Wh_ModInit() {
     using namespace explorer_item_pins;
     using WindhawkUtils::SetFunctionHook;
     const auto storage = GetModuleHandleW(L"Windows.Storage.dll");
-    const auto native = FindNativeOrdering(storage);
-    const auto grouping = native ? FindNativeGrouping(storage, FindSetGrouping(GetModuleHandleW(L"Shell32.dll")))
-                                 : std::nullopt;
-    if (!native || !grouping) {
-        Wh_Log(L"Explorer Item Pins requires verified Windows.Storage.dll and Shell32.dll images");
+    const auto setGrouping = FindSetGrouping(GetModuleHandleW(L"Shell32.dll"));
+    const auto native = FindStorageFunctions(storage, setGrouping, Wh_GetIntSetting(L"pinIndicator") != 0);
+    if (!native) {
+        Wh_Log(L"Compatible sorting and grouping functions are unavailable");
         return FALSE;
     }
 
@@ -2378,17 +2489,17 @@ BOOL Wh_ModInit() {
     } catch (...) {
         return FALSE;
     }
-    nativeCompare = native->compare;
-    nativeGrouping = *grouping;
-    nativeSetGroupingTarget = grouping->setGrouping;
-    if (!SetFunctionHook(native->sort, NativeSortHook, &nativeSortOriginal) ||
-        !SetFunctionHook(grouping->batch, NativeGroupBatchHook, &nativeGrouping.batch) ||
-        !SetFunctionHook(grouping->assign, NativeAssignGroupHook, &nativeGrouping.assign) ||
-        !SetFunctionHook(grouping->rangeInfo, NativeRangeInfoHook, &nativeGrouping.rangeInfo) ||
-        !SetFunctionHook(grouping->textInfo, NativeTextInfoHook, &nativeGrouping.textInfo) ||
-        !SetFunctionHook(grouping->apply, NativeApplyGroupsHook, &nativeGrouping.apply) ||
-        !SetFunctionHook(grouping->setGrouping, NativeSetGroupingHook, &nativeGrouping.setGrouping)) return FALSE;
-    HookNativeIndicator(storage);
+    nativeCompare = native->ordering.compare;
+    nativeGrouping = native->grouping;
+    nativeSetGroupingTarget = setGrouping;
+    if (!SetFunctionHook(native->ordering.sort, NativeSortHook, &nativeSortOriginal) ||
+        !SetFunctionHook(native->grouping.batch, NativeGroupBatchHook, &nativeGrouping.batch) ||
+        !SetFunctionHook(native->grouping.assign, NativeAssignGroupHook, &nativeGrouping.assign) ||
+        !SetFunctionHook(native->grouping.rangeInfo, NativeRangeInfoHook, &nativeGrouping.rangeInfo) ||
+        !SetFunctionHook(native->grouping.textInfo, NativeTextInfoHook, &nativeGrouping.textInfo) ||
+        !SetFunctionHook(native->grouping.apply, NativeApplyGroupsHook, &nativeGrouping.apply) ||
+        !SetFunctionHook(setGrouping, NativeSetGroupingHook, &nativeGrouping.setGrouping)) return FALSE;
+    HookNativeIndicator(native->draw);
     return TRUE;
 #else
     return FALSE;
