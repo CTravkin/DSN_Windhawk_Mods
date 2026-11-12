@@ -16,7 +16,7 @@ Explorer Item Pins keeps selected files and folders at the top of their parent f
 
 ## Platforms
 
-The mod requires [Windhawk](https://windhawk.net/) and Windows 11 x64 with the tabbed File Explorer. Tested on Windows 11 26H2 (build `26300.9974`) with Windhawk 1.7.3. Compatibility with other Explorer builds depends on available symbols and compatible internal interfaces.
+The mod requires [Windhawk](https://windhawk.net/) and Windows 11 x64 or ARM64 with the tabbed File Explorer. Tested in File Explorer on Windows 11 26H2 x64 (build `26300.9974`) with Windhawk 1.7.3. ARM64 verification covers native compilation, symbol resolution, and automated tests. Compatibility with other Explorer builds depends on available symbols and compatible internal interfaces.
 
 ## Data exchange
 

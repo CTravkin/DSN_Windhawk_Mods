@@ -17,16 +17,116 @@ using explorer_item_pins::GetPinAction;
 using explorer_item_pins::PinAction;
 using explorer_item_pins::PinStore;
 using explorer_item_pins::CompareViewItems;
-using explorer_item_pins::FindNativeOrdering;
 using explorer_item_pins::ReadPinNames;
 using explorer_item_pins::ReadItem;
-using explorer_item_pins::SortViewBatch;
-using explorer_item_pins::SortWithPins;
-using explorer_item_pins::ViewSortBatch;
 using explorer_item_pins::NativeGrouping;
 using explorer_item_pins::GroupList;
 using Microsoft::WRL::ComPtr;
 namespace fs = std::filesystem;
+
+using explorer_item_pins::SetGrouping;
+using explorer_item_pins::GroupBatch;
+using explorer_item_pins::AssignGroup;
+using explorer_item_pins::GroupInfo;
+using explorer_item_pins::ApplyGroups;
+using explorer_item_pins::RegisterGroup;
+using explorer_item_pins::MakeGroup;
+using explorer_item_pins::DrawItemImage;
+using explorer_item_pins::PaintFolderImage;
+
+// The isolated x64 hook tests verify the image identity before using fixture addresses.
+constexpr GUID storagePdb{0x6ebed4d4, 0x5734, 0x9fc4, {0x9e, 0x3e, 0x8d, 0xe5, 0x0b, 0x33, 0x0f, 0x0f}};
+constexpr GUID shellPdb{0x617696ae, 0x77ca, 0x0846, {0x74, 0x3e, 0x0c, 0x34, 0x54, 0xe1, 0x7c, 0x05}};
+constexpr GUID storagePdb9974{0x63a99e08, 0xa6bc, 0x71de, {0x16, 0x8a, 0xd4, 0xf5, 0x4b, 0x00, 0x12, 0x59}};
+constexpr GUID shellPdb9974{0x64708141, 0x4aa5, 0xc991, {0xb8, 0xa9, 0x4f, 0x15, 0xc5, 0xba, 0x60, 0x02}};
+
+unsigned char* CheckedImage(HMODULE module, const GUID& expectedPdb, DWORD lastRva) {
+    if (!module) return nullptr;
+    auto* image = reinterpret_cast<unsigned char*>(module);
+    const auto* dos = reinterpret_cast<const IMAGE_DOS_HEADER*>(image);
+    const auto* pe = reinterpret_cast<const IMAGE_NT_HEADERS64*>(image + dos->e_lfanew);
+    if (pe->FileHeader.Machine != IMAGE_FILE_MACHINE_AMD64) return nullptr;
+
+    const auto& debug = pe->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_DEBUG];
+    const auto size = pe->OptionalHeader.SizeOfImage;
+    if (!debug.VirtualAddress || debug.VirtualAddress >= size || debug.Size > size - debug.VirtualAddress ||
+        lastRva >= size) return nullptr;
+
+    const auto* entries = reinterpret_cast<const IMAGE_DEBUG_DIRECTORY*>(image + debug.VirtualAddress);
+    for (DWORD i = 0; i < debug.Size / sizeof(*entries); ++i) {
+        const auto& entry = entries[i];
+        constexpr DWORD codeViewHeaderSize = 24;
+        if (entry.Type != IMAGE_DEBUG_TYPE_CODEVIEW || !entry.AddressOfRawData ||
+            entry.AddressOfRawData >= size || entry.SizeOfData < codeViewHeaderSize ||
+            entry.SizeOfData > size - entry.AddressOfRawData) continue;
+        const auto* data = image + entry.AddressOfRawData;
+        DWORD age = 0;
+        std::memcpy(&age, data + 20, sizeof(age));
+        if (age == 1 && std::memcmp(data, "RSDS", 4) == 0 &&
+            std::memcmp(data + 4, &expectedPdb, sizeof(expectedPdb)) == 0) return image;
+    }
+    return nullptr;
+}
+
+struct OrderingFixture {
+    explorer_item_pins::RunViewSort sort;
+    CompareViewItems compare;
+    explorer_item_pins::GetComparedItem getItem;
+};
+
+std::optional<OrderingFixture> FindNativeOrdering(HMODULE storage) {
+    auto image = CheckedImage(storage, storagePdb9974, 0x1a6da0);
+    if (!image) return std::nullopt;
+    return OrderingFixture{reinterpret_cast<explorer_item_pins::RunViewSort>(image + 0x1537e8),
+                           reinterpret_cast<CompareViewItems>(image + 0x155190),
+                           reinterpret_cast<explorer_item_pins::GetComparedItem>(image + 0x1a6da0)};
+}
+
+[[maybe_unused]] SetGrouping FindKnownSetGrouping(HMODULE shell) {
+    constexpr DWORD oldRva = 0x2e8ae0;
+    constexpr DWORD updatedRva = 0x2e8e50;
+    if (const auto image = CheckedImage(shell, shellPdb, oldRva)) {
+        return reinterpret_cast<SetGrouping>(image + oldRva);
+    }
+    if (const auto image = CheckedImage(shell, shellPdb9974, updatedRva)) {
+        return reinterpret_cast<SetGrouping>(image + updatedRva);
+    }
+    return nullptr;
+}
+
+[[maybe_unused]] std::optional<NativeGrouping> FindNativeGrouping(HMODULE storage, SetGrouping setGrouping) {
+    const auto updated = CheckedImage(storage, storagePdb9974, 0x5bcf00);
+    const auto image = updated;
+    if (!image || !setGrouping) return std::nullopt;
+    return NativeGrouping{
+        reinterpret_cast<GroupBatch>(image + 0x153e50), reinterpret_cast<AssignGroup>(image + 0x1641f0),
+        reinterpret_cast<GroupInfo>(image + (updated ? 0x22fcf0 : 0x22fc90)), reinterpret_cast<GroupInfo>(image + 0x16f0c0),
+        reinterpret_cast<ApplyGroups>(image + 0x16eab8), setGrouping,
+        reinterpret_cast<RegisterGroup>(image + 0x1642dc), reinterpret_cast<MakeGroup>(image + (updated ? 0x22fdac : 0x22fd4c)),
+        image + (updated ? 0x248790 : 0x248730),
+        image + (updated ? 0x5bcf00 : 0x5bcb30),
+        reinterpret_cast<explorer_item_pins::ReadGroupValue>(image + 0x154390),
+        reinterpret_cast<explorer_item_pins::WriteGroupValue>(image + 0x294510),
+        reinterpret_cast<explorer_item_pins::GetGroupAt>(image + 0x2cec10),
+    };
+}
+
+constexpr GUID framePdb{0x468742f3, 0xd41c, 0x3441, {0xa5, 0x02, 0x2f, 0xbf, 0xfe, 0xf9, 0xa6, 0x56}};
+constexpr GUID framePdb9974{0xf8886b4f, 0x52b8, 0x73ab, {0x4a, 0x57, 0x43, 0xf3, 0x89, 0x20, 0x9a, 0xce}};
+
+[[maybe_unused]] DrawItemImage FindKnownImageRenderer(HMODULE storage) {
+    constexpr DWORD draw = 0x16d730;
+    auto image = CheckedImage(storage, storagePdb, draw);
+    if (!image) image = CheckedImage(storage, storagePdb9974, draw);
+    return image ? reinterpret_cast<DrawItemImage>(image + draw) : nullptr;
+}
+
+[[maybe_unused]] PaintFolderImage FindKnownFolderImagePaint(HMODULE frame) {
+    constexpr DWORD paint = 0xbde30;
+    auto image = CheckedImage(frame, framePdb, paint);
+    if (!image) image = CheckedImage(frame, framePdb9974, paint);
+    return image ? reinterpret_cast<PaintFolderImage>(image + paint) : nullptr;
+}
 
 void Require(bool condition, const char* message) {
     if (!condition) throw std::runtime_error(message);
@@ -212,8 +312,9 @@ void VerifyCommands(const fs::path& root) {
 
 std::optional<PinStore> orderingStore;
 explorer_item_pins::IndicatorPins orderingPins;
-SortViewBatch originalSort = nullptr;
-CompareViewItems nativeCompare = nullptr;
+explorer_item_pins::RunViewSort originalSort = nullptr;
+CompareViewItems originalCompare = nullptr;
+explorer_item_pins::GetComparedItem originalGetItem = nullptr;
 
 explorer_item_pins::PinNamesSnapshot TestFolderPins(const fs::path& folder) {
     return orderingPins.Snapshot(*orderingStore, folder);
@@ -260,8 +361,16 @@ void VerifyFolderSnapshots(const fs::path& root) {
     std::cout << "PASS background work drained on unload\n";
 }
 
-BOOL TestSortHook(ViewSortBatch* batch) {
-    return SortWithPins(TestFolderPins, originalSort, nativeCompare, batch);
+BOOL TestSortHook(void* request) {
+    return explorer_item_pins::RunSortWithPins(TestFolderPins, originalSort, request);
+}
+
+int TestCompare(const void* left, const void* right, void* context) {
+    return explorer_item_pins::CompareWithPins(originalCompare, left, right, context);
+}
+
+HRESULT TestGetItem(IUnknown* store, const void* key, IShellFolder* folder, void* viewState, REFIID iid, void** output) {
+    return explorer_item_pins::GetComparedItemWithPins(originalGetItem, store, key, folder, viewState, iid, output);
 }
 
 template <typename Function>
@@ -289,14 +398,15 @@ Function InstallTestHook(Function target, Function callback, std::span<const uns
     if (ripLoad == std::dynamic_extent) {
         std::memcpy(trampoline, entry, expected.size());
     } else {
-        constexpr unsigned char opcode[]{0x48, 0x8b, 0x05};
-        Require(std::memcmp(entry + ripLoad, opcode, sizeof(opcode)) == 0,
-                "verify the RIP-relative load at the end of the test prologue");
+        const auto opcode = entry + ripLoad;
+        Require(opcode[0] == 0x48 && (opcode[1] == 0x8b || opcode[1] == 0x8d) && opcode[2] == 0x05,
+                "verify the RIP-relative operand at the end of the test prologue");
         std::int32_t displacement{};
-        std::memcpy(&displacement, entry + ripLoad + sizeof(opcode), sizeof(displacement));
+        std::memcpy(&displacement, opcode + 3, sizeof(displacement));
         const auto address = reinterpret_cast<std::uintptr_t>(entry + expected.size()) + displacement;
         std::memcpy(trampoline, entry, ripLoad);
         unsigned char load[]{0x48, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0x48, 0x8b, 0x00};
+        if (opcode[1] == 0x8d) std::fill(load + 10, load + 13, 0x90);
         std::memcpy(load + 2, &address, sizeof(address));
         std::memcpy(trampoline + ripLoad, load, sizeof(load));
     }
@@ -317,6 +427,14 @@ Function InstallTestHook(Function target, Function callback, std::span<const uns
 
 constexpr unsigned char sortPrologue[]{0x48, 0x8b, 0xc4, 0x48, 0x89, 0x58, 0x08, 0x48,
                                        0x89, 0x68, 0x10, 0x48, 0x89, 0x70, 0x18};
+
+void InstallTestOrdering(const OrderingFixture& native) {
+    constexpr unsigned char compare[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56};
+    constexpr unsigned char getItem[]{0x40, 0x53, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56, 0x41, 0x57, 0x48, 0x83, 0xec, 0x58};
+    originalGetItem = InstallTestHook(native.getItem, TestGetItem, getItem);
+    originalCompare = InstallTestHook(native.compare, TestCompare, compare);
+    originalSort = InstallTestHook(native.sort, TestSortHook, sortPrologue);
+}
 
 struct Layout { FOLDERVIEWMODE mode; int size; };
 constexpr std::array layouts{Layout{FVM_DETAILS, 16}, Layout{FVM_LIST, 16}, Layout{FVM_TILE, 48},
@@ -350,8 +468,7 @@ void VerifyOrdering(const fs::path& root) {
     const auto native = FindNativeOrdering(storage);
     Require(native.has_value(), "native sort requires a verified Windows.Storage.dll image");
     const auto& store = orderingStore.emplace(root / L"ordering-data" / L"pins.json");
-    nativeCompare = native->compare;
-    originalSort = InstallTestHook(native->sort, TestSortHook, sortPrologue);
+    InstallTestOrdering(*native);
     ExplorerView ascending(folder, itemCount);
     ExplorerView descending(folder, itemCount);
 
@@ -427,8 +544,8 @@ HRESULT TestGroupBatch(const unsigned char* batch, void* result) {
     return explorer_item_pins::GroupWithPins(TestFolderPins, groupingApi.batch, batch, result);
 }
 
-HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, void* item, IShellFolder2* context, DWORD flags) {
-    return explorer_item_pins::AssignWithPins(groupingApi, category, row, item, context, flags);
+HRESULT TestAssignGroup(IUnknown* category, IUnknown* row, REFPROPERTYKEY property, IShellFolder2* context, DWORD flags) {
+    return explorer_item_pins::AssignWithPins(groupingApi, category, row, property, context, flags);
 }
 
 HRESULT TestGroupInfo(explorer_item_pins::GroupInfo original, IUnknown* category, DWORD id, IUnknown** result) {
@@ -514,12 +631,11 @@ void VerifyGrouping(const fs::path& root) {
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     Check(storage ? S_OK : HRESULT_FROM_WIN32(GetLastError()), "load Windows.Storage.dll in the isolated test process");
     const auto shell = GetModuleHandleW(L"Shell32.dll");
-    const auto grouping = explorer_item_pins::FindNativeGrouping(storage, explorer_item_pins::FindKnownSetGrouping(shell));
+    const auto grouping = FindNativeGrouping(storage, FindKnownSetGrouping(shell));
     const auto ordering = FindNativeOrdering(storage);
     Require(grouping && ordering, "native grouping requires verified Windows.Storage.dll and Shell32.dll images");
     const auto& store = orderingStore.emplace(root / L"grouping-data" / L"pins.json");
-    nativeCompare = ordering->compare;
-    originalSort = InstallTestHook(ordering->sort, TestSortHook, sortPrologue);
+    InstallTestOrdering(*ordering);
     InstallTestGrouping(*grouping);
 
     const std::array<std::wstring_view, 5> names{L"Alpha folder", L"Beta.txt", L"Gamma.zip",
@@ -575,10 +691,13 @@ void VerifyGrouping(const fs::path& root) {
     std::cout << "PASS pinned group and stock order in " << passed << " native view scenarios\n";
 }
 
-using explorer_item_pins::DrawItemImage;
 using explorer_item_pins::IndicatorPins;
 DrawItemImage nativeDrawImage = nullptr;
 explorer_item_pins::PaintFolderImage nativePaintFolderImage = nullptr;
+explorer_item_pins::ConstructImageRenderer nativeConstructImage = nullptr;
+explorer_item_pins::DestroyImageRenderer nativeDestroyImage = nullptr;
+explorer_item_pins::ImageSources imageSources;
+explorer_item_pins::ImageMethods imageMethods{};
 const void* previousPaintCaller = nullptr;
 bool paintScopeMatchesCaller = true;
 IndicatorPins indicatorFixture;
@@ -629,20 +748,28 @@ struct IndicatorRetryFixture {
     }
 };
 
-HRESULT ObserveStockImage(const unsigned char* image, HDC dc, const RECT* rect) {
-    const auto result = nativeDrawImage(image, dc, rect);
-    stockIcon = SampleIcon(dc, *rect);
+void* TestConstructImage(void* renderer, IUnknown* services, IUnknown* item) {
+    const auto result = nativeConstructImage(renderer, services, item);
+    imageSources.Set(renderer, {services, item});
     return result;
+}
+
+void TestDestroyImage(void* renderer) {
+    imageSources.Erase(renderer);
+    nativeDestroyImage(renderer);
 }
 
 HRESULT TestItemImage(const unsigned char* image, HDC dc, const RECT* rect) {
     const bool folderView = explorer_item_pins::FolderImagePaintScope::Active();
     paintScopeMatchesCaller &= folderView == (__builtin_return_address(0) == previousPaintCaller);
     if (!capturePaint || !folderView || !rect) return nativeDrawImage(image, dc, rect);
-    const auto path = explorer_item_pins::ItemImagePath(image);
-    if (!path) return nativeDrawImage(image, dc, rect);
-    const auto result = explorer_item_pins::DrawWithIndicator(*orderingStore, indicatorFixture, ObserveStockImage,
-                                                              image, dc, rect, indicatorOn);
+    const auto result = nativeDrawImage(image, dc, rect);
+    const auto source = imageSources.Find(image);
+    if (FAILED(result) || !source) return result;
+    const auto path = explorer_item_pins::ItemImagePath(imageMethods, *source);
+    if (!path) return result;
+    stockIcon = SampleIcon(dc, *rect);
+    if (indicatorOn) explorer_item_pins::DrawItemPin(*orderingStore, indicatorFixture, imageMethods, *source, dc, *rect);
     const auto output = SampleIcon(dc, *rect);
     const auto name = path->filename().native();
     if (name == L"Pinned shortcut.lnk") shortcutCornerPreserved &= stockIcon.left == output.left;
@@ -694,8 +821,8 @@ void VerifyIndicator(const fs::path& root) {
 
     const auto storage = LoadLibraryExW(L"Windows.Storage.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
     const auto frame = LoadLibraryExW(L"ExplorerFrame.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-    const auto renderer = explorer_item_pins::FindKnownImageRenderer(storage);
-    const auto paint = explorer_item_pins::FindKnownFolderImagePaint(frame);
+    const auto renderer = FindKnownImageRenderer(storage);
+    const auto paint = FindKnownFolderImagePaint(frame);
     Require(renderer && paint, "native indicator requires verified Windows.Storage.dll and ExplorerFrame.dll images");
     const auto& store = orderingStore.emplace(root / L"paint-data" / L"pins.json");
     for (const auto* name : {L"Pinned folder", L"Pinned thumbnail.bmp", L"Pinned shortcut.lnk"}) {
@@ -730,6 +857,20 @@ void VerifyIndicator(const fs::path& root) {
     constexpr unsigned char paintPrologue[]{0x40, 0x55, 0x53, 0x41, 0x57, 0x48, 0x8d, 0x6c, 0x24,
                                            0xc9, 0x48, 0x81, 0xec, 0xa0, 0x00, 0x00, 0x00};
     previousPaintCaller = reinterpret_cast<const unsigned char*>(frame) + 0xbe1ac;
+    constexpr unsigned char construct[]{0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x57, 0x48, 0x83, 0xec, 0x20};
+    constexpr unsigned char destroy[]{0x40, 0x53, 0x48, 0x83, 0xec, 0x20, 0x48, 0x8b, 0xd9, 0x48, 0x8d, 0x05, 0, 0, 0, 0};
+    const auto code = CheckedImage(storage, storagePdb9974, 0x215470);
+    Require(code != nullptr, "verify the current image renderer fixture");
+    imageMethods = {
+        reinterpret_cast<explorer_item_pins::ReadImageValue>(code + 0x31db0),
+        reinterpret_cast<explorer_item_pins::ReadImageValue>(code + 0x1add40),
+        reinterpret_cast<explorer_item_pins::DrawCachedIcon>(code + 0x215470),
+        reinterpret_cast<explorer_item_pins::FillCachedOverlay>(code + 0x1295c0),
+    };
+    nativeConstructImage = InstallTestHook(reinterpret_cast<explorer_item_pins::ConstructImageRenderer>(code + 0x32a88),
+                                           TestConstructImage, construct);
+    nativeDestroyImage = InstallTestHook(reinterpret_cast<explorer_item_pins::DestroyImageRenderer>(code + 0x32b68),
+                                         TestDestroyImage, destroy, 9);
     nativePaintFolderImage = InstallTestHook(paint, TestPaintFolderImage, paintPrologue);
     nativeDrawImage = InstallTestHook(renderer, TestItemImage, draw);
 
