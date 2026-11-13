@@ -9,3 +9,4 @@ DSN Windhawk Mods — набор модов Windhawk для Windows. Кажды�
 | Мод | ID Windhawk | Назначение |
 | --- | --- | --- |
 | [Explorer Item Pins](Explorer_Item_Pins/README.ru.md) | `explorer-item-pins` | Закрепление файлов и подпапок внутри открытой папки Проводника |
+| [Windows Border Switch](Windows_Border_Switch/README.ru.md) | `windows-border-switch` | Управление рамками окон, диалогов, меню «Пуск» и панели задач |
