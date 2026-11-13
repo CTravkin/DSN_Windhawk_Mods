@@ -4,10 +4,10 @@
 // @description     Control borders of windows, dialogs, the taskbar, and shell panels
 // @description:ru-RU Управление рамками окон, диалогов, панели задач и панелей оболочки
 // @description:es-ES Controla los bordes de las ventanas, los diálogos, la barra de tareas y los paneles del sistema
-// @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Taskleiste und Systembereichen
+// @description:de-DE Steuert die Rahmen von Fenstern, Dialogfeldern, der Taskleiste und Systembereichen
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
 // @description:zh-CN 控制窗口、对话框、任务栏和系统面板的边框
-// @version         0.2.7
+// @version         1.0.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 14
+// Build: 15
 
 // ==WindhawkModReadme==
 /*
@@ -39,6 +39,9 @@ virtual desktops bar in Task View.
 By default, the mod removes the active title bar accent while retaining its
 frame, and hides inactive window, dialog, taskbar, and shell panel borders.
 Window settings affect system-drawn frames.
+
+Interface languages: English, Russian, Spanish, German, Brazilian Portuguese,
+and Simplified Chinese.
 */
 // ==/WindhawkModReadme==
 
@@ -54,7 +57,7 @@ Window settings affect system-drawn frames.
   $options:
   - default: Default
   - hide: Hide border
-  - caption: Disable title bar accent
+  - caption: Disable title bar accent color
   $options:ru-RU:
   - default: По умолчанию
   - hide: Скрыть рамку
@@ -74,7 +77,7 @@ Window settings affect system-drawn frames.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
-  - caption: 关闭标题栏强调色
+  - caption: 关闭标题栏主题色
 - inactiveWindow: hide
   $name: Inactive window borders
   $name:ru-RU: Рамки неактивных окон
@@ -104,7 +107,7 @@ Window settings affect system-drawn frames.
   $name: Dialog borders
   $name:ru-RU: Рамки диалоговых окон
   $name:es-ES: Bordes de los cuadros de diálogo
-  $name:de-DE: Dialograhmen
+  $name:de-DE: Rahmen von Dialogfeldern
   $name:pt-BR: Bordas das caixas de diálogo
   $name:zh-CN: 对话框边框
   $options:
@@ -156,7 +159,7 @@ Window settings affect system-drawn frames.
   $name:es-ES: Borde del menú Inicio
   $name:de-DE: Startmenürahmen
   $name:pt-BR: Borda do menu Iniciar
-  $name:zh-CN: 开始菜单边框
+  $name:zh-CN: “开始”菜单边框
   $options:
   - default: Default
   - hide: Hide border
@@ -207,12 +210,12 @@ Window settings affect system-drawn frames.
   $name:de-DE: Benachrichtigungsrahmen
   $name:pt-BR: Bordas das notificações
   $name:zh-CN: 通知边框
-  $description: Includes the notification center, calendar, and desktop toasts
-  $description:ru-RU: Центр уведомлений, календарь и всплывающие уведомления
-  $description:es-ES: Incluye el centro de notificaciones, el calendario y las notificaciones emergentes
-  $description:de-DE: Umfasst das Benachrichtigungscenter, den Kalender und Popup-Benachrichtigungen
-  $description:pt-BR: Inclui a central de notificações, o calendário e as notificações pop-up
-  $description:zh-CN: 包括通知中心、日历和桌面横幅通知
+  $description: Includes the notification center, calendar, and notification banners
+  $description:ru-RU: Центр уведомлений, календарь и баннеры уведомлений
+  $description:es-ES: Incluye el centro de notificaciones, el calendario y los banners de notificación
+  $description:de-DE: Umfasst das Benachrichtigungscenter, den Kalender und Benachrichtigungsbanner
+  $description:pt-BR: Inclui a central de notificações, o calendário e os banners de notificação
+  $description:zh-CN: 包括通知中心、日历和通知横幅
   $options:
   - default: Default
   - hide: Hide border
@@ -232,7 +235,7 @@ Window settings affect system-drawn frames.
   - default: 默认
   - hide: 隐藏边框
 - quickSettings: hide
-  $name: Quick settings border
+  $name: Quick Settings border
   $name:ru-RU: Рамка быстрых настроек
   $name:es-ES: Borde de la configuración rápida
   $name:de-DE: Rahmen der Schnelleinstellungen
@@ -261,8 +264,8 @@ Window settings affect system-drawn frames.
   $name:ru-RU: Рамка панели мини-приложений
   $name:es-ES: Borde del panel de widgets
   $name:de-DE: Rahmen des Widgetboards
-  $name:pt-BR: Borda do painel de widgets
-  $name:zh-CN: 小组件面板边框
+  $name:pt-BR: Borda do quadro de widgets
+  $name:zh-CN: 小组件板边框
   $options:
   - default: Default
   - hide: Hide border
