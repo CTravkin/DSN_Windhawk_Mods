@@ -7,7 +7,7 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer in ihrem übergeordneten Ordner an
 // @description:pt-BR Fixa arquivos e pastas na pasta que os contém no Explorador de Arquivos
 // @description:zh-CN 在文件资源管理器中将文件和文件夹固定在各自的上级文件夹内
-// @version         1.1.1
+// @version         1.1.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 27
+// Build: 28
 
 // ==WindhawkModReadme==
 /*
@@ -137,7 +137,6 @@ The tests cover storage, concurrent access, pin operations, sorting, grouping, a
 #include <array>
 #include <atomic>
 #include <cstdint>
-#include <cstring>
 #include <filesystem>
 #include <initializer_list>
 #include <iterator>
@@ -714,15 +713,16 @@ PinNames ReadPinNames(std::span<const Item> pins, const fs::path& folder) {
     return names;
 }
 
-PinNames ReadPinNames(const PinStore& store, const fs::path& folder) {
-    return ReadPinNames(store.ReadFolder(folder), folder);
-}
-
 namespace {
 
 using CompareViewItems = int (*)(const void*, const void*, void*);
 using GetComparedItem = HRESULT (*)(IUnknown*, const void*, IShellFolder*, void*, REFIID, void**);
 using RunViewSort = BOOL (*)(void*);
+
+std::wstring_view LeafName(std::wstring_view path) {
+    const auto separator = path.find_last_of(L"\\/");
+    return separator == std::wstring_view::npos ? path : path.substr(separator + 1);
+}
 
 // Keep the folder snapshot for one synchronous sort. The request stays opaque.
 class SortPins {
@@ -738,6 +738,7 @@ public:
         if (folder_.Get() != &folder) {
             folder_ = &folder;
             names_.reset();
+            pinnedItems_.clear();
             try {
                 Microsoft::WRL::ComPtr<IPersistFolder2> parent;
                 if (SUCCEEDED(folder_.As(&parent))) {
@@ -750,13 +751,36 @@ public:
         return names_.get();
     }
 
+    bool IsPinned(PCUITEMID_CHILD id) {
+        if (!id) return false;
+        // The sort can move keys between slots. Cache by the child PIDL's
+        // bytes, whose identity remains stable when the keys move.
+        const std::string_view key(reinterpret_cast<const char*>(id), ILGetSize(id));
+        if (const auto found = pinnedItems_.find(key); found != pinnedItems_.end()) return found->second;
+        STRRET display{};
+        if (FAILED(folder_->GetDisplayNameOf(id, SHGDN_INFOLDER | SHGDN_FORPARSING, &display))) return false;
+        PWSTR raw = nullptr;
+        const auto status = StrRetToStrW(&display, id, &raw);
+        const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> name(raw, CoTaskMemFree);
+        if (FAILED(status) || !name) return false;
+        const bool pinned = names_->contains(LeafName(name.get()));
+        if (pinnedItems_.size() < 4096) pinnedItems_.emplace(std::string(key), pinned);
+        return pinned;
+    }
+
     inline static thread_local SortPins* current = nullptr;
 
 private:
+    struct PidlHash {
+        using is_transparent = void;
+        size_t operator()(std::string_view key) const { return std::hash<std::string_view>{}(key); }
+    };
+
     FindFolderPins findPins_;
     SortPins* previous_;
     Microsoft::WRL::ComPtr<IShellFolder> folder_;
     PinNamesSnapshot names_;
+    std::unordered_map<std::string, bool, PidlHash, std::equal_to<>> pinnedItems_;
 };
 
 [[maybe_unused]] BOOL RunSortWithPins(FindFolderPins findPins, RunViewSort original, void* request) {
@@ -793,11 +817,6 @@ struct ViewComparison {
     return result;
 }
 
-std::wstring_view LeafName(std::wstring_view path) {
-    const auto separator = path.find_last_of(L"\\/");
-    return separator == std::wstring_view::npos ? path : path.substr(separator + 1);
-}
-
 [[maybe_unused]] int CompareWithPins(CompareViewItems original, const void* left, const void* right, void* context) {
     const auto pins = SortPins::current;
     if (!pins || !pins->Needed()) return original(left, right, context);
@@ -814,19 +833,8 @@ std::wstring_view LeafName(std::wstring_view path) {
     try {
         const auto* names = pins->ForFolder(*comparison.folder.Get());
         if (!names || names->empty()) return stock;
-        const auto isPinned = [&](ChildId& child) {
-            const auto id = child.GetPtr();
-            STRRET display{};
-            if (!id || FAILED(comparison.folder->GetDisplayNameOf(id, SHGDN_INFOLDER | SHGDN_FORPARSING, &display))) {
-                return false;
-            }
-            PWSTR raw = nullptr;
-            const auto status = StrRetToStrW(&display, id, &raw);
-            const std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)> name(raw, CoTaskMemFree);
-            return SUCCEEDED(status) && name && names->contains(LeafName(name.get()));
-        };
-        const bool pinnedLeft = isPinned(*comparison.leftId.Get());
-        const bool pinnedRight = isPinned(*comparison.rightId.Get());
+        const bool pinnedLeft = pins->IsPinned(comparison.leftId->GetPtr());
+        const bool pinnedRight = pins->IsPinned(comparison.rightId->GetPtr());
         if (pinnedLeft != pinnedRight) return pinnedLeft ? -1 : 1;
     } catch (...) {
         // A pin lookup failure leaves the native comparison result intact.
@@ -1099,9 +1107,9 @@ public:
         sources_.insert_or_assign(renderer, source);
     }
 
-    void Erase(const void* renderer) {
+    bool Erase(const void* renderer) {
         const std::scoped_lock lock(mutex_);
-        sources_.erase(renderer);
+        return sources_.erase(renderer) != 0;
     }
 
     std::optional<ImageSource> Find(const void* renderer) {
@@ -1232,6 +1240,7 @@ public:
         const std::scoped_lock lock(mutex_);
         const auto found = folders_.find(folder);
         if (found == folders_.end() || !found->second.ready || found->second.expires <= GetTickCount64()) return std::nullopt;
+        found->second.lastUsed = ++sequence_;
         return found->second.names->contains(item.filename().native());
     }
 
@@ -1246,6 +1255,7 @@ public:
             const std::scoped_lock lock(mutex_);
             const auto entry = FindEntry(folder);
             if (!entry) return {};
+            entry->lastUsed = ++sequence_;
             names = entry->names;
             if (!entry->request && entry->expires <= now) {
                 if (pending_ < 4) {
@@ -1322,13 +1332,18 @@ private:
         std::shared_ptr<const Resolution> resolved;
         ULONGLONG expires = 0;
         uint64_t request = 0;
+        uint64_t lastUsed = 0;
         bool ready = false;
     };
 
     Entry* FindEntry(const std::wstring& folder) {
         if (const auto found = folders_.find(folder); found != folders_.end()) return &found->second;
         if (folders_.size() >= 64) {
-            const auto evict = std::ranges::find_if(folders_, [](const auto& entry) { return !entry.second.request; });
+            auto evict = folders_.end();
+            for (auto entry = folders_.begin(); entry != folders_.end(); ++entry) {
+                if (!entry->second.request &&
+                    (evict == folders_.end() || entry->second.lastUsed < evict->second.lastUsed)) evict = entry;
+            }
             if (evict == folders_.end()) return nullptr;
             folders_.erase(evict);
         }
@@ -1769,7 +1784,7 @@ HWND CommandWindow(const xaml::XamlRoot& root) {
            WindowHasClass(window, L"CabinetWClass") ? window : nullptr;
 }
 
-xaml::Controls::IconElement CommandIcon(PinAction action, xaml::ElementTheme theme) {
+xaml::Controls::IconElement CommandSvgIcon(PinAction action, xaml::ElementTheme theme) {
     wchar_t windows[MAX_PATH]{};
     if (!GetWindowsDirectoryW(windows, ARRAYSIZE(windows))) return nullptr;
     std::wstring path = windows;
@@ -1789,6 +1804,21 @@ xaml::Controls::IconElement CommandIcon(PinAction action, xaml::ElementTheme the
     svg.UriSource(winrt::Windows::Foundation::Uri(L"file:///" + path));
     controls::ImageIcon icon;
     icon.Source(svg);
+    icon.Width(16);
+    icon.Height(16);
+    return icon;
+}
+
+xaml::Controls::IconElement CommandIcon(PinAction action, xaml::ElementTheme theme) {
+    try {
+        if (const auto svg = CommandSvgIcon(action, theme)) return svg;
+    } catch (const winrt::hresult_error&) {
+        // Use the system glyph if the packaged asset cannot be loaded.
+    }
+    controls::FontIcon icon;
+    icon.FontFamily(xaml::Media::FontFamily(L"Segoe Fluent Icons"));
+    icon.Glyph(action == PinAction::Pin ? L"\uE718" : L"\uE77A");
+    icon.FontSize(16);
     icon.Width(16);
     icon.Height(16);
     return icon;
@@ -1827,14 +1857,17 @@ void InheritCommandStyle(const controls::AppBarButton& command, const controls::
 std::optional<CommandPlacement> FindCommandPlacement(const controls::CommandBar& bar, bool context) {
     const auto primary = bar.PrimaryCommands();
     if (!context) {
-        // This command bar's editing buttons are followed by a separator and
-        // the named Sort and Group command, independent of the display language.
-        if (primary.Size() < 10 || !primary.GetAt(8).try_as<controls::AppBarSeparator>()) return std::nullopt;
-        const auto sort = primary.GetAt(9).try_as<controls::AppBarButton>();
-        const auto share = primary.GetAt(6).try_as<controls::AppBarButton>();
-        const auto remove = primary.GetAt(7).try_as<controls::AppBarButton>();
-        if (!sort || sort.Name() != L"SortAndGroupButton" || !share || !remove) return std::nullopt;
-        return CommandPlacement{primary, 7, remove};
+        // Share and Delete end the editing section immediately before Sort and Group.
+        for (uint32_t i = 3; i < primary.Size(); ++i) {
+            const auto sort = primary.GetAt(i).try_as<controls::AppBarButton>();
+            if (!sort || sort.Name() != L"SortAndGroupButton") continue;
+            if (!primary.GetAt(i - 1).try_as<controls::AppBarSeparator>()) break;
+            const auto share = primary.GetAt(i - 3).try_as<controls::AppBarButton>();
+            const auto remove = primary.GetAt(i - 2).try_as<controls::AppBarButton>();
+            if (share && remove) return CommandPlacement{primary, i - 2, remove};
+            break;
+        }
+        return std::nullopt;
     }
 
     for (const auto* verb : {L"PinToStartScreen", L"pintohomefile", L"pintohome", L"Windows.CompressTo"}) {
@@ -2433,26 +2466,43 @@ void WINAPI CommandBarManagerSetBarHook(void* self, const controls::CommandBar& 
     } catch (...) {}
 }
 
-std::atomic_bool commandSymbolsAttempted;
+std::atomic_bool commandSymbolsReady;
+std::atomic_bool commandSymbolsResolving;
+bool commandHookQueued = false;
+PTP_TIMER commandSymbolsRetry = nullptr;
+unsigned commandSymbolRetries = 0;
 
 void HookCommandSymbols(bool apply) noexcept try {
-    if (!commandUiActive || commandSymbolsAttempted) return;
+    if (!commandUiActive || commandSymbolsReady) return;
     const auto extensions = GetModuleHandleW(L"FileExplorerExtensions.dll");
-    if (!extensions || commandSymbolsAttempted.exchange(true)) return;
+    if (!extensions || commandSymbolsResolving.exchange(true)) return;
+    struct ResetResolving {
+        ~ResetResolving() { commandSymbolsResolving = false; }
+    } resetResolving;
     const std::scoped_lock lock(commandHooksMutex);
-    if (!commandUiActive) return;
-    if (!HookExplorerCommandBar(extensions, &commandBarManagerSetBarOriginal, CommandBarManagerSetBarHook)) {
-        Wh_Log(L"File Explorer command bar symbol is unavailable");
+    if (!commandUiActive || commandSymbolsReady) return;
+    if (!commandHookQueued) {
+        commandHookQueued = HookExplorerCommandBar(extensions, &commandBarManagerSetBarOriginal, CommandBarManagerSetBarHook);
+    }
+    if (commandHookQueued && (!apply || Wh_ApplyHookOperations())) {
+        commandSymbolsReady = true;
+        if (commandSymbolsRetry) SetThreadpoolTimer(commandSymbolsRetry, nullptr, 0, 0);
         return;
     }
-    if (apply) Wh_ApplyHookOperations();
+    Wh_Log(L"File Explorer command bar hook is unavailable");
+    constexpr std::array retrySeconds{5, 30, 120};
+    if (commandSymbolsRetry && commandSymbolRetries < retrySeconds.size()) {
+        const auto delay = static_cast<ULONGLONG>(-10'000'000LL * retrySeconds[commandSymbolRetries++]);
+        FILETIME due{static_cast<DWORD>(delay), static_cast<DWORD>(delay >> 32)};
+        SetThreadpoolTimer(commandSymbolsRetry, &due, 0, 0);
+    }
 } catch (...) {}
 
 decltype(&LoadLibraryExW) commandLoadLibraryExOriginal;
 
 HMODULE WINAPI CommandLoadLibraryExHook(PCWSTR path, HANDLE file, DWORD flags) {
     const auto module = commandLoadLibraryExOriginal(path, file, flags);
-    if (module && path && commandUiActive && !commandSymbolsAttempted) {
+    if (module && path && commandUiActive && !commandSymbolsReady) {
         const auto name = std::wstring_view(path).substr(std::wstring_view(path).find_last_of(L"\\/") + 1);
         if (CompareNames(name, L"FileExplorerExtensions.dll") == CSTR_EQUAL ||
             CompareNames(name, L"FileExplorerExtensions") == CSTR_EQUAL) HookCommandSymbols(true);
@@ -2464,6 +2514,9 @@ void PrepareNativeCommands() noexcept {
     contextCommandEnabled = Wh_GetIntSetting(L"contextMenu") != 0;
     toolbarCommandEnabled = Wh_GetIntSetting(L"commandBar") != 0;
     if ((!contextCommandEnabled && !toolbarCommandEnabled) || !CommandUiMessage()) return;
+    commandSymbolsRetry = CreateThreadpoolTimer([](PTP_CALLBACK_INSTANCE, void*, PTP_TIMER) {
+        HookCommandSymbols(true);
+    }, nullptr, nullptr);
     commandUiActive = true;
     if (GetModuleHandleW(L"FileExplorerExtensions.dll")) {
         HookCommandSymbols(false);
@@ -2477,7 +2530,16 @@ void StartNativeCommands() noexcept { HookCommandSymbols(true); }
 
 void BeginStopNativeCommands() noexcept {
     commandUiActive = false;
-    const std::scoped_lock lock(commandHooksMutex);
+    PTP_TIMER retry;
+    {
+        const std::scoped_lock lock(commandHooksMutex);
+        retry = std::exchange(commandSymbolsRetry, nullptr);
+        if (retry) SetThreadpoolTimer(retry, nullptr, 0, 0);
+    }
+    if (retry) {
+        WaitForThreadpoolTimerCallbacks(retry, TRUE);
+        CloseThreadpoolTimer(retry);
+    }
 }
 
 void StopNativeCommands() noexcept {

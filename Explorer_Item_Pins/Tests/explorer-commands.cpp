@@ -276,7 +276,7 @@ void VerifyCommands(const fs::path& root) {
     }
 
     fs::rename(report, renamed);
-    Require(ReadPinNames(store, source) == explorer_item_pins::PinNames{renamed.filename().native(), photos.filename().native()},
+    Require(ReadPinNames(store.ReadFolder(source), source) == explorer_item_pins::PinNames{renamed.filename().native(), photos.filename().native()},
             "the view pin snapshot should follow a same-folder rename");
     {
         ExplorerView view(source, 2);
@@ -294,8 +294,8 @@ void VerifyCommands(const fs::path& root) {
             "replace the fixture file with a different filesystem object");
     fs::copy_file(renamed, target / renamed.filename());
     fs::rename(photos, target / photos.filename());
-    Require(ReadPinNames(store, source) == explorer_item_pins::PinNames{renamed.filename().native()} &&
-            ReadPinNames(store, target).empty(), "the view snapshot should retain replacement and exclude a copy and move");
+    Require(ReadPinNames(store.ReadFolder(source), source) == explorer_item_pins::PinNames{renamed.filename().native()} &&
+            ReadPinNames(store.ReadFolder(target), target).empty(), "the view snapshot should retain replacement and exclude a copy and move");
     {
         ExplorerView view(source, 1);
         Require(GetPinAction(store, Selected(view, renamed)) == PinAction::Unpin,
@@ -352,6 +352,20 @@ void VerifyFolderSnapshots(const fs::path& root) {
     fs::last_write_time(folder, fs::file_time_type::clock::now() + std::chrono::seconds(2));
     WaitForFolderPins(folder, {renamed.filename().native()});
     std::cout << "PASS asynchronous folder snapshots, cached missing pins and rename invalidation\n";
+
+    const auto recent = root / L"cache-a";
+    const auto oldest = root / L"cache-z";
+    WaitForFolderPins(oldest, {});
+    for (int i = 0; i < 61; ++i) {
+        WaitForFolderPins(root / (L"cache-m" + std::to_wstring(i)), {});
+    }
+    WaitForFolderPins(recent, {});
+    WaitForFolderPins(folder, {renamed.filename().native()});
+    const auto beforeEviction = TestFolderPins(recent);
+    WaitForFolderPins(root / L"cache-new", {});
+    Require(TestFolderPins(recent) == beforeEviction && !TestFolderPins(oldest),
+            "retain recently used snapshots and evict the oldest idle snapshot");
+    std::cout << "PASS folder snapshot eviction follows recency\n";
 
     std::atomic_bool completed = false;
     const bool submitted = explorer_item_pins::QueueModuleWork([&] { completed = true; });
@@ -703,6 +717,7 @@ explorer_item_pins::PaintFolderImage nativePaintFolderImage = nullptr;
 explorer_item_pins::ConstructImageRenderer nativeConstructImage = nullptr;
 explorer_item_pins::DestroyImageRenderer nativeDestroyImage = nullptr;
 explorer_item_pins::ImageSources imageSources;
+std::atomic_uint removedImageSources{};
 explorer_item_pins::ImageMethods imageMethods{};
 const void* previousPaintCaller = nullptr;
 bool paintScopeMatchesCaller = true;
@@ -761,7 +776,7 @@ void* TestConstructImage(void* renderer, IUnknown* services, IUnknown* item) {
 }
 
 void TestDestroyImage(void* renderer) {
-    imageSources.Erase(renderer);
+    if (imageSources.Erase(renderer)) ++removedImageSources;
     nativeDestroyImage(renderer);
 }
 
@@ -961,7 +976,9 @@ void VerifyIndicator(const fs::path& root) {
     Require(!indicatorFixture.Cached(bitmap), "invalidate the cached action after a pin change");
     WaitUntil([&] { return !indicatorFixture.Contains(store, bitmap); }, "apply a changed indicator snapshot");
     Require(indicatorFixture.Contains(store, folder / L"Pinned folder"), "preserve the other indicators after a change");
-    std::cout << "PASS indicator pixels and shortcut corner in " << verified << " native view scenarios\n";
+    Require(removedImageSources.load() > 0, "the native renderer destructor should remove tracked sources");
+    std::cout << "PASS indicator pixels and shortcut corner in " << verified
+              << " native view scenarios, with native renderer cleanup\n";
 }
 }
 
