@@ -1,23 +1,28 @@
 // ==WindhawkMod==
 // @id              windows-border-switch
 // @name            Windows Border Switch
-// @description     Control borders of windows, dialogs, Start, and the taskbar
-// @description:ru-RU Управление рамками окон, диалогов, меню «Пуск» и панели задач
-// @description:es-ES Controla los bordes de las ventanas, los diálogos, Inicio y la barra de tareas
-// @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Startmenü und Taskleiste
-// @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, do menu Iniciar e da barra de tarefas
-// @description:zh-CN 控制窗口、对话框、开始菜单和任务栏的边框
-// @version         0.1.4
+// @description     Control borders of windows, dialogs, the taskbar, and shell panels
+// @description:ru-RU Управление рамками окон, диалогов, панели задач и панелей оболочки
+// @description:es-ES Controla los bordes de las ventanas, los diálogos, la barra de tareas y los paneles del sistema
+// @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Taskleiste und Systembereichen
+// @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
+// @description:zh-CN 控制窗口、对话框、任务栏和系统面板的边框
+// @version         0.2.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
 // @license         MIT
 // @include         explorer.exe
 // @include         StartMenuExperienceHost.exe
+// @include         SearchHost.exe
+// @include         SearchApp.exe
+// @include         ShellExperienceHost.exe
+// @include         ShellHost.exe
+// @include         WidgetBoard.exe
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 5
+// Build: 12
 
 // ==WindhawkModReadme==
 /*
@@ -25,14 +30,15 @@
 
 **English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Windows_Border_Switch/README.ru.md)
 
-Control the borders of active windows, inactive windows, Win32 dialogs, Start,
-and the taskbar independently. The Start setting also applies to its Phone Link
-panel. The active-window setting can also remove the system-drawn title bar
-accent while keeping the window border.
+Control window and dialog borders, the taskbar, Start, Search, the notification
+center, Quick Settings, and the Widgets board independently. The Start setting
+also applies to Phone Link. Notifications include the calendar and desktop toasts.
+Quick Settings include the media controls. The taskbar setting also covers the
+virtual desktops bar in Task View.
 
-By default, the mod removes the active title bar accent and hides the borders
-of inactive windows, dialogs, Start, and the taskbar. Window settings affect
-system-drawn frames. Applications can draw their own frames and title bars.
+By default, the mod removes the active title bar accent while retaining its
+frame, and hides inactive window, dialog, taskbar, and shell panel borders.
+Window settings affect system-drawn frames.
 */
 // ==/WindhawkModReadme==
 
@@ -119,6 +125,31 @@ system-drawn frames. Applications can draw their own frames and title bars.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
+- taskbar: hide
+  $name: Taskbar border
+  $name:ru-RU: Рамка панели задач
+  $name:es-ES: Borde de la barra de tareas
+  $name:de-DE: Taskleistenrahmen
+  $name:pt-BR: Borda da barra de tarefas
+  $name:zh-CN: 任务栏边框
+  $options:
+  - default: Default
+  - hide: Hide border
+  $options:ru-RU:
+  - default: По умолчанию
+  - hide: Скрыть рамку
+  $options:es-ES:
+  - default: Predeterminado
+  - hide: Ocultar borde
+  $options:de-DE:
+  - default: Standard
+  - hide: Rahmen ausblenden
+  $options:pt-BR:
+  - default: Padrão
+  - hide: Ocultar borda
+  $options:zh-CN:
+  - default: 默认
+  - hide: 隐藏边框
 - startMenu: hide
   $name: Start menu border
   $name:ru-RU: Рамка меню «Пуск»
@@ -144,13 +175,94 @@ system-drawn frames. Applications can draw their own frames and title bars.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
-- taskbar: hide
-  $name: Taskbar border
-  $name:ru-RU: Рамка панели задач
-  $name:es-ES: Borde de la barra de tareas
-  $name:de-DE: Taskleistenrahmen
-  $name:pt-BR: Borda da barra de tarefas
-  $name:zh-CN: 任务栏边框
+- search: hide
+  $name: Search border
+  $name:ru-RU: Рамка поиска
+  $name:es-ES: Borde de la búsqueda
+  $name:de-DE: Rahmen der Suche
+  $name:pt-BR: Borda da pesquisa
+  $name:zh-CN: 搜索边框
+  $options:
+  - default: Default
+  - hide: Hide border
+  $options:ru-RU:
+  - default: По умолчанию
+  - hide: Скрыть рамку
+  $options:es-ES:
+  - default: Predeterminado
+  - hide: Ocultar borde
+  $options:de-DE:
+  - default: Standard
+  - hide: Rahmen ausblenden
+  $options:pt-BR:
+  - default: Padrão
+  - hide: Ocultar borda
+  $options:zh-CN:
+  - default: 默认
+  - hide: 隐藏边框
+- notificationCenter: hide
+  $name: Notification borders
+  $name:ru-RU: Уведомления
+  $name:es-ES: Bordes de las notificaciones
+  $name:de-DE: Benachrichtigungsrahmen
+  $name:pt-BR: Bordas das notificações
+  $name:zh-CN: 通知边框
+  $description: Includes the notification center, calendar, and desktop toasts
+  $description:ru-RU: Центр уведомлений, календарь и всплывающие уведомления
+  $description:es-ES: Incluye el centro de notificaciones, el calendario y las notificaciones emergentes
+  $description:de-DE: Umfasst das Benachrichtigungscenter, den Kalender und Popup-Benachrichtigungen
+  $description:pt-BR: Inclui a central de notificações, o calendário e as notificações pop-up
+  $description:zh-CN: 包括通知中心、日历和桌面横幅通知
+  $options:
+  - default: Default
+  - hide: Hide border
+  $options:ru-RU:
+  - default: По умолчанию
+  - hide: Скрыть рамку
+  $options:es-ES:
+  - default: Predeterminado
+  - hide: Ocultar borde
+  $options:de-DE:
+  - default: Standard
+  - hide: Rahmen ausblenden
+  $options:pt-BR:
+  - default: Padrão
+  - hide: Ocultar borda
+  $options:zh-CN:
+  - default: 默认
+  - hide: 隐藏边框
+- quickSettings: hide
+  $name: Quick settings border
+  $name:ru-RU: Рамка быстрых настроек
+  $name:es-ES: Borde de la configuración rápida
+  $name:de-DE: Rahmen der Schnelleinstellungen
+  $name:pt-BR: Borda das configurações rápidas
+  $name:zh-CN: 快速设置边框
+  $options:
+  - default: Default
+  - hide: Hide border
+  $options:ru-RU:
+  - default: По умолчанию
+  - hide: Скрыть рамку
+  $options:es-ES:
+  - default: Predeterminado
+  - hide: Ocultar borde
+  $options:de-DE:
+  - default: Standard
+  - hide: Rahmen ausblenden
+  $options:pt-BR:
+  - default: Padrão
+  - hide: Ocultar borda
+  $options:zh-CN:
+  - default: 默认
+  - hide: 隐藏边框
+- widgets: hide
+  $name: Widgets board border
+  $name:ru-RU: Рамка панели мини-приложений
+  $name:es-ES: Borde del panel de widgets
+  $name:de-DE: Rahmen des Widgetboards
+  $name:pt-BR: Borda do painel de widgets
+  $name:zh-CN: 小组件面板边框
   $options:
   - default: Default
   - hide: Hide border
@@ -241,16 +353,75 @@ constexpr WindowFrame WindowFrameFor(WindowSettings settings, bool active, bool 
     return frame;
 }
 
-enum class ShellBorder { None, Start, Taskbar };
+enum class ShellHost { Unknown, Explorer, Start, Search, Flyouts, Widgets };
+enum class ShellBorder {
+    None, Taskbar, TaskView, Start, Search, Notifications, QuickSettings, Widgets
+};
 
-constexpr ShellBorder ShellBorderFor(bool startHost,
+struct ShellSetting {
+    ShellHost host;
+    ShellBorder border;
+    const wchar_t* key;
+};
+
+constexpr ShellSetting kShellSettings[] = {
+    {ShellHost::Explorer, ShellBorder::Taskbar, L"taskbar"},
+    {ShellHost::Explorer, ShellBorder::TaskView, L"taskbar"},
+    {ShellHost::Start, ShellBorder::Start, L"startMenu"},
+    {ShellHost::Search, ShellBorder::Search, L"search"},
+    {ShellHost::Flyouts, ShellBorder::Notifications, L"notificationCenter"},
+    {ShellHost::Flyouts, ShellBorder::QuickSettings, L"quickSettings"},
+    {ShellHost::Widgets, ShellBorder::Widgets, L"widgets"},
+};
+
+constexpr unsigned BorderBit(ShellBorder border) {
+    return border == ShellBorder::None ? 0 : 1u << static_cast<unsigned>(border);
+}
+
+constexpr ShellBorder ShellBorderFor(ShellHost host,
                                      std::wstring_view type,
                                      std::wstring_view name) {
-    if (startHost && name == L"AcrylicBorder" && type == L"Windows.UI.Xaml.Controls.Border") {
+    if (host == ShellHost::Start && name == L"AcrylicBorder" &&
+        type == L"Windows.UI.Xaml.Controls.Border") {
         return ShellBorder::Start;
     }
-    if (!startHost && name == L"BackgroundStroke" && type == L"Windows.UI.Xaml.Shapes.Rectangle") {
+    if (host == ShellHost::Explorer && name == L"BackgroundStroke" &&
+        type == L"Windows.UI.Xaml.Shapes.Rectangle") {
         return ShellBorder::Taskbar;
+    }
+    if (host == ShellHost::Explorer && type == L"Windows.UI.Xaml.Controls.Border" &&
+        (name == L"VirtualDesktopBarBackground" || name == L"VirtualDesktopSwitcherBackground")) {
+        return ShellBorder::TaskView;
+    }
+    if (host == ShellHost::Search && (name == L"AppBorder" || name == L"AccentAppBorder") &&
+        type == L"Windows.UI.Xaml.Controls.Border") {
+        return ShellBorder::Search;
+    }
+    if (host == ShellHost::Flyouts && type == L"Windows.UI.Xaml.Controls.Grid") {
+        if (name == L"NotificationCenterGrid" || name == L"CalendarCenterGrid") {
+            return ShellBorder::Notifications;
+        }
+        if (name == L"ControlCenterRegion" || name == L"MediaTransportControlsRegion") {
+            return ShellBorder::QuickSettings;
+        }
+    }
+    if (host == ShellHost::Flyouts && type == L"Windows.UI.Xaml.Controls.Border" &&
+        (name == L"ToastBackgroundBorder" || name == L"ToastBackgroundBorder2" ||
+         name == L"CalendarHeaderMinimizedOverlay")) {
+        return ShellBorder::Notifications;
+    }
+    if (host == ShellHost::Widgets) {
+        if (name == L"NavigationViewBorder" && type == L"Microsoft.UI.Xaml.Controls.Border") {
+            return ShellBorder::Widgets;
+        }
+        if (name == L"WidgetBoardHost" && type == L"Microsoft.UI.Xaml.Controls.Grid") {
+            return ShellBorder::Widgets;
+        }
+        if (name == L"WidgetBoardContent" &&
+            (type == L"Microsoft.UI.Xaml.Controls.Grid" ||
+             type == L"WidgetBoard.WidgetHostContentControl")) {
+            return ShellBorder::Widgets;
+        }
     }
     return ShellBorder::None;
 }
@@ -275,11 +446,17 @@ constexpr bool IsStartPane(std::wstring_view name) {
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
+#include <winrt/Microsoft.UI.Dispatching.h>
+#include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.UI.Xaml.Media.h>
 
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <functional>
+#include <memory>
 #include <mutex>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -291,8 +468,11 @@ namespace Foundation = winrt::Windows::Foundation;
 namespace Xaml = winrt::Windows::UI::Xaml;
 namespace Core = winrt::Windows::UI::Core;
 namespace System = winrt::Windows::System;
+namespace WinUI = winrt::Microsoft::UI::Xaml;
+namespace Dispatching = winrt::Microsoft::UI::Dispatching;
 
-bool g_startHost;
+ShellHost g_shellHost;
+unsigned g_shellBorders;
 
 struct Worker {
     HANDLE thread = nullptr;
@@ -365,11 +545,24 @@ void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG o
             g_previousShellWindow = nullptr;
             g_shellWindowChanged = true;
         }
-    } else if (ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
+    } else if (g_shellHost == ShellHost::Widgets ||
+               ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
                ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
-               ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge")) {
+               ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge") ||
+               ClassIs(window, L"Microsoft.UI.Content.DesktopChildSiteBridge") ||
+               ClassIs(window, L"ControlCenterWindow")) {
         g_shellWindowChanged = true;
     }
+}
+
+bool HasFlyoutWindow() {
+    return !EnumWindows([](HWND window, LPARAM) -> BOOL {
+        DWORD process = 0;
+        GetWindowThreadProcessId(window, &process);
+        return process != GetCurrentProcessId() ||
+               !(ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
+                 ClassIs(window, L"ControlCenterWindow"));
+    }, 0);
 }
 
 bool WaitForShellActivity(HANDLE stop, DWORD delay) {
@@ -717,40 +910,87 @@ LSTATUS WINAPI QueryValueHook(HKEY key, PCWSTR name, DWORD* reserved, DWORD* typ
 }
 
 struct ShellEdit {
-    winrt::weak_ref<Xaml::FrameworkElement> element;
-    Core::CoreDispatcher dispatcher;
-    ShellBorder border;
-    Foundation::IInspectable original;
-
-    Xaml::DependencyProperty Property() const {
-        return border == ShellBorder::Start ? Xaml::Controls::Border::BorderThicknessProperty()
-                                           : Xaml::UIElement::VisibilityProperty();
-    }
-
-    bool Restore() const {
-        auto target = element.get();
-        if (!target) {
-            return false;
-        }
-        auto property = Property();
-        if (original) {
-            target.SetValue(property, original);
-        } else {
-            target.ClearValue(property);
-        }
-        return true;
-    }
+    DWORD thread;
+    std::function<bool()> expired;
+    std::function<void()> restore;
+    std::function<bool(std::function<void()>)> dispatch;
 };
+
+template <typename Element, typename Property, typename Value>
+ShellEdit TrackShellEdit(Element const& target, Property const& property,
+                         Foundation::IInspectable const& unset,
+                         Value const& replacement,
+                         std::function<bool(std::function<void()>)> dispatch) {
+    auto weak = winrt::make_weak(target);
+    auto original = target.ReadLocalValue(property);
+    if (original == unset) {
+        original = nullptr;
+    }
+    return {
+        GetCurrentThreadId(),
+        [weak] { return !weak.get(); },
+        [weak, property, original, replacement] {
+            auto element = weak.get();
+            if (!element) {
+                return;
+            }
+            auto local = element.ReadLocalValue(property);
+            bool matches;
+            if constexpr (std::is_same_v<Value, Foundation::IInspectable>) {
+                matches = local == replacement;
+            } else {
+                auto value = local.template try_as<Foundation::IReference<Value>>();
+                matches = value && value.Value() == replacement;
+            }
+            if (!matches) {
+                return;
+            }
+            if (original) {
+                element.SetValue(property, original);
+            } else {
+                element.ClearValue(property);
+            }
+            Wh_Log(L"Restored shell border: %s", element.Name().c_str());
+        },
+        std::move(dispatch),
+    };
+}
+
+void RestoreShellEdit(ShellEdit const& edit) {
+    winrt::handle thread{OpenThread(SYNCHRONIZE, FALSE, edit.thread)};
+    winrt::handle done{CreateEventW(nullptr, TRUE, FALSE, nullptr)};
+    if (!thread || !done) {
+        return;
+    }
+    // Keep the completion signal alive until the dispatcher releases the callback.
+    HANDLE duplicate = nullptr;
+    if (!DuplicateHandle(GetCurrentProcess(), done.get(), GetCurrentProcess(), &duplicate,
+                         EVENT_MODIFY_STATE, FALSE, 0)) {
+        return;
+    }
+    auto signal = std::make_shared<winrt::handle>(duplicate);
+    if (edit.dispatch([restore = edit.restore, signal] {
+            try {
+                restore();
+            } catch (...) {
+                Wh_Log(L"Unable to restore XAML border: %08X", winrt::to_hresult());
+            }
+            SetEvent(signal->get());
+        })) {
+        HANDLE events[] = {done.get(), thread.get()};
+        WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
+    }
+}
 
 struct TreeWatcher : winrt::implements<TreeWatcher, IVisualTreeServiceCallback2> {
     explicit TreeWatcher(winrt::com_ptr<IXamlDiagnostics> diagnostics)
-        : m_diagnostics(std::move(diagnostics)) {
+        : m_diagnostics(std::move(diagnostics)), m_borders(g_shellBorders) {
         m_diagnostics->QueryInterface(kDiagnosticsTestHooks, m_testHooks.put_void());
     }
 
     HRESULT Advise() {
         // Without UnregisterInstance, visiting an active shell can retain its XAML objects.
-        if (!m_testHooks) {
+        if (!m_testHooks && g_shellHost != ShellHost::Widgets) {
             return E_NOINTERFACE;
         }
         auto service = m_diagnostics.as<IVisualTreeService3>();
@@ -778,11 +1018,7 @@ struct TreeWatcher : winrt::implements<TreeWatcher, IVisualTreeServiceCallback2>
         }
         for (auto& [handle, edit] : edits) {
             try {
-                edit.dispatcher.RunAsync(Core::CoreDispatcherPriority::Normal, [&edit] {
-                    if (edit.Restore()) {
-                        Wh_Log(L"Restored shell border");
-                    }
-                }).get();
+                RestoreShellEdit(edit);
             } catch (...) {
                 Wh_Log(L"Unable to restore XAML border: %08X", winrt::to_hresult());
             }
@@ -797,14 +1033,16 @@ struct TreeWatcher : winrt::implements<TreeWatcher, IVisualTreeServiceCallback2>
         }
         try {
             if (mutation == Add && element.Type && element.Name) {
-                auto border = ShellBorderFor(g_startHost, element.Type, element.Name);
-                if (border != ShellBorder::None) {
+                auto border = ShellBorderFor(g_shellHost, element.Type, element.Name);
+                if (m_borders & BorderBit(border)) {
                     Apply(element.Handle, border);
                 }
             }
             // XAML reports both handles and may keep them alive even if they were
             // never resolved. Release after the current visual-tree walk returns.
-            QueueRelease(element.Handle, relation.Parent);
+            if (m_testHooks && g_shellHost != ShellHost::Widgets) {
+                QueueRelease(element.Handle, relation.Parent);
+            }
         } catch (...) {
             Wh_Log(L"Unable to update XAML border: %08X", winrt::to_hresult());
         }
@@ -823,53 +1061,100 @@ private:
                 handle, reinterpret_cast<::IInspectable**>(winrt::put_abi(inspectable))))) {
             return;
         }
-        auto target = inspectable.try_as<Xaml::FrameworkElement>();
-        if (!target) {
-            return;
-        }
-
-        auto parent = Xaml::Media::VisualTreeHelper::GetParent(target)
-                          .try_as<Xaml::FrameworkElement>();
-        auto parentName = parent ? parent.Name() : winrt::hstring{};
-        auto parentType = parent ? winrt::get_class_name(parent) : winrt::hstring{};
-        if (border == ShellBorder::Start && !IsStartPane(parentName) &&
-            !(parentName.empty() && parentType == L"Windows.UI.Xaml.Controls.Grid")) {
-            return;
-        }
-
         std::lock_guard guard(m_mutex);
         if (m_stopping) {
             return;
         }
         std::erase_if(m_edits, [](const auto& entry) {
-            // Weak references can only be resolved on their own dispatcher.
-            return entry.second.dispatcher.HasThreadAccess() && !entry.second.element.get();
+            return entry.second.thread == GetCurrentThreadId() && entry.second.expired();
         });
         if (m_edits.contains(handle)) {
             return;
         }
-
-        ShellEdit edit{winrt::make_weak(target), target.Dispatcher(), border, nullptr};
-        auto property = edit.Property();
-        auto original = target.ReadLocalValue(property);
-        if (original != Xaml::DependencyProperty::UnsetValue()) {
-            edit.original = original;
+        if (border == ShellBorder::Widgets) {
+            auto target = inspectable.try_as<WinUI::FrameworkElement>();
+            if (!target) {
+                return;
+            }
+            auto queue = target.DispatcherQueue();
+            if (!queue) {
+                return;
+            }
+            auto dispatch = [queue](std::function<void()> run) {
+                return queue.TryEnqueue([run = std::move(run)] { run(); });
+            };
+            auto unset = WinUI::DependencyProperty::UnsetValue();
+            // WidgetBoard uses the outline width for layout. Hide the brush to
+            // preserve that geometry and the acrylic backdrop.
+            auto brush = WinUI::Media::SolidColorBrush(winrt::Windows::UI::Color{});
+            if (target.try_as<WinUI::Controls::Control>()) {
+                ApplyProperty(handle, target, WinUI::Controls::Control::BorderBrushProperty(),
+                              unset, Foundation::IInspectable{brush}, dispatch);
+            } else if (target.try_as<WinUI::Controls::Grid>()) {
+                ApplyProperty(handle, target, WinUI::Controls::Grid::BorderBrushProperty(),
+                              unset, Foundation::IInspectable{brush}, dispatch);
+            } else if (target.try_as<WinUI::Controls::Border>()) {
+                ApplyProperty(handle, target, WinUI::Controls::Border::BorderBrushProperty(),
+                              unset, Foundation::IInspectable{brush}, dispatch);
+            }
+            return;
         }
 
+        auto target = inspectable.try_as<Xaml::FrameworkElement>();
+        if (!target) {
+            return;
+        }
+        if (border == ShellBorder::Start) {
+            auto parent = Xaml::Media::VisualTreeHelper::GetParent(target)
+                              .try_as<Xaml::FrameworkElement>();
+            if (!parent || (!IsStartPane(parent.Name()) &&
+                            !(parent.Name().empty() &&
+                              winrt::get_class_name(parent) == L"Windows.UI.Xaml.Controls.Grid"))) {
+                return;
+            }
+        }
+        auto dispatcher = target.Dispatcher();
+        if (!dispatcher) {
+            return;
+        }
+        auto dispatch = [dispatcher](std::function<void()> run) {
+            dispatcher.RunAsync(Core::CoreDispatcherPriority::Normal,
+                                [run = std::move(run)] { run(); });
+            return true;
+        };
+        auto unset = Xaml::DependencyProperty::UnsetValue();
+        if (border == ShellBorder::Taskbar) {
+            ApplyProperty(handle, target, Xaml::UIElement::VisibilityProperty(), unset,
+                          Xaml::Visibility::Collapsed, dispatch);
+            return;
+        }
+        auto property = target.try_as<Xaml::Controls::Grid>()
+                            ? Xaml::Controls::Grid::BorderThicknessProperty()
+                            : Xaml::Controls::Border::BorderThicknessProperty();
+        ApplyProperty(handle, target, property, unset, Xaml::Thickness{}, dispatch);
+    }
+
+    template <typename Element, typename Property, typename Value>
+    void ApplyProperty(InstanceHandle handle, Element const& target, Property const& property,
+                       Foundation::IInspectable const& unset,
+                       Value const& replacement,
+                       std::function<bool(std::function<void()>)> dispatch) {
+        auto edit = TrackShellEdit(target, property, unset, replacement, std::move(dispatch));
         auto [entry, inserted] = m_edits.emplace(handle, std::move(edit));
+        if (!inserted) {
+            return;
+        }
         try {
-            if (border == ShellBorder::Start) {
-                target.as<Xaml::Controls::Border>().BorderThickness(Xaml::Thickness{});
+            if constexpr (std::is_same_v<Value, Foundation::IInspectable>) {
+                target.SetValue(property, replacement);
             } else {
-                target.Visibility(Xaml::Visibility::Collapsed);
+                target.SetValue(property, winrt::box_value(replacement));
             }
         } catch (...) {
             m_edits.erase(entry);
             throw;
         }
-        Wh_Log(L"Updated shell border: %s (parent %s#%s)",
-               border == ShellBorder::Start ? L"Start" : L"taskbar",
-               parentType.c_str(), parentName.c_str());
+        Wh_Log(L"Updated shell border: %s", target.Name().c_str());
     }
 
     void QueueRelease(InstanceHandle element, InstanceHandle parent) {
@@ -953,6 +1238,7 @@ private:
     };
 
     winrt::com_ptr<IXamlDiagnostics> m_diagnostics;
+    const unsigned m_borders;
     winrt::com_ptr<DiagnosticsTestHooks> m_testHooks;
     std::atomic<bool> m_stopping = false;
     std::mutex m_mutex;
@@ -1011,7 +1297,9 @@ struct TapFactory : winrt::implements<TapFactory, IClassFactory, winrt::non_agil
 };
 
 HRESULT AttachTap(HANDLE stop) {
-    auto xaml = GetModuleHandleW(L"Windows.UI.Xaml.dll");
+    bool widgets = g_shellHost == ShellHost::Widgets;
+    auto xaml = GetModuleHandleW(widgets ? L"Microsoft.Internal.FrameworkUdk.dll"
+                                        : L"Windows.UI.Xaml.dll");
     if (!xaml) {
         return HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND);
     }
@@ -1031,7 +1319,8 @@ HRESULT AttachTap(HANDLE stop) {
     return FindDiagnosticEndpoint(
         [&](unsigned index) {
             WCHAR connection[40];
-            swprintf_s(connection, L"VisualDiagConnection%u", index);
+            swprintf_s(connection, L"%s%u",
+                       widgets ? L"WinUIVisualDiagConnection" : L"VisualDiagConnection", index);
             return initialize(connection, pid, L"", path, kTapClass, nullptr);
         },
         [stop] { return WaitForSingleObject(stop, 0) != WAIT_TIMEOUT; },
@@ -1064,7 +1353,7 @@ HRESULT ConnectShellTap(HANDLE stop, winrt::com_ptr<IXamlDiagnostics>& site) {
 
 DWORD WINAPI RunShellWorker(void* stopParameter) {
     HANDLE stop = static_cast<HANDLE>(stopParameter);
-    if (!g_startHost && !WaitForShellOwnership(stop)) {
+    if (g_shellHost == ShellHost::Explorer && !WaitForShellOwnership(stop)) {
         return 0;
     }
     HRESULT apartment = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
@@ -1081,12 +1370,21 @@ DWORD WINAPI RunShellWorker(void* stopParameter) {
     constexpr DWORD delays[] = {250, 1000, 4000, 10000};
     unsigned retry = 0;
     while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+        // ShellHost and ShellExperienceHost create their flyout XAML lazily.
+        // Wait until the UI window exists before attaching to its diagnostics.
+        if (g_shellHost == ShellHost::Flyouts && !site && !HasFlyoutWindow()) {
+            if (!WaitForShellActivity(stop, hook || uncloak ? INFINITE : 1000)) {
+                break;
+            }
+            continue;
+        }
         try {
             HRESULT result = site ? S_OK : ConnectShellTap(stop, site);
             if (SUCCEEDED(result) && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
                 auto watcher = winrt::make_self<TreeWatcher>(site);
                 result = watcher->Advise();
                 if (SUCCEEDED(result)) {
+                    Wh_Log(L"Subscribed to shell XAML");
                     if (hook) {
                         UnhookWinEvent(std::exchange(hook, nullptr));
                     }
@@ -1160,7 +1458,7 @@ WindowEffect ReadSetting(PCWSTR name) {
 }
 
 void ApplySettings() {
-    if (!g_startHost) {
+    if (g_shellHost == ShellHost::Explorer) {
         WindowSettings settings{
             ReadSetting(L"activeWindow"),
             ReadSetting(L"inactiveWindow") == WindowEffect::HideBorder,
@@ -1177,11 +1475,17 @@ void ApplySettings() {
         }
     }
 
-    bool shellEnabled = ReadSetting(g_startHost ? L"startMenu" : L"taskbar") ==
-                        WindowEffect::HideBorder;
-    if (!shellEnabled) {
+    unsigned borders = 0;
+    for (const auto& setting : kShellSettings) {
+        if (setting.host == g_shellHost && ReadSetting(setting.key) == WindowEffect::HideBorder) {
+            borders |= BorderBit(setting.border);
+        }
+    }
+    if (borders != g_shellBorders) {
         g_shellWorker.Stop();
-    } else {
+        g_shellBorders = borders;
+    }
+    if (borders) {
         if (!g_shellHooks) {
             g_shellHooks = InstallShellHooks() && Wh_ApplyHookOperations();
         }
@@ -1222,8 +1526,19 @@ BOOL Wh_ModInit() {
     if (!name) {
         return FALSE;
     }
-    g_startHost = _wcsicmp(name + 1, L"StartMenuExperienceHost.exe") == 0;
-    return g_startHost || _wcsicmp(name + 1, L"explorer.exe") == 0;
+    ++name;
+    if (_wcsicmp(name, L"explorer.exe") == 0) {
+        g_shellHost = ShellHost::Explorer;
+    } else if (_wcsicmp(name, L"StartMenuExperienceHost.exe") == 0) {
+        g_shellHost = ShellHost::Start;
+    } else if (_wcsicmp(name, L"SearchHost.exe") == 0 || _wcsicmp(name, L"SearchApp.exe") == 0) {
+        g_shellHost = ShellHost::Search;
+    } else if (_wcsicmp(name, L"ShellExperienceHost.exe") == 0 || _wcsicmp(name, L"ShellHost.exe") == 0) {
+        g_shellHost = ShellHost::Flyouts;
+    } else if (_wcsicmp(name, L"WidgetBoard.exe") == 0) {
+        g_shellHost = ShellHost::Widgets;
+    }
+    return g_shellHost != ShellHost::Unknown;
 }
 
 void Wh_ModAfterInit() {

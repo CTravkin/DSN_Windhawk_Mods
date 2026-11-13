@@ -32,19 +32,55 @@ static_assert(WindowFrameFor(kHideInactiveWithCaption, true, true, false, true) 
 static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, true, false) ==
               WindowFrame{false, CaptionEffect::Default});
 
-static_assert(ShellBorderFor(true, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
+static_assert(ShellBorderFor(ShellHost::Start, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
               ShellBorder::Start);
-static_assert(ShellBorderFor(false, L"Windows.UI.Xaml.Shapes.Rectangle", L"BackgroundStroke") ==
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Shapes.Rectangle", L"BackgroundStroke") ==
               ShellBorder::Taskbar);
-static_assert(ShellBorderFor(false, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
               ShellBorder::None);
-static_assert(ShellBorderFor(true, L"Windows.UI.Xaml.Shapes.Rectangle", L"BackgroundStroke") ==
+static_assert(ShellBorderFor(ShellHost::Start, L"Windows.UI.Xaml.Shapes.Rectangle", L"BackgroundStroke") ==
               ShellBorder::None);
-static_assert(ShellBorderFor(false, L"Windows.UI.Xaml.Controls.Border", L"BackgroundStroke") ==
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border", L"BackgroundStroke") ==
               ShellBorder::None);
 static_assert(IsStartPane(L"MainMenu"));
 static_assert(IsStartPane(L"CompanionRoot"));
 static_assert(!IsStartPane(L"SearchRoot"));
+static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
+                            L"AppBorder") == ShellBorder::Search);
+static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
+                            L"AccentAppBorder") == ShellBorder::Search);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Grid",
+                            L"CalendarCenterGrid") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Grid",
+                            L"NotificationCenterGrid") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Grid",
+                            L"ControlCenterRegion") == ShellBorder::QuickSettings);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Grid",
+                            L"MediaTransportControlsRegion") == ShellBorder::QuickSettings);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"ToastBackgroundBorder") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"ToastBackgroundBorder2") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"ItemOpaquePlating") == ShellBorder::None);
+static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Grid",
+                            L"CalendarCenterGrid") == ShellBorder::None);
+static_assert(ShellBorderFor(ShellHost::Widgets, L"Microsoft.UI.Xaml.Controls.Border",
+                            L"NavigationViewBorder") == ShellBorder::Widgets);
+static_assert(ShellBorderFor(ShellHost::Widgets, L"Microsoft.UI.Xaml.Controls.Border",
+                            L"WidgetFrameBorder") == ShellBorder::None);
+static_assert(ShellBorderFor(ShellHost::Widgets, L"Microsoft.UI.Xaml.Controls.Grid",
+                            L"WidgetBoardHost") == ShellBorder::Widgets);
+static_assert(ShellBorderFor(ShellHost::Widgets, L"Microsoft.UI.Xaml.Controls.Grid",
+                            L"WidgetBoardContent") == ShellBorder::Widgets);
+static_assert(ShellBorderFor(ShellHost::Widgets, L"WidgetBoard.WidgetHostContentControl",
+                            L"WidgetBoardContent") == ShellBorder::Widgets);
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border",
+                            L"VirtualDesktopBarBackground") == ShellBorder::TaskView);
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border",
+                            L"VirtualDesktopSwitcherBackground") == ShellBorder::TaskView);
+static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border",
+                            L"BorderHighlight") == ShellBorder::None);
 
 int main() {
     unsigned lastProbe = 0;
