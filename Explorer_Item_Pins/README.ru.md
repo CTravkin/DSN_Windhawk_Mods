@@ -6,7 +6,7 @@ Explorer Item Pins закрепляет выбранные файлы и под�
 
 ## Функции
 
-| ![Темная тема с крупными значками и командой открепления](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Dark_Large_Icons.png) | ![Светлая тема с мелкими значками, группой закрепленных и командой закрепления](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Light_Small_Icons.png) |
+| ![Темная тема с крупными значками и командой закрепления](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Dark_Large_Icons.png) | ![Светлая тема с командой открепления и подсказкой на панели инструментов](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Explorer_Item_Pins/Assets/Screenshots/Light_Small_Icons.png) |
 | :---: | :---: |
 
 - **Два способа закрепить.** Через современное контекстное меню или кнопку с булавкой между «Поделиться» и «Удалить» на панели команд.
