@@ -2,29 +2,47 @@
 
 **English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
-Windows Border Switch controls system-drawn borders in Windows 11.
+Windows Border Switch hides system-drawn borders around windows and panels in Windows 11.
 
 ## Features
 
-- Separate settings for active windows, inactive windows, classic Win32 dialogs, the taskbar, Start, Search, the notification center, Quick Settings, and the Widgets board
-- One Start setting covers the main menu and its Phone Link panel
-- The taskbar setting also covers the virtual desktops bar in Task View
-- The notifications setting covers the notification center, calendar, and desktop toasts
-- The Quick Settings setting also covers the media controls
-- The active-window setting can remove the title bar accent while keeping the frame
-- Interface in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese
+| Setting | Controls |
+| --- | --- |
+| Active window border | The focused window's system border or its title bar accent color |
+| Inactive window borders | System borders of windows without focus |
+| Dialog borders | System borders of classic Win32 dialogs, with or without focus |
+| Taskbar border | The taskbar edge and the virtual desktops strip at the bottom of Task View |
+| Start menu border | The Start menu and its Phone Link panel |
+| Search border | The Windows Search panel |
+| Notification borders | The notification center, calendar, and notification banners on the desktop |
+| Quick Settings border | Quick Settings and the media controls above them |
+| Widgets board border | The outer border of the Widgets board |
+
+The interface is available in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
 
 ## Platforms
 
-Windows 11 x64 or ARM64 with Windhawk. Shell panel support depends on the XAML templates used by the installed Windows build and Windows Web Experience Pack. Applications with custom-drawn frames and title bars control their own appearance.
+Requires Windows 11 x64 or ARM64 and [Windhawk](https://windhawk.net/). Shell panel support depends on the XAML templates used by the installed Windows build and Windows Web Experience Pack. Applications with custom-drawn frames and title bars control their own appearance.
 
 ## Operations
 
-In Windhawk, select **Create a New Mod**, paste the complete [source](Mod/windows-border-switch.wh.cpp) into the editor and select **Compile Mod**. By default, the mod removes the active title bar accent and hides inactive window, dialog, taskbar, and shell panel borders. These choices can be changed under **Settings**. The title bar option applies when Windows uses the accent color for title bars.
+### Installation
+
+1. Open Windhawk and choose **Create a New Mod**.
+2. Replace the contents of `mod.wh.cpp` with the complete [mod source](Mod/windows-border-switch.wh.cpp).
+3. Select **Compile Mod**, exit the editor, and check that **Windows Border Switch** is enabled on the Windhawk home page.
+
+To update a local installation, open its editor, replace the source, and compile it again.
+
+[Windhawk editing mode guide](https://github.com/ramensoftware/windhawk/wiki/Editing-mode-guidelines)
+
+### Usage
+
+Open the mod's **Settings** in Windhawk. Each setting can be changed independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. The title bar option applies when Windows uses the accent color for title bars.
 
 Returning a window setting to **Default** restores the system DWM color. Applications that set a custom DWM color can reapply it when the window reopens.
 
-## References
+## Links
 
 - [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)
 - [Windows 11 Accent Window Border](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/win11-accent-border.wh.cpp)

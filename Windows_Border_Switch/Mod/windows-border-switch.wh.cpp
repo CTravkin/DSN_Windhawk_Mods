@@ -30,18 +30,36 @@
 
 **English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Windows_Border_Switch/README.ru.md)
 
-Control window and dialog borders, the taskbar, Start, Search, the notification
-center, Quick Settings, and the Widgets board independently. The Start setting
-also applies to Phone Link. Notifications include the calendar and desktop toasts.
-Quick Settings include the media controls. The taskbar setting also covers the
-virtual desktops bar in Task View.
+Windows Border Switch hides system-drawn borders around windows and panels in Windows 11.
 
-By default, the mod removes the active title bar accent while retaining its
-frame, and hides inactive window, dialog, taskbar, and shell panel borders.
-Window settings affect system-drawn frames.
+## Features
 
-Interface languages: English, Russian, Spanish, German, Brazilian Portuguese,
-and Simplified Chinese.
+| Setting | Controls |
+| --- | --- |
+| Active window border | The focused window's system border or its title bar accent color |
+| Inactive window borders | System borders of windows without focus |
+| Dialog borders | System borders of classic Win32 dialogs, with or without focus |
+| Taskbar border | The taskbar edge and the virtual desktops strip at the bottom of Task View |
+| Start menu border | The Start menu and its Phone Link panel |
+| Search border | The Windows Search panel |
+| Notification borders | The notification center, calendar, and notification banners on the desktop |
+| Quick Settings border | Quick Settings and the media controls above them |
+| Widgets board border | The outer border of the Widgets board |
+
+The interface is available in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
+
+## Platforms
+
+Requires Windows 11 x64 or ARM64. Shell panel support depends on the Windows build and Windows Web Experience Pack. Applications with custom-drawn frames and title bars control their own appearance.
+
+## Usage
+
+Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Default** to restore Windows styling for a setting.
+
+## Links
+
+- [Windows Border Switch on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Windows_Border_Switch)
+- [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
 
