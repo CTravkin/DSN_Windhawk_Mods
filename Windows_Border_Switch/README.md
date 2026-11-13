@@ -17,7 +17,7 @@ Windows 11 x64 or ARM64 with Windhawk. Start and taskbar support depends on the 
 
 ## Operations
 
-In Windhawk, select **Create a New Mod**, paste the complete [source](Mod/windows-border-switch.wh.cpp) into the editor and select **Compile Mod**. Open **Settings** to choose which borders to hide. Each setting starts at **Default**. The title bar option applies when Windows uses the accent color for title bars.
+In Windhawk, select **Create a New Mod**, paste the complete [source](Mod/windows-border-switch.wh.cpp) into the editor and select **Compile Mod**. By default, the mod removes the active title bar accent and hides the borders of inactive windows, dialogs, Start, and the taskbar. These choices can be changed under **Settings**. The title bar option applies when Windows uses the accent color for title bars.
 
 Returning a window setting to **Default** restores the system DWM color. Applications that set a custom DWM color can reapply it when the window reopens.
 

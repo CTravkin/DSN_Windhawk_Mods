@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Startmenü und Taskleiste
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, do menu Iniciar e da barra de tarefas
 // @description:zh-CN 控制窗口、对话框、开始菜单和任务栏的边框
-// @version         0.1.0
+// @version         0.1.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 1
+// Build: 2
 
 // ==WindhawkModReadme==
 /*
@@ -30,14 +30,15 @@ and the taskbar independently. The Start setting also applies to its Phone Link
 panel. The active-window setting can also remove the system-drawn title bar
 accent while keeping the window border.
 
-All five settings use the Windows default initially. Window settings affect
+By default, the mod removes the active title bar accent and hides the borders
+of inactive windows, dialogs, Start, and the taskbar. Window settings affect
 system-drawn frames. Applications can draw their own frames and title bars.
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- activeWindow: default
+- activeWindow: caption
   $name: Active window border
   $name:ru-RU: Рамка активного окна
   $name:es-ES: Borde de la ventana activa
@@ -68,7 +69,7 @@ system-drawn frames. Applications can draw their own frames and title bars.
   - default: 默认
   - hide: 隐藏边框
   - caption: 关闭标题栏强调色
-- inactiveWindow: default
+- inactiveWindow: hide
   $name: Inactive window borders
   $name:ru-RU: Рамки неактивных окон
   $name:es-ES: Bordes de las ventanas inactivas
@@ -93,7 +94,7 @@ system-drawn frames. Applications can draw their own frames and title bars.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
-- dialog: default
+- dialog: hide
   $name: Dialog borders
   $name:ru-RU: Рамки диалоговых окон
   $name:es-ES: Bordes de los cuadros de diálogo
@@ -118,7 +119,7 @@ system-drawn frames. Applications can draw their own frames and title bars.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
-- startMenu: default
+- startMenu: hide
   $name: Start menu border
   $name:ru-RU: Рамка меню «Пуск»
   $name:es-ES: Borde del menú Inicio
@@ -143,7 +144,7 @@ system-drawn frames. Applications can draw their own frames and title bars.
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
-- taskbar: default
+- taskbar: hide
   $name: Taskbar border
   $name:ru-RU: Рамка панели задач
   $name:es-ES: Borde de la barra de tareas
