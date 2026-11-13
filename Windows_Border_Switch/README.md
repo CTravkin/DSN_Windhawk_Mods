@@ -6,6 +6,9 @@ Windows Border Switch hides system-drawn borders around windows and panels in Wi
 
 ## Features
 
+| ![Dark theme comparison, with default borders on the left and hidden borders on the right](Assets/Screenshots/Dark_Border_Comparison.png) | ![Light theme comparison, with default borders on the left and hidden borders on the right](Assets/Screenshots/Light_Border_Comparison.png) |
+| :---: | :---: |
+
 | Setting | Controls |
 | --- | --- |
 | Active window border | The focused window's system border or its title bar accent color |
