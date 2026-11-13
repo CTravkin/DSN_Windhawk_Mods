@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.10
+// @version         1.0.13
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 25
+// Build: 28
 
 // ==WindhawkModReadme==
 /*
@@ -60,6 +60,8 @@ Requires Windows 11 x64 or ARM64. Shell panel support depends on the Windows bui
 Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Default** to restore Windows styling for a setting.
 
 Mods that change the same DWM border or title bar colors can override each other's changes. This includes Windows 11 Accent Window Border.
+
+Window border and title bar settings apply to windows that Windhawk can access at the desktop user's permission level. Windows running as administrator can keep their system frames, including an elevated Windhawk window.
 
 ## Links
 
@@ -481,6 +483,8 @@ constexpr bool IsStartBorderParent(std::wstring_view name, std::wstring_view typ
 #include <windows.h>
 #include <dwmapi.h>
 #include <ocidl.h>
+#include <roapi.h>
+#include <winstring.h>
 #include <xamlom.h>
 #include <windhawk_api.h>
 #include <windhawk_utils.h>
@@ -495,6 +499,7 @@ constexpr bool IsStartBorderParent(std::wstring_view name, std::wstring_view typ
 #include <winrt/Windows.UI.Xaml.Media.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
+#include <winrt/Microsoft.UI.Xaml.Hosting.h>
 #include <winrt/Microsoft.UI.Xaml.Media.h>
 
 #include <algorithm>
@@ -594,8 +599,7 @@ void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG o
             g_previousShellWindow = nullptr;
             g_shellWindowChanged = true;
         }
-    } else if (g_shellHost == ShellHost::Widgets ||
-               ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
+    } else if (ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
                ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
                ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge") ||
                ClassIs(window, L"Microsoft.UI.Content.DesktopChildSiteBridge") ||
@@ -1083,7 +1087,7 @@ struct TreeWatcher : winrt::implements<TreeWatcher, IVisualTreeServiceCallback2>
 
     HRESULT Advise() {
         // Without UnregisterInstance, visiting an active shell can retain its XAML objects.
-        if (!m_testHooks && g_shellHost != ShellHost::Widgets) {
+        if (!m_testHooks) {
             return E_NOINTERFACE;
         }
         auto service = m_diagnostics.as<IVisualTreeService3>();
@@ -1133,7 +1137,7 @@ struct TreeWatcher : winrt::implements<TreeWatcher, IVisualTreeServiceCallback2>
             }
             // XAML reports both handles and may keep them alive even if they were
             // never resolved. Release after the current visual-tree walk returns.
-            if (m_testHooks && g_shellHost != ShellHost::Widgets) {
+            if (m_testHooks) {
                 QueueRelease(element.Handle, relation.Parent);
             }
         } catch (...) {
@@ -1164,35 +1168,6 @@ private:
         if (m_edits.contains(handle)) {
             return;
         }
-        if (border == ShellBorder::Widgets) {
-            auto target = inspectable.try_as<WinUI::FrameworkElement>();
-            if (!target) {
-                return;
-            }
-            auto queue = target.DispatcherQueue();
-            if (!queue) {
-                return;
-            }
-            auto dispatch = [queue](std::function<void()> run) {
-                return queue.TryEnqueue([run = std::move(run)] { run(); });
-            };
-            auto unset = WinUI::DependencyProperty::UnsetValue();
-            // WidgetBoard uses the outline width for layout. Hide the brush to
-            // preserve that geometry and the acrylic backdrop.
-            auto brush = WinUI::Media::SolidColorBrush(winrt::Windows::UI::Color{});
-            if (target.try_as<WinUI::Controls::Control>()) {
-                ApplyProperty(handle, target, WinUI::Controls::Control::BorderBrushProperty(),
-                              unset, Foundation::IInspectable{brush}, dispatch);
-            } else if (target.try_as<WinUI::Controls::Grid>()) {
-                ApplyProperty(handle, target, WinUI::Controls::Grid::BorderBrushProperty(),
-                              unset, Foundation::IInspectable{brush}, dispatch);
-            } else if (target.try_as<WinUI::Controls::Border>()) {
-                ApplyProperty(handle, target, WinUI::Controls::Border::BorderBrushProperty(),
-                              unset, Foundation::IInspectable{brush}, dispatch);
-            }
-            return;
-        }
-
         auto target = inspectable.try_as<Xaml::FrameworkElement>();
         if (!target) {
             return;
@@ -1381,9 +1356,7 @@ struct TapFactory : winrt::implements<TapFactory, IClassFactory, winrt::non_agil
 };
 
 HRESULT AttachTap(HANDLE stop) {
-    bool widgets = g_shellHost == ShellHost::Widgets;
-    auto xaml = GetModuleHandleW(widgets ? L"Microsoft.Internal.FrameworkUdk.dll"
-                                        : L"Windows.UI.Xaml.dll");
+    auto xaml = GetModuleHandleW(L"Windows.UI.Xaml.dll");
     if (!xaml) {
         return HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND);
     }
@@ -1404,7 +1377,7 @@ HRESULT AttachTap(HANDLE stop) {
         [&](unsigned index) {
             WCHAR connection[40];
             swprintf_s(connection, L"%s%u",
-                       widgets ? L"WinUIVisualDiagConnection" : L"VisualDiagConnection", index);
+                       L"VisualDiagConnection", index);
             return initialize(connection, pid, L"", path, kTapClass, nullptr);
         },
         [stop] { return WaitForSingleObject(stop, 0) != WAIT_TIMEOUT; },
@@ -1510,9 +1483,9 @@ struct FlyoutBorder {
     DWORD thread;
 };
 
-bool UsesCoreWindow() {
+bool UsesNativeXaml() {
     return g_shellHost == ShellHost::Flyouts || g_shellHost == ShellHost::Start ||
-           g_shellHost == ShellHost::Search;
+           g_shellHost == ShellHost::Search || g_shellHost == ShellHost::Widgets;
 }
 
 std::mutex g_flyoutMutex;
@@ -1520,6 +1493,125 @@ std::vector<FlyoutBorder> g_flyoutEdits;
 std::atomic<unsigned> g_flyoutMask;
 std::atomic<bool> g_flyoutStopping;
 Worker g_flyoutWorker;
+
+using WidgetSource = WinUI::Hosting::DesktopWindowXamlSource;
+winrt::weak_ref<WidgetSource> g_widgetSource;
+std::atomic<DWORD> g_widgetThread;
+decltype(&RoGetActivationFactory) g_activationFactory;
+using CreateXamlSource = HRESULT(WINAPI*)(void*, void*, void**, void**);
+CreateXamlSource g_createWidgetSource;
+std::mutex g_widgetFactoryMutex;
+
+HRESULT WINAPI CaptureWidgetSource(void* factory, void* outer, void** inner, void** result) {
+    const HRESULT hr = g_createWidgetSource(factory, outer, inner, result);
+    if (SUCCEEDED(hr) && result && *result && !g_flyoutStopping) {
+        try {
+            WidgetSource source{nullptr};
+            winrt::copy_from_abi(source, *result);
+            const DWORD thread = GetCurrentThreadId();
+            DWORD unset = 0;
+            if (g_widgetThread.compare_exchange_strong(unset, thread) || unset == thread) {
+                g_widgetSource = winrt::make_weak(source);
+            }
+        } catch (...) {
+            Wh_Log(L"Unable to track Widgets content: %08X", winrt::to_hresult());
+        }
+    }
+    return hr;
+}
+
+HRESULT WINAPI FindWidgetFactory(HSTRING classId, REFIID iid, void** result) {
+    const HRESULT hr = g_activationFactory(classId, iid, result);
+    if (SUCCEEDED(hr) && result && *result && !g_flyoutStopping && classId &&
+        std::wstring_view(WindowsGetStringRawBuffer(classId, nullptr)) ==
+            winrt::name_of<WidgetSource>()) {
+        std::lock_guard guard(g_widgetFactoryMutex);
+        if (!g_createWidgetSource) {
+            winrt::com_ptr<IUnknown> object;
+            object.copy_from(static_cast<IUnknown*>(*result));
+            if (auto factory = object.try_as<WinUI::Hosting::IDesktopWindowXamlSourceFactory>()) {
+                // The composable factory declares CreateInstance immediately after IInspectable.
+                auto table = *reinterpret_cast<void***>(winrt::get_abi(factory));
+                if (WindhawkUtils::SetFunctionHook(reinterpret_cast<CreateXamlSource>(table[6]),
+                                                  CaptureWidgetSource, &g_createWidgetSource)) {
+                    Wh_ApplyHookOperations();
+                }
+            }
+        }
+    }
+    return hr;
+}
+
+struct WidgetEdit {
+    winrt::weak_ref<WinUI::FrameworkElement> element;
+    WinUI::DependencyProperty property;
+    Foundation::IInspectable previous;
+    WinUI::Media::SolidColorBrush brush;
+};
+std::vector<WidgetEdit> g_widgetEdits;
+
+void ScanWidgetTree(WinUI::DependencyObject const& node, unsigned depth = 0) {
+    if (!node || depth == 36) {
+        return;
+    }
+    if (auto element = node.try_as<WinUI::FrameworkElement>()) {
+        auto border = ShellBorderFor(ShellHost::Widgets, winrt::get_class_name(element), element.Name());
+        if (border == ShellBorder::Widgets) {
+            WinUI::DependencyProperty property{nullptr};
+            if (element.try_as<WinUI::Controls::Grid>()) {
+                property = WinUI::Controls::Grid::BorderBrushProperty();
+            } else if (element.try_as<WinUI::Controls::Border>()) {
+                property = WinUI::Controls::Border::BorderBrushProperty();
+            } else if (element.try_as<WinUI::Controls::Control>()) {
+                property = WinUI::Controls::Control::BorderBrushProperty();
+            }
+            if (property) {
+                auto local = element.ReadLocalValue(property);
+                auto edit = std::find_if(g_widgetEdits.begin(), g_widgetEdits.end(),
+                                         [&](auto const& entry) { return entry.element.get() == element; });
+                if (edit == g_widgetEdits.end()) {
+                    WinUI::Media::SolidColorBrush brush{winrt::Windows::UI::Color{}};
+                    element.SetValue(property, brush);
+                    g_widgetEdits.push_back({winrt::make_weak(element), property, local, brush});
+                    Wh_Log(L"Hid Widgets border: %s", element.Name().c_str());
+                } else if (local != edit->brush) {
+                    element.SetValue(property, edit->brush);
+                    edit->previous = local;
+                }
+            }
+        }
+    }
+    const int count = WinUI::Media::VisualTreeHelper::GetChildrenCount(node);
+    for (int child = 0; child < count; ++child) {
+        ScanWidgetTree(WinUI::Media::VisualTreeHelper::GetChild(node, child), depth + 1);
+    }
+}
+
+void RefreshWidgets(bool hide) {
+    if (g_widgetThread.load() != GetCurrentThreadId()) {
+        return;
+    }
+    if (hide) {
+        std::erase_if(g_widgetEdits, [](auto const& edit) { return !edit.element.get(); });
+        if (auto source = g_widgetSource.get()) {
+            ScanWidgetTree(source.Content());
+        }
+        return;
+    }
+    for (auto const& edit : std::exchange(g_widgetEdits, {})) {
+        if (auto element = edit.element.get(); element && element.ReadLocalValue(edit.property) == edit.brush) {
+            if (edit.previous == WinUI::DependencyProperty::UnsetValue()) {
+                element.ClearValue(edit.property);
+            } else {
+                element.SetValue(edit.property, edit.previous);
+            }
+            Wh_Log(L"Restored Widgets border: %s", element.Name().c_str());
+        }
+    }
+    if (g_flyoutStopping) {
+        g_widgetSource = {};
+    }
+}
 
 bool ZeroThickness(Foundation::IInspectable const& local) {
     auto thickness = local.try_as<Foundation::IReference<Xaml::Thickness>>();
@@ -1611,6 +1703,10 @@ void ScanFlyoutTree(Xaml::DependencyObject const& node, unsigned mask, unsigned 
 
 void ScanFlyoutsOnUiThread(bool refresh) noexcept try {
     const unsigned mask = g_flyoutStopping ? 0 : g_flyoutMask.load();
+    if (g_shellHost == ShellHost::Widgets) {
+        RefreshWidgets(mask != 0);
+        return;
+    }
     if (refresh) {
         RestoreFlyoutBorders(mask);
     }
@@ -1660,6 +1756,9 @@ void RequestFlyoutScan(HWND window, bool refresh) {
 }
 
 bool IsFlyoutWindow(HWND window) {
+    if (g_shellHost == ShellHost::Widgets) {
+        return ClassIs(window, L"WindowsDashboard");
+    }
     return ClassIs(window, L"Windows.UI.Core.CoreWindow") || ClassIs(window, L"ControlCenterWindow");
 }
 
@@ -1791,7 +1890,7 @@ void ApplySettings() {
             borders |= BorderBit(setting.border);
         }
     }
-    if (UsesCoreWindow()) {
+    if (UsesNativeXaml()) {
         ApplyFlyoutSettings(borders);
         return;
     }
@@ -1852,6 +1951,12 @@ BOOL Wh_ModInit() {
         g_shellHost = ShellHost::Flyouts;
     } else if (_wcsicmp(name, L"WidgetBoard.exe") == 0) {
         g_shellHost = ShellHost::Widgets;
+        auto combase = GetModuleHandleW(L"combase.dll");
+        auto factory = combase ? reinterpret_cast<decltype(g_activationFactory)>(
+                                    GetProcAddress(combase, "RoGetActivationFactory")) : nullptr;
+        if (!factory || !WindhawkUtils::SetFunctionHook(factory, FindWidgetFactory, &g_activationFactory)) {
+            return FALSE;
+        }
     }
     return g_shellHost != ShellHost::Unknown;
 }
@@ -1865,7 +1970,7 @@ void Wh_ModSettingsChanged() {
 }
 
 void Wh_ModBeforeUninit() {
-    if (UsesCoreWindow()) {
+    if (UsesNativeXaml()) {
         g_flyoutStopping = true;
         g_flyoutWorker.Stop();
         RefreshFlyoutWindows(true);

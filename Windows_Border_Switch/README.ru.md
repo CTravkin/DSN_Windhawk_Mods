@@ -47,6 +47,8 @@ Windows Border Switch скрывает системные рамки окон и
 
 Моды, меняющие цвет той же рамки или заголовка DWM, могут перезаписывать изменения друг друга. Это касается и Windows 11 Accent Window Border.
 
+Настройки рамок и заголовков действуют на окна, доступные Windhawk с правами пользователя рабочего стола. Окна, запущенные от имени администратора, могут сохранить системные рамки. Это касается и самого окна Windhawk при таком запуске.
+
 ## Ссылки
 
 - [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)

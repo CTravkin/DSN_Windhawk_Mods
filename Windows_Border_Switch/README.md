@@ -47,6 +47,8 @@ Returning a window setting to **Default** restores the system DWM color. Applica
 
 Mods that change the same DWM border or title bar colors can override each other's changes. This includes Windows 11 Accent Window Border.
 
+Window border and title bar settings apply to windows that Windhawk can access at the desktop user's permission level. Windows running as administrator can keep their system frames, including an elevated Windhawk window.
+
 ## Links
 
 - [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)
