@@ -99,24 +99,4 @@ static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Bord
                             L"VirtualDesktopBarBackground") ==
               ShellBorder::None);
 
-int main() {
-    unsigned lastProbe = 0;
-    auto probe = [&](unsigned index) {
-        lastProbe = index;
-        return index == 87 ? 0 : 1;
-    };
-    if (FindDiagnosticEndpoint(probe, [] { return false; }, 1, 2) != 0 ||
-        lastProbe != 87) {
-        return 1;
-    }
-    lastProbe = 0;
-    if (FindDiagnosticEndpoint(probe, [&] { return lastProbe == 65; }, 1, 2) != 2 ||
-        lastProbe != 65) {
-        return 2;
-    }
-    unsigned probes = 0;
-    if (FindDiagnosticEndpoint([&](unsigned) { ++probes; return 1; },
-                               [] { return false; }, 1, 2) != 1 || probes != 10000) {
-        return 3;
-    }
-}
+int main() {}
