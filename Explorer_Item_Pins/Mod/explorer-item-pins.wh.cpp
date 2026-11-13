@@ -7,7 +7,7 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer in ihrem übergeordneten Ordner an
 // @description:pt-BR Fixa arquivos e pastas na pasta que os contém no Explorador de Arquivos
 // @description:zh-CN 在文件资源管理器中将文件和文件夹固定在各自的上级文件夹内
-// @version         1.1.3
+// @version         1.1.4
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 29
+// Build: 30
 
 // ==WindhawkModReadme==
 /*
@@ -735,20 +735,26 @@ bool ReadDirectoryIdentities(const fs::path& folder, std::span<const Item> pins,
     return GetLastError() == ERROR_NO_MORE_FILES;
 }
 
-PinNames ReadPinNames(std::span<const Item> pins, const fs::path& folder) {
+bool HasExactName(const fs::path& folder, const std::wstring& name) {
+    WIN32_FIND_DATAW found{};
+    HANDLE search = FindFirstFileW((folder / name).c_str(), &found);
+    if (search == INVALID_HANDLE_VALUE) return false;
+    FindClose(search);
+    return name == found.cFileName;
+}
+
+PinNames ReadExactPinNames(std::span<const Item> pins, const fs::path& folder) {
     PinNames names;
     for (const auto& pin : pins) {
-        WIN32_FIND_DATAW found{};
-        HANDLE search = FindFirstFileW((folder / pin.name).c_str(), &found);
-        if (search == INVALID_HANDLE_VALUE) continue;
-        FindClose(search);
-        if (pin.name == found.cFileName) names.insert(pin.name);
+        if (HasExactName(folder, pin.name)) names.insert(pin.name);
     }
-    if (names.size() == pins.size()) return names;
+    return names;
+}
 
+PinNames ResolvePinAliases(std::span<const Item> pins, const fs::path& folder, const PinNames& exactNames) {
     // Only a missing exact name needs enumeration and possible identity lookup.
     const bool lookUpIdentities = std::ranges::any_of(pins, [&](const Item& pin) {
-        return !pin.identity.empty() && !names.contains(pin.name);
+        return !pin.identity.empty() && !exactNames.contains(pin.name);
     });
     std::vector<Item> entries;
     if (!lookUpIdentities || !ReadDirectoryIdentities(folder, pins, entries)) {
@@ -761,9 +767,9 @@ PinNames ReadPinNames(std::span<const Item> pins, const fs::path& folder) {
                 entries.push_back({entry->path().filename().native(), {}});
             }
         }
-        if (error) return names;
+        if (error) return exactNames;
     }
-    names.clear();
+    PinNames names;
     for (const auto& index : ResolvePins(pins, entries)) {
         if (index) names.insert(std::move(entries[*index].name));
     }
@@ -1369,7 +1375,9 @@ private:
 
     struct Resolution {
         std::vector<Item> records;
-        std::optional<DirectoryVersion> version;
+        PinNames exactNames;
+        std::optional<DirectoryVersion> scannedVersion;
+        ULONGLONG scannedAt;
         PinNamesSnapshot names;
     };
 
@@ -1384,11 +1392,38 @@ private:
     static std::shared_ptr<const Resolution> ResolveFolder(const PinStore& store, const fs::path& parent,
                                                             const std::shared_ptr<const Resolution>& previous) {
         auto records = store.ReadFolder(parent);
-        const auto version = records.empty() ? std::nullopt : ReadDirectoryVersion(parent);
-        // A missing item only needs another identity lookup after the folder or its pins change.
-        if (previous && previous->records == records && previous->version == version) return previous;
-        auto names = std::make_shared<const PinNames>(ReadPinNames(records, parent));
-        return std::make_shared<const Resolution>(Resolution{std::move(records), version, std::move(names)});
+        auto exactNames = ReadExactPinNames(records, parent);
+        const bool sameInputs = previous && previous->records == records && previous->exactNames == exactNames;
+        if (exactNames.size() == records.size()) {
+            if (sameInputs) return previous;
+            auto names = std::make_shared<const PinNames>(exactNames);
+            return std::make_shared<const Resolution>(Resolution{std::move(records), std::move(exactNames),
+                                                                 std::nullopt, 0, std::move(names)});
+        }
+
+        constexpr ULONGLONG changedFolderRetryMs = 2000;
+        constexpr ULONGLONG unchangedFolderRetryMs = 5000;
+        const auto elapsed = sameInputs ? GetTickCount64() - previous->scannedAt : unchangedFolderRetryMs;
+        if (elapsed >= changedFolderRetryMs) {
+            const auto version = ReadDirectoryVersion(parent);
+            // A changed timestamp can bring the scan forward. An unchanged one cannot prevent it.
+            if (elapsed >= unchangedFolderRetryMs || version != previous->scannedVersion) {
+                auto names = ResolvePinAliases(records, parent, exactNames);
+                auto snapshot = previous && *previous->names == names ? previous->names
+                    : std::make_shared<const PinNames>(std::move(names));
+                return std::make_shared<const Resolution>(Resolution{std::move(records), std::move(exactNames),
+                                                                     version, GetTickCount64(), std::move(snapshot)});
+            }
+        }
+
+        // Recheck the already resolved aliases while waiting for the next full scan.
+        auto names = exactNames;
+        for (const auto& name : *previous->names) {
+            if (!names.contains(name) && HasExactName(parent, name)) names.insert(name);
+        }
+        if (*previous->names == names) return previous;
+        return std::make_shared<const Resolution>(Resolution{std::move(records), std::move(exactNames),
+            previous->scannedVersion, previous->scannedAt, std::make_shared<const PinNames>(std::move(names))});
     }
 
     struct Entry {

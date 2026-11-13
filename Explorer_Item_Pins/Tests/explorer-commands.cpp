@@ -17,7 +17,6 @@ using explorer_item_pins::GetPinAction;
 using explorer_item_pins::PinAction;
 using explorer_item_pins::PinStore;
 using explorer_item_pins::CompareViewItems;
-using explorer_item_pins::ReadPinNames;
 using explorer_item_pins::ReadItem;
 using explorer_item_pins::NativeGrouping;
 using explorer_item_pins::GroupList;
@@ -149,13 +148,19 @@ void Pump() {
 }
 
 template <typename Predicate>
-void WaitUntil(Predicate ready, const char* message) {
-    const auto deadline = GetTickCount64() + 4000;
+void WaitUntil(Predicate ready, const char* message, ULONGLONG timeoutMs = 4000) {
+    const auto deadline = GetTickCount64() + timeoutMs;
     while (GetTickCount64() < deadline) {
         if (ready()) return;
         Pump();
     }
     throw std::runtime_error(message);
+}
+
+explorer_item_pins::PinNames ReadPinNames(std::span<const explorer_item_pins::Item> pins, const fs::path& folder) {
+    const auto exactNames = explorer_item_pins::ReadExactPinNames(pins, folder);
+    if (exactNames.size() == pins.size()) return exactNames;
+    return explorer_item_pins::ResolvePinAliases(pins, folder, exactNames);
 }
 
 class ExplorerView {
@@ -348,10 +353,34 @@ void VerifyFolderSnapshots(const fs::path& root) {
     WaitForFolderPins(folder, {current.filename().native()});
     Require(TestFolderPins(folder) == snapshot, "reuse a negative identity lookup for an unchanged folder");
 
+    const auto unchangedTime = fs::last_write_time(folder);
+    std::ofstream(missing) << "replacement at the pinned name";
+    fs::last_write_time(folder, unchangedTime);
+    Require(fs::last_write_time(folder) == unchangedTime, "restore the original directory timestamp");
+    WaitUntil([&] {
+        const auto names = TestFolderPins(folder);
+        return names && names->contains(missing.filename().native());
+    }, "restore a pin when its exact name returns without a directory timestamp change");
+    fs::remove(missing);
+
     fs::rename(current, renamed);
     fs::last_write_time(folder, fs::file_time_type::clock::now() + std::chrono::seconds(2));
     WaitForFolderPins(folder, {renamed.filename().native()});
-    std::cout << "PASS asynchronous folder snapshots, cached missing pins and rename invalidation\n";
+
+    const auto sameTime = fs::last_write_time(folder);
+    const auto renamedAgain = folder / L"Renamed without timestamp change.txt";
+    fs::rename(renamed, renamedAgain);
+    fs::last_write_time(folder, sameTime);
+    Require(fs::last_write_time(folder) == sameTime, "preserve the directory timestamp after renaming an alias");
+    WaitForFolderPins(folder, {});
+    WaitUntil([&] {
+        const auto names = TestFolderPins(folder);
+        return names && *names == explorer_item_pins::PinNames{renamedAgain.filename().native()};
+    }, "retry the identity lookup even when the directory timestamp stays the same", 8000);
+    fs::rename(renamedAgain, renamed);
+    fs::last_write_time(folder, sameTime + std::chrono::seconds(2));
+    WaitForFolderPins(folder, {renamed.filename().native()});
+    std::cout << "PASS asynchronous snapshots, same-name restoration and deferred identity retries with unchanged timestamps\n";
 
     const auto exactFolder = root / L"cold-view";
     fs::create_directories(exactFolder);
