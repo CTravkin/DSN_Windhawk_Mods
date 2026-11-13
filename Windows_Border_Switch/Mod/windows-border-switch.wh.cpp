@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Startmenü und Taskleiste
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, do menu Iniciar e da barra de tarefas
 // @description:zh-CN 控制窗口、对话框、开始菜单和任务栏的边框
-// @version         0.1.3
+// @version         0.1.4
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 4
+// Build: 5
 
 // ==WindhawkModReadme==
 /*
@@ -175,6 +175,23 @@ system-drawn frames. Applications can draw their own frames and title bars.
 #include <string_view>
 
 namespace {
+
+constexpr unsigned kMaxDiagnosticEndpoint = 10000;
+
+template <typename Probe, typename ShouldStop, typename Result>
+Result FindDiagnosticEndpoint(Probe probe, ShouldStop shouldStop,
+                              Result notFound, Result cancelled) {
+    for (unsigned index = 1; index <= kMaxDiagnosticEndpoint; ++index) {
+        if (shouldStop()) {
+            return cancelled;
+        }
+        Result result = probe(index);
+        if (result != notFound) {
+            return result;
+        }
+    }
+    return notFound;
+}
 
 enum class WindowEffect { Default, HideBorder, RemoveCaptionAccent };
 
@@ -336,13 +353,21 @@ bool IsMainExplorer() {
 }
 
 thread_local bool g_shellWindowChanged;
+thread_local HWND g_previousShellWindow;
 
-void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD, HWND window, LONG object, LONG child,
+void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LONG child,
                                 DWORD, DWORD) {
-    if (object == OBJID_WINDOW && child == CHILDID_SELF &&
-        (ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
-         ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
-         ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge"))) {
+    if (object != OBJID_WINDOW || child != CHILDID_SELF || !window) {
+        return;
+    }
+    if (event == EVENT_OBJECT_DESTROY) {
+        if (window == g_previousShellWindow) {
+            g_previousShellWindow = nullptr;
+            g_shellWindowChanged = true;
+        }
+    } else if (ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
+               ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
+               ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge")) {
         g_shellWindowChanged = true;
     }
 }
@@ -385,12 +410,37 @@ bool WaitForShellOwnership(HANDLE stop) {
         Wh_Log(L"Unable to watch for the Explorer shell window");
         return false;
     }
-    while (!IsMainExplorer() && WaitForShellActivity(stop, INFINITE)) {
-        // Registration of the shell can follow the creation notification.
-        for (int attempt = 0; attempt < 10 && !IsMainExplorer(); ++attempt) {
-            if (!WaitForShellActivity(stop, 100)) {
+    while (!IsMainExplorer() && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+        g_previousShellWindow = GetShellWindow();
+        DWORD previousPid = 0;
+        if (g_previousShellWindow) {
+            GetWindowThreadProcessId(g_previousShellWindow, &previousPid);
+        }
+        HWINEVENTHOOK previousHook = nullptr;
+        if (previousPid && previousPid != GetCurrentProcessId()) {
+            previousHook = SetWinEventHook(EVENT_OBJECT_DESTROY, EVENT_OBJECT_DESTROY, nullptr,
+                                           OnShellWindowEvent, previousPid, 0,
+                                           WINEVENT_OUTOFCONTEXT);
+        }
+        // A taskbar creation or the loss of the old desktop can precede
+        // registration of the new desktop by several messages.
+        constexpr DWORD settleDelays[] = {50, 150, 500, 1500, 5000};
+        for (DWORD delay : settleDelays) {
+            if (IsMainExplorer() || !WaitForShellActivity(stop, delay)) {
                 break;
             }
+        }
+        bool changed = false;
+        if (!IsMainExplorer()) {
+            changed = g_previousShellWindow != GetShellWindow() ||
+                      WaitForShellActivity(stop, INFINITE);
+        }
+        if (previousHook) {
+            UnhookWinEvent(previousHook);
+        }
+        g_previousShellWindow = nullptr;
+        if (!changed) {
+            break;
         }
     }
     UnhookWinEvent(hook);
@@ -977,16 +1027,15 @@ HRESULT AttachTap(HANDLE stop) {
     }
     // The default connection is normally the first one. Multiple XAML islands
     // can have higher-numbered endpoints.
-    HRESULT result = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
-    for (unsigned index = 1; index <= 10000 && result == HRESULT_FROM_WIN32(ERROR_NOT_FOUND); ++index) {
-        if (WaitForSingleObject(stop, 0) != WAIT_TIMEOUT) {
-            return HRESULT_FROM_WIN32(ERROR_CANCELLED);
-        }
-        WCHAR connection[40];
-        swprintf_s(connection, L"VisualDiagConnection%u", index);
-        result = initialize(connection, GetCurrentProcessId(), L"", path, kTapClass, nullptr);
-    }
-    return result;
+    DWORD pid = GetCurrentProcessId();
+    return FindDiagnosticEndpoint(
+        [&](unsigned index) {
+            WCHAR connection[40];
+            swprintf_s(connection, L"VisualDiagConnection%u", index);
+            return initialize(connection, pid, L"", path, kTapClass, nullptr);
+        },
+        [stop] { return WaitForSingleObject(stop, 0) != WAIT_TIMEOUT; },
+        HRESULT_FROM_WIN32(ERROR_NOT_FOUND), HRESULT_FROM_WIN32(ERROR_CANCELLED));
 }
 
 HRESULT ConnectShellTap(HANDLE stop, winrt::com_ptr<IXamlDiagnostics>& site) {
