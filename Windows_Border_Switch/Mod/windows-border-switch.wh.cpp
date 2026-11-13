@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.0
+// @version         1.0.6
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 15
+// Build: 21
 
 // ==WindhawkModReadme==
 /*
@@ -466,9 +466,11 @@ constexpr bool IsStartPane(std::wstring_view name) {
 
 #undef GetCurrentTime
 #include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.System.h>
 #include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
 #include <winrt/Microsoft.UI.Dispatching.h>
 #include <winrt/Microsoft.UI.Xaml.Controls.h>
@@ -1494,6 +1496,229 @@ DWORD WINAPI RunShellWorker(void* stopParameter) {
     return 0;
 }
 
+struct FlyoutBorder {
+    winrt::weak_ref<Xaml::FrameworkElement> element;
+    Xaml::DependencyProperty property;
+    Foundation::IInspectable previous;
+    ShellBorder border;
+    DWORD thread;
+};
+
+std::mutex g_flyoutMutex;
+std::vector<FlyoutBorder> g_flyoutEdits;
+std::atomic<unsigned> g_flyoutMask;
+std::atomic<bool> g_flyoutStopping;
+Worker g_flyoutWorker;
+
+bool ZeroThickness(Foundation::IInspectable const& local) {
+    auto thickness = local.try_as<Foundation::IReference<Xaml::Thickness>>();
+    return thickness && thickness.Value() == Xaml::Thickness{};
+}
+
+void RestoreFlyoutBorders(unsigned mask) {
+    std::vector<FlyoutBorder> restore;
+    {
+        std::lock_guard guard(g_flyoutMutex);
+        const DWORD thread = GetCurrentThreadId();
+        for (auto it = g_flyoutEdits.begin(); it != g_flyoutEdits.end();) {
+            if (it->thread == thread && !(mask & BorderBit(it->border))) {
+                restore.push_back(std::move(*it));
+                it = g_flyoutEdits.erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+    for (auto const& edit : restore) {
+        try {
+            if (auto element = edit.element.get()) {
+                if (!ZeroThickness(element.ReadLocalValue(edit.property))) {
+                    continue;
+                }
+                if (edit.previous == Xaml::DependencyProperty::UnsetValue()) {
+                    element.ClearValue(edit.property);
+                } else {
+                    element.SetValue(edit.property, edit.previous);
+                }
+                Wh_Log(L"Restored flyout border: %s", element.Name().c_str());
+            }
+        } catch (...) {
+            Wh_Log(L"Unable to restore flyout border: %08X", winrt::to_hresult());
+        }
+    }
+}
+
+void HideFlyoutBorder(Xaml::FrameworkElement const& element, ShellBorder border) {
+    auto property = element.try_as<Xaml::Controls::Grid>()
+        ? Xaml::Controls::Grid::BorderThicknessProperty()
+        : Xaml::Controls::Border::BorderThicknessProperty();
+    auto local = element.ReadLocalValue(property);
+    if (ZeroThickness(local)) {
+        return;
+    }
+    {
+        const DWORD thread = GetCurrentThreadId();
+        std::lock_guard guard(g_flyoutMutex);
+        std::erase_if(g_flyoutEdits, [thread](FlyoutBorder const& edit) {
+            return edit.thread == thread && !edit.element.get();
+        });
+        auto current = std::find_if(g_flyoutEdits.begin(), g_flyoutEdits.end(),
+                                    [&](FlyoutBorder const& edit) {
+            return edit.thread == thread && edit.element.get() == element;
+        });
+        if (current == g_flyoutEdits.end()) {
+            g_flyoutEdits.push_back({winrt::make_weak(element), property, local, border, thread});
+        } else {
+            current->previous = local;
+        }
+    }
+    element.SetValue(property, winrt::box_value(Xaml::Thickness{}));
+    Wh_Log(L"Hid flyout border: %s", element.Name().c_str());
+}
+
+void ScanFlyoutTree(Xaml::DependencyObject const& node, unsigned mask, unsigned depth = 0) {
+    if (!node || depth == 36) {
+        return;
+    }
+    if (auto element = node.try_as<Xaml::FrameworkElement>()) {
+        auto border = ShellBorderFor(ShellHost::Flyouts, winrt::get_class_name(element), element.Name());
+        if (mask & BorderBit(border)) {
+            HideFlyoutBorder(element, border);
+        }
+    }
+    const int count = Xaml::Media::VisualTreeHelper::GetChildrenCount(node);
+    for (int child = 0; child < count; ++child) {
+        ScanFlyoutTree(Xaml::Media::VisualTreeHelper::GetChild(node, child), mask, depth + 1);
+    }
+}
+
+void ScanFlyoutsOnUiThread(bool refresh) noexcept try {
+    const unsigned mask = g_flyoutStopping ? 0 : g_flyoutMask.load();
+    if (refresh) {
+        RestoreFlyoutBorders(mask);
+    }
+    if (mask) {
+        if (auto window = Xaml::Window::Current()) {
+            ScanFlyoutTree(window.Content(), mask);
+            for (auto popup : Xaml::Media::VisualTreeHelper::GetOpenPopups(window)) {
+                ScanFlyoutTree(popup.Child(), mask);
+            }
+        }
+    }
+} catch (...) {
+    Wh_Log(L"Flyout scan failed: %08X", winrt::to_hresult());
+}
+
+UINT FlyoutScanMessage() {
+    static const UINT message = RegisterWindowMessageW(L"Windhawk.WindowsBorderSwitch.ScanFlyouts");
+    return message;
+}
+
+LRESULT CALLBACK FlyoutScanHook(int code, WPARAM wParam, LPARAM lParam) {
+    if (code == HC_ACTION) {
+        const auto& message = *reinterpret_cast<const CWPSTRUCT*>(lParam);
+        if (message.message == FlyoutScanMessage()) {
+            ScanFlyoutsOnUiThread(message.wParam != 0);
+        }
+    }
+    return CallNextHookEx(nullptr, code, wParam, lParam);
+}
+
+void RequestFlyoutScan(HWND window, bool refresh) {
+    DWORD pid = 0;
+    const DWORD thread = GetWindowThreadProcessId(window, &pid);
+    const UINT message = FlyoutScanMessage();
+    if (!thread || pid != GetCurrentProcessId() || !message) {
+        return;
+    }
+    if (thread == GetCurrentThreadId()) {
+        ScanFlyoutsOnUiThread(refresh);
+        return;
+    }
+    if (HHOOK hook = SetWindowsHookExW(WH_CALLWNDPROC, FlyoutScanHook, nullptr, thread)) {
+        DWORD_PTR ignored;
+        SendMessageTimeoutW(window, message, refresh, 0, SMTO_ABORTIFHUNG | SMTO_BLOCK, 1500, &ignored);
+        UnhookWindowsHookEx(hook);
+    }
+}
+
+bool IsFlyoutWindow(HWND window) {
+    return ClassIs(window, L"Windows.UI.Core.CoreWindow") || ClassIs(window, L"ControlCenterWindow");
+}
+
+void RefreshFlyoutWindows(bool refresh) {
+    struct Request { bool refresh; std::unordered_set<DWORD> scanned; } request{refresh, {}};
+    EnumWindows([](HWND window, LPARAM value) -> BOOL {
+        auto& request = *reinterpret_cast<Request*>(value);
+        DWORD pid = 0;
+        DWORD thread = GetWindowThreadProcessId(window, &pid);
+        if (pid == GetCurrentProcessId() && IsFlyoutWindow(window) &&
+            request.scanned.insert(thread).second) {
+            RequestFlyoutScan(window, request.refresh);
+        }
+        return TRUE;
+    }, reinterpret_cast<LPARAM>(&request));
+}
+
+bool g_flyoutScanPending;
+UINT_PTR g_flyoutScanTimer;
+
+void CALLBACK OnFlyoutWindow(HWINEVENTHOOK, DWORD, HWND window, LONG object, LONG child, DWORD, DWORD) {
+    if (object == OBJID_WINDOW && child == CHILDID_SELF && window && IsFlyoutWindow(window)) {
+        g_flyoutScanPending = true;
+        if (!g_flyoutScanTimer) {
+            g_flyoutScanTimer = SetTimer(nullptr, 0, 100, nullptr);
+        }
+    }
+}
+
+DWORD WINAPI RunFlyoutWorker(void* parameter) {
+    HANDLE stop = static_cast<HANDLE>(parameter);
+    const DWORD pid = GetCurrentProcessId();
+    const auto show = SetWinEventHook(EVENT_OBJECT_SHOW, EVENT_OBJECT_SHOW, nullptr,
+                                      OnFlyoutWindow, pid, 0, WINEVENT_OUTOFCONTEXT);
+    const auto uncloak = SetWinEventHook(EVENT_OBJECT_UNCLOAKED, EVENT_OBJECT_UNCLOAKED, nullptr,
+                                         OnFlyoutWindow, pid, 0, WINEVENT_OUTOFCONTEXT);
+    RefreshFlyoutWindows(false);
+    while (MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT) == WAIT_OBJECT_0 + 1) {
+        MSG message;
+        while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT &&
+               PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
+            if (!message.hwnd && message.message == WM_TIMER && message.wParam == g_flyoutScanTimer) {
+                KillTimer(nullptr, std::exchange(g_flyoutScanTimer, 0));
+            } else {
+                TranslateMessage(&message);
+                DispatchMessageW(&message);
+            }
+        }
+        if (!g_flyoutScanTimer && std::exchange(g_flyoutScanPending, false)) {
+            RefreshFlyoutWindows(false);
+        }
+    }
+    if (show) {
+        UnhookWinEvent(show);
+    }
+    if (uncloak) {
+        UnhookWinEvent(uncloak);
+    }
+    if (g_flyoutScanTimer) {
+        KillTimer(nullptr, std::exchange(g_flyoutScanTimer, 0));
+    }
+    g_flyoutScanPending = false;
+    return 0;
+}
+
+void ApplyFlyoutSettings(unsigned mask) {
+    if (g_flyoutMask.exchange(mask) != mask) {
+        RefreshFlyoutWindows(true);
+    }
+    if (mask) {
+        g_flyoutWorker.Start(RunFlyoutWorker);
+    } else {
+        g_flyoutWorker.Stop();
+    }
+}
+
 bool g_shellHooks;
 
 bool InstallShellHooks() {
@@ -1548,6 +1773,10 @@ void ApplySettings() {
         if (setting.host == g_shellHost && ReadSetting(setting.key) == WindowEffect::HideBorder) {
             borders |= BorderBit(setting.border);
         }
+    }
+    if (g_shellHost == ShellHost::Flyouts) {
+        ApplyFlyoutSettings(borders);
+        return;
     }
     if (borders != g_shellBorders) {
         g_shellWorker.Stop();
@@ -1618,6 +1847,11 @@ void Wh_ModSettingsChanged() {
 }
 
 void Wh_ModBeforeUninit() {
+    if (g_shellHost == ShellHost::Flyouts) {
+        g_flyoutStopping = true;
+        g_flyoutWorker.Stop();
+        RefreshFlyoutWindows(true);
+    }
     g_shellWorker.Stop();
     g_windowWorker.Stop();
 }

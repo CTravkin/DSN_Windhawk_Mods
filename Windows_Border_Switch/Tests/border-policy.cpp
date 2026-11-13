@@ -82,6 +82,12 @@ static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Bor
 static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border",
                             L"BorderHighlight") == ShellBorder::None);
 
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"CalendarHeaderMinimizedOverlay") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"VirtualDesktopBarBackground") ==
+              ShellBorder::None);
+
 int main() {
     unsigned lastProbe = 0;
     auto probe = [&](unsigned index) {
