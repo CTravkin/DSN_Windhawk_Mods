@@ -353,6 +353,44 @@ void VerifyFolderSnapshots(const fs::path& root) {
     WaitForFolderPins(folder, {renamed.filename().native()});
     std::cout << "PASS asynchronous folder snapshots, cached missing pins and rename invalidation\n";
 
+    const auto exactFolder = root / L"cold-view";
+    fs::create_directories(exactFolder);
+    const auto exact = exactFolder / L"Pinned.txt";
+    std::ofstream(exact) << "pinned";
+    Require(store.SetPinned(exactFolder, ReadItem(exact), true), "persist a first-open fixture pin");
+    store.PrimeCache();
+    explorer_item_pins::IndicatorPins firstOpen;
+    const auto initial = firstOpen.Snapshot(store, exactFolder);
+    Require(initial && initial->contains(exact.filename().native()),
+            "use the preloaded name on the first snapshot request");
+    WaitUntil([&] { return firstOpen.Cached(exact) == true; }, "validate the first-open pin in the background");
+
+    const auto identityFolder = root / L"directory-identities";
+    fs::create_directories(identityFolder);
+    const auto original = identityFolder / L"Original.txt";
+    const auto alias = identityFolder / L"Renamed.txt";
+    const auto hardLink = identityFolder / L"Hard link.txt";
+    std::ofstream(original) << "identity";
+    const std::array records{ReadItem(original)};
+    fs::rename(original, alias);
+    for (int i = 0; i < 600; ++i) {
+        std::ofstream(identityFolder / (L"Ordinary " + std::to_wstring(i) + L".txt")) << i;
+    }
+    std::vector<explorer_item_pins::Item> entries;
+    Require(explorer_item_pins::ReadDirectoryIdentities(identityFolder, records, entries) && entries.size() == 601,
+            "read a directory spanning multiple batches");
+    const auto candidate = std::ranges::find(entries, alias.filename().native(), &explorer_item_pins::Item::name);
+    Require(candidate != entries.end() && candidate->identity == records.front().identity && !candidate->identity.empty(),
+            "the batched directory IDs must find the same rename as the handle lookup");
+    Require(ReadPinNames(records, identityFolder) == explorer_item_pins::PinNames{alias.filename().native()},
+            "resolve a unique rename using batched IDs");
+    fs::create_hard_link(alias, hardLink);
+    Require(ReadPinNames(records, identityFolder).empty(), "multiple aliases remain ambiguous");
+    std::ofstream(original) << "replacement";
+    Require(ReadPinNames(records, identityFolder) == explorer_item_pins::PinNames{original.filename().native()},
+            "a replacement at the original name wins over aliases");
+    std::cout << "PASS first-open pin snapshot and multi-batch rename, hard-link and replacement semantics\n";
+
     const auto recent = root / L"cache-a";
     const auto oldest = root / L"cache-z";
     WaitForFolderPins(oldest, {});
