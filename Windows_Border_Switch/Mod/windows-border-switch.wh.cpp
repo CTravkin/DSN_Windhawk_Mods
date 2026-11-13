@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Startmenü und Taskleiste
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, do menu Iniciar e da barra de tarefas
 // @description:zh-CN 控制窗口、对话框、开始菜单和任务栏的边框
-// @version         0.1.2
+// @version         0.1.3
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 3
+// Build: 4
 
 // ==WindhawkModReadme==
 /*
@@ -198,6 +198,32 @@ constexpr WindowEffect WindowEffectFor(WindowSettings settings, bool active, boo
     return settings.hideInactive ? WindowEffect::HideBorder : WindowEffect::Default;
 }
 
+enum class CaptionEffect { Default, Transparent, Neutral };
+
+struct WindowFrame {
+    bool hideBorder = false;
+    CaptionEffect caption = CaptionEffect::Default;
+
+    bool operator==(const WindowFrame&) const = default;
+};
+
+constexpr WindowFrame WindowFrameFor(WindowSettings settings, bool active, bool dialog,
+                                     bool clientAtTop, bool captionAccentEnabled) {
+    WindowEffect effect = WindowEffectFor(settings, active, dialog);
+    WindowFrame frame{effect == WindowEffect::HideBorder};
+    if (dialog || !captionAccentEnabled) {
+        return frame;
+    }
+    if (effect == WindowEffect::RemoveCaptionAccent) {
+        frame.caption = clientAtTop ? CaptionEffect::Transparent : CaptionEffect::Neutral;
+    } else if (frame.hideBorder && clientAtTop) {
+        // A caption backdrop can show through the client at the top edge,
+        // even after the compositor's border has been hidden.
+        frame.caption = CaptionEffect::Transparent;
+    }
+    return frame;
+}
+
 enum class ShellBorder { None, Start, Taskbar };
 
 constexpr ShellBorder ShellBorderFor(bool startHost,
@@ -238,6 +264,7 @@ constexpr bool IsStartPane(std::wstring_view name) {
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -284,7 +311,16 @@ struct Worker {
 
 WindowSettings g_windowSettings;
 Worker g_windowWorker;
-std::unordered_map<HWND, WindowEffect> g_changedWindows;
+struct AppliedFrame {
+    COLORREF border = DWMWA_COLOR_DEFAULT;
+    COLORREF caption = DWMWA_COLOR_DEFAULT;
+
+    bool operator==(const AppliedFrame&) const = default;
+};
+
+std::unordered_map<HWND, AppliedFrame> g_changedWindows;
+std::unordered_set<HWND> g_pendingWindows;
+UINT_PTR g_frameTimer;
 HWND g_foreground;
 
 bool ClassIs(HWND window, std::wstring_view name) {
@@ -362,6 +398,11 @@ bool WaitForShellOwnership(HANDLE stop) {
 }
 
 bool CaptionAccentEnabled() {
+    HIGHCONTRASTW contrast{sizeof(contrast), 0, nullptr};
+    if (SystemParametersInfoW(SPI_GETHIGHCONTRAST, sizeof(contrast), &contrast, 0) &&
+        (contrast.dwFlags & HCF_HIGHCONTRASTON)) {
+        return false;
+    }
     DWORD value = 0;
     DWORD size = sizeof(value);
     return RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
@@ -370,9 +411,7 @@ bool CaptionAccentEnabled() {
            value != 0;
 }
 
-bool SetWindowEffect(HWND window, WindowEffect effect, COLORREF color) {
-    DWORD attribute = effect == WindowEffect::HideBorder ? DWMWA_BORDER_COLOR
-                                                         : DWMWA_CAPTION_COLOR;
+bool SetFrameColor(HWND window, DWORD attribute, COLORREF color) {
     HRESULT result = DwmSetWindowAttribute(window, attribute, &color, sizeof(color));
     if (SUCCEEDED(result)) {
         Wh_Log(L"DWM window %p attribute %lu = %08lX", window, attribute, color);
@@ -380,39 +419,95 @@ bool SetWindowEffect(HWND window, WindowEffect effect, COLORREF color) {
     return SUCCEEDED(result);
 }
 
-void ApplyWindowBorder(HWND window) {
+bool ClientReachesTop(HWND window) {
+    RECT frame{};
+    POINT client{};
+    return SUCCEEDED(DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS,
+                                           &frame, sizeof(frame))) &&
+           ClientToScreen(window, &client) && client.y <= frame.top;
+}
+
+COLORREF NeutralCaptionColor(HWND window) {
+    BOOL supportsDark = FALSE;
+    DWORD light = 1;
+    DWORD size = sizeof(light);
+    DwmGetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE, &supportsDark,
+                          sizeof(supportsDark));
+    if (supportsDark && RegGetValueW(HKEY_CURRENT_USER,
+                                    L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                                    L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &light,
+                                    &size) == ERROR_SUCCESS && !light) {
+        return RGB(32, 32, 32);
+    }
+    return GetSysColor(COLOR_BTNFACE);
+}
+
+AppliedFrame DesiredFrame(HWND window) {
+    if (!IsWindowVisible(window) || IsIconic(window)) {
+        return {};
+    }
+    auto style = static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE));
+    bool hasCaption = (style & WS_CAPTION) == WS_CAPTION;
+    bool dialog = ClassIs(window, L"#32770");
+    if ((style & WS_CHILD) || !(dialog || hasCaption || (style & WS_THICKFRAME))) {
+        return {};
+    }
+    bool active = window == g_foreground;
+    WindowEffect effect = WindowEffectFor(g_windowSettings, active, dialog);
+    bool accent = hasCaption && !dialog && effect != WindowEffect::Default &&
+                  CaptionAccentEnabled();
+    auto frame = WindowFrameFor(g_windowSettings, active, dialog,
+                               accent && ClientReachesTop(window), accent);
+    AppliedFrame desired;
+    if (frame.hideBorder) {
+        desired.border = DWMWA_COLOR_NONE;
+    }
+    if (frame.caption == CaptionEffect::Transparent) {
+        desired.caption = DWMWA_COLOR_NONE;
+    } else if (frame.caption == CaptionEffect::Neutral) {
+        desired.caption = NeutralCaptionColor(window);
+    }
+    return desired;
+}
+
+void ApplyWindowBorder(HWND window, bool reapply = false) {
     if (!window || GetAncestor(window, GA_ROOT) != window) {
         return;
     }
-
+    AppliedFrame desired = DesiredFrame(window);
     auto changed = g_changedWindows.find(window);
-    bool visible = IsWindowVisible(window);
-    if (!visible && changed == g_changedWindows.end()) {
+    AppliedFrame applied = changed == g_changedWindows.end() ? AppliedFrame{} : changed->second;
+    if ((applied.border != desired.border || (reapply && desired.border != DWMWA_COLOR_DEFAULT)) &&
+        SetFrameColor(window, DWMWA_BORDER_COLOR, desired.border)) {
+        applied.border = desired.border;
+    }
+    if ((applied.caption != desired.caption ||
+         (reapply && desired.caption != DWMWA_COLOR_DEFAULT)) &&
+        SetFrameColor(window, DWMWA_CAPTION_COLOR, desired.caption)) {
+        applied.caption = desired.caption;
+    }
+    if (applied == AppliedFrame{}) {
+        g_changedWindows.erase(window);
+    } else {
+        g_changedWindows.insert_or_assign(window, applied);
+    }
+}
+
+void UpdateWindowFrame(HWND window) {
+    if (!window || GetAncestor(window, GA_ROOT) != window) {
         return;
     }
-    auto style = static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE));
-    bool caption = (style & WS_CAPTION) == WS_CAPTION;
-    bool dialog = ClassIs(window, L"#32770");
-    bool decorated = !(style & WS_CHILD) && (dialog || caption || (style & WS_THICKFRAME));
-    WindowEffect effect = WindowEffect::Default;
-    if (visible && decorated) {
-        effect = WindowEffectFor(g_windowSettings, window == g_foreground, dialog);
-    }
-    if (effect == WindowEffect::RemoveCaptionAccent && (!caption || !CaptionAccentEnabled())) {
-        effect = WindowEffect::Default;
-    }
-
-    if (changed != g_changedWindows.end()) {
-        if (changed->second == effect) {
-            return;
+    ApplyWindowBorder(window, true);
+    if (g_changedWindows.contains(window)) {
+        g_pendingWindows.insert(window);
+        if (!g_frameTimer) {
+            // Some applications update their DWM colors during activation.
+            // Reapply once after that message sequence has settled.
+            g_frameTimer = SetTimer(nullptr, 0, 80, nullptr);
+            if (!g_frameTimer) {
+                g_pendingWindows.clear();
+            }
         }
-        if (!SetWindowEffect(window, changed->second, DWMWA_COLOR_DEFAULT)) {
-            return;
-        }
-        g_changedWindows.erase(changed);
-    }
-    if (effect != WindowEffect::Default && SetWindowEffect(window, effect, DWMWA_COLOR_NONE)) {
-        g_changedWindows.emplace(window, effect);
     }
 }
 
@@ -431,14 +526,19 @@ void CALLBACK OnWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object
     }
     if (event == EVENT_OBJECT_DESTROY) {
         g_changedWindows.erase(window);
-    } else if (event == EVENT_OBJECT_SHOW || event == EVENT_OBJECT_HIDE) {
+        g_pendingWindows.erase(window);
+    } else if (event == EVENT_OBJECT_HIDE) {
+        g_pendingWindows.erase(window);
         ApplyWindowBorder(window);
+    } else if (event == EVENT_OBJECT_SHOW || event == EVENT_SYSTEM_MINIMIZEEND ||
+               event == EVENT_SYSTEM_MOVESIZEEND) {
+        UpdateWindowFrame(window);
     } else if (event == EVENT_SYSTEM_FOREGROUND) {
         HWND previous = std::exchange(g_foreground, GetForegroundWindow());
         if (previous != g_foreground) {
-            ApplyWindowBorder(previous);
+            UpdateWindowFrame(previous);
         }
-        ApplyWindowBorder(g_foreground);
+        UpdateWindowFrame(g_foreground);
     }
 }
 
@@ -447,10 +547,15 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
     if (!WaitForShellOwnership(stop)) {
         return 0;
     }
+    SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
     const std::array hooks = {
         SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr,
                         OnWindowEvent, 0, 0, WINEVENT_OUTOFCONTEXT),
         SetWinEventHook(EVENT_OBJECT_DESTROY, EVENT_OBJECT_HIDE, nullptr,
+                        OnWindowEvent, 0, 0, WINEVENT_OUTOFCONTEXT),
+        SetWinEventHook(EVENT_SYSTEM_MOVESIZEEND, EVENT_SYSTEM_MOVESIZEEND, nullptr,
+                        OnWindowEvent, 0, 0, WINEVENT_OUTOFCONTEXT),
+        SetWinEventHook(EVENT_SYSTEM_MINIMIZEEND, EVENT_SYSTEM_MINIMIZEEND, nullptr,
                         OnWindowEvent, 0, 0, WINEVENT_OUTOFCONTEXT),
     };
 
@@ -461,6 +566,15 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
             MSG message;
             while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT &&
                    PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
+                if (!message.hwnd && message.message == WM_TIMER &&
+                    g_frameTimer && message.wParam == g_frameTimer) {
+                    KillTimer(nullptr, std::exchange(g_frameTimer, 0));
+                    for (HWND window : g_pendingWindows) {
+                        ApplyWindowBorder(window, true);
+                    }
+                    g_pendingWindows.clear();
+                    continue;
+                }
                 TranslateMessage(&message);
                 DispatchMessageW(&message);
             }
@@ -474,8 +588,17 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
             UnhookWinEvent(hook);
         }
     }
-    for (auto [window, effect] : g_changedWindows) {
-        SetWindowEffect(window, effect, DWMWA_COLOR_DEFAULT);
+    if (g_frameTimer) {
+        KillTimer(nullptr, std::exchange(g_frameTimer, 0));
+    }
+    g_pendingWindows.clear();
+    for (auto [window, frame] : g_changedWindows) {
+        if (frame.border != DWMWA_COLOR_DEFAULT) {
+            SetFrameColor(window, DWMWA_BORDER_COLOR, DWMWA_COLOR_DEFAULT);
+        }
+        if (frame.caption != DWMWA_COLOR_DEFAULT) {
+            SetFrameColor(window, DWMWA_CAPTION_COLOR, DWMWA_COLOR_DEFAULT);
+        }
     }
     g_changedWindows.clear();
     return 0;

@@ -18,6 +18,20 @@ static_assert(WindowEffectFor({WindowEffect::HideBorder, true}, true, true) ==
 static_assert(WindowEffectFor({WindowEffect::RemoveCaptionAccent, false, true}, true, true) ==
               WindowEffect::HideBorder);
 
+constexpr WindowSettings kHideInactiveWithCaption{WindowEffect::RemoveCaptionAccent, true, true};
+static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, true, true) ==
+              WindowFrame{false, CaptionEffect::Transparent});
+static_assert(WindowFrameFor(kHideInactiveWithCaption, false, false, true, true) ==
+              WindowFrame{true, CaptionEffect::Transparent});
+static_assert(WindowFrameFor(kHideInactiveWithCaption, false, false, false, true) ==
+              WindowFrame{true, CaptionEffect::Default});
+static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, false, true) ==
+              WindowFrame{false, CaptionEffect::Neutral});
+static_assert(WindowFrameFor(kHideInactiveWithCaption, true, true, false, true) ==
+              WindowFrame{true, CaptionEffect::Default});
+static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, true, false) ==
+              WindowFrame{false, CaptionEffect::Default});
+
 static_assert(ShellBorderFor(true, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
               ShellBorder::Start);
 static_assert(ShellBorderFor(false, L"Windows.UI.Xaml.Shapes.Rectangle", L"BackgroundStroke") ==
