@@ -7,7 +7,7 @@
 // @description:de-DE Heftet Dateien und Ordner im Datei-Explorer in ihrem übergeordneten Ordner an
 // @description:pt-BR Fixa arquivos e pastas na pasta que os contém no Explorador de Arquivos
 // @description:zh-CN 在文件资源管理器中将文件和文件夹固定在各自的上级文件夹内
-// @version         1.1.4
+// @version         1.1.5
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -luuid -lgdi32 -lcomctl32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 30
+// Build: 31
 
 // ==WindhawkModReadme==
 /*
@@ -1401,19 +1401,15 @@ private:
                                                                  std::nullopt, 0, std::move(names)});
         }
 
-        constexpr ULONGLONG changedFolderRetryMs = 2000;
         constexpr ULONGLONG unchangedFolderRetryMs = 5000;
-        const auto elapsed = sameInputs ? GetTickCount64() - previous->scannedAt : unchangedFolderRetryMs;
-        if (elapsed >= changedFolderRetryMs) {
-            const auto version = ReadDirectoryVersion(parent);
-            // A changed timestamp can bring the scan forward. An unchanged one cannot prevent it.
-            if (elapsed >= unchangedFolderRetryMs || version != previous->scannedVersion) {
-                auto names = ResolvePinAliases(records, parent, exactNames);
-                auto snapshot = previous && *previous->names == names ? previous->names
-                    : std::make_shared<const PinNames>(std::move(names));
-                return std::make_shared<const Resolution>(Resolution{std::move(records), std::move(exactNames),
-                                                                     version, GetTickCount64(), std::move(snapshot)});
-            }
+        const auto version = ReadDirectoryVersion(parent);
+        if (!sameInputs || version != previous->scannedVersion ||
+            GetTickCount64() - previous->scannedAt >= unchangedFolderRetryMs) {
+            auto names = ResolvePinAliases(records, parent, exactNames);
+            auto snapshot = previous && *previous->names == names ? previous->names
+                : std::make_shared<const PinNames>(std::move(names));
+            return std::make_shared<const Resolution>(Resolution{std::move(records), std::move(exactNames),
+                                                                 version, GetTickCount64(), std::move(snapshot)});
         }
 
         // Recheck the already resolved aliases while waiting for the next full scan.

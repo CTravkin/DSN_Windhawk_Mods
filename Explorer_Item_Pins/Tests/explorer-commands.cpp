@@ -379,8 +379,15 @@ void VerifyFolderSnapshots(const fs::path& root) {
     }, "retry the identity lookup even when the directory timestamp stays the same", 8000);
     fs::rename(renamedAgain, renamed);
     fs::last_write_time(folder, sameTime + std::chrono::seconds(2));
-    WaitForFolderPins(folder, {renamed.filename().native()});
-    std::cout << "PASS asynchronous snapshots, same-name restoration and deferred identity retries with unchanged timestamps\n";
+    orderingPins.Invalidate(folder);
+    TestFolderPins(folder);
+    std::optional<bool> pinnedAfterChange;
+    WaitUntil([&] {
+        pinnedAfterChange = orderingPins.Cached(renamed);
+        return pinnedAfterChange.has_value();
+    }, "complete the first background refresh after the directory timestamp changes");
+    Require(*pinnedAfterChange, "the first refresh after a timestamp change must resolve the renamed pin");
+    std::cout << "PASS asynchronous snapshots, same-name restoration and identity retries for changed and unchanged timestamps\n";
 
     const auto exactFolder = root / L"cold-view";
     fs::create_directories(exactFolder);
