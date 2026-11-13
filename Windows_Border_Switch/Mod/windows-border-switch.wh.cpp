@@ -2,7 +2,7 @@
 // @id              windows-border-switch
 // @name            Windows Border Switch
 // @description     Control borders of windows, dialogs, the taskbar, and shell panels
-// @description:ru-RU Управление рамками окон, диалогов, панели задач и панелей оболочки
+// @description:ru-RU Отключение рамок для окон, меню «Пуск», панели задач и других элементов системы
 // @description:es-ES Controla los bordes de las ventanas, los diálogos, la barra de tareas y los paneles del sistema
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogfeldern, der Taskleiste und Systembereichen
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
