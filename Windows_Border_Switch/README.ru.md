@@ -45,6 +45,8 @@ Windows Border Switch скрывает системные рамки окон и
 
 Режим **По умолчанию** восстанавливает системный цвет DWM. Приложения с собственным цветом DWM могут восстановить его при повторном открытии окна.
 
+Моды, меняющие цвет той же рамки или заголовка DWM, могут перезаписывать изменения друг друга. Это касается и Windows 11 Accent Window Border.
+
 ## Ссылки
 
 - [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)

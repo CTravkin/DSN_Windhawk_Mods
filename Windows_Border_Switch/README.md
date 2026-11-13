@@ -45,6 +45,8 @@ Open the mod's **Settings** in Windhawk. Each setting can be changed independent
 
 Returning a window setting to **Default** restores the system DWM color. Applications that set a custom DWM color can reapply it when the window reopens.
 
+Mods that change the same DWM border or title bar colors can override each other's changes. This includes Windows 11 Accent Window Border.
+
 ## Links
 
 - [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)

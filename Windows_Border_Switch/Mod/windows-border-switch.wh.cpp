@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.8
+// @version         1.0.10
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 23
+// Build: 25
 
 // ==WindhawkModReadme==
 /*
@@ -58,6 +58,8 @@ Requires Windows 11 x64 or ARM64. Shell panel support depends on the Windows bui
 ## Usage
 
 Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Default** to restore Windows styling for a setting.
+
+Mods that change the same DWM border or title bar colors can override each other's changes. This includes Windows 11 Accent Window Border.
 
 ## Links
 
@@ -468,6 +470,10 @@ constexpr bool IsStartPane(std::wstring_view name) {
     return name == L"MainMenu" || name == L"CompanionRoot";
 }
 
+constexpr bool IsStartBorderParent(std::wstring_view name, std::wstring_view type) {
+    return IsStartPane(name) || (name.empty() && type == L"Windows.UI.Xaml.Controls.Grid");
+}
+
 }  // namespace
 
 #ifndef BORDER_SWITCH_POLICY_TEST
@@ -596,16 +602,6 @@ void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG o
                ClassIs(window, L"ControlCenterWindow")) {
         g_shellWindowChanged = true;
     }
-}
-
-bool HasFlyoutWindow() {
-    return !EnumWindows([](HWND window, LPARAM) -> BOOL {
-        DWORD process = 0;
-        GetWindowThreadProcessId(window, &process);
-        return process != GetCurrentProcessId() ||
-               !(ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
-                 ClassIs(window, L"ControlCenterWindow"));
-    }, 0);
 }
 
 bool WaitForShellActivity(HANDLE stop, DWORD delay) {
@@ -1201,15 +1197,6 @@ private:
         if (!target) {
             return;
         }
-        if (border == ShellBorder::Start) {
-            auto parent = Xaml::Media::VisualTreeHelper::GetParent(target)
-                              .try_as<Xaml::FrameworkElement>();
-            if (!parent || (!IsStartPane(parent.Name()) &&
-                            !(parent.Name().empty() &&
-                              winrt::get_class_name(parent) == L"Windows.UI.Xaml.Controls.Grid"))) {
-                return;
-            }
-        }
         auto dispatcher = target.Dispatcher();
         if (!dispatcher) {
             return;
@@ -1467,14 +1454,6 @@ DWORD WINAPI RunShellWorker(void* stopParameter) {
     constexpr DWORD delays[] = {250, 1000, 4000, 10000};
     unsigned retry = 0;
     while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
-        // ShellHost and ShellExperienceHost create their flyout XAML lazily.
-        // Wait until the UI window exists before attaching to its diagnostics.
-        if (g_shellHost == ShellHost::Flyouts && !site && !HasFlyoutWindow()) {
-            if (!WaitForShellActivity(stop, hook || uncloak ? INFINITE : 1000)) {
-                break;
-            }
-            continue;
-        }
         try {
             HRESULT result = site ? S_OK : ConnectShellTap(stop, site);
             if (SUCCEEDED(result) && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
@@ -1530,6 +1509,11 @@ struct FlyoutBorder {
     ShellBorder border;
     DWORD thread;
 };
+
+bool UsesCoreWindow() {
+    return g_shellHost == ShellHost::Flyouts || g_shellHost == ShellHost::Start ||
+           g_shellHost == ShellHost::Search;
+}
 
 std::mutex g_flyoutMutex;
 std::vector<FlyoutBorder> g_flyoutEdits;
@@ -1608,9 +1592,15 @@ void ScanFlyoutTree(Xaml::DependencyObject const& node, unsigned mask, unsigned 
         return;
     }
     if (auto element = node.try_as<Xaml::FrameworkElement>()) {
-        auto border = ShellBorderFor(ShellHost::Flyouts, winrt::get_class_name(element), element.Name());
+        auto border = ShellBorderFor(g_shellHost, winrt::get_class_name(element), element.Name());
         if (mask & BorderBit(border)) {
-            HideFlyoutBorder(element, border);
+            auto parent = border == ShellBorder::Start
+                ? Xaml::Media::VisualTreeHelper::GetParent(element).try_as<Xaml::FrameworkElement>()
+                : nullptr;
+            if (border != ShellBorder::Start ||
+                (parent && IsStartBorderParent(parent.Name(), winrt::get_class_name(parent)))) {
+                HideFlyoutBorder(element, border);
+            }
         }
     }
     const int count = Xaml::Media::VisualTreeHelper::GetChildrenCount(node);
@@ -1801,7 +1791,7 @@ void ApplySettings() {
             borders |= BorderBit(setting.border);
         }
     }
-    if (g_shellHost == ShellHost::Flyouts) {
+    if (UsesCoreWindow()) {
         ApplyFlyoutSettings(borders);
         return;
     }
@@ -1875,7 +1865,7 @@ void Wh_ModSettingsChanged() {
 }
 
 void Wh_ModBeforeUninit() {
-    if (g_shellHost == ShellHost::Flyouts) {
+    if (UsesCoreWindow()) {
         g_flyoutStopping = true;
         g_flyoutWorker.Stop();
         RefreshFlyoutWindows(true);

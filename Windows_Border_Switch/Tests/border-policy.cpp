@@ -53,6 +53,9 @@ static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Bor
 static_assert(IsStartPane(L"MainMenu"));
 static_assert(IsStartPane(L"CompanionRoot"));
 static_assert(!IsStartPane(L"SearchRoot"));
+static_assert(IsStartBorderParent(L"CompanionRoot", L"Windows.UI.Xaml.Controls.Grid"));
+static_assert(IsStartBorderParent(L"", L"Windows.UI.Xaml.Controls.Grid"));
+static_assert(!IsStartBorderParent(L"SearchRoot", L"Windows.UI.Xaml.Controls.Grid"));
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
                             L"AppBorder") == ShellBorder::Search);
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
