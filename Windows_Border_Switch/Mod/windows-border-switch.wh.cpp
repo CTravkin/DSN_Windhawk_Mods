@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Taskleiste und Systembereichen
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
 // @description:zh-CN 控制窗口、对话框、任务栏和系统面板的边框
-// @version         0.2.0
+// @version         0.2.6
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 12
+// Build: 13
 
 // ==WindhawkModReadme==
 /*
