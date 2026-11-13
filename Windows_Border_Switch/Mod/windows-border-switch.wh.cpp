@@ -1,12 +1,12 @@
 // ==WindhawkMod==
 // @id              windows-border-switch
 // @name            Windows Border Switch
-// @description     Control borders of windows, dialogs, the taskbar, and shell panels
+// @description     Hide borders around windows, the Start menu, the taskbar, and other system elements
 // @description:ru-RU Отключение рамок для окон, меню «Пуск», панели задач и других элементов системы
-// @description:es-ES Controla los bordes de las ventanas, los diálogos, la barra de tareas y los paneles del sistema
-// @description:de-DE Steuert die Rahmen von Fenstern, Dialogfeldern, der Taskleiste und Systembereichen
-// @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
-// @description:zh-CN 控制窗口、对话框、任务栏和系统面板的边框
+// @description:es-ES Oculta los bordes de las ventanas, el menú Inicio, la barra de tareas y otros elementos del sistema
+// @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
+// @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
+// @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
 // @version         1.0.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
