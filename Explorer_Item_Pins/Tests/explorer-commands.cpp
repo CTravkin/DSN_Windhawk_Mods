@@ -375,12 +375,13 @@ HRESULT TestGetItem(IUnknown* store, const void* key, IShellFolder* folder, void
 
 template <typename Function>
 Function InstallTestHook(Function target, Function callback, std::span<const unsigned char> expected,
-                         size_t ripLoad = std::dynamic_extent) {
+                         size_t relativeOperand = std::dynamic_extent) {
     // This process is isolated from the Explorer session. Install before
     // opening the test view and let process teardown discard the code pages.
     auto* entry = reinterpret_cast<unsigned char*>(target);
-    const bool relative = ripLoad != std::dynamic_extent;
-    Require(expected.size() >= 14 && (!relative || ripLoad + 7 == expected.size()),
+    const bool relative = relativeOperand != std::dynamic_extent;
+    const bool relativeCall = relative && expected[relativeOperand] == 0xe8;
+    Require(expected.size() >= 14 && (!relative || relativeOperand + (relativeCall ? 5 : 7) == expected.size()),
             "verify the test trampoline's prologue length");
     // The last four bytes of a RIP-relative load are a displacement that varies by image.
     const auto fixedBytes = expected.size() - (relative ? sizeof(std::int32_t) : 0);
@@ -391,24 +392,32 @@ Function InstallTestHook(Function target, Function callback, std::span<const uns
         std::memcpy(instruction + 6, &targetAddress, sizeof(targetAddress));
         std::memcpy(location, instruction, sizeof(instruction));
     };
-    const size_t trampolineSize = expected.size() + 14 + (ripLoad == std::dynamic_extent ? 0 : 6);
+    const size_t trampolineSize = expected.size() + 14 + (relativeCall ? 7 : relative ? 6 : 0);
     auto* trampoline = static_cast<unsigned char*>(VirtualAlloc(nullptr, trampolineSize,
         MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE));
     Require(trampoline != nullptr, "allocate the isolated test trampoline");
-    if (ripLoad == std::dynamic_extent) {
+    if (!relative) {
         std::memcpy(trampoline, entry, expected.size());
+    } else if (relativeCall) {
+        std::int32_t displacement{};
+        std::memcpy(&displacement, entry + relativeOperand + 1, sizeof(displacement));
+        const auto address = reinterpret_cast<std::uintptr_t>(entry + expected.size()) + displacement;
+        std::memcpy(trampoline, entry, relativeOperand);
+        unsigned char call[]{0x48, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xd0};
+        std::memcpy(call + 2, &address, sizeof(address));
+        std::memcpy(trampoline + relativeOperand, call, sizeof(call));
     } else {
-        const auto opcode = entry + ripLoad;
+        const auto opcode = entry + relativeOperand;
         Require(opcode[0] == 0x48 && (opcode[1] == 0x8b || opcode[1] == 0x8d) && opcode[2] == 0x05,
                 "verify the RIP-relative operand at the end of the test prologue");
         std::int32_t displacement{};
         std::memcpy(&displacement, opcode + 3, sizeof(displacement));
         const auto address = reinterpret_cast<std::uintptr_t>(entry + expected.size()) + displacement;
-        std::memcpy(trampoline, entry, ripLoad);
+        std::memcpy(trampoline, entry, relativeOperand);
         unsigned char load[]{0x48, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0x48, 0x8b, 0x00};
         if (opcode[1] == 0x8d) std::fill(load + 10, load + 13, 0x90);
         std::memcpy(load + 2, &address, sizeof(address));
-        std::memcpy(trampoline + ripLoad, load, sizeof(load));
+        std::memcpy(trampoline + relativeOperand, load, sizeof(load));
     }
     jump(trampoline + trampolineSize - 14, entry + expected.size());
     DWORD protection = 0;
@@ -536,6 +545,7 @@ void VerifyOrdering(const fs::path& root) {
 }
 
 NativeGrouping groupingApi{};
+explorer_item_pins::GetGroupAt originalGroupAt = nullptr;
 explorer_item_pins::SetGrouping testSetGroupingTarget = nullptr;
 std::atomic<unsigned> pinnedHeaders{};
 std::atomic<unsigned> topPinnedGroups{};
@@ -562,47 +572,41 @@ HRESULT TestTextInfo(IUnknown* category, DWORD id, IUnknown** result) {
     return TestGroupInfo(groupingApi.textInfo, category, id, result);
 }
 
-class ObservedGroupList final : public GroupList {
-public:
-    explicit ObservedGroupList(GroupList& groups) : groups_(groups) {}
-
-    HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void** output) override {
-        *output = nullptr;
-        if (iid != IID_IUnknown) return E_NOINTERFACE;
-        *output = static_cast<GroupList*>(this);
-        return S_OK;
-    }
-    ULONG STDMETHODCALLTYPE AddRef() override { return 1; }
-    ULONG STDMETHODCALLTYPE Release() override { return 1; }
-    HRESULT STDMETHODCALLTYPE GetCount(UINT* count) override { return groups_.GetCount(count); }
-    HRESULT STDMETHODCALLTYPE GetAt(UINT index, IUnknown** group) override {
-        const auto result = groups_.GetAt(index, group);
-        if (!firstRead_ && SUCCEEDED(result) && *group) {
-            firstRead_ = true;
-            pinnedFirst_ = explorer_item_pins::NativeGroupId(**group) == explorer_item_pins::pinnedGroupId;
-        }
-        return result;
-    }
-    bool PinnedFirst() const { return pinnedFirst_; }
-
-private:
-    GroupList& groups_;
-    bool firstRead_ = false;
-    bool pinnedFirst_ = false;
+struct GroupObservation {
+    GroupList* array;
+    bool applying = false;
+    bool firstRead = false;
+    bool pinnedFirst = false;
 };
+thread_local GroupObservation* groupObservation = nullptr;
+
+HRESULT TestGetGroupAt(GroupList* list, UINT index, IUnknown** group) {
+    const auto result = originalGroupAt(list, explorer_item_pins::GroupOrder::Index(list, index), group);
+    const auto observation = groupObservation;
+    if (observation && observation->applying && list == observation->array && !observation->firstRead &&
+        SUCCEEDED(result) && *group) {
+        observation->firstRead = true;
+        observation->pinnedFirst = explorer_item_pins::IsPinnedGroup(**group);
+    }
+    return result;
+}
 
 HRESULT ObserveAppliedGroups(const unsigned char* view, GroupList* list, UINT* added) {
-    if (!list) return groupingApi.apply(view, list, added);
-    ObservedGroupList observed(*list);
-    const auto hr = groupingApi.apply(view, &observed, added);
-    if (SUCCEEDED(hr) && observed.PinnedFirst()) ++topPinnedGroups;
+    Require(groupObservation && list == groupObservation->array, "pass Explorer's original COM array to the native apply method");
+    groupObservation->applying = true;
+    const auto hr = groupingApi.apply(view, list, added);
+    if (SUCCEEDED(hr) && groupObservation->pinnedFirst) ++topPinnedGroups;
     return hr;
 }
 
 HRESULT TestApplyGroups(const unsigned char* view, GroupList* list, UINT* added) {
     auto observed = groupingApi;
     observed.apply = ObserveAppliedGroups;
-    return explorer_item_pins::ApplyWithPins(observed, view, list, added);
+    GroupObservation observation{list};
+    auto previous = std::exchange(groupObservation, &observation);
+    const auto result = explorer_item_pins::ApplyWithPins(observed, view, list, added);
+    groupObservation = previous;
+    return result;
 }
 
 HRESULT TestSetGrouping(IFolderView2* view, REFPROPERTYKEY key, BOOL ascending) {
@@ -616,12 +620,14 @@ void InstallTestGrouping(const NativeGrouping& native) {
     constexpr unsigned char range[]{0x48, 0x89, 0x5c, 0x24, 0x20, 0x55, 0x56, 0x57, 0x48, 0x83, 0xec, 0x50, 0x48, 0x8b, 0x05, 0x1d, 0xb9, 0x60, 0x00};
     constexpr unsigned char strings[]{0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x57, 0x48, 0x83, 0xec, 0x40};
     constexpr unsigned char apply[]{0x40, 0x55, 0x53, 0x56, 0x57, 0x41, 0x54, 0x41, 0x56, 0x41, 0x57, 0x48, 0x8b, 0xec};
+    constexpr unsigned char getAt[]{0x48, 0x83, 0xec, 0x28, 0x48, 0x8b, 0x49, 0x08, 0x8b, 0xd2, 0xe8, 0, 0, 0, 0};
     constexpr unsigned char set[]{0x48, 0x8b, 0x89, 0x60, 0x05, 0x00, 0x00, 0x48, 0x8b, 0x01, 0x48, 0x8b, 0x40, 0x20};
     groupingApi = native;
     groupingApi.batch = InstallTestHook(native.batch, TestGroupBatch, batch);
     groupingApi.assign = InstallTestHook(native.assign, TestAssignGroup, assign, 9);
     groupingApi.rangeInfo = InstallTestHook(native.rangeInfo, TestRangeInfo, range, 12);
     groupingApi.textInfo = InstallTestHook(native.textInfo, TestTextInfo, strings);
+    originalGroupAt = InstallTestHook(native.getGroupAt, TestGetGroupAt, getAt, 10);
     groupingApi.apply = InstallTestHook(native.apply, TestApplyGroups, apply);
     testSetGroupingTarget = native.setGrouping;
     groupingApi.setGrouping = InstallTestHook(native.setGrouping, TestSetGrouping, set);
