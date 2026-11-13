@@ -9,3 +9,4 @@ DSN Windhawk Mods is a collection of Windhawk mods for Windows. Each mod can be 
 | Mod | Windhawk ID | Purpose |
 | --- | --- | --- |
 | [Explorer Item Pins](Explorer_Item_Pins/README.md) | `explorer-item-pins` | Pin files and folders within their parent folder in File Explorer |
+| [Windows Border Switch](Windows_Border_Switch/README.md) | `windows-border-switch` | Control the borders of windows, dialogs, Start, and the taskbar |
