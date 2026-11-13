@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Taskleiste und Systembereichen
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, da barra de tarefas e dos painéis do sistema
 // @description:zh-CN 控制窗口、对话框、任务栏和系统面板的边框
-// @version         0.2.6
+// @version         0.2.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 13
+// Build: 14
 
 // ==WindhawkModReadme==
 /*
@@ -670,14 +670,16 @@ bool ClientReachesTop(HWND window) {
            ClientToScreen(window, &client) && client.y <= frame.top;
 }
 
+constexpr wchar_t kPersonalizeKey[] =
+    L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+
 COLORREF NeutralCaptionColor(HWND window) {
     BOOL supportsDark = FALSE;
     DWORD light = 1;
     DWORD size = sizeof(light);
     DwmGetWindowAttribute(window, DWMWA_USE_IMMERSIVE_DARK_MODE, &supportsDark,
                           sizeof(supportsDark));
-    if (supportsDark && RegGetValueW(HKEY_CURRENT_USER,
-                                    L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+    if (supportsDark && RegGetValueW(HKEY_CURRENT_USER, kPersonalizeKey,
                                     L"AppsUseLightTheme", RRF_RT_REG_DWORD, nullptr, &light,
                                     &size) == ERROR_SUCCESS && !light) {
         return RGB(32, 32, 32);
@@ -754,12 +756,12 @@ void UpdateWindowFrame(HWND window) {
     }
 }
 
-void RefreshWindows() {
+void RefreshWindows(bool reapply = false) {
     g_foreground = GetForegroundWindow();
-    EnumWindows([](HWND window, LPARAM) -> BOOL {
-        ApplyWindowBorder(window);
+    EnumWindows([](HWND window, LPARAM reapply) -> BOOL {
+        ApplyWindowBorder(window, reapply != 0);
         return TRUE;
-    }, 0);
+    }, reapply);
 }
 
 void CALLBACK OnWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object, LONG child,
@@ -803,12 +805,48 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
     };
 
     if (hooks[0] && hooks[1]) {
+        winrt::handle themeChanged{CreateEventW(nullptr, FALSE, FALSE, nullptr)};
+        HKEY themeKey = nullptr;
+        auto watchTheme = [&] {
+            return RegNotifyChangeKeyValue(themeKey, FALSE, REG_NOTIFY_CHANGE_LAST_SET,
+                                           themeChanged.get(), TRUE) == ERROR_SUCCESS;
+        };
+        bool watchingTheme = themeChanged &&
+            RegOpenKeyExW(HKEY_CURRENT_USER, kPersonalizeKey, 0, KEY_NOTIFY,
+                          &themeKey) == ERROR_SUCCESS && watchTheme();
+        if (!watchingTheme) {
+            Wh_Log(L"Unable to subscribe to theme changes");
+        }
+        const HANDLE events[] = {stop, themeChanged.get()};
+        UINT_PTR themeTimer = 0;
         RefreshWindows();
-        while (MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT) ==
-               WAIT_OBJECT_0 + 1) {
+        for (;;) {
+            const DWORD count = watchingTheme ? ARRAYSIZE(events) : 1;
+            const DWORD result = MsgWaitForMultipleObjects(count, events, FALSE, INFINITE,
+                                                            QS_ALLINPUT);
+            if (watchingTheme && result == WAIT_OBJECT_0 + 1) {
+                watchingTheme = watchTheme();
+                if (!themeTimer) {
+                    // Let applications apply the new theme before reading their DWM flags.
+                    themeTimer = SetTimer(nullptr, 0, 250, nullptr);
+                    if (!themeTimer) {
+                        RefreshWindows(true);
+                    }
+                }
+                continue;
+            }
+            if (result != WAIT_OBJECT_0 + count) {
+                break;
+            }
             MSG message;
             while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT &&
                    PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
+                if (!message.hwnd && message.message == WM_TIMER &&
+                    themeTimer && message.wParam == themeTimer) {
+                    KillTimer(nullptr, std::exchange(themeTimer, 0));
+                    RefreshWindows(true);
+                    continue;
+                }
                 if (!message.hwnd && message.message == WM_TIMER &&
                     g_frameTimer && message.wParam == g_frameTimer) {
                     KillTimer(nullptr, std::exchange(g_frameTimer, 0));
@@ -821,6 +859,12 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
                 TranslateMessage(&message);
                 DispatchMessageW(&message);
             }
+        }
+        if (themeTimer) {
+            KillTimer(nullptr, themeTimer);
+        }
+        if (themeKey) {
+            RegCloseKey(themeKey);
         }
     } else {
         Wh_Log(L"Unable to subscribe to window events");
