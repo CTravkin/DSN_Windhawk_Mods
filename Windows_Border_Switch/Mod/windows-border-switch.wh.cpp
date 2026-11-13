@@ -7,7 +7,7 @@
 // @description:de-DE Steuert die Rahmen von Fenstern, Dialogen, Startmenü und Taskleiste
 // @description:pt-BR Controla as bordas das janelas, das caixas de diálogo, do menu Iniciar e da barra de tarefas
 // @description:zh-CN 控制窗口、对话框、开始菜单和任务栏的边框
-// @version         0.1.1
+// @version         0.1.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 2
+// Build: 3
 
 // ==WindhawkModReadme==
 /*
@@ -255,6 +255,12 @@ struct Worker {
     HANDLE stop = nullptr;
 
     void Start(LPTHREAD_START_ROUTINE run) {
+        if (thread) {
+            if (WaitForSingleObject(thread, 0) != WAIT_OBJECT_0) {
+                return;
+            }
+            Stop();
+        }
         stop = CreateEventW(nullptr, TRUE, FALSE, nullptr);
         if (!stop) {
             return;
@@ -280,7 +286,6 @@ WindowSettings g_windowSettings;
 Worker g_windowWorker;
 std::unordered_map<HWND, WindowEffect> g_changedWindows;
 HWND g_foreground;
-bool g_ownsDesktop;
 
 bool ClassIs(HWND window, std::wstring_view name) {
     WCHAR buffer[96];
@@ -292,6 +297,68 @@ bool IsMainExplorer() {
     DWORD pid = 0;
     GetWindowThreadProcessId(GetShellWindow(), &pid);
     return pid == GetCurrentProcessId();
+}
+
+thread_local bool g_shellWindowChanged;
+
+void CALLBACK OnShellWindowEvent(HWINEVENTHOOK, DWORD, HWND window, LONG object, LONG child,
+                                DWORD, DWORD) {
+    if (object == OBJID_WINDOW && child == CHILDID_SELF &&
+        (ClassIs(window, L"Progman") || ClassIs(window, L"Shell_TrayWnd") ||
+         ClassIs(window, L"Windows.UI.Core.CoreWindow") ||
+         ClassIs(window, L"Windows.UI.Composition.DesktopWindowContentBridge"))) {
+        g_shellWindowChanged = true;
+    }
+}
+
+bool WaitForShellActivity(HANDLE stop, DWORD delay) {
+    ULONGLONG deadline = GetTickCount64() + delay;
+    while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+        if (std::exchange(g_shellWindowChanged, false)) {
+            return true;
+        }
+        ULONGLONG now = GetTickCount64();
+        DWORD remaining = delay == INFINITE ? INFINITE
+                          : now < deadline ? static_cast<DWORD>(deadline - now)
+                                           : 0;
+        DWORD result = MsgWaitForMultipleObjects(1, &stop, FALSE, remaining, QS_ALLINPUT);
+        if (result == WAIT_TIMEOUT) {
+            return true;
+        }
+        if (result != WAIT_OBJECT_0 + 1) {
+            break;
+        }
+        MSG message;
+        while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT &&
+               PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&message);
+            DispatchMessageW(&message);
+        }
+    }
+    return false;
+}
+
+bool WaitForShellOwnership(HANDLE stop) {
+    if (IsMainExplorer()) {
+        return true;
+    }
+    HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_SHOW, nullptr,
+                                       OnShellWindowEvent, GetCurrentProcessId(), 0,
+                                       WINEVENT_OUTOFCONTEXT);
+    if (!hook) {
+        Wh_Log(L"Unable to watch for the Explorer shell window");
+        return false;
+    }
+    while (!IsMainExplorer() && WaitForShellActivity(stop, INFINITE)) {
+        // Registration of the shell can follow the creation notification.
+        for (int attempt = 0; attempt < 10 && !IsMainExplorer(); ++attempt) {
+            if (!WaitForShellActivity(stop, 100)) {
+                break;
+            }
+        }
+    }
+    UnhookWinEvent(hook);
+    return WaitForSingleObject(stop, 0) == WAIT_TIMEOUT && IsMainExplorer();
 }
 
 bool CaptionAccentEnabled() {
@@ -362,13 +429,6 @@ void CALLBACK OnWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object
     if (object != OBJID_WINDOW || child != CHILDID_SELF) {
         return;
     }
-    if (!g_ownsDesktop) {
-        if (IsMainExplorer()) {
-            g_ownsDesktop = true;
-            RefreshWindows();
-        }
-        return;
-    }
     if (event == EVENT_OBJECT_DESTROY) {
         g_changedWindows.erase(window);
     } else if (event == EVENT_OBJECT_SHOW || event == EVENT_OBJECT_HIDE) {
@@ -384,6 +444,9 @@ void CALLBACK OnWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object
 
 DWORD WINAPI RunWindowWorker(void* stopParameter) {
     HANDLE stop = static_cast<HANDLE>(stopParameter);
+    if (!WaitForShellOwnership(stop)) {
+        return 0;
+    }
     const std::array hooks = {
         SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, nullptr,
                         OnWindowEvent, 0, 0, WINEVENT_OUTOFCONTEXT),
@@ -392,10 +455,7 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
     };
 
     if (hooks[0] && hooks[1]) {
-        g_ownsDesktop = IsMainExplorer();
-        if (g_ownsDesktop) {
-            RefreshWindows();
-        }
+        RefreshWindows();
         while (MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT) ==
                WAIT_OBJECT_0 + 1) {
             MSG message;
@@ -777,7 +837,7 @@ struct TapFactory : winrt::implements<TapFactory, IClassFactory, winrt::non_agil
     }
 };
 
-HRESULT AttachTap() {
+HRESULT AttachTap(HANDLE stop) {
     auto xaml = GetModuleHandleW(L"Windows.UI.Xaml.dll");
     if (!xaml) {
         return HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND);
@@ -795,7 +855,10 @@ HRESULT AttachTap() {
     // The default connection is normally the first one. Multiple XAML islands
     // can have higher-numbered endpoints.
     HRESULT result = HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
-    for (unsigned index = 1; index <= 64 && result == HRESULT_FROM_WIN32(ERROR_NOT_FOUND); ++index) {
+    for (unsigned index = 1; index <= 10000 && result == HRESULT_FROM_WIN32(ERROR_NOT_FOUND); ++index) {
+        if (WaitForSingleObject(stop, 0) != WAIT_TIMEOUT) {
+            return HRESULT_FROM_WIN32(ERROR_CANCELLED);
+        }
         WCHAR connection[40];
         swprintf_s(connection, L"VisualDiagConnection%u", index);
         result = initialize(connection, GetCurrentProcessId(), L"", path, kTapClass, nullptr);
@@ -803,62 +866,90 @@ HRESULT AttachTap() {
     return result;
 }
 
-DWORD WINAPI RunShellWorker(void* stopParameter) {
-    HANDLE stop = static_cast<HANDLE>(stopParameter);
-    HRESULT apartment = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-    if (FAILED(apartment)) {
-        return 0;
-    }
-
+HRESULT ConnectShellTap(HANDLE stop, winrt::com_ptr<IXamlDiagnostics>& site) {
     HANDLE siteReady = CreateEventW(nullptr, TRUE, FALSE, nullptr);
     if (!siteReady) {
-        CoUninitialize();
-        return 0;
+        return HRESULT_FROM_WIN32(GetLastError());
     }
     {
         std::lock_guard guard(g_siteMutex);
         g_siteReady = siteReady;
     }
-    HRESULT attach = E_FAIL;
-    // Only on enable or process startup. No timer or retries after attach.
-    for (int attempt = 0; attempt < 25 && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT; ++attempt) {
-        attach = AttachTap();
-        if (SUCCEEDED(attach) ||
-            (attach != HRESULT_FROM_WIN32(ERROR_MOD_NOT_FOUND) &&
-             attach != HRESULT_FROM_WIN32(ERROR_NOT_FOUND))) {
-            break;
-        }
-        WaitForSingleObject(stop, 200);
-    }
-
+    HRESULT attach = AttachTap(stop);
     // InitializeXamlDiagnosticsEx can return before the UI thread calls SetSite.
     if (SUCCEEDED(attach)) {
         const HANDLE events[] = {stop, siteReady};
         WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, 5000);
     }
-    winrt::com_ptr<IXamlDiagnostics> site;
     {
         std::lock_guard guard(g_siteMutex);
         g_siteReady = nullptr;
         site = std::move(g_site);
     }
     CloseHandle(siteReady);
-    try {
-        if (site && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
-            auto watcher = winrt::make_self<TreeWatcher>(std::move(site));
-            HRESULT result = watcher->Advise();
-            if (SUCCEEDED(result)) {
-                WaitForSingleObject(stop, INFINITE);
-            } else {
-                Wh_Log(L"Unable to subscribe to XAML notifications: %08X", result);
+    return site || FAILED(attach) ? attach : HRESULT_FROM_WIN32(ERROR_TIMEOUT);
+}
+
+DWORD WINAPI RunShellWorker(void* stopParameter) {
+    HANDLE stop = static_cast<HANDLE>(stopParameter);
+    if (!g_startHost && !WaitForShellOwnership(stop)) {
+        return 0;
+    }
+    HRESULT apartment = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+    if (FAILED(apartment)) {
+        return 0;
+    }
+    HWINEVENTHOOK hook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_SHOW, nullptr,
+                                       OnShellWindowEvent, GetCurrentProcessId(), 0,
+                                       WINEVENT_OUTOFCONTEXT);
+    HWINEVENTHOOK uncloak = SetWinEventHook(EVENT_OBJECT_UNCLOAKED, EVENT_OBJECT_UNCLOAKED,
+                                          nullptr, OnShellWindowEvent, GetCurrentProcessId(), 0,
+                                          WINEVENT_OUTOFCONTEXT);
+    winrt::com_ptr<IXamlDiagnostics> site;
+    constexpr DWORD delays[] = {250, 1000, 4000, 10000};
+    unsigned retry = 0;
+    while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+        try {
+            HRESULT result = site ? S_OK : ConnectShellTap(stop, site);
+            if (SUCCEEDED(result) && WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+                auto watcher = winrt::make_self<TreeWatcher>(site);
+                result = watcher->Advise();
+                if (SUCCEEDED(result)) {
+                    if (hook) {
+                        UnhookWinEvent(std::exchange(hook, nullptr));
+                    }
+                    if (uncloak) {
+                        UnhookWinEvent(std::exchange(uncloak, nullptr));
+                    }
+                    WaitForSingleObject(stop, INFINITE);
+                    watcher->Stop(true);
+                    break;
+                }
+                watcher->Stop(false);
             }
-            watcher->Stop(SUCCEEDED(result));
-        } else if (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
-            Wh_Log(L"Unable to attach to shell XAML: %08X",
-                   SUCCEEDED(attach) ? HRESULT_FROM_WIN32(ERROR_TIMEOUT) : attach);
+            Wh_Log(L"Shell XAML is unavailable: %08X", result);
+            if (result == E_NOINTERFACE ||
+                result == HRESULT_FROM_WIN32(ERROR_PROC_NOT_FOUND)) {
+                break;
+            }
+        } catch (...) {
+            Wh_Log(L"Shell worker failed: %08X", winrt::to_hresult());
+            break;
         }
-    } catch (...) {
-        Wh_Log(L"Shell worker failed: %08X", winrt::to_hresult());
+
+        DWORD delay = retry < ARRAYSIZE(delays) ? delays[retry++] : INFINITE;
+        if (!WaitForShellActivity(stop, delay)) {
+            break;
+        }
+        if (delay == INFINITE) {
+            retry = 0;
+        }
+    }
+    if (hook) {
+        UnhookWinEvent(hook);
+    }
+    if (uncloak) {
+        UnhookWinEvent(uncloak);
     }
     site = nullptr;
     CoUninitialize();
@@ -908,9 +999,9 @@ void ApplySettings() {
             settings.hideDialog != g_windowSettings.hideDialog) {
             g_windowWorker.Stop();
             g_windowSettings = settings;
-            if (settings.AnyEnabled() && (!GetShellWindow() || IsMainExplorer())) {
-                g_windowWorker.Start(RunWindowWorker);
-            }
+        }
+        if (settings.AnyEnabled()) {
+            g_windowWorker.Start(RunWindowWorker);
         }
     }
 
@@ -918,7 +1009,7 @@ void ApplySettings() {
                         WindowEffect::HideBorder;
     if (!shellEnabled) {
         g_shellWorker.Stop();
-    } else if (!g_shellWorker.thread && (g_startHost || !GetShellWindow() || IsMainExplorer())) {
+    } else {
         if (!g_shellHooks) {
             g_shellHooks = InstallShellHooks() && Wh_ApplyHookOperations();
         }
