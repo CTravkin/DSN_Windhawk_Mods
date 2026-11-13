@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.6
+// @version         1.0.8
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 21
+// Build: 23
 
 // ==WindhawkModReadme==
 /*
@@ -336,10 +336,24 @@ struct WindowSettings {
     bool hideInactive = false;
     bool hideDialog = false;
 
-    bool AnyEnabled() const {
+    constexpr bool AnyEnabled() const {
         return active != WindowEffect::Default || hideInactive || hideDialog;
     }
+
+    bool operator==(const WindowSettings&) const = default;
 };
+
+enum class WindowUpdate { None, Start, Refresh, Stop };
+
+constexpr WindowUpdate WindowSettingsUpdate(WindowSettings previous, WindowSettings next) {
+    if (previous == next) {
+        return WindowUpdate::None;
+    }
+    if (!next.AnyEnabled()) {
+        return WindowUpdate::Stop;
+    }
+    return previous.AnyEnabled() ? WindowUpdate::Refresh : WindowUpdate::Start;
+}
 
 constexpr WindowEffect WindowEffectFor(WindowSettings settings, bool active, bool dialog) {
     if (dialog) {
@@ -463,6 +477,7 @@ constexpr bool IsStartPane(std::wstring_view name) {
 #include <ocidl.h>
 #include <xamlom.h>
 #include <windhawk_api.h>
+#include <windhawk_utils.h>
 
 #undef GetCurrentTime
 #include <winrt/Windows.Foundation.h>
@@ -495,7 +510,6 @@ namespace Xaml = winrt::Windows::UI::Xaml;
 namespace Core = winrt::Windows::UI::Core;
 namespace System = winrt::Windows::System;
 namespace WinUI = winrt::Microsoft::UI::Xaml;
-namespace Dispatching = winrt::Microsoft::UI::Dispatching;
 
 ShellHost g_shellHost;
 unsigned g_shellBorders;
@@ -533,6 +547,9 @@ struct Worker {
 };
 
 WindowSettings g_windowSettings;
+std::mutex g_windowSettingsMutex;
+WindowSettings g_requestedWindowSettings;
+winrt::handle g_windowSettingsChanged;
 Worker g_windowWorker;
 struct AppliedFrame {
     COLORREF border = DWMWA_COLOR_DEFAULT;
@@ -843,14 +860,24 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
         if (!watchingTheme) {
             Wh_Log(L"Unable to subscribe to theme changes");
         }
-        const HANDLE events[] = {stop, themeChanged.get()};
+        const HANDLE events[] = {stop, g_windowSettingsChanged.get(), themeChanged.get()};
         UINT_PTR themeTimer = 0;
+        auto loadSettings = [] {
+            std::lock_guard guard(g_windowSettingsMutex);
+            g_windowSettings = g_requestedWindowSettings;
+        };
+        loadSettings();
         RefreshWindows();
         for (;;) {
-            const DWORD count = watchingTheme ? ARRAYSIZE(events) : 1;
+            const DWORD count = watchingTheme ? ARRAYSIZE(events) : 2;
             const DWORD result = MsgWaitForMultipleObjects(count, events, FALSE, INFINITE,
                                                             QS_ALLINPUT);
-            if (watchingTheme && result == WAIT_OBJECT_0 + 1) {
+            if (result == WAIT_OBJECT_0 + 1) {
+                loadSettings();
+                RefreshWindows();
+                continue;
+            }
+            if (watchingTheme && result == WAIT_OBJECT_0 + 2) {
                 watchingTheme = watchTheme();
                 if (!themeTimer) {
                     // Let applications apply the new theme before reading their DWM flags.
@@ -1026,7 +1053,7 @@ ShellEdit TrackShellEdit(Element const& target, Property const& property,
     };
 }
 
-void RestoreShellEdit(ShellEdit const& edit) {
+void RestoreShellEdit(ShellEdit& edit) {
     winrt::handle thread{OpenThread(SYNCHRONIZE, FALSE, edit.thread)};
     winrt::handle done{CreateEventW(nullptr, TRUE, FALSE, nullptr)};
     if (!thread || !done) {
@@ -1039,7 +1066,7 @@ void RestoreShellEdit(ShellEdit const& edit) {
         return;
     }
     auto signal = std::make_shared<winrt::handle>(duplicate);
-    if (edit.dispatch([restore = edit.restore, signal] {
+    if (edit.dispatch([restore = std::move(edit.restore), signal] {
             try {
                 restore();
             } catch (...) {
@@ -1726,42 +1753,42 @@ bool InstallShellHooks() {
     if (!kernelBase) {
         return false;
     }
-    auto openKey = reinterpret_cast<void*>(GetProcAddress(kernelBase, "RegOpenKeyExW"));
-    auto queryValue = reinterpret_cast<void*>(GetProcAddress(kernelBase, "RegQueryValueExW"));
+    auto openKey = reinterpret_cast<OpenKey>(GetProcAddress(kernelBase, "RegOpenKeyExW"));
+    auto queryValue = reinterpret_cast<QueryValue>(GetProcAddress(kernelBase, "RegQueryValueExW"));
     return openKey && queryValue &&
-           Wh_SetFunctionHook(openKey, reinterpret_cast<void*>(&OpenKeyHook),
-                              reinterpret_cast<void**>(&g_openKey)) &&
-           Wh_SetFunctionHook(queryValue, reinterpret_cast<void*>(&QueryValueHook),
-                              reinterpret_cast<void**>(&g_queryValue));
+           WindhawkUtils::SetFunctionHook(openKey, OpenKeyHook, &g_openKey) &&
+           WindhawkUtils::SetFunctionHook(queryValue, QueryValueHook, &g_queryValue);
 }
 
 WindowEffect ReadSetting(PCWSTR name) {
-    PCWSTR value = Wh_GetStringSetting(name);
-    std::wstring_view setting = value ? value : L"";
-    WindowEffect effect = WindowEffect::Default;
+    auto value = WindhawkUtils::StringSetting::make(name);
+    const std::wstring_view setting = value.get();
     if (setting == L"hide") {
-        effect = WindowEffect::HideBorder;
-    } else if (setting == L"caption") {
-        effect = WindowEffect::RemoveCaptionAccent;
+        return WindowEffect::HideBorder;
     }
-    if (value) {
-        Wh_FreeStringSetting(value);
+    if (setting == L"caption") {
+        return WindowEffect::RemoveCaptionAccent;
     }
-    return effect;
+    return WindowEffect::Default;
 }
 
 void ApplySettings() {
-    if (g_shellHost == ShellHost::Explorer) {
+    if (g_windowSettingsChanged) {
         WindowSettings settings{
             ReadSetting(L"activeWindow"),
             ReadSetting(L"inactiveWindow") == WindowEffect::HideBorder,
             ReadSetting(L"dialog") == WindowEffect::HideBorder,
         };
-        if (settings.active != g_windowSettings.active ||
-            settings.hideInactive != g_windowSettings.hideInactive ||
-            settings.hideDialog != g_windowSettings.hideDialog) {
+        WindowUpdate update;
+        {
+            std::lock_guard guard(g_windowSettingsMutex);
+            update = WindowSettingsUpdate(g_requestedWindowSettings, settings);
+            g_requestedWindowSettings = settings;
+        }
+        if (update == WindowUpdate::Stop) {
             g_windowWorker.Stop();
-            g_windowSettings = settings;
+        } else if (update == WindowUpdate::Refresh) {
+            SetEvent(g_windowSettingsChanged.get());
         }
         if (settings.AnyEnabled()) {
             g_windowWorker.Start(RunWindowWorker);
@@ -1826,6 +1853,7 @@ BOOL Wh_ModInit() {
     ++name;
     if (_wcsicmp(name, L"explorer.exe") == 0) {
         g_shellHost = ShellHost::Explorer;
+        g_windowSettingsChanged.attach(CreateEventW(nullptr, FALSE, FALSE, nullptr));
     } else if (_wcsicmp(name, L"StartMenuExperienceHost.exe") == 0) {
         g_shellHost = ShellHost::Start;
     } else if (_wcsicmp(name, L"SearchHost.exe") == 0 || _wcsicmp(name, L"SearchApp.exe") == 0) {
@@ -1854,5 +1882,6 @@ void Wh_ModBeforeUninit() {
     }
     g_shellWorker.Stop();
     g_windowWorker.Stop();
+    g_windowSettingsChanged.close();
 }
 #endif

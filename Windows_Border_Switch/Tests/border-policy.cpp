@@ -1,5 +1,13 @@
 #include "../Mod/windows-border-switch.wh.cpp"
 
+static_assert(WindowSettingsUpdate({}, {WindowEffect::HideBorder}) == WindowUpdate::Start);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {WindowEffect::HideBorder, true}) ==
+              WindowUpdate::Refresh);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {}) == WindowUpdate::Stop);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {WindowEffect::HideBorder}) ==
+              WindowUpdate::None);
+static_assert(WindowSettingsUpdate({}, {}) == WindowUpdate::None);
+
 static_assert(WindowEffectFor({}, true, false) == WindowEffect::Default);
 static_assert(WindowEffectFor({WindowEffect::HideBorder}, true, false) ==
               WindowEffect::HideBorder);
