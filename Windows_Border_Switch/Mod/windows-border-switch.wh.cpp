@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.15
+// @version         1.0.24
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 30
+// Build: 39
 
 // ==WindhawkModReadme==
 /*
@@ -970,6 +970,13 @@ XamlSources<TaskbarSource> g_taskbarSources;
 XamlSources<Xaml::FrameworkElement> g_taskViewRoots;
 std::mutex g_sourcesMutex;
 
+struct MeasuredTaskbar {
+    DWORD thread;
+    winrt::weak_ref<Xaml::FrameworkElement> frame;
+    winrt::weak_ref<Xaml::FrameworkElement> stroke;
+};
+std::vector<MeasuredTaskbar> g_measuredTaskbars;
+
 decltype(&RoGetActivationFactory) g_getActivationFactory;
 using CreateXamlSource = HRESULT(WINAPI*)(void*, void*, void**, void**);
 CreateXamlSource g_createXamlSource;
@@ -1268,7 +1275,8 @@ void HideXamlBorder(Xaml::FrameworkElement const& element, ShellBorder border) {
     Wh_Log(L"Hid XAML border: %s", element.Name().c_str());
 }
 
-void ScanShellTree(Xaml::DependencyObject const& node, unsigned mask, unsigned depth = 0) {
+void ScanShellTree(Xaml::DependencyObject const& node, unsigned mask, unsigned depth = 0,
+                   Xaml::FrameworkElement* stroke = nullptr) {
     if (!node || depth == 36) {
         return;
     }
@@ -1281,12 +1289,15 @@ void ScanShellTree(Xaml::DependencyObject const& node, unsigned mask, unsigned d
             if (border != ShellBorder::Start ||
                 (parent && IsStartBorderParent(parent.Name(), winrt::get_class_name(parent)))) {
                 HideXamlBorder(element, border);
+                if (stroke && border == ShellBorder::Taskbar && !*stroke) {
+                    *stroke = element;
+                }
             }
         }
     }
     const int count = Xaml::Media::VisualTreeHelper::GetChildrenCount(node);
     for (int child = 0; child < count; ++child) {
-        ScanShellTree(Xaml::Media::VisualTreeHelper::GetChild(node, child), mask, depth + 1);
+        ScanShellTree(Xaml::Media::VisualTreeHelper::GetChild(node, child), mask, depth + 1, stroke);
     }
 }
 
@@ -1301,14 +1312,27 @@ void ScanShellOnUiThread(bool refresh) noexcept try {
     }
     if (mask && g_shellHost == ShellHost::Explorer) {
         std::vector<TaskbarSource> taskbars;
-        std::vector<Xaml::FrameworkElement> taskViews;
+        std::vector<Xaml::FrameworkElement> taskViews, measuredTaskbars;
         {
             std::lock_guard guard(g_sourcesMutex);
             taskbars = g_taskbarSources.OnCurrentThread();
             taskViews = g_taskViewRoots.OnCurrentThread();
+            if (mask & BorderBit(ShellBorder::Taskbar)) {
+                const DWORD thread = GetCurrentThreadId();
+                for (auto const& entry : g_measuredTaskbars) {
+                    if (entry.thread == thread) {
+                        if (auto frame = entry.frame.get()) {
+                            measuredTaskbars.push_back(std::move(frame));
+                        }
+                    }
+                }
+            }
         }
         for (auto const& taskbar : taskbars) {
             ScanShellTree(taskbar.Content(), mask);
+        }
+        for (auto const& frame : measuredTaskbars) {
+            ScanShellTree(frame, BorderBit(ShellBorder::Taskbar));
         }
         for (auto const& taskView : taskViews) {
             ScanShellTree(taskView, mask);
@@ -1323,6 +1347,78 @@ void ScanShellOnUiThread(bool refresh) noexcept try {
     }
 } catch (...) {
     Wh_Log(L"Shell XAML scan failed: %08X", winrt::to_hresult());
+}
+
+using MeasureTaskbarFrame = HRESULT(WINAPI*)(IUnknown*, Foundation::Size, Foundation::Size*);
+MeasureTaskbarFrame g_measureTaskbarFrame;
+bool g_taskbarLayoutHookAttempted;
+
+void ApplyMeasuredTaskbar(Xaml::FrameworkElement const& frame, unsigned mask) {
+    const DWORD thread = GetCurrentThreadId();
+    {
+        std::lock_guard guard(g_sourcesMutex);
+        auto entry = std::find_if(g_measuredTaskbars.begin(), g_measuredTaskbars.end(),
+                                  [&](auto const& item) { return item.thread == thread && item.frame.get() == frame; });
+        if (entry != g_measuredTaskbars.end()) {
+            if (auto stroke = entry->stroke.get(); stroke && stroke.IsLoaded()) {
+                return;
+            }
+            g_measuredTaskbars.erase(entry);
+        }
+        std::erase_if(g_measuredTaskbars, [thread](auto const& item) {
+            return item.thread == thread && !item.frame.get();
+        });
+    }
+
+    Xaml::FrameworkElement stroke{nullptr};
+    ScanShellTree(frame, mask, 0, &stroke);
+    if (stroke) {
+        std::lock_guard guard(g_sourcesMutex);
+        g_measuredTaskbars.push_back({thread, winrt::make_weak(frame), winrt::make_weak(stroke)});
+    }
+}
+
+HRESULT WINAPI MeasureTaskbarFrameHook(IUnknown* self, Foundation::Size available, Foundation::Size* result) {
+    const HRESULT hr = g_measureTaskbarFrame(self, available, result);
+    const unsigned mask = g_shellXamlStopping ? 0 : g_shellXamlMask.load() & BorderBit(ShellBorder::Taskbar);
+    if (SUCCEEDED(hr) && mask) {
+        try {
+            Xaml::FrameworkElement frame{nullptr};
+            if (SUCCEEDED(self->QueryInterface(winrt::guid_of<Xaml::FrameworkElement>(), winrt::put_abi(frame)))) {
+                ApplyMeasuredTaskbar(frame, mask);
+            }
+        } catch (...) {
+            Wh_Log(L"Unable to update the taskbar frame: %08X", winrt::to_hresult());
+        }
+    }
+    return hr;
+}
+
+void HookTaskbarLayout() {
+    if (g_taskbarLayoutHookAttempted) {
+        return;
+    }
+    DWORD owner = 0;
+    GetWindowThreadProcessId(FindWindowW(L"Shell_TrayWnd", nullptr), &owner);
+    if (owner != GetCurrentProcessId()) {
+        return;
+    }
+    HMODULE taskbar = GetModuleHandleW(L"Taskbar.View.dll");
+    if (!taskbar) {
+        taskbar = GetModuleHandleW(L"ExplorerExtensions.dll");
+    }
+    if (!taskbar) {
+        return;
+    }
+    g_taskbarLayoutHookAttempted = true;
+    const WindhawkUtils::SYMBOL_HOOK hook[] = {
+        {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskbarFrame,struct winrt::Windows::UI::Xaml::IFrameworkElementOverrides>::MeasureOverride(struct winrt::Windows::Foundation::Size,struct winrt::Windows::Foundation::Size *))"},
+         &g_measureTaskbarFrame, MeasureTaskbarFrameHook, true},
+    };
+    if (WindhawkUtils::HookSymbols(taskbar, hook, ARRAYSIZE(hook)) && g_measureTaskbarFrame) {
+        Wh_ApplyHookOperations();
+        Wh_Log(L"Taskbar layout hook installed");
+    }
 }
 
 UINT ShellScanMessage() {
@@ -1410,7 +1506,14 @@ DWORD WINAPI RunShellXamlWorker(void* parameter) {
     const auto uncloak = SetWinEventHook(EVENT_OBJECT_UNCLOAKED, EVENT_OBJECT_UNCLOAKED, nullptr,
                                          OnShellXamlWindow, pid, 0, WINEVENT_OUTOFCONTEXT);
     RefreshShellXamlWindows(false);
-    while (MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT) == WAIT_OBJECT_0 + 1) {
+    for (;;) {
+        if (g_shellHost == ShellHost::Explorer) {
+            HookTaskbarLayout();
+        }
+        const DWORD result = MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT);
+        if (result != WAIT_OBJECT_0 + 1) {
+            break;
+        }
         MSG message;
         while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT &&
                PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
