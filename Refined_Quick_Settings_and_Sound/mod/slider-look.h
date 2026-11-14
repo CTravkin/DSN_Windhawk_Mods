@@ -1,10 +1,11 @@
 #pragma once
 #include "common.h"
 namespace native {
-// The native thumb tooltip belongs to the drag gesture. A XAML popup keeps
-// the wheel value visible independently and stays above scrollable rows.
+// The native thumb tooltip belongs to the drag gesture. Draw the wheel value
+// over the panel's content without opening another shell surface.
 class WheelToolTip {
-  P::Popup popup_{nullptr};
+  C::Grid host_{nullptr};
+  C::Canvas overlay_{nullptr};
   C::Border plate_{nullptr};
   C::TextBlock label_{nullptr};
   X::DispatcherTimer timer_{nullptr};
@@ -15,22 +16,21 @@ class WheelToolTip {
   IInspectable pressed_{nullptr};
 
   void Position() {
-    auto root = slider_.XamlRoot();
-    if (!root)
-      return;
     auto thumb = Named(slider_, L"HorizontalThumb");
     auto anchor = thumb ? thumb : slider_.as<X::FrameworkElement>();
-    auto point = anchor.TransformToVisual(root.Content()).TransformPoint(
+    auto point = anchor.TransformToVisual(host_).TransformPoint(
         {float(anchor.ActualWidth() / 2), 0});
     plate_.Measure({INFINITY, INFINITY});
     auto size = plate_.DesiredSize();
     auto left = std::clamp(point.X - size.Width / 2, 0.f,
-                           std::max(0.f, root.Size().Width - size.Width));
+                           std::max(0.f, float(host_.ActualWidth()) - size.Width));
     auto top = std::max(0.f, point.Y - size.Height - 4);
-    if (std::abs(popup_.HorizontalOffset() - left) > .25)
-      popup_.HorizontalOffset(left);
-    if (std::abs(popup_.VerticalOffset() - top) > .25)
-      popup_.VerticalOffset(top);
+    auto previousLeft = C::Canvas::GetLeft(plate_);
+    auto previousTop = C::Canvas::GetTop(plate_);
+    if (!std::isfinite(previousLeft) || std::abs(previousLeft - left) > .25)
+      C::Canvas::SetLeft(plate_, left);
+    if (!std::isfinite(previousTop) || std::abs(previousTop - top) > .25)
+      C::Canvas::SetTop(plate_, top);
   }
 
 public:
@@ -52,22 +52,23 @@ public:
       slider_ = nullptr;
       pressed_ = nullptr;
     }
-    if (popup_)
+    if (host_)
       try {
-        popup_.IsOpen(false);
+        uint32_t index;
+        if (host_.Children().IndexOf(overlay_, index))
+          host_.Children().RemoveAt(index);
       } catch (...) {
         Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
       }
+    host_ = nullptr;
   }
-  void Show(C::Slider const &slider, double value) {
-    auto root = slider.XamlRoot();
-    if (!root)
+  void Show(X::FrameworkElement const &page, C::Slider const &slider, double value) {
+    if (!slider.XamlRoot())
       return;
-    if (!popup_ || popup_.XamlRoot() != root) {
-      Hide();
-      popup_ = P::Popup();
-      popup_.XamlRoot(root);
-      popup_.IsHitTestVisible(false);
+    if (!overlay_) {
+      overlay_ = C::Canvas();
+      overlay_.IsHitTestVisible(false);
+      C::Canvas::SetZIndex(overlay_, 100);
       plate_ = C::Border();
       plate_.IsHitTestVisible(false);
       plate_.CornerRadius({4, 4, 4, 4});
@@ -76,10 +77,23 @@ public:
       label_ = C::TextBlock();
       label_.FontSize(12);
       plate_.Child(label_);
-      popup_.Child(plate_);
+      overlay_.Children().Append(plate_);
     }
     if (slider_ != slider) {
       Hide();
+      C::Grid host{nullptr};
+      for (auto ancestor = Parent(slider); ancestor; ancestor = Parent(ancestor)) {
+        if (auto grid = ancestor.try_as<C::Grid>())
+          host = grid;
+        if (ancestor == page)
+          break;
+      }
+      if (!host)
+        return;
+      host_ = host;
+      C::Grid::SetRowSpan(overlay_, std::max(1u, host_.RowDefinitions().Size()));
+      C::Grid::SetColumnSpan(overlay_, std::max(1u, host_.ColumnDefinitions().Size()));
+      host_.Children().Append(overlay_);
       auto handler = winrt::box_value(X::Input::PointerEventHandler(
           [this](auto &&, auto &&) { Hide(); }));
       slider.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
@@ -88,7 +102,7 @@ public:
       unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
       layout_ = slider.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
         try {
-          if (slider_ && popup_.IsOpen())
+          if (slider_ && host_)
             Position();
         } catch (...) {
           Hide();
@@ -117,7 +131,6 @@ public:
       }
     label_.Text(content);
     Position();
-    popup_.IsOpen(true);
     if (!timer_) {
       timer_ = X::DispatcherTimer();
       timer_.Interval(std::chrono::milliseconds(900));
@@ -127,6 +140,14 @@ public:
     timer_.Start();
   }
 };
+
+inline void ListenVolumeWheel(C::Slider const &slider, X::Input::PointerEventHandler const &callback,
+                              std::vector<std::function<void()>> &revoke) {
+  auto event = X::UIElement::PointerWheelChangedEvent();
+  auto handler = winrt::box_value(callback);
+  slider.AddHandler(event, handler, true);
+  revoke.push_back([slider, event, handler] { slider.RemoveHandler(event, handler); });
+}
 
 // Thin slider look shared by the Sound page and Quick Settings:
 // 1 DIP rail, 4 DIP value bar with rounded ends, thumb invisible until hover,

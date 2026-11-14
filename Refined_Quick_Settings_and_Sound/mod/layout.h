@@ -1214,10 +1214,10 @@ class SoundPage {
         MasterGlyph(value, value <= 0);
       }
     }));
-    Keep(master_.PointerWheelChanged(
-        winrt::auto_revoke, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
+    ListenVolumeWheel(
+        master_, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
-            if (args.Handled() || !master_.IsEnabled())
+            if (!master_.IsEnabled())
               return;
             auto point = args.GetCurrentPoint(master_);
             if (point.Properties().IsHorizontalMouseWheel())
@@ -1225,14 +1225,18 @@ class SoundPage {
             int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
+            if (args.Handled()) {
+              wheelTip_.Show(page_, master_, master_.Value());
+              return;
+            }
             args.Handled(true);
             master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
                                            master_.Maximum(), delta, volumeWheelStep));
-            wheelTip_.Show(master_, master_.Value());
+            wheelTip_.Show(page_, master_, master_.Value());
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
           }
-        }));
+        }, revoke_);
     Keep(masterIcon_.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
       pending_ = audio_.Send({sound::Action::MasterMute});
     }));
@@ -2189,11 +2193,11 @@ public:
     // Mouse wheel as on SV. Written to the session's model like mute/restore;
     // quick notches add up on the last requested value instead of a slider that
     // has not caught up yet.
-    Keep(slider.PointerWheelChanged(
-        winrt::auto_revoke, [this, row](auto &&, X::Input::PointerRoutedEventArgs const &args) {
+    ListenVolumeWheel(
+        slider, [this, row](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
             auto s = row->slider.get();
-            if (!s || args.Handled() || !s.IsEnabled())
+            if (!s || !s.IsEnabled())
               return;
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
@@ -2201,6 +2205,10 @@ public:
             int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
+            if (args.Handled()) {
+              wheelTip_.Show(page_, s, s.Value());
+              return;
+            }
             args.Handled(true);
             if (RowModel(s) != row->model) {
               row->model = RowModel(s);
@@ -2218,11 +2226,11 @@ public:
               if (!WriteVolume(s, row->model, next))
                 s.Value(next);
             }
-            wheelTip_.Show(s, next);
+            wheelTip_.Show(page_, s, next);
           } catch (...) {
             Wh_Log(L"MixerWheelError %08X", winrt::to_hresult());
           }
-        }));
+        }, revoke_);
     Keep(slider.ValueChanged(winrt::auto_revoke, [row](auto &&, auto const &args) {
       if (args.NewValue() > 0)
         row->last = args.NewValue();

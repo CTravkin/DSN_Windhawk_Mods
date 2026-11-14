@@ -7,7 +7,7 @@
 // @description:de-DE Anpassbare Kachelzeilen, Verknüpfungen und Symbole mit Lautstärkemixer per Klick
 // @description:pt-BR Linhas de blocos, atalhos e ícones personalizáveis e mixer de volume a um clique
 // @description:zh-CN 自定义磁贴行数、快捷方式和图标，一键打开音量合成器
-// @version 0.5.1
+// @version 0.5.2
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 161
+// Build: 162
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound

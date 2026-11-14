@@ -1225,11 +1225,11 @@ class QuickPage {
                              }
                              QuickGlyph(value, value <= 0);
                            }));
-    Keep(mine.PointerWheelChanged(
-        winrt::auto_revoke, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
+    ListenVolumeWheel(
+        mine, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
             auto s = quickSlider_;
-            if (!s || args.Handled() || !s.IsEnabled())
+            if (!s || !s.IsEnabled())
               return;
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
@@ -1237,13 +1237,17 @@ class QuickPage {
             int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
+            if (args.Handled()) {
+              wheelTip_.Show(view_, s, s.Value());
+              return;
+            }
             args.Handled(true);
             s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
-            wheelTip_.Show(s, s.Value());
+            wheelTip_.Show(view_, s, s.Value());
           } catch (...) {
             Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
-        }));
+        }, revoke_);
     if (own)
       Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
         try {
