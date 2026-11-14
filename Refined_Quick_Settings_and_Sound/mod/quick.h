@@ -113,6 +113,7 @@ class QuickPage {
   C::Slider quickSlider_{nullptr};
   C::Button quickMute_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
+  sound::WheelVolume volumeWheel_;
   bool quickSync_ = false, quickAvailable_ = false;
   ULONGLONG quickUserAt_ = 0;
   // As ApplyMaster on the Sound page: while the slider is being moved (400 ms
@@ -1221,10 +1222,10 @@ class QuickPage {
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
-            s.Value(std::clamp(s.Value() + delta * s.SmallChange(), s.Minimum(), s.Maximum()));
+            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
             args.Handled(true);
           } catch (...) {
           }

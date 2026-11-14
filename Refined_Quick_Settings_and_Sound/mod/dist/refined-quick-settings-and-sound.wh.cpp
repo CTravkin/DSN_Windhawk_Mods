@@ -7,7 +7,7 @@
 // @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
 // @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
 // @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.3.0
+// @version 0.4.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 158
+// Build: 159
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -50,14 +50,14 @@ customizations are restored when the mod is unloaded.
   dropdown lists.
 - Below them, a reworked Volume mixer for the apps. It is collapsible and
   remembers its last state.
-- Mouse wheel on every slider; press an app's icon to mute and restore it, or
+- Set the volume change per wheel notch, default 2 percentage points. Press an app's icon to mute and restore it, or
   its volume number to set it to 100.
-- Hide apps from the mixer by name (setting below).
+- Hide apps from the mixer by name or executable, one app per row.
 
 **Taskbar**
 
 - Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
-- Alternative mixer, volume and Ethernet icons can be enabled individually.
+- Choose where the alternative mixer, speaker, Ethernet and settings icons appear.
 
 ## Compatibility
 
@@ -101,12 +101,25 @@ in this source file.
   $name:de-DE: "Schnellzugriff auf Sound"
   $name:pt-BR: "Acesso rápido ao som"
   $name:zh-CN: "快速访问声音设置"
-  $description: "Click the taskbar volume icon to open Sound directly."
-  $description:ru-RU: "Нажатие на значок громкости на панели задач сразу открывает панель «Звук»"
-  $description:es-ES: "Abre directamente Sonido al pulsar el icono de volumen de la barra de tareas."
-  $description:de-DE: "Ein Klick auf das Lautstärkesymbol in der Taskleiste öffnet direkt das Soundfenster."
-  $description:pt-BR: "Clicar no ícone de volume na barra de tarefas abre diretamente o painel Som."
+  $description: "Opens the Sound panel from the taskbar volume icon"
+  $description:ru-RU: "Панель «Звук» открывается по нажатию на значок громкости"
+  $description:es-ES: "Abre el panel Sonido desde el icono de volumen de la barra de tareas"
+  $description:de-DE: "Öffnet das Soundfenster über das Lautstärkesymbol in der Taskleiste"
+  $description:pt-BR: "Abre o painel Som pelo ícone de volume da barra de tarefas"
   $description:zh-CN: "单击任务栏上的音量图标可直接打开“声音”面板"
+- volumeWheelStep: 2
+  $name: Volume wheel step
+  $name:ru-RU: Шаг громкости
+  $name:es-ES: Paso de volumen con la rueda del ratón
+  $name:de-DE: Lautstärkeschritt mit dem Mausrad
+  $name:pt-BR: Passo do volume com a roda do mouse
+  $name:zh-CN: 鼠标滚轮音量步长
+  $description: Percentage points per notch over a volume slider, from 1 to 100
+  $description:ru-RU: На сколько процентных пунктов меняется громкость за одно деление колеса, от 1 до 100
+  $description:es-ES: Puntos porcentuales por paso de rueda sobre un control de volumen, de 1 a 100
+  $description:de-DE: Prozentpunkte pro Mausradschritt über einem Lautstärkeregler, von 1 bis 100
+  $description:pt-BR: Pontos percentuais por passo da roda sobre um controle de volume, de 1 a 100
+  $description:zh-CN: 在音量滑块上滚动一格改变的百分点，范围为 1 到 100
 - brightnessMode: auto
   $name: Display brightness
   $name:ru-RU: Яркость дисплея
@@ -114,12 +127,12 @@ in this source file.
   $name:de-DE: Anzeigehelligkeit
   $name:pt-BR: Brilho da tela
   $name:zh-CN: 显示亮度
-  $description: Auto checks whether brightness can be adjusted. Disable hides the brightness row.
-  $description:ru-RU: Авто проверяет доступность регулировки яркости. Отключить скрывает строку яркости
-  $description:es-ES: Automático comprueba si se puede ajustar el brillo. Desactivar oculta la fila de brillo
-  $description:de-DE: Automatisch prüft, ob sich die Helligkeit anpassen lässt. Deaktivieren blendet die Helligkeitszeile aus
-  $description:pt-BR: Automático verifica se o brilho pode ser ajustado. Desativar oculta a linha de brilho
-  $description:zh-CN: 自动检查亮度是否可调。禁用会隐藏亮度行
+  $description: In Auto mode, the slider appears when brightness can be adjusted
+  $description:ru-RU: В режиме «Авто» ползунок виден, если яркость можно регулировать
+  $description:es-ES: En modo automático, el control se muestra si el brillo se puede ajustar
+  $description:de-DE: Im Modus Automatisch erscheint der Regler, wenn die Helligkeit einstellbar ist
+  $description:pt-BR: No modo automático, o controle aparece quando é possível ajustar o brilho
+  $description:zh-CN: 自动模式下，可调节亮度时显示滑块
   $options:
   - auto: Auto
   - disabled: Disable
@@ -139,12 +152,18 @@ in this source file.
   - auto: 自动
   - disabled: 禁用
 - quickActionRows: "2"
-  $name: Quick Settings tile rows
-  $name:ru-RU: Строки плиток быстрых настроек
+  $name: Rows of tiles
+  $name:ru-RU: Строки плиток
   $name:es-ES: Filas de iconos de configuración rápida
   $name:de-DE: Kachelzeilen in den Schnelleinstellungen
   $name:pt-BR: Linhas de blocos nas configurações rápidas
   $name:zh-CN: 快速设置磁贴行数
+  $description: How many rows fit on each Quick Settings page
+  $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
+  $description:es-ES: Número de filas por página de Configuración rápida
+  $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
+  $description:pt-BR: Número de linhas por página das Configurações rápidas
+  $description:zh-CN: 每页快速设置显示的磁贴行数
   $options:
   - "1": "1"
   - "2": "2"
@@ -402,75 +421,252 @@ in this source file.
   $name:de-DE: "Schnelleinstellungen"
   $name:pt-BR: "Configurações rápidas"
   $name:zh-CN: "快速设置"
+  $description: Shortcuts to the right of Settings, in the selected order
+  $description:ru-RU: Порядок кнопок справа от «Настроек», пустые позиции и повторы пропускаются
+  $description:es-ES: Accesos a la derecha de Configuración, en el orden seleccionado
+  $description:de-DE: Verknüpfungen rechts neben Einstellungen in der gewählten Reihenfolge
+  $description:pt-BR: Atalhos à direita de Configurações, na ordem selecionada
+  $description:zh-CN: 按所选顺序显示在“设置”右侧的快捷方式
 - alternativeIcons:
-  - quickMixer: true
-    $name: "Mixer button in Quick Settings"
-    $name:ru-RU: "Кнопка микшера в быстрых настройках"
-    $name:es-ES: "Botón del mezclador en Configuración rápida"
-    $name:de-DE: "Lautstärkemixer-Schaltfläche in den Schnelleinstellungen"
-    $name:pt-BR: "Botão do mixer nas Configurações rápidas"
-    $name:zh-CN: "快速设置中的音量合成器按钮"
-  - soundMixer: true
-    $name: "Mixer settings button in Sound"
-    $name:ru-RU: "Кнопка параметров микшера в панели «Звук»"
-    $name:es-ES: "Botón de configuración del mezclador en Sonido"
-    $name:de-DE: "Mixer-Einstellungen im Soundfenster"
-    $name:pt-BR: "Botão de configurações do mixer no painel Som"
-    $name:zh-CN: "声音面板中的音量合成器设置按钮"
-  - trayVolume: true
-    $name: "Volume icon on the taskbar"
-    $name:ru-RU: "Значок громкости на панели задач"
-    $name:es-ES: "Icono de volumen en la barra de tareas"
-    $name:de-DE: "Lautstärkesymbol in der Taskleiste"
-    $name:pt-BR: "Ícone de volume na barra de tarefas"
-    $name:zh-CN: "任务栏音量图标"
-  - trayEthernet: true
-    $name: "Ethernet icon on the taskbar"
-    $name:ru-RU: "Значок Ethernet на панели задач"
-    $name:es-ES: "Icono de Ethernet en la barra de tareas"
-    $name:de-DE: "Ethernet-Symbol in der Taskleiste"
-    $name:pt-BR: "Ícone de Ethernet na barra de tarefas"
-    $name:zh-CN: "任务栏以太网图标"
-  - quickVolume: true
-    $name: "Volume icon in Quick Settings"
-    $name:ru-RU: "Значок громкости в быстрых настройках"
-    $name:es-ES: "Icono de volumen en Configuración rápida"
-    $name:de-DE: "Lautstärkesymbol in den Schnelleinstellungen"
-    $name:pt-BR: "Ícone de volume nas Configurações rápidas"
-    $name:zh-CN: "快速设置中的音量图标"
-  - soundVolume: true
-    $name: "System volume icon in Sound"
-    $name:ru-RU: "Значок общей громкости в панели «Звук»"
-    $name:es-ES: "Icono de volumen del sistema en Sonido"
-    $name:de-DE: "Systemlautstärkesymbol im Soundfenster"
-    $name:pt-BR: "Ícone de volume do sistema no painel Som"
-    $name:zh-CN: "声音面板中的系统音量图标"
-  - appUnmute: true
-    $name: "App unmute icon in the mixer"
-    $name:ru-RU: "Значок включения звука приложения в микшере"
-    $name:es-ES: "Icono para reactivar el sonido de una aplicación en el mezclador"
-    $name:de-DE: "Symbol zum Aufheben der App-Stummschaltung im Mixer"
-    $name:pt-BR: "Ícone para ativar o som de um aplicativo no mixer"
-    $name:zh-CN: "音量合成器中的应用取消静音图标"
+  - mixerPlaces: saved
+    $name: "Mixer icon"
+    $name:ru-RU: "Микшер"
+    $name:es-ES: "Icono del mezclador"
+    $name:de-DE: "Mixer-Symbol"
+    $name:pt-BR: "Ícone do mixer"
+    $name:zh-CN: "合成器图标"
+    $options:
+    - saved: "As before"
+    - "0": "Windows icons everywhere"
+    - "1": "Quick Settings"
+    - "2": "Sound panel"
+    - "3": "Everywhere"
+    $options:ru-RU:
+    - saved: "Как раньше"
+    - "0": "Везде иконки Windows"
+    - "1": "Быстрые настройки"
+    - "2": "Панель «Звук»"
+    - "3": "Везде"
+    $options:es-ES:
+    - saved: "Como antes"
+    - "0": "Iconos de Windows en todas partes"
+    - "1": "Configuración rápida"
+    - "2": "Panel Sonido"
+    - "3": "En todas partes"
+    $options:de-DE:
+    - saved: "Wie zuvor"
+    - "0": "Überall Windows-Symbole"
+    - "1": "Schnelleinstellungen"
+    - "2": "Soundfenster"
+    - "3": "Überall"
+    $options:pt-BR:
+    - saved: "Como antes"
+    - "0": "Ícones do Windows em todos os locais"
+    - "1": "Configurações rápidas"
+    - "2": "Painel Som"
+    - "3": "Em todos os locais"
+    $options:zh-CN:
+    - saved: "沿用原设置"
+    - "0": "所有位置使用 Windows 图标"
+    - "1": "快速设置"
+    - "2": "“声音”面板"
+    - "3": "所有位置"
+  - volumePlaces: saved
+    $name: "Speaker icon"
+    $name:ru-RU: "Динамик"
+    $name:es-ES: "Icono del altavoz"
+    $name:de-DE: "Lautsprechersymbol"
+    $name:pt-BR: "Ícone de alto-falante"
+    $name:zh-CN: "扬声器图标"
+    $options:
+    - saved: "As before"
+    - "0": "Windows icons everywhere"
+    - "1": "Taskbar"
+    - "2": "Quick Settings"
+    - "4": "Sound panel"
+    - "8": "Volume mixer"
+    - "3": "Taskbar + Quick Settings"
+    - "5": "Taskbar + Sound panel"
+    - "6": "Quick Settings + Sound panel"
+    - "9": "Taskbar + Volume mixer"
+    - "a": "Quick Settings + Volume mixer"
+    - "c": "Sound panel + Volume mixer"
+    - "7": "Taskbar + Quick Settings + Sound panel"
+    - "b": "Taskbar + Quick Settings + Volume mixer"
+    - "d": "Taskbar + Sound panel + Volume mixer"
+    - "e": "Quick Settings + Sound panel + Volume mixer"
+    - "f": "Everywhere"
+    $options:ru-RU:
+    - saved: "Как раньше"
+    - "0": "Везде иконки Windows"
+    - "1": "Панель задач"
+    - "2": "Быстрые настройки"
+    - "4": "Панель «Звук»"
+    - "8": "Микшер громкости"
+    - "3": "Панель задач + Быстрые настройки"
+    - "5": "Панель задач + Панель «Звук»"
+    - "6": "Быстрые настройки + Панель «Звук»"
+    - "9": "Панель задач + Микшер громкости"
+    - "a": "Быстрые настройки + Микшер громкости"
+    - "c": "Панель «Звук» + Микшер громкости"
+    - "7": "Панель задач + Быстрые настройки + Панель «Звук»"
+    - "b": "Панель задач + Быстрые настройки + Микшер громкости"
+    - "d": "Панель задач + Панель «Звук» + Микшер громкости"
+    - "e": "Быстрые настройки + Панель «Звук» + Микшер громкости"
+    - "f": "Везде"
+    $options:es-ES:
+    - saved: "Como antes"
+    - "0": "Iconos de Windows en todas partes"
+    - "1": "Barra de tareas"
+    - "2": "Configuración rápida"
+    - "4": "Panel Sonido"
+    - "8": "Mezclador de volumen"
+    - "3": "Barra de tareas + Configuración rápida"
+    - "5": "Barra de tareas + Panel Sonido"
+    - "6": "Configuración rápida + Panel Sonido"
+    - "9": "Barra de tareas + Mezclador de volumen"
+    - "a": "Configuración rápida + Mezclador de volumen"
+    - "c": "Panel Sonido + Mezclador de volumen"
+    - "7": "Barra de tareas + Configuración rápida + Panel Sonido"
+    - "b": "Barra de tareas + Configuración rápida + Mezclador de volumen"
+    - "d": "Barra de tareas + Panel Sonido + Mezclador de volumen"
+    - "e": "Configuración rápida + Panel Sonido + Mezclador de volumen"
+    - "f": "En todas partes"
+    $options:de-DE:
+    - saved: "Wie zuvor"
+    - "0": "Überall Windows-Symbole"
+    - "1": "Taskleiste"
+    - "2": "Schnelleinstellungen"
+    - "4": "Soundfenster"
+    - "8": "Lautstärkemixer"
+    - "3": "Taskleiste + Schnelleinstellungen"
+    - "5": "Taskleiste + Soundfenster"
+    - "6": "Schnelleinstellungen + Soundfenster"
+    - "9": "Taskleiste + Lautstärkemixer"
+    - "a": "Schnelleinstellungen + Lautstärkemixer"
+    - "c": "Soundfenster + Lautstärkemixer"
+    - "7": "Taskleiste + Schnelleinstellungen + Soundfenster"
+    - "b": "Taskleiste + Schnelleinstellungen + Lautstärkemixer"
+    - "d": "Taskleiste + Soundfenster + Lautstärkemixer"
+    - "e": "Schnelleinstellungen + Soundfenster + Lautstärkemixer"
+    - "f": "Überall"
+    $options:pt-BR:
+    - saved: "Como antes"
+    - "0": "Ícones do Windows em todos os locais"
+    - "1": "Barra de tarefas"
+    - "2": "Configurações rápidas"
+    - "4": "Painel Som"
+    - "8": "Mixer de volume"
+    - "3": "Barra de tarefas + Configurações rápidas"
+    - "5": "Barra de tarefas + Painel Som"
+    - "6": "Configurações rápidas + Painel Som"
+    - "9": "Barra de tarefas + Mixer de volume"
+    - "a": "Configurações rápidas + Mixer de volume"
+    - "c": "Painel Som + Mixer de volume"
+    - "7": "Barra de tarefas + Configurações rápidas + Painel Som"
+    - "b": "Barra de tarefas + Configurações rápidas + Mixer de volume"
+    - "d": "Barra de tarefas + Painel Som + Mixer de volume"
+    - "e": "Configurações rápidas + Painel Som + Mixer de volume"
+    - "f": "Em todos os locais"
+    $options:zh-CN:
+    - saved: "沿用原设置"
+    - "0": "所有位置使用 Windows 图标"
+    - "1": "任务栏"
+    - "2": "快速设置"
+    - "4": "“声音”面板"
+    - "8": "音量合成器"
+    - "3": "任务栏、快速设置"
+    - "5": "任务栏、“声音”面板"
+    - "6": "快速设置、“声音”面板"
+    - "9": "任务栏、音量合成器"
+    - "a": "快速设置、音量合成器"
+    - "c": "“声音”面板、音量合成器"
+    - "7": "任务栏、快速设置、“声音”面板"
+    - "b": "任务栏、快速设置、音量合成器"
+    - "d": "任务栏、“声音”面板、音量合成器"
+    - "e": "快速设置、“声音”面板、音量合成器"
+    - "f": "所有位置"
+  - ethernetPlaces: saved
+    $name: "Ethernet icon"
+    $name:ru-RU: "Ethernet"
+    $name:es-ES: "Icono de Ethernet"
+    $name:de-DE: "Ethernet-Symbol"
+    $name:pt-BR: "Ícone de Ethernet"
+    $name:zh-CN: "以太网图标"
+    $options:
+    - saved: "As before"
+    - "0": "Windows icons everywhere"
+    - "1": "Alternative icon"
+    $options:ru-RU:
+    - saved: "Как раньше"
+    - "0": "Везде иконки Windows"
+    - "1": "Альтернативная иконка"
+    $options:es-ES:
+    - saved: "Como antes"
+    - "0": "Iconos de Windows en todas partes"
+    - "1": "Icono alternativo"
+    $options:de-DE:
+    - saved: "Wie zuvor"
+    - "0": "Überall Windows-Symbole"
+    - "1": "Alternatives Symbol"
+    $options:pt-BR:
+    - saved: "Como antes"
+    - "0": "Ícones do Windows em todos os locais"
+    - "1": "Ícone alternativo"
+    $options:zh-CN:
+    - saved: "沿用原设置"
+    - "0": "所有位置使用 Windows 图标"
+    - "1": "备用图标"
+  - gearPlaces: "1"
+    $name: "Settings gear"
+    $name:ru-RU: "Шестеренка"
+    $name:es-ES: "Engranaje de configuración"
+    $name:de-DE: "Einstellungszahnrad"
+    $name:pt-BR: "Engrenagem de configurações"
+    $name:zh-CN: "设置齿轮图标"
+    $options:
+    - "0": "Windows icons everywhere"
+    - "1": "Sound panel"
+    $options:ru-RU:
+    - "0": "Везде иконки Windows"
+    - "1": "Панель «Звук»"
+    $options:es-ES:
+    - "0": "Iconos de Windows en todas partes"
+    - "1": "Panel Sonido"
+    $options:de-DE:
+    - "0": "Überall Windows-Symbole"
+    - "1": "Soundfenster"
+    $options:pt-BR:
+    - "0": "Ícones do Windows em todos os locais"
+    - "1": "Painel Som"
+    $options:zh-CN:
+    - "0": "所有位置使用 Windows 图标"
+    - "1": "“声音”面板"
   $name: "Alternative icons"
   $name:ru-RU: "Альтернативные иконки"
   $name:es-ES: "Iconos alternativos"
   $name:de-DE: "Alternative Symbole"
   $name:pt-BR: "Ícones alternativos"
   $name:zh-CN: "备用图标"
-- hiddenApps: ""
-  $name: Hidden applications
+  $description: "Choose where each alternative icon is used"
+  $description:ru-RU: "Выбор мест, где отображаются альтернативные иконки"
+  $description:es-ES: "Elige dónde se usa cada icono alternativo"
+  $description:de-DE: "Legt fest, wo die alternativen Symbole erscheinen"
+  $description:pt-BR: "Escolhe onde cada ícone alternativo aparece"
+  $description:zh-CN: "选择各备用图标的显示位置"
+- hiddenApplications: [""]
+  $name: Hidden apps
   $name:ru-RU: Скрытые приложения
   $name:es-ES: Aplicaciones ocultas
   $name:de-DE: Ausgeblendete Apps
   $name:pt-BR: Aplicativos ocultos
   $name:zh-CN: 隐藏的应用
-  $description: Parts of application names separated by semicolons. Hidden applications can still play sound.
-  $description:ru-RU: Части названий приложений через точку с запятой. Скрытые приложения продолжают воспроизводить звук
-  $description:es-ES: Partes de los nombres de las aplicaciones separadas por punto y coma. Las aplicaciones ocultas pueden seguir reproduciendo sonido
-  $description:de-DE: Teile von App-Namen, getrennt durch Semikolons. Ausgeblendete Apps können weiterhin Ton wiedergeben
-  $description:pt-BR: Partes dos nomes dos aplicativos separadas por ponto e vírgula. Os aplicativos ocultos ainda podem reproduzir som
-  $description:zh-CN: 应用名称的一部分，用分号分隔。隐藏的应用仍可播放声音
+  $description: One app per row, by name or executable, for example Steam or steam.exe
+  $description:ru-RU: По одному приложению на строку, например Steam или steam.exe
+  $description:es-ES: Una aplicación por fila, por ejemplo Steam o steam.exe
+  $description:de-DE: Eine App pro Zeile, zum Beispiel Steam oder steam.exe
+  $description:pt-BR: Um aplicativo por linha, por exemplo Steam ou steam.exe
+  $description:zh-CN: 每行一个应用，例如 Steam 或 steam.exe
 */
 // ==/WindhawkModSettings==
 
@@ -526,6 +722,7 @@ in this source file.
 #include <array>
 #include <cmath>
 #include <cwctype>
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -572,6 +769,11 @@ inline std::wstring Lower(std::wstring value) {
     CharLowerBuffW(value.data(), static_cast<DWORD>(value.size()));
   return value;
 }
+inline void AddHiddenApp(std::vector<std::wstring> &apps, std::wstring_view name) {
+  auto first = name.find_first_not_of(L" \t\r\n");
+  if (first != name.npos)
+    apps.push_back(Lower(std::wstring(name.substr(first, name.find_last_not_of(L" \t\r\n") - first + 1))));
+}
 inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
   std::vector<std::wstring> result;
   size_t start = 0;
@@ -579,13 +781,33 @@ inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
     auto end = text.find_first_of(L";,\r\n", start);
     if (end == text.npos)
       end = text.size();
-    auto part = text.substr(start, end - start);
-    auto first = part.find_first_not_of(L" \t");
-    if (first != part.npos)
-      result.push_back(Lower(part.substr(first, part.find_last_not_of(L" \t") - first + 1)));
+    AddHiddenApp(result, std::wstring_view(text).substr(start, end - start));
     start = end + 1;
   }
   return result;
+}
+inline int VolumeWheelStep(int value) {
+  return value >= 1 && value <= 100 ? value : 2;
+}
+struct WheelVolume {
+  int64_t remainder = 0;
+  double Next(double current, double minimum, double maximum, int delta, int step) {
+    auto movement = remainder + int64_t(delta) * step;
+    auto target = current + double(movement / WHEEL_DELTA);
+    remainder = movement % WHEEL_DELTA;
+    if ((target <= minimum && remainder < 0) || (target >= maximum && remainder > 0))
+      remainder = 0;
+    return std::clamp(target, minimum, maximum);
+  }
+};
+// The options contain the selected places in the order listed in the settings.
+inline unsigned IconPlaces(std::wstring_view value, unsigned supported, unsigned defaults) {
+  if (value.size() != 1)
+    return defaults;
+  auto digit = value.front();
+  unsigned mask = digit >= L'0' && digit <= L'9' ? digit - L'0'
+                : digit >= L'a' && digit <= L'f' ? digit - L'a' + 10 : supported + 1;
+  return mask <= supported ? mask : defaults;
 }
 inline bool Hidden(std::vector<std::wstring> const &patterns, std::wstring const &name,
                    std::wstring const &path) {
@@ -1160,9 +1382,10 @@ inline bool brightnessEnabled = true;
 inline int quickActionRows = 2;
 inline sound::QuickShortcutSlots quickShortcuts{};
 inline bool quickSoundAccess = true;
+inline int volumeWheelStep = 2;
 inline bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
             altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
-            altAppUnmute = true;
+            altAppUnmute = true, altSoundGear = true;
 inline UINT volumePulseMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.VolumePulse.1");
 // Used only while unloading. Wait for the asynchronous operation itself,
 // not an event set inside its delegate: the DLL must outlive the delegate's return.
@@ -2316,10 +2539,10 @@ struct AppRow {
   winrt::weak_ref<C::Grid> root;
   winrt::weak_ref<C::Slider> slider;
   winrt::weak_ref<P::ToggleButton> toggle;
-  C::Border badge{nullptr};
   C::TextBlock level{nullptr};
   C::Button levelButton{nullptr}, levelMute{nullptr};
   std::shared_ptr<AnimatedVolume> levelIcon;
+  sound::WheelVolume wheel;
   double last = 50, before = 0, expected = NAN;
   ULONGLONG verifyAt = 0;
   IInspectable model{nullptr};
@@ -2357,6 +2580,7 @@ class SoundPage {
   C::Border footerBorder_{nullptr};
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
+  sound::WheelVolume masterWheel_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
@@ -2424,6 +2648,10 @@ class SoundPage {
         button.Width(36);
         button.Height(36);
         button.Margin({-2, -2, -2, -2});
+      }
+      if (!altSoundGear) {
+        button.Content(SymbolGlyph(page_, 0xe713, 16));
+        return;
       }
       auto factory = NativeAnimatedFactory();
       IInspectable inner{nullptr};
@@ -3493,11 +3721,11 @@ class SoundPage {
             auto point = args.GetCurrentPoint(master_);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
-            master_.Value(std::clamp(master_.Value() + delta * master_.SmallChange(),
-                                     master_.Minimum(), master_.Maximum()));
+            master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
+                                           master_.Maximum(), delta, volumeWheelStep));
             args.Handled(true);
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
@@ -4254,12 +4482,14 @@ public:
     if (row.level)
       row.level.Text(std::to_wstring(n));
     if (row.levelButton) {
-      row.levelButton.Visibility(n <= 0 ? X::Visibility::Collapsed : X::Visibility::Visible);
+      row.levelButton.Visibility(n <= 0 && row.levelMute ? X::Visibility::Collapsed
+                                                       : X::Visibility::Visible);
       // At 100 the button is disabled rather than taken out of hit testing: a
       // hit-test change under the pointer leaves the button's pointer-over state
       // set, and its hover plate came back on the next visual state update.
-      if (row.levelButton.IsEnabled() != (n < 100))
-        row.levelButton.IsEnabled(n < 100);
+      bool enabled = n > 0 && n < 100;
+      if (row.levelButton.IsEnabled() != enabled)
+        row.levelButton.IsEnabled(enabled);
     }
     if (row.levelMute)
       row.levelMute.Visibility(n <= 0 ? X::Visibility::Visible : X::Visibility::Collapsed);
@@ -4308,28 +4538,13 @@ public:
         winrt::box_value(X::HorizontalAlignment::Center));
     Set(toggle, C::Control::VerticalContentAlignmentProperty(),
         winrt::box_value(X::VerticalAlignment::Center));
-    // The shell badge is anchored to the bottom of the entire 48 DIP row.
-    // A button-relative badge instead: right -5, bottom 2 of a 32 DIP icon.
-    std::vector<X::FrameworkElement> nativeBadges;
-    for (auto const &child : root.Children())
-      if (auto e = child.try_as<X::FrameworkElement>();
-          e && e != toggle && e != slider && C::Grid::GetColumn(e) == 0)
-        nativeBadges.push_back(e);
-    for (auto const &badge : nativeBadges)
-      Set(badge, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    row->badge = C::Border();
-    row->badge.Width(13);
-    row->badge.Height(13);
-    row->badge.CornerRadius({4, 4, 4, 4});
-    row->badge.HorizontalAlignment(X::HorizontalAlignment::Right);
-    row->badge.VerticalAlignment(X::VerticalAlignment::Center);
-    row->badge.Margin({0, 15, -5, 0});
-    row->badge.IsHitTestVisible(false);
-    row->badge.Child(VolumeGlyph(page_, 0, 11));
-    if (auto brush = Resource(page_, L"SolidBackgroundFillColorBaseBrush").try_as<M::Brush>())
-      row->badge.Background(brush);
-    row->badge.Visibility(slider.Value() <= 0 ? X::Visibility::Visible : X::Visibility::Collapsed);
-    C::Canvas::SetZIndex(row->badge, 1);
+    // The alternative mute button next to the slider replaces the shell badge.
+    if (altAppUnmute) {
+      for (auto const &child : root.Children())
+        if (auto e = child.try_as<X::FrameworkElement>();
+            e && e != toggle && e != slider && C::Grid::GetColumn(e) == 0)
+          Set(e, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
+    }
     // The mute indicator replaces the number in the level column at 0. The
     // app's volume is shown as a number in the column under the SV settings
     // button: 32 DIP wide, 12 DIP after the slider, i.e. inside the row's 64 DIP
@@ -4388,12 +4603,14 @@ public:
     // size) replaces the number; pressing it unmutes like the app icon does: the
     // native toggle is toggled through UI Automation, so its command and the
     // mod's restore run exactly as for a click on the icon.
-    row->levelMute = Button(page_, L"Unmute");
-    row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
-    row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
-    row->levelMute.Margin({0, 0, -44, 0});
-    row->levelMute.Content(VolumeGlyph(page_, 0, 16));
-    if (altAppUnmute)
+    if (altAppUnmute) {
+      auto unmute = sound::Text(L"Unmute", L"Включить звук", L"Activar sonido", L"Stummschaltung aufheben",
+                              L"Ativar som", L"取消静音");
+      row->levelMute = Button(page_, unmute);
+      row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
+      row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
+      row->levelMute.Margin({0, 0, -44, 0});
+      row->levelMute.Content(VolumeGlyph(page_, 0, 16));
       try {
         row->levelIcon = std::make_shared<AnimatedVolume>();
         row->levelIcon->Update(0, true);
@@ -4401,7 +4618,6 @@ public:
       } catch (...) {
         row->levelIcon.reset();
       }
-    {
       auto weakToggle = winrt::make_weak(toggle);
       Keep(row->levelMute.Click(winrt::auto_revoke, [weakToggle](auto &&, auto &&) {
         try {
@@ -4415,10 +4631,10 @@ public:
           Wh_Log(L"MixerUnmuteError %08X", winrt::to_hresult());
         }
       }));
+      C::Grid::SetColumnSpan(row->levelMute, std::max(1u, root.ColumnDefinitions().Size()));
+      C::Grid::SetRowSpan(row->levelMute, std::max(1u, root.RowDefinitions().Size()));
+      Add(root, row->levelMute);
     }
-    C::Grid::SetColumnSpan(row->levelMute, std::max(1u, root.ColumnDefinitions().Size()));
-    C::Grid::SetRowSpan(row->levelMute, std::max(1u, root.RowDefinitions().Size()));
-    Add(root, row->levelMute);
     ShowLevel(*row, slider.Value());
     // Application images and the native fallback FontIcon remain shell-owned.
     // ButtonBase can mark routed input handled before instance subscribers run.
@@ -4480,20 +4696,20 @@ public:
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
             args.Handled(true);
             if (RowModel(s) != row->model) {
               row->model = RowModel(s);
               row->wheelTarget = NAN;
+              row->wheel = {};
             }
             auto now = GetTickCount64();
             double base = now - row->wheelAt < 400 && std::isfinite(row->wheelTarget)
                               ? row->wheelTarget
                               : s.Value();
-            double step = s.SmallChange() > 0 ? s.SmallChange() : 1;
-            double next = std::clamp(std::round(base + delta * step), s.Minimum(), s.Maximum());
+            double next = row->wheel.Next(base, s.Minimum(), s.Maximum(), delta, volumeWheelStep);
             if (next == base)
               return;
             row->wheelTarget = next;
@@ -4507,8 +4723,6 @@ public:
     Keep(slider.ValueChanged(winrt::auto_revoke, [row](auto &&, auto const &args) {
       if (args.NewValue() > 0)
         row->last = args.NewValue();
-      row->badge.Visibility(args.NewValue() <= 0 ? X::Visibility::Visible
-                                                 : X::Visibility::Collapsed);
       ShowLevel(*row, args.NewValue());
     }));
   }
@@ -5165,6 +5379,7 @@ class QuickPage {
   C::Slider quickSlider_{nullptr};
   C::Button quickMute_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
+  sound::WheelVolume volumeWheel_;
   bool quickSync_ = false, quickAvailable_ = false;
   ULONGLONG quickUserAt_ = 0;
   // As ApplyMaster on the Sound page: while the slider is being moved (400 ms
@@ -6273,10 +6488,10 @@ class QuickPage {
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
-            s.Value(std::clamp(s.Value() + delta * s.SmallChange(), s.Minimum(), s.Maximum()));
+            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
             args.Handled(true);
           } catch (...) {
           }
@@ -8484,9 +8699,30 @@ inline void Shutdown() {
 
 namespace native {
 inline bool explorer = false;
+inline void ReadHiddenApps() {
+  hidden.clear();
+  // Windhawk exposes indexed values but no array length. Allow empty rows
+  // between names, including rows left blank in the settings editor.
+  for (int i = 0, blanks = 0; blanks < 32; ++i) {
+    auto name = WindhawkUtils::StringSetting::make(L"hiddenApplications[%d]", i);
+    if (!*name.get()) {
+      ++blanks;
+      continue;
+    }
+    blanks = 0;
+    sound::AddHiddenApp(hidden, name.get());
+  }
+  if (!hidden.empty()) {
+    if (!Wh_GetIntValue(L"usesHiddenAppRows", 0))
+      Wh_SetIntValue(L"usesHiddenAppRows", 1);
+  } else if (!Wh_GetIntValue(L"usesHiddenAppRows", 0)) {
+    auto legacy = WindhawkUtils::StringSetting::make(L"hiddenApps");
+    hidden = sound::ParseHidden(legacy.get());
+  }
+}
 inline void Settings() {
-  auto setting = WindhawkUtils::StringSetting::make(L"hiddenApps");
-  hidden = sound::ParseHidden(setting.get());
+  ReadHiddenApps();
+  volumeWheelStep = sound::VolumeWheelStep(Wh_GetIntSetting(L"volumeWheelStep"));
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
   auto rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
@@ -8495,19 +8731,30 @@ inline void Settings() {
                         ? rowCount.front() - L'0' : 2;
   using S = sound::QuickShortcut;
   auto first = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut1");
+  const auto oldIcon = [&](PCWSTR key) { return !*first.get() || Wh_GetIntSetting(key) != 0; };
+  auto mixer = WindhawkUtils::StringSetting::make(L"alternativeIcons.mixerPlaces");
+  auto volume = WindhawkUtils::StringSetting::make(L"alternativeIcons.volumePlaces");
+  auto ethernet = WindhawkUtils::StringSetting::make(L"alternativeIcons.ethernetPlaces");
+  auto gear = WindhawkUtils::StringSetting::make(L"alternativeIcons.gearPlaces");
+  unsigned mixerPlaces = sound::IconPlaces(mixer.get(), 3,
+      oldIcon(L"alternativeIcons.quickMixer") | (oldIcon(L"alternativeIcons.soundMixer") << 1));
+  unsigned volumePlaces = sound::IconPlaces(volume.get(), 15,
+      oldIcon(L"alternativeIcons.trayVolume") | (oldIcon(L"alternativeIcons.quickVolume") << 1) |
+      (oldIcon(L"alternativeIcons.soundVolume") << 2) | (oldIcon(L"alternativeIcons.appUnmute") << 3));
+  altQuickMixer = (mixerPlaces & 1) != 0;
+  altSoundMixer = (mixerPlaces & 2) != 0;
+  altTrayVolume = (volumePlaces & 1) != 0;
+  altQuickVolume = (volumePlaces & 2) != 0;
+  altSoundVolume = (volumePlaces & 4) != 0;
+  altAppUnmute = (volumePlaces & 8) != 0;
+  altTrayEthernet = sound::IconPlaces(ethernet.get(), 1, oldIcon(L"alternativeIcons.trayEthernet")) != 0;
+  altSoundGear = sound::IconPlaces(gear.get(), 1, 1) != 0;
   if (*first.get()) {
     for (int i = 0; i < int(quickShortcuts.size()); ++i) {
       auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut%d", i + 1);
       quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
     }
     quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
-    altQuickMixer = Wh_GetIntSetting(L"alternativeIcons.quickMixer") != 0;
-    altSoundMixer = Wh_GetIntSetting(L"alternativeIcons.soundMixer") != 0;
-    altTrayVolume = Wh_GetIntSetting(L"alternativeIcons.trayVolume") != 0;
-    altTrayEthernet = Wh_GetIntSetting(L"alternativeIcons.trayEthernet") != 0;
-    altQuickVolume = Wh_GetIntSetting(L"alternativeIcons.quickVolume") != 0;
-    altSoundVolume = Wh_GetIntSetting(L"alternativeIcons.soundVolume") != 0;
-    altAppUnmute = Wh_GetIntSetting(L"alternativeIcons.appUnmute") != 0;
   } else {
     quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
                       Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};

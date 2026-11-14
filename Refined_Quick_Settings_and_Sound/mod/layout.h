@@ -23,10 +23,10 @@ struct AppRow {
   winrt::weak_ref<C::Grid> root;
   winrt::weak_ref<C::Slider> slider;
   winrt::weak_ref<P::ToggleButton> toggle;
-  C::Border badge{nullptr};
   C::TextBlock level{nullptr};
   C::Button levelButton{nullptr}, levelMute{nullptr};
   std::shared_ptr<AnimatedVolume> levelIcon;
+  sound::WheelVolume wheel;
   double last = 50, before = 0, expected = NAN;
   ULONGLONG verifyAt = 0;
   IInspectable model{nullptr};
@@ -64,6 +64,7 @@ class SoundPage {
   C::Border footerBorder_{nullptr};
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
+  sound::WheelVolume masterWheel_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
@@ -131,6 +132,10 @@ class SoundPage {
         button.Width(36);
         button.Height(36);
         button.Margin({-2, -2, -2, -2});
+      }
+      if (!altSoundGear) {
+        button.Content(SymbolGlyph(page_, 0xe713, 16));
+        return;
       }
       auto factory = NativeAnimatedFactory();
       IInspectable inner{nullptr};
@@ -1200,11 +1205,11 @@ class SoundPage {
             auto point = args.GetCurrentPoint(master_);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
-            master_.Value(std::clamp(master_.Value() + delta * master_.SmallChange(),
-                                     master_.Minimum(), master_.Maximum()));
+            master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
+                                           master_.Maximum(), delta, volumeWheelStep));
             args.Handled(true);
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
@@ -1961,12 +1966,14 @@ public:
     if (row.level)
       row.level.Text(std::to_wstring(n));
     if (row.levelButton) {
-      row.levelButton.Visibility(n <= 0 ? X::Visibility::Collapsed : X::Visibility::Visible);
+      row.levelButton.Visibility(n <= 0 && row.levelMute ? X::Visibility::Collapsed
+                                                       : X::Visibility::Visible);
       // At 100 the button is disabled rather than taken out of hit testing: a
       // hit-test change under the pointer leaves the button's pointer-over state
       // set, and its hover plate came back on the next visual state update.
-      if (row.levelButton.IsEnabled() != (n < 100))
-        row.levelButton.IsEnabled(n < 100);
+      bool enabled = n > 0 && n < 100;
+      if (row.levelButton.IsEnabled() != enabled)
+        row.levelButton.IsEnabled(enabled);
     }
     if (row.levelMute)
       row.levelMute.Visibility(n <= 0 ? X::Visibility::Visible : X::Visibility::Collapsed);
@@ -2015,28 +2022,13 @@ public:
         winrt::box_value(X::HorizontalAlignment::Center));
     Set(toggle, C::Control::VerticalContentAlignmentProperty(),
         winrt::box_value(X::VerticalAlignment::Center));
-    // The shell badge is anchored to the bottom of the entire 48 DIP row.
-    // A button-relative badge instead: right -5, bottom 2 of a 32 DIP icon.
-    std::vector<X::FrameworkElement> nativeBadges;
-    for (auto const &child : root.Children())
-      if (auto e = child.try_as<X::FrameworkElement>();
-          e && e != toggle && e != slider && C::Grid::GetColumn(e) == 0)
-        nativeBadges.push_back(e);
-    for (auto const &badge : nativeBadges)
-      Set(badge, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    row->badge = C::Border();
-    row->badge.Width(13);
-    row->badge.Height(13);
-    row->badge.CornerRadius({4, 4, 4, 4});
-    row->badge.HorizontalAlignment(X::HorizontalAlignment::Right);
-    row->badge.VerticalAlignment(X::VerticalAlignment::Center);
-    row->badge.Margin({0, 15, -5, 0});
-    row->badge.IsHitTestVisible(false);
-    row->badge.Child(VolumeGlyph(page_, 0, 11));
-    if (auto brush = Resource(page_, L"SolidBackgroundFillColorBaseBrush").try_as<M::Brush>())
-      row->badge.Background(brush);
-    row->badge.Visibility(slider.Value() <= 0 ? X::Visibility::Visible : X::Visibility::Collapsed);
-    C::Canvas::SetZIndex(row->badge, 1);
+    // The alternative mute button next to the slider replaces the shell badge.
+    if (altAppUnmute) {
+      for (auto const &child : root.Children())
+        if (auto e = child.try_as<X::FrameworkElement>();
+            e && e != toggle && e != slider && C::Grid::GetColumn(e) == 0)
+          Set(e, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
+    }
     // The mute indicator replaces the number in the level column at 0. The
     // app's volume is shown as a number in the column under the SV settings
     // button: 32 DIP wide, 12 DIP after the slider, i.e. inside the row's 64 DIP
@@ -2095,12 +2087,14 @@ public:
     // size) replaces the number; pressing it unmutes like the app icon does: the
     // native toggle is toggled through UI Automation, so its command and the
     // mod's restore run exactly as for a click on the icon.
-    row->levelMute = Button(page_, L"Unmute");
-    row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
-    row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
-    row->levelMute.Margin({0, 0, -44, 0});
-    row->levelMute.Content(VolumeGlyph(page_, 0, 16));
-    if (altAppUnmute)
+    if (altAppUnmute) {
+      auto unmute = sound::Text(L"Unmute", L"Включить звук", L"Activar sonido", L"Stummschaltung aufheben",
+                              L"Ativar som", L"取消静音");
+      row->levelMute = Button(page_, unmute);
+      row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
+      row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
+      row->levelMute.Margin({0, 0, -44, 0});
+      row->levelMute.Content(VolumeGlyph(page_, 0, 16));
       try {
         row->levelIcon = std::make_shared<AnimatedVolume>();
         row->levelIcon->Update(0, true);
@@ -2108,7 +2102,6 @@ public:
       } catch (...) {
         row->levelIcon.reset();
       }
-    {
       auto weakToggle = winrt::make_weak(toggle);
       Keep(row->levelMute.Click(winrt::auto_revoke, [weakToggle](auto &&, auto &&) {
         try {
@@ -2122,10 +2115,10 @@ public:
           Wh_Log(L"MixerUnmuteError %08X", winrt::to_hresult());
         }
       }));
+      C::Grid::SetColumnSpan(row->levelMute, std::max(1u, root.ColumnDefinitions().Size()));
+      C::Grid::SetRowSpan(row->levelMute, std::max(1u, root.RowDefinitions().Size()));
+      Add(root, row->levelMute);
     }
-    C::Grid::SetColumnSpan(row->levelMute, std::max(1u, root.ColumnDefinitions().Size()));
-    C::Grid::SetRowSpan(row->levelMute, std::max(1u, root.RowDefinitions().Size()));
-    Add(root, row->levelMute);
     ShowLevel(*row, slider.Value());
     // Application images and the native fallback FontIcon remain shell-owned.
     // ButtonBase can mark routed input handled before instance subscribers run.
@@ -2187,20 +2180,20 @@ public:
             auto point = args.GetCurrentPoint(s);
             if (point.Properties().IsHorizontalMouseWheel())
               return;
-            double delta = point.Properties().MouseWheelDelta() / 120.;
+            int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
             args.Handled(true);
             if (RowModel(s) != row->model) {
               row->model = RowModel(s);
               row->wheelTarget = NAN;
+              row->wheel = {};
             }
             auto now = GetTickCount64();
             double base = now - row->wheelAt < 400 && std::isfinite(row->wheelTarget)
                               ? row->wheelTarget
                               : s.Value();
-            double step = s.SmallChange() > 0 ? s.SmallChange() : 1;
-            double next = std::clamp(std::round(base + delta * step), s.Minimum(), s.Maximum());
+            double next = row->wheel.Next(base, s.Minimum(), s.Maximum(), delta, volumeWheelStep);
             if (next == base)
               return;
             row->wheelTarget = next;
@@ -2214,8 +2207,6 @@ public:
     Keep(slider.ValueChanged(winrt::auto_revoke, [row](auto &&, auto const &args) {
       if (args.NewValue() > 0)
         row->last = args.NewValue();
-      row->badge.Visibility(args.NewValue() <= 0 ? X::Visibility::Visible
-                                                 : X::Visibility::Collapsed);
       ShowLevel(*row, args.NewValue());
     }));
   }

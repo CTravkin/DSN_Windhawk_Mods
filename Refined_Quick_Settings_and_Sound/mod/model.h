@@ -3,6 +3,7 @@
 #include <array>
 #include <cmath>
 #include <cwctype>
+#include <cstdint>
 #include <map>
 #include <string>
 #include <string_view>
@@ -51,6 +52,11 @@ inline std::wstring Lower(std::wstring value) {
     CharLowerBuffW(value.data(), static_cast<DWORD>(value.size()));
   return value;
 }
+inline void AddHiddenApp(std::vector<std::wstring> &apps, std::wstring_view name) {
+  auto first = name.find_first_not_of(L" \t\r\n");
+  if (first != name.npos)
+    apps.push_back(Lower(std::wstring(name.substr(first, name.find_last_not_of(L" \t\r\n") - first + 1))));
+}
 inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
   std::vector<std::wstring> result;
   size_t start = 0;
@@ -58,13 +64,33 @@ inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
     auto end = text.find_first_of(L";,\r\n", start);
     if (end == text.npos)
       end = text.size();
-    auto part = text.substr(start, end - start);
-    auto first = part.find_first_not_of(L" \t");
-    if (first != part.npos)
-      result.push_back(Lower(part.substr(first, part.find_last_not_of(L" \t") - first + 1)));
+    AddHiddenApp(result, std::wstring_view(text).substr(start, end - start));
     start = end + 1;
   }
   return result;
+}
+inline int VolumeWheelStep(int value) {
+  return value >= 1 && value <= 100 ? value : 2;
+}
+struct WheelVolume {
+  int64_t remainder = 0;
+  double Next(double current, double minimum, double maximum, int delta, int step) {
+    auto movement = remainder + int64_t(delta) * step;
+    auto target = current + double(movement / WHEEL_DELTA);
+    remainder = movement % WHEEL_DELTA;
+    if ((target <= minimum && remainder < 0) || (target >= maximum && remainder > 0))
+      remainder = 0;
+    return std::clamp(target, minimum, maximum);
+  }
+};
+// The options contain the selected places in the order listed in the settings.
+inline unsigned IconPlaces(std::wstring_view value, unsigned supported, unsigned defaults) {
+  if (value.size() != 1)
+    return defaults;
+  auto digit = value.front();
+  unsigned mask = digit >= L'0' && digit <= L'9' ? digit - L'0'
+                : digit >= L'a' && digit <= L'f' ? digit - L'a' + 10 : supported + 1;
+  return mask <= supported ? mask : defaults;
 }
 inline bool Hidden(std::vector<std::wstring> const &patterns, std::wstring const &name,
                    std::wstring const &path) {

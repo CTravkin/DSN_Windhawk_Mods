@@ -90,6 +90,35 @@ int main() {
       return 5;
     }
     std::puts("PASS: Quick Settings shortcuts skip gaps, duplicates and visible slider commands");
+    sound::WheelVolume wheel;
+    if (sound::VolumeWheelStep(0) != 2 || sound::VolumeWheelStep(7) != 7 ||
+        wheel.Next(50, 0, 100, 120, 2) != 52 ||
+        wheel.Next(99, 0, 100, 240, 7) != 100 ||
+        wheel.Next(50, 0, 100, 30, 2) != 50 ||
+        wheel.Next(50, 0, 100, 30, 2) != 51 ||
+        wheel.Next(51, 0, 100, -120, 2) != 49) {
+      std::puts("FAIL: Volume wheel defaults, bounds and partial detents");
+      return 6;
+    }
+    std::vector<std::wstring> names;
+    sound::AddHiddenApp(names, L"  Foo, Inc. ");
+    sound::AddHiddenApp(names, L" ");
+    sound::AddHiddenApp(names, L"STEAM.exe");
+    if (names != std::vector<std::wstring>{L"foo, inc.", L"steam.exe"} ||
+        sound::ParseHidden(L"FOO; Steam.exe, Slack") !=
+            std::vector<std::wstring>{L"foo", L"steam.exe", L"slack"}) {
+      std::puts("FAIL: Hidden app rows keep punctuation and legacy groups still split");
+      return 7;
+    }
+    std::puts("PASS: Volume wheel and hidden app setting behavior");
+    for (unsigned mask = 0; mask <= 15; ++mask) {
+      std::wstring_view value(&L"0123456789abcdef"[mask], 1);
+      if (sound::IconPlaces(value, 15, 0) != mask)
+        return 8;
+    }
+    if (sound::IconPlaces(L"f", 3, 2) != 2 || sound::IconPlaces(L"", 1, 1) != 1)
+      return 8;
+    std::puts("PASS: Icon placement combinations and fallback");
     winrt::init_apartment();
     for (auto kind : {F::PropertyType::Int32, F::PropertyType::UInt32, F::PropertyType::Single,
                       F::PropertyType::Double}) {
