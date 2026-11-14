@@ -35,18 +35,23 @@ static_assert(WindowEffectFor({WindowEffect::RemoveCaptionAccent, false, true}, 
               WindowEffect::HideBorder);
 
 constexpr WindowSettings kHideInactiveWithCaption{WindowEffect::RemoveCaptionAccent, true, true};
-static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, true, true) ==
-              WindowFrame{false, CaptionEffect::Transparent});
-static_assert(WindowFrameFor(kHideInactiveWithCaption, false, false, true, true) ==
-              WindowFrame{true, CaptionEffect::Transparent});
-static_assert(WindowFrameFor(kHideInactiveWithCaption, false, false, false, true) ==
-              WindowFrame{true, CaptionEffect::Default});
-static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, false, true) ==
-              WindowFrame{false, CaptionEffect::Neutral});
-static_assert(WindowFrameFor(kHideInactiveWithCaption, true, true, false, true) ==
-              WindowFrame{true, CaptionEffect::Default});
-static_assert(WindowFrameFor(kHideInactiveWithCaption, true, false, true, false) ==
-              WindowFrame{false, CaptionEffect::Default});
+
+constexpr bool FrameMatches(WindowFrame frame, bool hideBorder, CaptionEffect caption) {
+    return frame.hideBorder == hideBorder && frame.caption == caption;
+}
+
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, true, false, true, true),
+                           false, CaptionEffect::Transparent));
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, false, false, true, true),
+                           true, CaptionEffect::Transparent));
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, false, false, false, true),
+                           true, CaptionEffect::Default));
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, true, false, false, true),
+                           false, CaptionEffect::Neutral));
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, true, true, false, true),
+                           true, CaptionEffect::Default));
+static_assert(FrameMatches(WindowFrameFor(kHideInactiveWithCaption, true, false, true, false),
+                           false, CaptionEffect::Default));
 
 static_assert(ShellBorderFor(ShellHost::Start, L"Windows.UI.Xaml.Controls.Border", L"AcrylicBorder") ==
               ShellBorder::Start);
