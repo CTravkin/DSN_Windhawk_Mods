@@ -1,23 +1,23 @@
 // ==WindhawkMod==
-// @id dsn-refined-quick-settings-and-sound
-// @name Refined Quick Settings and Sound (DSN)
+// @id refined-quick-settings-and-sound
+// @name Refined Quick Settings and Sound
 // @description Refines Windows 11 Quick Settings and Sound, with configurable brightness, tile rows and shortcuts
 // @description:ru-RU Настройка быстрых настроек и звука Windows 11, включая яркость, число строк и кнопки
 // @description:es-ES Personaliza la configuración rápida y el sonido de Windows 11, con brillo, filas y accesos directos configurables
 // @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
 // @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
 // @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.2.1
-// @author Constantine Travkin, based on HeyOkay's mod
-// @github https://github.com/CTravkin
-// @homepage https://github.com/CTravkin/DSN_Windhawk_Mods
+// @version 0.2.2
+// @author HeyOkay, CTravkin
+// @github https://github.com/HeyOkay
+// @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
 // @include explorer.exe
 // @include ShellHost.exe
 // @architecture x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 156
+// Build: 157
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound

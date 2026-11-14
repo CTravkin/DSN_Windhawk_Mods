@@ -30,7 +30,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - Click the volume icon to open Sound directly.
 - The system's animated volume glyph and an Ethernet glyph for wired networks.
 
-Mod ID: `dsn-refined-quick-settings-and-sound`. The version is in `mod/sound-native.wh.cpp`.
+Mod ID: `refined-quick-settings-and-sound`. The version is in `mod/sound-native.wh.cpp`.
 
 ## Compatibility
 
@@ -43,7 +43,7 @@ Control Center discovery uses COM-interface symbol hooks in ControlCenter.dll an
 ## Installation from source
 
 1. Install [Windhawk](https://windhawk.net/).
-2. Open [the standalone source](mod/dist/dsn-refined-quick-settings-and-sound.wh.cpp).
+2. Open [the standalone source](mod/dist/refined-quick-settings-and-sound.wh.cpp).
 3. Disable the original Refined Quick Settings and Sound. Create a new mod in Windhawk, replace the template with the standalone source, then compile and enable it.
 4. If the panels do not update, restart ShellHost. Windhawk logs contain diagnostic errors.
 

@@ -15,4 +15,6 @@ Use `Mod/` for a mod's source and `Tests/` for its checks. Keep local builds und
 
 ## Publication
 
-Maintain the sources in this repository. Submit each mod and its updates to the Windhawk catalog through a pull request containing its standalone `mods/<mod-id>.wh.cpp` file.
+Maintain the sources in this repository. Submit original DSN mods and their updates to the Windhawk catalog through a pull request containing the standalone `mods/<mod-id>.wh.cpp` file.
+
+Refined Quick Settings and Sound is a GPL-3.0-only subtree with separate third-party notices. Keep the upstream title, ID and GitHub profile. Propose changes to HeyOkay in the upstream source repository. The upstream author handles any catalog update.

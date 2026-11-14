@@ -30,7 +30,7 @@
 - Нажатие на значок громкости сразу открывает «Звук».
 - Системный анимированный значок громкости и значок Ethernet для проводной сети.
 
-Идентификатор мода — `dsn-refined-quick-settings-and-sound`. Версия указана в `mod/sound-native.wh.cpp`.
+Идентификатор мода — `refined-quick-settings-and-sound`. Версия указана в `mod/sound-native.wh.cpp`.
 
 ## Совместимость
 
@@ -43,7 +43,7 @@ Windows 11 24H2 и новее с быстрыми настройками в Shel
 ## Установка из исходника
 
 1. Установите [Windhawk](https://windhawk.net/).
-2. Откройте [единый файл исходника](../mod/dist/dsn-refined-quick-settings-and-sound.wh.cpp).
+2. Откройте [единый файл исходника](../mod/dist/refined-quick-settings-and-sound.wh.cpp).
 3. Отключите оригинальный Refined Quick Settings and Sound. Создайте новый мод в Windhawk, замените шаблон исходником, скомпилируйте и включите мод.
 4. Если панели не обновились, перезапустите ShellHost. Диагностические ошибки доступны в журнале Windhawk.
 
