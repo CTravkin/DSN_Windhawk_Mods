@@ -2,12 +2,12 @@
 // @id refined-quick-settings-and-sound
 // @name Refined Quick Settings and Sound
 // @description More options for Quick Settings and direct access to sound settings
-// @description:ru-RU Дополнительные параметры панели быстрого доступа, быстрый доступ к настройкам звука
+// @description:ru-RU Дополнительные параметры панели «Быстрые настройки» и открытие раздела «Звук» одним нажатием
 // @description:es-ES Más opciones para la configuración rápida y acceso directo a los ajustes de sonido
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.6.1
+// @version 0.6.2
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 166
+// Build: 167
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
