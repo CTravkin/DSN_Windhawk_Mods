@@ -38,8 +38,8 @@ To update an existing local installation, edit that mod in Windhawk, replace its
 
 ### Usage
 
-1. Select a file or folder and choose **Pin in item pane** in its context menu, or click the pin on the command bar.
-2. To remove the pin, select the item and choose **Unpin from item pane** or click the crossed-out pin on the command bar. The item returns to its usual position in the folder.
+1. Select a file or folder and choose **Pin to top** in its context menu, or click the pin on the command bar.
+2. To remove the pin, select the item and choose **Unpin from top** or click the crossed-out pin on the command bar. The item returns to its usual position in the folder.
 
 In Windhawk, open the mod's **Settings** to control these options independently. All three are enabled by default.
 

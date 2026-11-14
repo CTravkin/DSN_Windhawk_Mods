@@ -389,6 +389,35 @@ void VerifyFolderSnapshots(const fs::path& root) {
     Require(*pinnedAfterChange, "the first refresh after a timestamp change must resolve the renamed pin");
     std::cout << "PASS asynchronous snapshots, same-name restoration and identity retries for changed and unchanged timestamps\n";
 
+    const auto busyFolder = root / L"busy-folder";
+    const auto heldFolder = root / L"held-files";
+    fs::create_directories(busyFolder);
+    fs::create_directories(heldFolder);
+    const auto originalPin = busyFolder / L"Pinned.txt";
+    const auto heldPin = heldFolder / originalPin.filename();
+    const auto returnedPin = busyFolder / L"Returned under a new name.txt";
+    std::ofstream(originalPin) << "pin that may return";
+    Require(store.SetPinned(busyFolder, ReadItem(originalPin), true), "persist a pin for the busy folder");
+    fs::rename(originalPin, heldPin);
+    WaitForFolderPins(busyFolder, {});
+    const auto busyTime = fs::last_write_time(busyFolder) + std::chrono::seconds(2);
+    fs::last_write_time(busyFolder, busyTime);
+    WaitForFolderPins(busyFolder, {});
+
+    fs::rename(heldPin, returnedPin);
+    fs::last_write_time(busyFolder, busyTime + std::chrono::seconds(2));
+    orderingPins.Invalidate(busyFolder);
+    TestFolderPins(busyFolder);
+    WaitUntil([&] { return orderingPins.Cached(returnedPin).has_value(); }, "refresh the busy folder snapshot");
+    Require(orderingPins.Cached(returnedPin) == false,
+            "avoid an immediate third full scan after repeated misses even if the folder timestamp changes");
+    WaitUntil([&] { TestFolderPins(busyFolder); return orderingPins.Cached(returnedPin) == true; },
+              "retry the deferred scan and restore the pin by ID", 15000);
+    fs::rename(returnedPin, originalPin);
+    fs::last_write_time(busyFolder, busyTime + std::chrono::seconds(2));
+    WaitForFolderPins(busyFolder, {originalPin.filename().native()});
+    std::cout << "PASS repeated misses defer full scans and preserve pin restoration\n";
+
     const auto exactFolder = root / L"cold-view";
     fs::create_directories(exactFolder);
     const auto exact = exactFolder / L"Pinned.txt";
@@ -430,11 +459,12 @@ void VerifyFolderSnapshots(const fs::path& root) {
     const auto recent = root / L"cache-a";
     const auto oldest = root / L"cache-z";
     WaitForFolderPins(oldest, {});
-    for (int i = 0; i < 61; ++i) {
+    for (int i = 0; i < 60; ++i) {
         WaitForFolderPins(root / (L"cache-m" + std::to_wstring(i)), {});
     }
     WaitForFolderPins(recent, {});
     WaitForFolderPins(folder, {renamed.filename().native()});
+    WaitForFolderPins(busyFolder, {originalPin.filename().native()});
     const auto beforeEviction = TestFolderPins(recent);
     WaitForFolderPins(root / L"cache-new", {});
     Require(TestFolderPins(recent) == beforeEviction && !TestFolderPins(oldest),
