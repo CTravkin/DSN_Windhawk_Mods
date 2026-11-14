@@ -1,13 +1,13 @@
 ﻿// ==WindhawkMod==
 // @id refined-quick-settings-and-sound
 // @name Refined Quick Settings and Sound
-// @description Custom tile rows, shortcuts and icons, with a volume mixer one click away
-// @description:ru-RU Настраиваемые плитки, кнопки и иконки, микшер громкости в один клик
-// @description:es-ES Filas de mosaicos, accesos e iconos personalizables y mezclador de volumen a un clic
-// @description:de-DE Anpassbare Kachelzeilen, Verknüpfungen und Symbole mit Lautstärkemixer per Klick
-// @description:pt-BR Linhas de blocos, atalhos e ícones personalizáveis e mixer de volume a um clique
-// @description:zh-CN 自定义磁贴行数、快捷方式和图标，一键打开音量合成器
-// @version 0.5.3
+// @description More options for Quick Settings and direct access to sound settings
+// @description:ru-RU Дополнительные параметры панели быстрого доступа, быстрый доступ к настройкам звука
+// @description:es-ES Más opciones para la configuración rápida y acceso directo a los ajustes de sonido
+// @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
+// @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
+// @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
+// @version 0.5.4
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 163
+// Build: 164
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -135,6 +135,24 @@ in this source file.
   $description:de-DE: Prozentpunkte pro Mausradschritt über einem Lautstärkeregler, von 1 bis 100
   $description:pt-BR: Pontos percentuais por passo da roda sobre um controle de volume, de 1 a 100
   $description:zh-CN: 在音量滑块上滚动一格改变的百分点，范围为 1 到 100
+- quickActionRows: "2"
+  $name: Rows of tiles
+  $name:ru-RU: Строки плиток
+  $name:es-ES: Filas de mosaicos
+  $name:de-DE: Kachelzeilen in den Schnelleinstellungen
+  $name:pt-BR: Linhas de blocos nas configurações rápidas
+  $name:zh-CN: 快速设置磁贴行数
+  $description: How many rows fit on each Quick Settings page
+  $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
+  $description:es-ES: Número de filas de mosaicos por página de Configuración rápida
+  $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
+  $description:pt-BR: Número de linhas por página das Configurações rápidas
+  $description:zh-CN: 每页快速设置显示的磁贴行数
+  $options:
+  - "1": "1"
+  - "2": "2"
+  - "3": "3"
+  - "4": "4"
 - brightnessMode: auto
   $name: Display brightness
   $name:ru-RU: Яркость дисплея
@@ -166,24 +184,6 @@ in this source file.
   $options:zh-CN:
   - auto: 自动
   - disabled: 禁用
-- quickActionRows: "2"
-  $name: Rows of tiles
-  $name:ru-RU: Строки плиток
-  $name:es-ES: Filas de mosaicos
-  $name:de-DE: Kachelzeilen in den Schnelleinstellungen
-  $name:pt-BR: Linhas de blocos nas configurações rápidas
-  $name:zh-CN: 快速设置磁贴行数
-  $description: How many rows fit on each Quick Settings page
-  $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
-  $description:es-ES: Número de filas de mosaicos por página de Configuración rápida
-  $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
-  $description:pt-BR: Número de linhas por página das Configurações rápidas
-  $description:zh-CN: 每页快速设置显示的磁贴行数
-  $options:
-  - "1": "1"
-  - "2": "2"
-  - "3": "3"
-  - "4": "4"
 - quickSettings:
   - shortcut1: display
     $name: "Shortcut 1"
@@ -430,12 +430,12 @@ in this source file.
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
-  $name: "Quick Settings"
-  $name:ru-RU: "Быстрые настройки"
-  $name:es-ES: "Configuración rápida"
-  $name:de-DE: "Schnelleinstellungen"
-  $name:pt-BR: "Configurações rápidas"
-  $name:zh-CN: "快速设置"
+  $name: "Additional shortcuts"
+  $name:ru-RU: "Дополнительные переходы"
+  $name:es-ES: "Accesos directos adicionales"
+  $name:de-DE: "Weitere Verknüpfungen"
+  $name:pt-BR: "Atalhos adicionais"
+  $name:zh-CN: "其他快捷方式"
   $description: Shortcuts to the right of Settings, in the selected order, skipping empty slots and duplicates
   $description:ru-RU: Порядок кнопок справа от «Настроек», пустые позиции и повторы пропускаются
   $description:es-ES: Accesos a la derecha de Configuración, en el orden elegido y sin huecos ni duplicados

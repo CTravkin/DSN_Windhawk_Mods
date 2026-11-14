@@ -170,7 +170,9 @@ struct Record {
   X::FrameworkElement visual{nullptr};
   X::DispatcherTimer timer{nullptr};
   winrt::event_token loaded{}, tick{};
-  IInspectable middlePressed{nullptr};
+  IInspectable middleGesture{nullptr};
+  bool suppressMiddleTap = false;
+  ULONGLONG middleReleasedAt = 0;
   winrt::weak_ref<C::MenuFlyout> menu;
   C::MenuFlyoutItem soundSettingsItem{nullptr};
   winrt::event_token soundSettingsClick{};
@@ -345,26 +347,55 @@ inline void DetachSoundSettings(Record &record) {
   record.soundSettingsItem = nullptr;
   record.menu = nullptr;
 }
-inline void AttachMiddleMute(Record &record, X::FrameworkElement const &icon) {
+inline void AttachMiddleMute(std::shared_ptr<Record> const &record, X::FrameworkElement const &icon) {
+  std::weak_ptr<Record> weak = record;
   auto handler = winrt::box_value(X::Input::PointerEventHandler(
-      [](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+      [weak](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
         try {
+          auto record = weak.lock();
+          if (!record || stopping || !SettingsSnapshot().trayMiddleClickMute)
+            return;
           auto element = sender.as<X::FrameworkElement>();
           auto point = args.GetCurrentPoint(element);
           using Kind = winrt::Windows::UI::Input::PointerUpdateKind;
-          if (point.Properties().PointerUpdateKind() != Kind::MiddleButtonPressed ||
-              !Find(element, [](auto const &node) { return VolumeLeaf(node); }))
-            return;
-          if (!stopping && SettingsSnapshot().trayMiddleClickMute &&
-              audio && audio->Get().masterAvailable &&
-              audio->Send({sound::Action::ToggleEndpointMute}))
+          auto kind = point.Properties().PointerUpdateKind();
+          if (kind == Kind::LeftButtonPressed || kind == Kind::RightButtonPressed) {
+            record->suppressMiddleTap = false;
+          } else if (kind == Kind::MiddleButtonPressed &&
+                     Find(element, [](auto const &node) { return VolumeLeaf(node); })) {
+            record->suppressMiddleTap = true;
+            record->middleReleasedAt = 0;
             args.Handled(true);
+            if (audio && audio->Get().masterAvailable)
+              audio->Send({sound::Action::ToggleEndpointMute});
+          } else if (kind == Kind::MiddleButtonReleased && record->suppressMiddleTap) {
+            record->middleReleasedAt = GetTickCount64();
+            args.Handled(true);
+          }
         } catch (...) {
           Wh_Log(L"TrayMiddleMuteError %08X", winrt::to_hresult());
         }
       }));
   icon.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
-  record.middlePressed = handler;
+  try {
+    icon.AddHandler(X::UIElement::PointerReleasedEvent(), handler, true);
+  } catch (...) {
+    icon.RemoveHandler(X::UIElement::PointerPressedEvent(), handler);
+    throw;
+  }
+  record->middleGesture = handler;
+}
+inline bool ConsumeMiddleTap(X::FrameworkElement const &icon) {
+  std::lock_guard lock(recordsMutex);
+  for (auto const &record : records)
+    if (record->thread == GetCurrentThreadId() && record->suppressMiddleTap &&
+        record->icon.get() == icon) {
+      record->suppressMiddleTap = false;
+      // If XAML didn't emit a tap for the middle release, discard the old
+      // gesture before a later activation (for example from the keyboard).
+      return !record->middleReleasedAt || GetTickCount64() - record->middleReleasedAt < 500;
+    }
+  return false;
 }
 inline void AppendSoundSettings(Record &record, C::MenuFlyout const &menu) {
   if (menu == record.menu.get())
@@ -598,10 +629,12 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
     return;
   }
   auto settings = SettingsSnapshot();
-  if (settings.trayMiddleClickMute && !record->middlePressed && InControlCenter(icon) &&
+  if (!settings.trayMiddleClickMute)
+    record->suppressMiddleTap = false;
+  if (settings.trayMiddleClickMute && !record->middleGesture && InControlCenter(icon) &&
       Find(icon, [](auto const &node) { return VolumeLeaf(node); }))
     try {
-      AttachMiddleMute(*record, icon);
+      AttachMiddleMute(record, icon);
     } catch (...) {
       Wh_Log(L"TrayVolumeActionsError %08X", winrt::to_hresult());
     }
@@ -987,7 +1020,8 @@ using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
-  if (!stopping && SettingsSnapshot().quickSoundAccess)
+  auto settings = SettingsSnapshot();
+  if (!stopping && (settings.quickSoundAccess || settings.trayMiddleClickMute))
     try {
       // Intercept the shell's own handler, before it activates Quick Settings.
       // A later UIElement.Tapped subscription cannot cancel an action already
@@ -997,21 +1031,31 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
         X::FrameworkElement icon{nullptr};
         (*address)->QueryInterface(winrt::guid_of<X::FrameworkElement>(), winrt::put_abi(icon));
         if (icon && InControlCenter(icon) &&
-            Find(icon, [](auto const &child) { return VolumeLeaf(child); }) &&
-            OpenNativeSound()) {
-          args.Handled(true);
-          Wh_Log(L"Sound panel: native volume click intercepted");
-          try {
-            for (auto taskbar : Taskbars())
-              if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
-                Observe(icon, taskbar);
-                break;
-              }
-          } catch (...) {
-            Wh_Log(L"Lazy volume icon styling failed; click was still handled");
+            Find(icon, [](auto const &child) { return VolumeLeaf(child); })) {
+          // Tapped is independent of the handled flag on the pointer events.
+          if (settings.trayMiddleClickMute &&
+              args.PointerDeviceType() == winrt::Windows::Devices::Input::PointerDeviceType::Mouse &&
+              ConsumeMiddleTap(icon)) {
+            args.Handled(true);
+            Wh_Log(L"Tray middle click: suppressed the panel tap");
+            args = nullptr; // the callee's share of the by-value argument
+            return;
           }
-          args = nullptr; // the callee's share of the by-value argument
-          return;
+          if (settings.quickSoundAccess && OpenNativeSound()) {
+            args.Handled(true);
+            Wh_Log(L"Sound panel: native volume click intercepted");
+            try {
+              for (auto taskbar : Taskbars())
+                if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
+                  Observe(icon, taskbar);
+                  break;
+                }
+            } catch (...) {
+              Wh_Log(L"Lazy volume icon styling failed; click was still handled");
+            }
+            args = nullptr; // the callee's share of the by-value argument
+            return;
+          }
         }
       }
     } catch (winrt::hresult_error const &error) {
@@ -1131,10 +1175,12 @@ inline void CleanupThreadRecords() {
           icon.Loaded(record->loaded);
           record->loaded = {};
         }
-        if (record->middlePressed)
-          icon.RemoveHandler(X::UIElement::PointerPressedEvent(), record->middlePressed);
+        if (record->middleGesture) {
+          icon.RemoveHandler(X::UIElement::PointerPressedEvent(), record->middleGesture);
+          icon.RemoveHandler(X::UIElement::PointerReleasedEvent(), record->middleGesture);
+        }
       }
-      record->middlePressed = nullptr;
+      record->middleGesture = nullptr;
       DetachSoundSettings(*record);
       RestoreGlyphs(record);
       RemoveVisual(record);
