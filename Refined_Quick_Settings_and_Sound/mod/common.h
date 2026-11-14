@@ -44,7 +44,7 @@ inline std::vector<std::wstring> hidden;
 inline bool brightnessEnabled = true;
 inline int quickActionRows = 2;
 inline sound::QuickShortcutSlots quickShortcuts{};
-inline bool quickSoundAccess = true;
+inline bool quickSoundAccess = true, trayMiddleClickMute = false;
 inline int volumeWheelStep = 2;
 inline bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
             altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
@@ -163,13 +163,18 @@ inline C::FontIcon SymbolGlyph(X::FrameworkElement const &owner, wchar_t code, d
   icon.IsHitTestVisible(false);
   return icon;
 }
-inline C::FontIcon VolumeGlyph(X::FrameworkElement const &owner, int level, double size = 16) {
-  return SymbolGlyph(owner,
-                     level == 0   ? 0xe74f
-                     : level == 1 ? 0xe993
-                     : level == 2 ? 0xe994
-                                  : 0xe995,
-                     size);
+inline X::UIElement VolumeGlyph(X::FrameworkElement const &owner, int level, double size = 16) {
+  auto active = SymbolGlyph(owner, level < 0 ? 0xe74f : 0xe992 + level, size);
+  if (level < 0 || level == 3)
+    return active;
+  // The Windows symbol font provides the waves separately as VolumeBars.
+  auto waves = SymbolGlyph(owner, 0xebc5, size);
+  waves.Opacity(.35);
+  C::Grid icon;
+  icon.IsHitTestVisible(false);
+  icon.Children().Append(waves);
+  icon.Children().Append(active);
+  return icon;
 }
 // Built in code: XamlReader::Load ran several times per Sound opening (pickers,
 // input rows, master row), and parsed XAML stays registered with XAML Diagnostics.

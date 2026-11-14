@@ -285,7 +285,13 @@ class Audio final {
   void Execute(Command const &cmd) {
     error_.clear();
     auto value = Clamp(cmd.value);
-    if (cmd.action == Action::MasterVolume || cmd.action == Action::MasterMute) {
+    if (cmd.action == Action::ToggleEndpointMute) {
+      if (!master_)
+        throw winrt::hresult_error(E_NOTFOUND, L"Output device unavailable");
+      BOOL muted = FALSE;
+      winrt::check_hresult(master_->GetMute(&muted));
+      winrt::check_hresult(master_->SetMute(!muted, nullptr));
+    } else if (cmd.action == Action::MasterVolume || cmd.action == Action::MasterMute) {
       if (!master_)
         throw winrt::hresult_error(E_NOTFOUND, L"Output device unavailable");
       float before = 0;

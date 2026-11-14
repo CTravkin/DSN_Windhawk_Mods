@@ -111,9 +111,11 @@ class QuickPage {
   // The volume row's own slider and mute button (QuickVolume).
   std::unique_ptr<QuickVolume> quickVolume_;
   C::Slider quickSlider_{nullptr};
-  C::Button quickMute_{nullptr};
+  P::ButtonBase quickMute_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
   sound::WheelVolume volumeWheel_;
+  WheelToolTip wheelTip_;
+  int quickGlyph_ = -2;
   bool quickSync_ = false, quickAvailable_ = false;
   ULONGLONG quickUserAt_ = 0;
   // As ApplyMaster on the Sound page: while the slider is being moved (400 ms
@@ -133,14 +135,20 @@ class QuickPage {
     }
     if (quickSlider_.IsEnabled() != available)
       quickSlider_.IsEnabled(available);
-    if (quickMute_ && quickMute_.IsEnabled() != available)
+    if (quickIcon_ && quickMute_ && quickMute_.IsEnabled() != available)
       quickMute_.IsEnabled(available);
-    if (quickIcon_) {
-      if (dragging) {
-        auto v = float(quickSlider_.Value() / 100);
-        quickIcon_->Update(v, v <= 0, available);
-      } else
-        quickIcon_->Update(value, muted, available);
+    if (dragging) {
+      value = float(quickSlider_.Value() / 100);
+      muted = value <= 0;
+    }
+    QuickGlyph(value, muted);
+  }
+  void QuickGlyph(float value, bool muted) {
+    if (quickIcon_)
+      quickIcon_->Update(value, muted, quickAvailable_);
+    else if (int glyph = sound::VolumeIcon(value, muted); quickMute_ && glyph != quickGlyph_) {
+      quickMute_.Content(VolumeGlyph(view_, glyph));
+      quickGlyph_ = glyph;
     }
   }
   void RefreshVolume() {
@@ -370,7 +378,7 @@ class QuickPage {
       break;
     case S::Bluetooth:
       name = sound::Text(L"Bluetooth & devices", L"Bluetooth и устройства", L"Bluetooth y dispositivos",
-                         L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和其他设备");
+                         L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和设备");
       uri = L"ms-settings:bluetooth";
       glyph = 0xe702;
       break;
@@ -1132,11 +1140,12 @@ class QuickPage {
         }
       });
     };
-    // Mute button, built as SV's on the Sound page (Button(), IconButtonStyle,
-    // 32 DIP, the isolated system QA_Volume icon), in the toggle's Grid cell.
+    // Keep the native toggle and its command for the Windows glyph.
     C::Button own{nullptr};
     if (quickIcon_) {
-      own = Button(view_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
+      own = Button(view_, sound::Text(L"Turn sound on or off", L"Включить или выключить звук",
+                   L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten",
+                   L"Ativar ou desativar o som", L"打开或关闭声音"));
       own.Margin(mute.Margin());
       own.HorizontalAlignment(mute.HorizontalAlignment());
       own.VerticalAlignment(X::VerticalAlignment::Center);
@@ -1160,6 +1169,10 @@ class QuickPage {
         }
       });
       quickMute_ = own;
+    } else {
+      journal_.Save(mute, C::ContentControl::ContentProperty());
+      quickMute_ = mute;
+      quickGlyph_ = -2;
     }
     // Slider: as master_ on the Sound page; geometry and thin look follow in Sliders().
     C::Slider mine;
@@ -1210,8 +1223,7 @@ class QuickPage {
                              } catch (...) {
                                Wh_Log(L"QuickVolumeSetError %08X", winrt::to_hresult());
                              }
-                             if (quickIcon_)
-                               quickIcon_->Update(value, value <= 0, quickAvailable_);
+                             QuickGlyph(value, value <= 0);
                            }));
     Keep(mine.PointerWheelChanged(
         winrt::auto_revoke, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
@@ -1225,8 +1237,9 @@ class QuickPage {
             int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
-            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
             args.Handled(true);
+            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
+            wheelTip_.Show(s, s.Value());
           } catch (...) {
           }
         }));
@@ -1291,11 +1304,9 @@ class QuickPage {
       SmallButton(l2);
       if (altQuickMixer)
         Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
-      if (X::Automation::AutomationProperties::GetName(l2).empty()) {
-        auto name = sound::Text(L"Sound settings", L"Параметры звука", L"Configuración de sonido",
-                                L"Soundeinstellungen", L"Configurações de som", L"声音设置");
-        Set(l2, X::Automation::AutomationProperties::NameProperty(), winrt::box_value(name));
-      }
+      auto name = winrt::box_value(sound::Text(L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"));
+      Set(l2, X::Automation::AutomationProperties::NameProperty(), name);
+      Set(l2, C::ToolTipService::ToolTipProperty(), name);
       if (auto row = Parent(l2).try_as<C::Panel>())
         for (auto const &child : row.Children())
           if (auto toggle = child.try_as<P::ToggleButton>())
@@ -1594,6 +1605,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
+    wheelTip_.Hide();
     try {
       FinishNightSearch();
     } catch (...) {

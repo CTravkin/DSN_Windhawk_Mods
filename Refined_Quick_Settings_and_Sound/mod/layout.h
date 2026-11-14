@@ -65,12 +65,13 @@ class SoundPage {
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
   sound::WheelVolume masterWheel_;
+  WheelToolTip wheelTip_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
   sound::Audio audio_;
   bool sync_ = false, expanded_ = true, restoring_ = false;
-  int glyph_ = -1;
+  int glyph_ = -2;
   std::wstring inputSignature_;
   sound::Snapshot latest_;
   unsigned long long pending_ = 0;
@@ -846,8 +847,15 @@ class SoundPage {
       settings.MinHeight(0);
       settings.Padding({0, 0, 0, 0});
       settings.Margin({0, 11, 20, 0});
+      auto name = winrt::box_value(sound::Text(L"Volume", L"Громкость", L"Volumen",
+                                               L"Lautstärke", L"Volume", L"音量"));
+      Set(settings, X::Automation::AutomationProperties::NameProperty(), name);
+      Set(settings, C::ToolTipService::ToolTipProperty(), name);
       if (altSoundMixer)
         settings.Content(Icon(L"sliders-horizontal"));
+      else
+        // SystemSettings_Audio_MixerLink uses the Segoe Fluent Volume3 glyph.
+        settings.Content(SymbolGlyph(page_, 0xe995));
     }
     journal_.Save(mixerList_, X::UIElement::VisibilityProperty());
     journal_.Save(mixerList_, X::FrameworkElement::HeightProperty());
@@ -1157,7 +1165,9 @@ class SoundPage {
     footer_ = Grid(L"32,*,32");
     footer_.Name(L"NativeSoundMasterRow");
     FooterMargins();
-    masterIcon_ = Button(page_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
+    masterIcon_ = Button(page_, sound::Text(L"Turn sound on or off", L"Включить или выключить звук",
+                          L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten",
+                          L"Ativar ou desativar o som", L"打开或关闭声音"));
     masterIcon_.Content(VolumeGlyph(page_, 3));
     if (altSoundVolume)
       try {
@@ -1179,7 +1189,9 @@ class SoundPage {
     C::Grid::SetColumn(master_, 1);
     footer_.Children().Append(master_);
     X::Automation::AutomationProperties::SetName(master_, sound::Text(L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke", L"Volume do sistema", L"系统音量"));
-    auto settings = Button(page_, sound::Text(L"More volume settings", L"Дополнительные параметры звука", L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen", L"Mais configurações de som", L"更多声音设置"));
+    auto settings = Button(page_, sound::Text(L"Sound settings", L"Параметры звука",
+                           L"Configuración de sonido", L"Soundeinstellungen",
+                           L"Configurações de som", L"声音设置"));
     SettingsGear(settings);
     C::Grid::SetColumn(settings, 2);
     footer_.Children().Append(settings);
@@ -1208,9 +1220,10 @@ class SoundPage {
             int delta = point.Properties().MouseWheelDelta();
             if (!delta)
               return;
+            args.Handled(true);
             master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
                                            master_.Maximum(), delta, volumeWheelStep));
-            args.Handled(true);
+            wheelTip_.Show(master_, master_.Value());
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
           }
@@ -1233,7 +1246,7 @@ public:
       } catch (...) {
         Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
         masterAnimation_.reset();
-        glyph_ = -1;
+        glyph_ = -2;
       }
     int glyph = sound::VolumeIcon(value, muted);
     if (glyph != glyph_) {
@@ -2094,7 +2107,7 @@ public:
       row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
       row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
       row->levelMute.Margin({0, 0, -44, 0});
-      row->levelMute.Content(VolumeGlyph(page_, 0, 16));
+      row->levelMute.Content(VolumeGlyph(page_, -1));
       try {
         row->levelIcon = std::make_shared<AnimatedVolume>();
         row->levelIcon->Update(0, true);
@@ -2194,12 +2207,13 @@ public:
                               ? row->wheelTarget
                               : s.Value();
             double next = row->wheel.Next(base, s.Minimum(), s.Maximum(), delta, volumeWheelStep);
-            if (next == base)
-              return;
-            row->wheelTarget = next;
-            row->wheelAt = now;
-            if (!WriteVolume(s, row->model, next))
-              s.Value(next);
+            if (next != base) {
+              row->wheelTarget = next;
+              row->wheelAt = now;
+              if (!WriteVolume(s, row->model, next))
+                s.Value(next);
+            }
+            wheelTip_.Show(s, next);
           } catch (...) {
             Wh_Log(L"MixerWheelError %08X", winrt::to_hresult());
           }
@@ -2241,6 +2255,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
+    wheelTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);
@@ -2295,6 +2310,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
+    wheelTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);

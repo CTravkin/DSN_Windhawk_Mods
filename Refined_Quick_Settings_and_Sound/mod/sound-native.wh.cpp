@@ -1,13 +1,13 @@
-// ==WindhawkMod==
+﻿// ==WindhawkMod==
 // @id refined-quick-settings-and-sound
 // @name Refined Quick Settings and Sound
-// @description Refines Windows 11 Quick Settings and Sound, with configurable brightness, tile rows and shortcuts
-// @description:ru-RU Настройка быстрых настроек и звука Windows 11, включая яркость, число строк и кнопки
-// @description:es-ES Personaliza la configuración rápida y el sonido de Windows 11, con brillo, filas y accesos directos configurables
-// @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
-// @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
-// @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.4.0
+// @description Custom tile rows, shortcuts and icons, with a volume mixer one click away
+// @description:ru-RU Настраиваемые плитки, кнопки и иконки, микшер громкости в один клик
+// @description:es-ES Filas de mosaicos, accesos e iconos personalizables y mezclador de volumen a un clic
+// @description:de-DE Anpassbare Kachelzeilen, Verknüpfungen und Symbole mit Lautstärkemixer per Klick
+// @description:pt-BR Linhas de blocos, atalhos e ícones personalizáveis e mixer de volume a um clique
+// @description:zh-CN 自定义磁贴行数、快捷方式和图标，一键打开音量合成器
+// @version 0.5.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 159
+// Build: 160
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -50,14 +50,16 @@ customizations are restored when the mod is unloaded.
   dropdown lists.
 - Below them, a reworked Volume mixer for the apps. It is collapsible and
   remembers its last state.
-- Set the volume change per wheel notch, default 2 percentage points. Press an app's icon to mute and restore it, or
-  its volume number to set it to 100.
+- Scroll over a volume slider to adjust it and see the new value. The default step is 2 percentage points.
+- Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - Hide apps from the mixer by name or executable, one app per row.
 
 **Taskbar**
 
 - Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
-- Choose where the alternative mixer, speaker, Ethernet and settings icons appear.
+- Enable Middle-click to mute to toggle the sound without changing the volume level.
+- More sound settings in the volume icon menu opens the classic Sound Control Panel.
+- The Alternative icons switches select the icon for each location.
 
 ## Compatibility
 
@@ -107,15 +109,28 @@ in this source file.
   $description:de-DE: "Öffnet das Soundfenster über das Lautstärkesymbol in der Taskleiste"
   $description:pt-BR: "Abre o painel Som pelo ícone de volume da barra de tarefas"
   $description:zh-CN: "单击任务栏上的音量图标可直接打开“声音”面板"
+- trayMiddleClickMute: false
+  $name: "Middle-click to mute"
+  $name:ru-RU: "Выключение звука средним кликом"
+  $name:es-ES: "Silenciar con el botón central"
+  $name:de-DE: "Ton per Mittelklick stummschalten"
+  $name:pt-BR: "Silenciar com o botão do meio"
+  $name:zh-CN: "单击鼠标中键静音"
+  $description: "Middle-click the taskbar volume icon to mute or unmute"
+  $description:ru-RU: "Средний клик по значку громкости на панели задач выключает или включает звук"
+  $description:es-ES: "El botón central sobre el icono de volumen de la barra de tareas silencia o reactiva el sonido"
+  $description:de-DE: "Ein Mittelklick auf das Lautstärkesymbol in der Taskleiste schaltet den Ton aus oder wieder ein"
+  $description:pt-BR: "O botão do meio no ícone de volume da barra de tarefas ativa ou desativa o som"
+  $description:zh-CN: "在任务栏的音量图标上单击鼠标中键可静音或取消静音"
 - volumeWheelStep: 2
   $name: Volume wheel step
-  $name:ru-RU: Шаг громкости
+  $name:ru-RU: Шаг громкости при прокрутке
   $name:es-ES: Paso de volumen con la rueda del ratón
   $name:de-DE: Lautstärkeschritt mit dem Mausrad
   $name:pt-BR: Passo do volume com a roda do mouse
   $name:zh-CN: 鼠标滚轮音量步长
   $description: Percentage points per notch over a volume slider, from 1 to 100
-  $description:ru-RU: На сколько процентных пунктов меняется громкость за одно деление колеса, от 1 до 100
+  $description:ru-RU: Изменение громкости за деление колеса, от 1 до 100 процентных пунктов
   $description:es-ES: Puntos porcentuales por paso de rueda sobre un control de volumen, de 1 a 100
   $description:de-DE: Prozentpunkte pro Mausradschritt über einem Lautstärkeregler, von 1 bis 100
   $description:pt-BR: Pontos percentuais por passo da roda sobre um controle de volume, de 1 a 100
@@ -154,13 +169,13 @@ in this source file.
 - quickActionRows: "2"
   $name: Rows of tiles
   $name:ru-RU: Строки плиток
-  $name:es-ES: Filas de iconos de configuración rápida
+  $name:es-ES: Filas de mosaicos
   $name:de-DE: Kachelzeilen in den Schnelleinstellungen
   $name:pt-BR: Linhas de blocos nas configurações rápidas
   $name:zh-CN: 快速设置磁贴行数
   $description: How many rows fit on each Quick Settings page
   $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
-  $description:es-ES: Número de filas por página de Configuración rápida
+  $description:es-ES: Número de filas de mosaicos por página de Configuración rápida
   $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
   $description:pt-BR: Número de linhas por página das Configurações rápidas
   $description:zh-CN: 每页快速设置显示的磁贴行数
@@ -217,7 +232,7 @@ in this source file.
     - display: "显示设置"
     - night: "夜间模式"
     - network: "网络和 Internet"
-    - bluetooth: "蓝牙和其他设备"
+    - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
   - shortcut2: night
     $name: "Shortcut 2"
@@ -266,7 +281,7 @@ in this source file.
     - display: "显示设置"
     - night: "夜间模式"
     - network: "网络和 Internet"
-    - bluetooth: "蓝牙和其他设备"
+    - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
   - shortcut3: none
     $name: "Shortcut 3"
@@ -315,7 +330,7 @@ in this source file.
     - display: "显示设置"
     - night: "夜间模式"
     - network: "网络和 Internet"
-    - bluetooth: "蓝牙和其他设备"
+    - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
   - shortcut4: none
     $name: "Shortcut 4"
@@ -364,7 +379,7 @@ in this source file.
     - display: "显示设置"
     - night: "夜间模式"
     - network: "网络和 Internet"
-    - bluetooth: "蓝牙和其他设备"
+    - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
   - shortcut5: none
     $name: "Shortcut 5"
@@ -413,7 +428,7 @@ in this source file.
     - display: "显示设置"
     - night: "夜间模式"
     - network: "网络和 Internet"
-    - bluetooth: "蓝牙和其他设备"
+    - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
   $name: "Quick Settings"
   $name:ru-RU: "Быстрые настройки"
@@ -421,252 +436,122 @@ in this source file.
   $name:de-DE: "Schnelleinstellungen"
   $name:pt-BR: "Configurações rápidas"
   $name:zh-CN: "快速设置"
-  $description: Shortcuts to the right of Settings, in the selected order
+  $description: Shortcuts to the right of Settings, in the selected order, skipping empty slots and duplicates
   $description:ru-RU: Порядок кнопок справа от «Настроек», пустые позиции и повторы пропускаются
-  $description:es-ES: Accesos a la derecha de Configuración, en el orden seleccionado
-  $description:de-DE: Verknüpfungen rechts neben Einstellungen in der gewählten Reihenfolge
-  $description:pt-BR: Atalhos à direita de Configurações, na ordem selecionada
-  $description:zh-CN: 按所选顺序显示在“设置”右侧的快捷方式
+  $description:es-ES: Accesos a la derecha de Configuración, en el orden elegido y sin huecos ni duplicados
+  $description:de-DE: Verknüpfungen rechts neben Einstellungen in der gewählten Reihenfolge, ohne Lücken oder Duplikate
+  $description:pt-BR: Atalhos à direita de Configurações, na ordem escolhida, sem lacunas nem duplicatas
+  $description:zh-CN: 快捷方式按所选顺序显示在“设置”右侧，跳过空位及重复项
 - alternativeIcons:
-  - mixerPlaces: saved
-    $name: "Mixer icon"
-    $name:ru-RU: "Микшер"
-    $name:es-ES: "Icono del mezclador"
-    $name:de-DE: "Mixer-Symbol"
-    $name:pt-BR: "Ícone do mixer"
-    $name:zh-CN: "合成器图标"
-    $options:
-    - saved: "As before"
-    - "0": "Windows icons everywhere"
-    - "1": "Quick Settings"
-    - "2": "Sound panel"
-    - "3": "Everywhere"
-    $options:ru-RU:
-    - saved: "Как раньше"
-    - "0": "Везде иконки Windows"
-    - "1": "Быстрые настройки"
-    - "2": "Панель «Звук»"
-    - "3": "Везде"
-    $options:es-ES:
-    - saved: "Como antes"
-    - "0": "Iconos de Windows en todas partes"
-    - "1": "Configuración rápida"
-    - "2": "Panel Sonido"
-    - "3": "En todas partes"
-    $options:de-DE:
-    - saved: "Wie zuvor"
-    - "0": "Überall Windows-Symbole"
-    - "1": "Schnelleinstellungen"
-    - "2": "Soundfenster"
-    - "3": "Überall"
-    $options:pt-BR:
-    - saved: "Como antes"
-    - "0": "Ícones do Windows em todos os locais"
-    - "1": "Configurações rápidas"
-    - "2": "Painel Som"
-    - "3": "Em todos os locais"
-    $options:zh-CN:
-    - saved: "沿用原设置"
-    - "0": "所有位置使用 Windows 图标"
-    - "1": "快速设置"
-    - "2": "“声音”面板"
-    - "3": "所有位置"
-  - volumePlaces: saved
-    $name: "Speaker icon"
+  - mixer:
+    - quick: true
+      $name: "Quick Settings"
+      $name:ru-RU: "Быстрые настройки"
+      $name:es-ES: "Configuración rápida"
+      $name:de-DE: "Schnelleinstellungen"
+      $name:pt-BR: "Configurações rápidas"
+      $name:zh-CN: "快速设置"
+    - sound: true
+      $name: "Sound panel"
+      $name:ru-RU: "Панель «Звук»"
+      $name:es-ES: "Panel Sonido"
+      $name:de-DE: "Soundbereich"
+      $name:pt-BR: "Painel Som"
+      $name:zh-CN: "“声音”面板"
+    $name: "Volume mixer"
+    $name:ru-RU: "Микшер громкости"
+    $name:es-ES: "Mezclador de volumen"
+    $name:de-DE: "Lautstärkemixer"
+    $name:pt-BR: "Mixer de volume"
+    $name:zh-CN: "音量合成器"
+  - volume:
+    - taskbar: true
+      $name: "Taskbar"
+      $name:ru-RU: "Панель задач"
+      $name:es-ES: "Barra de tareas"
+      $name:de-DE: "Taskleiste"
+      $name:pt-BR: "Barra de tarefas"
+      $name:zh-CN: "任务栏"
+    - quick: true
+      $name: "Quick Settings slider"
+      $name:ru-RU: "Ползунок в быстрых настройках"
+      $name:es-ES: "Control de Configuración rápida"
+      $name:de-DE: "Regler in den Schnelleinstellungen"
+      $name:pt-BR: "Controle das Configurações rápidas"
+      $name:zh-CN: "快速设置音量滑块"
+    - sound: true
+      $name: "Sound panel slider"
+      $name:ru-RU: "Ползунок на панели «Звук»"
+      $name:es-ES: "Control del panel Sonido"
+      $name:de-DE: "Regler im Soundbereich"
+      $name:pt-BR: "Controle do painel Som"
+      $name:zh-CN: "“声音”面板的音量滑块"
+    - apps: true
+      $name: "Muted apps in the mixer"
+      $name:ru-RU: "Приложения без звука в микшере"
+      $name:es-ES: "Aplicaciones silenciadas en el mezclador"
+      $name:de-DE: "Stummgeschaltete Apps im Mixer"
+      $name:pt-BR: "Aplicativos silenciados no mixer"
+      $name:zh-CN: "合成器中已静音的应用"
+    $name: "Speaker"
     $name:ru-RU: "Динамик"
-    $name:es-ES: "Icono del altavoz"
-    $name:de-DE: "Lautsprechersymbol"
-    $name:pt-BR: "Ícone de alto-falante"
-    $name:zh-CN: "扬声器图标"
-    $options:
-    - saved: "As before"
-    - "0": "Windows icons everywhere"
-    - "1": "Taskbar"
-    - "2": "Quick Settings"
-    - "4": "Sound panel"
-    - "8": "Volume mixer"
-    - "3": "Taskbar + Quick Settings"
-    - "5": "Taskbar + Sound panel"
-    - "6": "Quick Settings + Sound panel"
-    - "9": "Taskbar + Volume mixer"
-    - "a": "Quick Settings + Volume mixer"
-    - "c": "Sound panel + Volume mixer"
-    - "7": "Taskbar + Quick Settings + Sound panel"
-    - "b": "Taskbar + Quick Settings + Volume mixer"
-    - "d": "Taskbar + Sound panel + Volume mixer"
-    - "e": "Quick Settings + Sound panel + Volume mixer"
-    - "f": "Everywhere"
-    $options:ru-RU:
-    - saved: "Как раньше"
-    - "0": "Везде иконки Windows"
-    - "1": "Панель задач"
-    - "2": "Быстрые настройки"
-    - "4": "Панель «Звук»"
-    - "8": "Микшер громкости"
-    - "3": "Панель задач + Быстрые настройки"
-    - "5": "Панель задач + Панель «Звук»"
-    - "6": "Быстрые настройки + Панель «Звук»"
-    - "9": "Панель задач + Микшер громкости"
-    - "a": "Быстрые настройки + Микшер громкости"
-    - "c": "Панель «Звук» + Микшер громкости"
-    - "7": "Панель задач + Быстрые настройки + Панель «Звук»"
-    - "b": "Панель задач + Быстрые настройки + Микшер громкости"
-    - "d": "Панель задач + Панель «Звук» + Микшер громкости"
-    - "e": "Быстрые настройки + Панель «Звук» + Микшер громкости"
-    - "f": "Везде"
-    $options:es-ES:
-    - saved: "Como antes"
-    - "0": "Iconos de Windows en todas partes"
-    - "1": "Barra de tareas"
-    - "2": "Configuración rápida"
-    - "4": "Panel Sonido"
-    - "8": "Mezclador de volumen"
-    - "3": "Barra de tareas + Configuración rápida"
-    - "5": "Barra de tareas + Panel Sonido"
-    - "6": "Configuración rápida + Panel Sonido"
-    - "9": "Barra de tareas + Mezclador de volumen"
-    - "a": "Configuración rápida + Mezclador de volumen"
-    - "c": "Panel Sonido + Mezclador de volumen"
-    - "7": "Barra de tareas + Configuración rápida + Panel Sonido"
-    - "b": "Barra de tareas + Configuración rápida + Mezclador de volumen"
-    - "d": "Barra de tareas + Panel Sonido + Mezclador de volumen"
-    - "e": "Configuración rápida + Panel Sonido + Mezclador de volumen"
-    - "f": "En todas partes"
-    $options:de-DE:
-    - saved: "Wie zuvor"
-    - "0": "Überall Windows-Symbole"
-    - "1": "Taskleiste"
-    - "2": "Schnelleinstellungen"
-    - "4": "Soundfenster"
-    - "8": "Lautstärkemixer"
-    - "3": "Taskleiste + Schnelleinstellungen"
-    - "5": "Taskleiste + Soundfenster"
-    - "6": "Schnelleinstellungen + Soundfenster"
-    - "9": "Taskleiste + Lautstärkemixer"
-    - "a": "Schnelleinstellungen + Lautstärkemixer"
-    - "c": "Soundfenster + Lautstärkemixer"
-    - "7": "Taskleiste + Schnelleinstellungen + Soundfenster"
-    - "b": "Taskleiste + Schnelleinstellungen + Lautstärkemixer"
-    - "d": "Taskleiste + Soundfenster + Lautstärkemixer"
-    - "e": "Schnelleinstellungen + Soundfenster + Lautstärkemixer"
-    - "f": "Überall"
-    $options:pt-BR:
-    - saved: "Como antes"
-    - "0": "Ícones do Windows em todos os locais"
-    - "1": "Barra de tarefas"
-    - "2": "Configurações rápidas"
-    - "4": "Painel Som"
-    - "8": "Mixer de volume"
-    - "3": "Barra de tarefas + Configurações rápidas"
-    - "5": "Barra de tarefas + Painel Som"
-    - "6": "Configurações rápidas + Painel Som"
-    - "9": "Barra de tarefas + Mixer de volume"
-    - "a": "Configurações rápidas + Mixer de volume"
-    - "c": "Painel Som + Mixer de volume"
-    - "7": "Barra de tarefas + Configurações rápidas + Painel Som"
-    - "b": "Barra de tarefas + Configurações rápidas + Mixer de volume"
-    - "d": "Barra de tarefas + Painel Som + Mixer de volume"
-    - "e": "Configurações rápidas + Painel Som + Mixer de volume"
-    - "f": "Em todos os locais"
-    $options:zh-CN:
-    - saved: "沿用原设置"
-    - "0": "所有位置使用 Windows 图标"
-    - "1": "任务栏"
-    - "2": "快速设置"
-    - "4": "“声音”面板"
-    - "8": "音量合成器"
-    - "3": "任务栏、快速设置"
-    - "5": "任务栏、“声音”面板"
-    - "6": "快速设置、“声音”面板"
-    - "9": "任务栏、音量合成器"
-    - "a": "快速设置、音量合成器"
-    - "c": "“声音”面板、音量合成器"
-    - "7": "任务栏、快速设置、“声音”面板"
-    - "b": "任务栏、快速设置、音量合成器"
-    - "d": "任务栏、“声音”面板、音量合成器"
-    - "e": "快速设置、“声音”面板、音量合成器"
-    - "f": "所有位置"
-  - ethernetPlaces: saved
-    $name: "Ethernet icon"
+    $name:es-ES: "Altavoz"
+    $name:de-DE: "Lautsprecher"
+    $name:pt-BR: "Alto-falante"
+    $name:zh-CN: "扬声器"
+  - ethernet:
+    - taskbar: true
+      $name: "Taskbar"
+      $name:ru-RU: "Панель задач"
+      $name:es-ES: "Barra de tareas"
+      $name:de-DE: "Taskleiste"
+      $name:pt-BR: "Barra de tarefas"
+      $name:zh-CN: "任务栏"
+    $name: "Ethernet"
     $name:ru-RU: "Ethernet"
-    $name:es-ES: "Icono de Ethernet"
-    $name:de-DE: "Ethernet-Symbol"
-    $name:pt-BR: "Ícone de Ethernet"
-    $name:zh-CN: "以太网图标"
-    $options:
-    - saved: "As before"
-    - "0": "Windows icons everywhere"
-    - "1": "Alternative icon"
-    $options:ru-RU:
-    - saved: "Как раньше"
-    - "0": "Везде иконки Windows"
-    - "1": "Альтернативная иконка"
-    $options:es-ES:
-    - saved: "Como antes"
-    - "0": "Iconos de Windows en todas partes"
-    - "1": "Icono alternativo"
-    $options:de-DE:
-    - saved: "Wie zuvor"
-    - "0": "Überall Windows-Symbole"
-    - "1": "Alternatives Symbol"
-    $options:pt-BR:
-    - saved: "Como antes"
-    - "0": "Ícones do Windows em todos os locais"
-    - "1": "Ícone alternativo"
-    $options:zh-CN:
-    - saved: "沿用原设置"
-    - "0": "所有位置使用 Windows 图标"
-    - "1": "备用图标"
-  - gearPlaces: "1"
+    $name:es-ES: "Ethernet"
+    $name:de-DE: "Ethernet"
+    $name:pt-BR: "Ethernet"
+    $name:zh-CN: "以太网"
+  - gear:
+    - sound: true
+      $name: "Sound panel"
+      $name:ru-RU: "Панель «Звук»"
+      $name:es-ES: "Panel Sonido"
+      $name:de-DE: "Soundbereich"
+      $name:pt-BR: "Painel Som"
+      $name:zh-CN: "“声音”面板"
     $name: "Settings gear"
-    $name:ru-RU: "Шестеренка"
+    $name:ru-RU: "Шестеренка настроек"
     $name:es-ES: "Engranaje de configuración"
     $name:de-DE: "Einstellungszahnrad"
     $name:pt-BR: "Engrenagem de configurações"
-    $name:zh-CN: "设置齿轮图标"
-    $options:
-    - "0": "Windows icons everywhere"
-    - "1": "Sound panel"
-    $options:ru-RU:
-    - "0": "Везде иконки Windows"
-    - "1": "Панель «Звук»"
-    $options:es-ES:
-    - "0": "Iconos de Windows en todas partes"
-    - "1": "Panel Sonido"
-    $options:de-DE:
-    - "0": "Überall Windows-Symbole"
-    - "1": "Soundfenster"
-    $options:pt-BR:
-    - "0": "Ícones do Windows em todos os locais"
-    - "1": "Painel Som"
-    $options:zh-CN:
-    - "0": "所有位置使用 Windows 图标"
-    - "1": "“声音”面板"
+    $name:zh-CN: "设置齿轮"
   $name: "Alternative icons"
   $name:ru-RU: "Альтернативные иконки"
   $name:es-ES: "Iconos alternativos"
   $name:de-DE: "Alternative Symbole"
   $name:pt-BR: "Ícones alternativos"
-  $name:zh-CN: "备用图标"
-  $description: "Choose where each alternative icon is used"
-  $description:ru-RU: "Выбор мест, где отображаются альтернативные иконки"
-  $description:es-ES: "Elige dónde se usa cada icono alternativo"
-  $description:de-DE: "Legt fest, wo die alternativen Symbole erscheinen"
-  $description:pt-BR: "Escolhe onde cada ícone alternativo aparece"
-  $description:zh-CN: "选择各备用图标的显示位置"
+  $name:zh-CN: "替代图标"
+  $description: "Turn off a switch to use the Windows icon in that location"
+  $description:ru-RU: "Выключенный переключатель возвращает иконку Windows"
+  $description:es-ES: "Al desactivar un interruptor, se usa el icono de Windows en esa ubicación"
+  $description:de-DE: "Ein ausgeschalteter Schalter verwendet dort das Windows-Symbol"
+  $description:pt-BR: "Ao desativar uma opção, o ícone do Windows aparece nesse local"
+  $description:zh-CN: "关闭开关后，相应位置将使用 Windows 图标"
 - hiddenApplications: [""]
-  $name: Hidden apps
-  $name:ru-RU: Скрытые приложения
-  $name:es-ES: Aplicaciones ocultas
-  $name:de-DE: Ausgeblendete Apps
-  $name:pt-BR: Aplicativos ocultos
-  $name:zh-CN: 隐藏的应用
-  $description: One app per row, by name or executable, for example Steam or steam.exe
-  $description:ru-RU: По одному приложению на строку, например Steam или steam.exe
-  $description:es-ES: Una aplicación por fila, por ejemplo Steam o steam.exe
-  $description:de-DE: Eine App pro Zeile, zum Beispiel Steam oder steam.exe
-  $description:pt-BR: Um aplicativo por linha, por exemplo Steam ou steam.exe
-  $description:zh-CN: 每行一个应用，例如 Steam 或 steam.exe
+  $name: "Hide from the volume mixer"
+  $name:ru-RU: "Скрыть в микшере громкости"
+  $name:es-ES: "Ocultar en el mezclador de volumen"
+  $name:de-DE: "Im Lautstärkemixer ausblenden"
+  $name:pt-BR: "Ocultar no mixer de volume"
+  $name:zh-CN: "在音量合成器中隐藏"
+  $description: "One app per row, by name or executable, for example Steam or steam.exe"
+  $description:ru-RU: "По одному названию или имени файла на строку, например Steam или steam.exe"
+  $description:es-ES: "Una aplicación por fila, por nombre o archivo ejecutable, por ejemplo, Steam o steam.exe"
+  $description:de-DE: "Eine App pro Zeile anhand ihres Namens oder ihrer ausführbaren Datei, etwa Steam oder steam.exe"
+  $description:pt-BR: "Um aplicativo por linha, pelo nome ou executável, como Steam ou steam.exe"
+  $description:zh-CN: "每行填写一个应用名称或可执行文件名，例如 Steam 或 steam.exe"
 */
 // ==/WindhawkModSettings==
 #include "host.h"
@@ -697,6 +582,7 @@ inline void ReadHiddenApps() {
 inline void Settings() {
   ReadHiddenApps();
   volumeWheelStep = sound::VolumeWheelStep(Wh_GetIntSetting(L"volumeWheelStep"));
+  trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
   auto rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
@@ -706,6 +592,10 @@ inline void Settings() {
   using S = sound::QuickShortcut;
   auto first = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut1");
   const auto oldIcon = [&](PCWSTR key) { return !*first.get() || Wh_GetIntSetting(key) != 0; };
+  const auto icon = [](PCWSTR key, bool fallback) {
+    auto value = WindhawkUtils::StringSetting::make(key);
+    return *value.get() ? std::wstring_view(value.get()) == L"1" : fallback;
+  };
   auto mixer = WindhawkUtils::StringSetting::make(L"alternativeIcons.mixerPlaces");
   auto volume = WindhawkUtils::StringSetting::make(L"alternativeIcons.volumePlaces");
   auto ethernet = WindhawkUtils::StringSetting::make(L"alternativeIcons.ethernetPlaces");
@@ -715,14 +605,15 @@ inline void Settings() {
   unsigned volumePlaces = sound::IconPlaces(volume.get(), 15,
       oldIcon(L"alternativeIcons.trayVolume") | (oldIcon(L"alternativeIcons.quickVolume") << 1) |
       (oldIcon(L"alternativeIcons.soundVolume") << 2) | (oldIcon(L"alternativeIcons.appUnmute") << 3));
-  altQuickMixer = (mixerPlaces & 1) != 0;
-  altSoundMixer = (mixerPlaces & 2) != 0;
-  altTrayVolume = (volumePlaces & 1) != 0;
-  altQuickVolume = (volumePlaces & 2) != 0;
-  altSoundVolume = (volumePlaces & 4) != 0;
-  altAppUnmute = (volumePlaces & 8) != 0;
-  altTrayEthernet = sound::IconPlaces(ethernet.get(), 1, oldIcon(L"alternativeIcons.trayEthernet")) != 0;
-  altSoundGear = sound::IconPlaces(gear.get(), 1, 1) != 0;
+  altQuickMixer = icon(L"alternativeIcons.mixer.quick", mixerPlaces & 1);
+  altSoundMixer = icon(L"alternativeIcons.mixer.sound", mixerPlaces & 2);
+  altTrayVolume = icon(L"alternativeIcons.volume.taskbar", volumePlaces & 1);
+  altQuickVolume = icon(L"alternativeIcons.volume.quick", volumePlaces & 2);
+  altSoundVolume = icon(L"alternativeIcons.volume.sound", volumePlaces & 4);
+  altAppUnmute = icon(L"alternativeIcons.volume.apps", volumePlaces & 8);
+  altTrayEthernet = icon(L"alternativeIcons.ethernet.taskbar",
+                        sound::IconPlaces(ethernet.get(), 1, oldIcon(L"alternativeIcons.trayEthernet")));
+  altSoundGear = icon(L"alternativeIcons.gear.sound", sound::IconPlaces(gear.get(), 1, 1));
   if (*first.get()) {
     for (int i = 0; i < int(quickShortcuts.size()); ++i) {
       auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut%d", i + 1);

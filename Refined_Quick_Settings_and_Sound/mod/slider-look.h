@@ -1,6 +1,89 @@
 #pragma once
 #include "common.h"
 namespace native {
+// A wheel gesture doesn't enter the Slider's native thumb-drag state.
+// Use the same XAML control and anchor as the drag tooltip.
+class WheelToolTip {
+  C::ToolTip tip_{nullptr};
+  X::DispatcherTimer timer_{nullptr};
+  X::DispatcherTimer::Tick_revoker tick_;
+  X::FrameworkElement::Unloaded_revoker unloaded_;
+  C::Slider slider_{nullptr};
+  IInspectable pressed_{nullptr};
+
+public:
+  void Hide() noexcept {
+    if (timer_)
+      try {
+        timer_.Stop();
+      } catch (...) {
+        Wh_Log(L"WheelTooltipTimerStopError %08X", winrt::to_hresult());
+      }
+    unloaded_.revoke();
+    if (slider_) {
+      try {
+        slider_.RemoveHandler(X::UIElement::PointerPressedEvent(), pressed_);
+      } catch (...) {
+        Wh_Log(L"WheelTooltipHandlerRemovalError %08X", winrt::to_hresult());
+      }
+      slider_ = nullptr;
+      pressed_ = nullptr;
+    }
+    if (tip_)
+      try {
+        tip_.IsOpen(false);
+        tip_.PlacementTarget(nullptr);
+      } catch (...) {
+        Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
+      }
+  }
+  void Show(C::Slider const &slider, double value) {
+    auto root = slider.XamlRoot();
+    if (!root)
+      return;
+    if (!tip_ || tip_.XamlRoot() != root) {
+      Hide();
+      tip_ = C::ToolTip();
+      tip_.XamlRoot(root);
+      tip_.Placement(P::PlacementMode::Top);
+      tip_.IsHitTestVisible(false);
+    }
+    if (slider_ != slider) {
+      Hide();
+      auto handler = winrt::box_value(X::Input::PointerEventHandler(
+          [this](auto &&, auto &&) { Hide(); }));
+      slider.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
+      slider_ = slider;
+      pressed_ = handler;
+      unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
+    }
+    auto thumb = Named(slider, L"HorizontalThumb");
+    auto target = thumb ? thumb.as<X::UIElement>() : slider.as<X::UIElement>();
+    if (tip_.PlacementTarget() != target) {
+      tip_.IsOpen(false);
+      tip_.PlacementTarget(target);
+    }
+    auto content = winrt::box_value(std::to_wstring(std::lround(value)));
+    if (auto converter = slider.ThumbToolTipValueConverter())
+      try {
+        if (auto converted = converter.Convert(winrt::box_value(value),
+                                               winrt::xaml_typename<winrt::hstring>(), nullptr,
+                                               L""))
+          content = converted;
+      } catch (...) {
+      }
+    tip_.Content(content);
+    tip_.IsOpen(true);
+    if (!timer_) {
+      timer_ = X::DispatcherTimer();
+      timer_.Interval(std::chrono::milliseconds(900));
+      tick_ = timer_.Tick(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
+    }
+    timer_.Stop();
+    timer_.Start();
+  }
+};
+
 // Thin slider look shared by the Sound page and Quick Settings:
 // 1 DIP rail, 4 DIP value bar with rounded ends, thumb invisible until hover,
 // drag or keyboard focus. The rail and the bar run from the thumb centre at 0

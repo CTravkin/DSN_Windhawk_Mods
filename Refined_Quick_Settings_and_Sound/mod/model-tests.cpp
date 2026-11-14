@@ -119,6 +119,13 @@ int main() {
     if (sound::IconPlaces(L"f", 3, 2) != 2 || sound::IconPlaces(L"", 1, 1) != 1)
       return 8;
     std::puts("PASS: Icon placement combinations and fallback");
+    if (sound::VolumeIcon(.5f, true) != -1 || sound::VolumeIcon(0.f, false) != 0 ||
+        sound::VolumeIcon(.1f, false) != 1 || sound::VolumeIcon(.5f, false) != 2 ||
+        sound::VolumeIcon(1.f, false) != 3) {
+      std::puts("FAIL: Speaker glyph states distinguish zero volume from mute");
+      return 9;
+    }
+    std::puts("PASS: Speaker glyph states distinguish zero volume from mute");
     winrt::init_apartment();
     for (auto kind : {F::PropertyType::Int32, F::PropertyType::UInt32, F::PropertyType::Single,
                       F::PropertyType::Double}) {

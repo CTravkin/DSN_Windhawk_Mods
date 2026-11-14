@@ -22,14 +22,18 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - The "Sound output" page is now simply "Sound".
 - Change the output and input devices and the spatial sound provider from dropdown lists.
 - Below them, a reworked Volume mixer for the apps. It is collapsible and remembers its last state.
-- The wheel changes volume by 2 percentage points per notch by default. The step applies to system and app volume sliders.
+- Scrolling over a system or app volume slider shows the new value. The default step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - Hide apps from the mixer by name or executable, one app per row.
 
 **Taskbar**
 
 - **Quick access to Sound** opens Sound with a click on the taskbar volume icon.
-- **Alternative icons** selects where to use the alternative mixer, speaker, Ethernet and settings icons.
+- **Middle-click to mute** toggles sound from the volume icon and preserves the volume level. Off by default.
+- **More sound settings** in the volume icon menu opens the classic Sound Control Panel.
+- **Alternative icons** provides a switch per location. Switching one off uses the Windows icon there.
+
+When Windhawk adds the icon switches during a standard upgrade from 0.4.0, it starts them enabled. Apply any previous icon choices to the new switches.
 
 Mod ID: `refined-quick-settings-and-sound`. The version is in `mod/sound-native.wh.cpp`.
 

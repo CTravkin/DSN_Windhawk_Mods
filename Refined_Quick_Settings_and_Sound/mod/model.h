@@ -100,7 +100,7 @@ inline bool Hidden(std::vector<std::wstring> const &patterns, std::wstring const
 }
 inline float Clamp(float value) { return std::clamp(value, 0.f, 1.f); }
 inline int VolumeIcon(float value, bool mute) {
-  return mute || value <= 0 ? 0 : value <= .33f ? 1 : value <= .66f ? 2 : 3;
+  return mute ? -1 : value <= 0 ? 0 : value <= .33f ? 1 : value <= .66f ? 2 : 3;
 }
 struct SavedVolume {
   float last = .5f;
@@ -126,7 +126,7 @@ struct Snapshot {
   unsigned long long revision = 0;
   unsigned long long applied = 0;
 };
-enum class Action { MasterVolume, MasterMute, Input, Refresh };
+enum class Action { MasterVolume, MasterMute, ToggleEndpointMute, Input, Refresh };
 struct Command {
   Action action = Action::Refresh;
   std::wstring id;

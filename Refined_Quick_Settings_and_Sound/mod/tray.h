@@ -170,6 +170,10 @@ struct Record {
   X::FrameworkElement visual{nullptr};
   X::DispatcherTimer timer{nullptr};
   winrt::event_token loaded{}, tick{};
+  IInspectable middlePressed{nullptr};
+  winrt::weak_ref<C::MenuFlyout> menu;
+  C::MenuFlyoutItem soundSettingsItem{nullptr};
+  winrt::event_token soundSettingsClick{};
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -328,6 +332,150 @@ inline bool InControlCenter(X::FrameworkElement element) {
   }
   return false;
 }
+inline void DetachSoundSettings(Record &record) {
+  if (!record.soundSettingsItem)
+    return;
+  if (auto menu = record.menu.get()) {
+    auto items = menu.Items();
+    uint32_t index;
+    if (items.IndexOf(record.soundSettingsItem, index))
+      items.RemoveAt(index);
+  }
+  record.soundSettingsItem.Click(record.soundSettingsClick);
+  record.soundSettingsItem = nullptr;
+  record.menu = nullptr;
+}
+inline void AttachMiddleMute(Record &record, X::FrameworkElement const &icon) {
+  auto handler = winrt::box_value(X::Input::PointerEventHandler(
+      [](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+        try {
+          auto element = sender.as<X::FrameworkElement>();
+          auto point = args.GetCurrentPoint(element);
+          using Kind = winrt::Windows::UI::Input::PointerUpdateKind;
+          if (point.Properties().PointerUpdateKind() != Kind::MiddleButtonPressed ||
+              !Find(element, [](auto const &node) { return VolumeLeaf(node); }))
+            return;
+          if (!stopping && audio && audio->Get().masterAvailable &&
+              audio->Send({sound::Action::ToggleEndpointMute}))
+            args.Handled(true);
+        } catch (...) {
+          Wh_Log(L"TrayMiddleMuteError %08X", winrt::to_hresult());
+        }
+      }));
+  icon.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
+  record.middlePressed = handler;
+}
+inline void AppendSoundSettings(Record &record, C::MenuFlyout const &menu) {
+  if (menu == record.menu.get())
+    return;
+  DetachSoundSettings(record);
+  for (auto const &entry : menu.Items())
+    if (entry.Name() == L"RefinedSoundControlPanel")
+      return;
+  C::MenuFlyoutItem item;
+  item.Name(L"RefinedSoundControlPanel");
+  item.Text(sound::Text(L"More sound settings", L"Дополнительные параметры звука",
+                        L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen",
+                        L"Mais configurações de som", L"更多声音设置"));
+  auto click = item.Click([](auto &&, auto &&) {
+    ShellExecuteW(nullptr, L"open", L"control.exe", L"mmsys.cpl", nullptr, SW_SHOWNORMAL);
+  });
+  try {
+    menu.Items().Append(item);
+  } catch (...) {
+    item.Click(click);
+    throw;
+  }
+  record.menu = winrt::make_weak(menu);
+  record.soundSettingsItem = item;
+  record.soundSettingsClick = click;
+}
+inline std::wstring TrayString(PCWSTR key) {
+  WCHAR file[MAX_PATH]{};
+  auto module = GetModuleHandleW(L"SystemTray.dll");
+  if (!module || !GetModuleFileNameW(module, file, ARRAYSIZE(file)) ||
+      !PathRemoveFileSpecW(file))
+    return {};
+  auto uri = std::wstring(L"@{") + file +
+             L"\\resources.pri?ms-resource://MicrosoftWindows.Client.Core/SystemTray/Resources/" +
+             key + L"}";
+  WCHAR value[256]{};
+  if (FAILED(SHLoadIndirectString(uri.c_str(), value, ARRAYSIZE(value), nullptr)))
+    return {};
+  return value;
+}
+inline void ExtendVolumeMenu(void *self) {
+  if (stopping)
+    return;
+  try {
+    IInspectable flyout{nullptr};
+    winrt::copy_from_abi(flyout, self);
+    auto menu = flyout.try_as<C::MenuFlyout>();
+    if (!menu || menu.Items().Size() < 2)
+      return;
+    // Identify the original volume menu by both shell resource strings.
+    // The same XAML ShowAt implementation also opens other tray flyouts.
+    auto mixer = TrayString(L"VolumeContextMenuVolumeMixer");
+    auto settings = TrayString(L"VolumeContextMenuSoundSettings");
+    if (mixer.empty() || settings.empty())
+      return;
+    bool hasMixer = false, hasSettings = false;
+    for (auto const &entry : menu.Items())
+      if (auto item = entry.try_as<C::MenuFlyoutItem>()) {
+        auto label = item.Text();
+        hasMixer |= label == mixer;
+        hasSettings |= label == settings;
+      }
+    if (!hasMixer || !hasSettings)
+      return;
+    std::vector<std::shared_ptr<Record>> local;
+    {
+      std::lock_guard lock(recordsMutex);
+      for (auto const &record : records)
+        if (record->thread == GetCurrentThreadId())
+          local.push_back(record);
+    }
+    for (auto const &record : local)
+      if (auto icon = record->icon.get(); icon && InControlCenter(icon) &&
+          Find(icon, [](auto const &node) { return VolumeLeaf(node); })) {
+        AppendSoundSettings(*record, menu);
+        return;
+      }
+  } catch (...) {
+    Wh_Log(L"TrayVolumeMenuError %08X", winrt::to_hresult());
+  }
+}
+using ShowFlyout = HRESULT(WINAPI *)(void *, void *);
+using ShowFlyoutWithOptions = HRESULT(WINAPI *)(void *, void *, void *);
+inline ShowFlyout originalShowFlyout = nullptr;
+inline ShowFlyoutWithOptions originalShowFlyoutWithOptions = nullptr;
+inline HRESULT WINAPI ShowVolumeFlyout(void *self, void *target) {
+  ExtendVolumeMenu(self);
+  return originalShowFlyout(self, target);
+}
+inline HRESULT WINAPI ShowVolumeFlyoutWithOptions(void *self, void *target, void *options) {
+  ExtendVolumeMenu(self);
+  return originalShowFlyoutWithOptions(self, target, options);
+}
+inline void HookVolumeMenus() {
+  try {
+    C::MenuFlyout flyout;
+    auto base = flyout.as<P::IFlyoutBase>();
+    auto withOptions = flyout.as<P::IFlyoutBase5>();
+    // Slots from the stable Windows.UI.Xaml WinRT ABI (including IInspectable).
+    auto table = *reinterpret_cast<void ***>(winrt::get_abi(base));
+    auto table5 = *reinterpret_cast<void ***>(winrt::get_abi(withOptions));
+    bool basic = WindhawkUtils::SetFunctionHook(reinterpret_cast<ShowFlyout>(table[14]),
+                                               ShowVolumeFlyout, &originalShowFlyout);
+    bool options = WindhawkUtils::SetFunctionHook(
+        reinterpret_cast<ShowFlyoutWithOptions>(table5[12]), ShowVolumeFlyoutWithOptions,
+        &originalShowFlyoutWithOptions);
+    if (!(basic || options) || !Wh_ApplyHookOperations())
+      Wh_Log(L"Tray volume menu hook unavailable");
+  } catch (...) {
+    Wh_Log(L"TrayVolumeMenuHookError %08X", winrt::to_hresult());
+  }
+}
 inline void CopySlot(X::FrameworkElement const &to, X::FrameworkElement const &from) {
   to.HorizontalAlignment(from.HorizontalAlignment());
   to.VerticalAlignment(from.VerticalAlignment());
@@ -448,6 +596,13 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
       record->timer.Stop();
     return;
   }
+  if (trayMiddleClickMute && !record->middlePressed && InControlCenter(icon) &&
+      Find(icon, [](auto const &node) { return VolumeLeaf(node); }))
+    try {
+      AttachMiddleMute(*record, icon);
+    } catch (...) {
+      Wh_Log(L"TrayVolumeActionsError %08X", winrt::to_hresult());
+    }
   if (record->attached) {
     auto native = record->native.get();
     if (!native || !native.IsLoaded()) {
@@ -910,12 +1065,18 @@ inline bool Initialize(HINSTANCE instance) {
   return result;
 }
 inline void AttachExisting() {
+  bool menuHooked = false;
   for (auto taskbar : Taskbars())
-    Dispatch(taskbar, [taskbar] {
+    Dispatch(taskbar, [taskbar, &menuHooked] {
       EnsurePulse(taskbar);
       auto root = Root(taskbar);
-      if (root)
+      if (root) {
         Walk(root.Content(), taskbar);
+        if (!menuHooked) {
+          HookVolumeMenus();
+          menuHooked = true;
+        }
+      }
     });
   size_t attached = 0;
   {
@@ -943,10 +1104,16 @@ inline void CleanupThreadRecords() {
         record->timer.Tick(record->tick);
         record->timer = nullptr;
       }
-      if (auto icon = record->icon.get(); icon && record->loaded.value) {
-        icon.Loaded(record->loaded);
-        record->loaded = {};
+      if (auto icon = record->icon.get()) {
+        if (record->loaded.value) {
+          icon.Loaded(record->loaded);
+          record->loaded = {};
+        }
+        if (record->middlePressed)
+          icon.RemoveHandler(X::UIElement::PointerPressedEvent(), record->middlePressed);
       }
+      record->middlePressed = nullptr;
+      DetachSoundSettings(*record);
       RestoreGlyphs(record);
       RemoveVisual(record);
       record->animated.reset();
