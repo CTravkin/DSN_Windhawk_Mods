@@ -49,6 +49,8 @@ To update a local installation, open its editor, replace the source, and compile
 
 Open the mod's **Settings** in Windhawk. Each setting can be changed independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. The title bar option applies when Windows uses the accent color for title bars.
 
+Under **Window exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
+
 Returning a window setting to **Default** restores the system DWM color. Applications that set a custom DWM color can reapply it when the window reopens.
 
 ## Links

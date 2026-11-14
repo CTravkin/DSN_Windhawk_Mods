@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.25
+// @version         1.1.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 40
+// Build: 41
 
 // ==WindhawkModReadme==
 /*
@@ -65,6 +65,8 @@ Requires Windows 11 x64 or ARM64.
 
 Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Default** to restore Windows styling for a setting.
 
+Under **Window exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
+
 ## Links
 
 - [Windows Border Switch on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Windows_Border_Switch)
@@ -75,12 +77,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
 // ==WindhawkModSettings==
 /*
 - activeWindow: caption
-  $name: Active window border
-  $name:ru-RU: Рамка активного окна
-  $name:es-ES: Borde de la ventana activa
-  $name:de-DE: Rahmen des aktiven Fensters
-  $name:pt-BR: Borda da janela ativa
-  $name:zh-CN: 活动窗口边框
+  $name: Active window
+  $name:ru-RU: Активное окно
+  $name:es-ES: Ventana activa
+  $name:de-DE: Aktives Fenster
+  $name:pt-BR: Janela ativa
+  $name:zh-CN: 活动窗口
+  $description: Focused window border or title bar accent color
+  $description:ru-RU: Рамка окна в фокусе или акцентный цвет его заголовка
+  $description:es-ES: Borde de la ventana con el foco o color de énfasis de su barra de título
+  $description:de-DE: Rahmen des fokussierten Fensters oder Akzentfarbe seiner Titelleiste
+  $description:pt-BR: Borda da janela em foco ou cor de destaque da barra de título
+  $description:zh-CN: 焦点窗口的边框或标题栏主题色
   $options:
   - default: Default
   - hide: Hide border
@@ -106,12 +114,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - hide: 隐藏边框
   - caption: 关闭标题栏主题色
 - inactiveWindow: hide
-  $name: Inactive window borders
-  $name:ru-RU: Рамки неактивных окон
-  $name:es-ES: Bordes de las ventanas inactivas
-  $name:de-DE: Rahmen inaktiver Fenster
-  $name:pt-BR: Bordas das janelas inativas
-  $name:zh-CN: 非活动窗口边框
+  $name: Inactive windows
+  $name:ru-RU: Неактивные окна
+  $name:es-ES: Ventanas inactivas
+  $name:de-DE: Inaktive Fenster
+  $name:pt-BR: Janelas inativas
+  $name:zh-CN: 非活动窗口
+  $description: System-drawn borders of windows without focus
+  $description:ru-RU: Системные рамки окон вне фокуса
+  $description:es-ES: Bordes del sistema de las ventanas sin el foco
+  $description:de-DE: Systemrahmen von Fenstern ohne Fokus
+  $description:pt-BR: Bordas do sistema das janelas sem foco
+  $description:zh-CN: 未获得焦点的窗口的系统边框
   $options:
   - default: Default
   - hide: Hide border
@@ -131,12 +145,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - dialog: hide
-  $name: Dialog borders
-  $name:ru-RU: Рамки диалоговых окон
-  $name:es-ES: Bordes de los cuadros de diálogo
-  $name:de-DE: Rahmen von Dialogfeldern
-  $name:pt-BR: Bordas das caixas de diálogo
-  $name:zh-CN: 对话框边框
+  $name: Dialogs
+  $name:ru-RU: Диалоговые окна
+  $name:es-ES: Cuadros de diálogo
+  $name:de-DE: Dialogfelder
+  $name:pt-BR: Caixas de diálogo
+  $name:zh-CN: 对话框
+  $description: Classic Windows dialog borders, with or without focus
+  $description:ru-RU: Системные рамки классических диалогов вне зависимости от фокуса
+  $description:es-ES: Bordes de los cuadros de diálogo clásicos, con o sin el foco
+  $description:de-DE: Rahmen klassischer Dialogfelder mit oder ohne Fokus
+  $description:pt-BR: Bordas das caixas de diálogo clássicas, com ou sem foco
+  $description:zh-CN: 经典 Windows 对话框的边框，无论是否有焦点
   $options:
   - default: Default
   - hide: Hide border
@@ -156,12 +176,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - taskbar: hide
-  $name: Taskbar border
-  $name:ru-RU: Рамка панели задач
-  $name:es-ES: Borde de la barra de tareas
-  $name:de-DE: Taskleistenrahmen
-  $name:pt-BR: Borda da barra de tarefas
-  $name:zh-CN: 任务栏边框
+  $name: Taskbar
+  $name:ru-RU: Панель задач
+  $name:es-ES: Barra de tareas
+  $name:de-DE: Taskleiste
+  $name:pt-BR: Barra de tarefas
+  $name:zh-CN: 任务栏
+  $description: Taskbar edge and the desktops strip in Task View
+  $description:ru-RU: Кромка панели задач и панель рабочих столов в представлении задач
+  $description:es-ES: Borde de la barra de tareas y panel de escritorios en Vista de tareas
+  $description:de-DE: Kante der Taskleiste und Leiste der virtuellen Desktops in der Taskansicht
+  $description:pt-BR: Borda da barra de tarefas e faixa de áreas de trabalho na Visão de tarefas
+  $description:zh-CN: 任务栏边缘和任务视图中的桌面栏
   $options:
   - default: Default
   - hide: Hide border
@@ -181,12 +207,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - startMenu: hide
-  $name: Start menu border
-  $name:ru-RU: Рамка меню «Пуск»
-  $name:es-ES: Borde del menú Inicio
-  $name:de-DE: Startmenürahmen
-  $name:pt-BR: Borda do menu Iniciar
-  $name:zh-CN: “开始”菜单边框
+  $name: Start menu
+  $name:ru-RU: Меню «Пуск»
+  $name:es-ES: Menú Inicio
+  $name:de-DE: Startmenü
+  $name:pt-BR: Menu Iniciar
+  $name:zh-CN: “开始”菜单
+  $description: Start menu and its Phone Link panel
+  $description:ru-RU: Меню «Пуск» и его панель «Телефон»
+  $description:es-ES: Menú Inicio y su panel Enlace Móvil
+  $description:de-DE: Startmenü und sein Bereich Smartphone-Link
+  $description:pt-BR: Menu Iniciar e seu painel Vincular ao Celular
+  $description:zh-CN: “开始”菜单及其手机连接面板
   $options:
   - default: Default
   - hide: Hide border
@@ -206,12 +238,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - search: hide
-  $name: Search border
-  $name:ru-RU: Рамка поиска
-  $name:es-ES: Borde de la búsqueda
-  $name:de-DE: Rahmen der Suche
-  $name:pt-BR: Borda da pesquisa
-  $name:zh-CN: 搜索边框
+  $name: Search
+  $name:ru-RU: Поиск
+  $name:es-ES: Búsqueda
+  $name:de-DE: Suche
+  $name:pt-BR: Pesquisa
+  $name:zh-CN: 搜索
+  $description: Outer border of the Windows Search panel
+  $description:ru-RU: Внешняя рамка панели поиска Windows
+  $description:es-ES: Borde exterior del panel de búsqueda de Windows
+  $description:de-DE: Außenrahmen des Windows-Suchbereichs
+  $description:pt-BR: Borda externa do painel de pesquisa do Windows
+  $description:zh-CN: Windows 搜索面板的外边框
   $options:
   - default: Default
   - hide: Hide border
@@ -231,18 +269,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - notificationCenter: hide
-  $name: Notification borders
+  $name: Notifications
   $name:ru-RU: Уведомления
-  $name:es-ES: Bordes de las notificaciones
-  $name:de-DE: Benachrichtigungsrahmen
-  $name:pt-BR: Bordas das notificações
-  $name:zh-CN: 通知边框
-  $description: Includes the notification center, calendar, and notification banners
-  $description:ru-RU: Центр уведомлений, календарь и баннеры уведомлений
-  $description:es-ES: Incluye el centro de notificaciones, el calendario y los banners de notificación
-  $description:de-DE: Umfasst das Benachrichtigungscenter, den Kalender und Benachrichtigungsbanner
-  $description:pt-BR: Inclui a central de notificações, o calendário e os banners de notificação
-  $description:zh-CN: 包括通知中心、日历和通知横幅
+  $name:es-ES: Notificaciones
+  $name:de-DE: Benachrichtigungen
+  $name:pt-BR: Notificações
+  $name:zh-CN: 通知
+  $description: Notification center, calendar, and desktop banners
+  $description:ru-RU: Центр уведомлений, календарь и баннеры на рабочем столе
+  $description:es-ES: Centro de notificaciones, calendario y banners del escritorio
+  $description:de-DE: Benachrichtigungscenter, Kalender und Desktopbanner
+  $description:pt-BR: Central de notificações, calendário e banners na área de trabalho
+  $description:zh-CN: 通知中心、日历和桌面横幅
   $options:
   - default: Default
   - hide: Hide border
@@ -262,12 +300,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - quickSettings: hide
-  $name: Quick Settings border
-  $name:ru-RU: Рамка быстрых настроек
-  $name:es-ES: Borde de la configuración rápida
-  $name:de-DE: Rahmen der Schnelleinstellungen
-  $name:pt-BR: Borda das configurações rápidas
-  $name:zh-CN: 快速设置边框
+  $name: Quick Settings
+  $name:ru-RU: Быстрые настройки
+  $name:es-ES: Configuración rápida
+  $name:de-DE: Schnelleinstellungen
+  $name:pt-BR: Configurações rápidas
+  $name:zh-CN: 快速设置
+  $description: Quick Settings and the media controls above them
+  $description:ru-RU: Панель быстрых настроек и управление воспроизведением над ней
+  $description:es-ES: Configuración rápida y los controles multimedia situados encima
+  $description:de-DE: Schnelleinstellungen und die Mediensteuerung darüber
+  $description:pt-BR: Configurações rápidas e os controles de mídia acima delas
+  $description:zh-CN: 快速设置及其上方的媒体控件
   $options:
   - default: Default
   - hide: Hide border
@@ -287,12 +331,18 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   - default: 默认
   - hide: 隐藏边框
 - widgets: hide
-  $name: Widgets board border
-  $name:ru-RU: Рамка панели мини-приложений
-  $name:es-ES: Borde del panel de widgets
-  $name:de-DE: Rahmen des Widgetboards
-  $name:pt-BR: Borda do quadro de widgets
-  $name:zh-CN: 小组件板边框
+  $name: Widgets
+  $name:ru-RU: Мини-приложения
+  $name:es-ES: Widgets
+  $name:de-DE: Widgets
+  $name:pt-BR: Widgets
+  $name:zh-CN: 小组件
+  $description: Outer border of the widgets board
+  $description:ru-RU: Внешняя рамка панели мини-приложений
+  $description:es-ES: Borde exterior del panel de widgets
+  $description:de-DE: Außenrahmen des Widget-Boards
+  $description:pt-BR: Borda externa do painel de widgets
+  $description:zh-CN: 小组件面板的外边框
   $options:
   - default: Default
   - hide: Hide border
@@ -311,6 +361,63 @@ Open the mod's **Settings** to change each setting independently. Initially, the
   $options:zh-CN:
   - default: 默认
   - hide: 隐藏边框
+- processExceptions:
+  - - process: ""
+      $name: Process
+      $name:ru-RU: Процесс
+      $name:es-ES: Proceso
+      $name:de-DE: Prozess
+      $name:pt-BR: Processo
+      $name:zh-CN: 进程
+      $description: Executable name, e.g. steam.exe
+      $description:ru-RU: Имя файла процесса, например steam.exe
+      $description:es-ES: Nombre del ejecutable, p. ej. steam.exe
+      $description:de-DE: Name der ausführbaren Datei, z. B. steam.exe
+      $description:pt-BR: Nome do executável, por exemplo, steam.exe
+      $description:zh-CN: 可执行文件名，例如 steam.exe
+    - scope: both
+      $name: Exclude windows
+      $name:ru-RU: Какие окна исключить
+      $name:es-ES: Ventanas que se excluyen
+      $name:de-DE: Ausgeschlossene Fenster
+      $name:pt-BR: Janelas excluídas
+      $name:zh-CN: 排除的窗口
+      $options:
+      - both: All windows
+      - active: Active only
+      - inactive: Inactive only
+      $options:ru-RU:
+      - both: Все окна
+      - active: Только активные
+      - inactive: Только неактивные
+      $options:es-ES:
+      - both: Todas las ventanas
+      - active: Solo activas
+      - inactive: Solo inactivas
+      $options:de-DE:
+      - both: Alle Fenster
+      - active: Nur aktive
+      - inactive: Nur inaktive
+      $options:pt-BR:
+      - both: Todas as janelas
+      - active: Apenas ativas
+      - inactive: Apenas inativas
+      $options:zh-CN:
+      - both: 所有窗口
+      - active: 仅活动窗口
+      - inactive: 仅非活动窗口
+  $name: Window exceptions
+  $name:ru-RU: Исключения для окон
+  $name:es-ES: Excepciones para ventanas
+  $name:de-DE: Fensterausnahmen
+  $name:pt-BR: Exceções para janelas
+  $name:zh-CN: 窗口例外
+  $description: Keep the usual window border and title bar for selected processes
+  $description:ru-RU: Сохраняют обычные рамки и заголовки окон выбранных процессов
+  $description:es-ES: Conservan los bordes y las barras de título habituales de los procesos seleccionados
+  $description:de-DE: Behält bei ausgewählten Prozessen die üblichen Fensterrahmen und Titelleisten bei
+  $description:pt-BR: Preservam as bordas e barras de título habituais dos processos selecionados
+  $description:zh-CN: 为选定进程保留原有窗口边框和标题栏
 */
 // ==/WindhawkModSettings==
 
@@ -319,6 +426,13 @@ Open the mod's **Settings** to change each setting independently. Initially, the
 namespace {
 
 enum class WindowEffect { Default, HideBorder, RemoveCaptionAccent };
+
+enum class WindowException : unsigned { None = 0, Active = 1, Inactive = 2, Both = 3 };
+
+constexpr bool ExcludesWindow(WindowException exception, bool active) {
+    auto state = active ? WindowException::Active : WindowException::Inactive;
+    return (static_cast<unsigned>(exception) & static_cast<unsigned>(state)) != 0;
+}
 
 struct WindowSettings {
     WindowEffect active = WindowEffect::Default;
@@ -487,6 +601,7 @@ constexpr bool IsStartBorderParent(std::wstring_view name, std::wstring_view typ
 #include <array>
 #include <atomic>
 #include <mutex>
+#include <string>
 #include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
@@ -534,6 +649,21 @@ struct Worker {
 };
 
 WindowSettings g_windowSettings;
+struct ProcessException {
+    std::wstring name;
+    WindowException scope;
+
+    bool operator==(ProcessException const&) const = default;
+};
+
+std::vector<ProcessException> g_windowExceptions;
+std::vector<ProcessException> g_requestedWindowExceptions;
+struct WindowOwner {
+    DWORD pid;
+    WindowException exception;
+};
+
+std::unordered_map<HWND, WindowOwner> g_windowOwners;
 std::mutex g_windowSettingsMutex;
 WindowSettings g_requestedWindowSettings;
 winrt::handle g_windowSettingsChanged;
@@ -706,6 +836,54 @@ COLORREF NeutralCaptionColor(HWND window) {
     return GetSysColor(COLOR_BTNFACE);
 }
 
+WindowException FindProcessException(DWORD pid) {
+    winrt::handle process{OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid)};
+    if (!process) {
+        return WindowException::None;
+    }
+    WCHAR path[MAX_PATH];
+    DWORD length = ARRAYSIZE(path);
+    std::wstring longPath;
+    std::wstring_view filename;
+    if (QueryFullProcessImageNameW(process.get(), 0, path, &length)) {
+        filename = {path, length};
+    } else if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
+        longPath.resize(32768);
+        length = static_cast<DWORD>(longPath.size());
+        if (QueryFullProcessImageNameW(process.get(), 0, longPath.data(), &length)) {
+            filename = {longPath.data(), length};
+        }
+    }
+    if (filename.empty()) {
+        return WindowException::None;
+    }
+    filename.remove_prefix(filename.find_last_of(L"\\/") + 1);
+    unsigned scopes = 0;
+    for (auto const& entry : g_windowExceptions) {
+        if (CompareStringOrdinal(filename.data(), static_cast<int>(filename.size()),
+                                 entry.name.c_str(), -1, TRUE) == CSTR_EQUAL) {
+            scopes |= static_cast<unsigned>(entry.scope);
+        }
+    }
+    return static_cast<WindowException>(scopes);
+}
+
+bool IsExcludedWindow(HWND window, bool active) {
+    if (g_windowExceptions.empty()) {
+        return false;
+    }
+    DWORD pid = 0;
+    GetWindowThreadProcessId(window, &pid);
+    if (!pid) {
+        return false;
+    }
+    auto entry = g_windowOwners.find(window);
+    if (entry == g_windowOwners.end() || entry->second.pid != pid) {
+        entry = g_windowOwners.insert_or_assign(window, WindowOwner{pid, FindProcessException(pid)}).first;
+    }
+    return ExcludesWindow(entry->second.exception, active);
+}
+
 AppliedFrame DesiredFrame(HWND window) {
     if (!IsWindowVisible(window) || IsIconic(window)) {
         return {};
@@ -718,8 +896,10 @@ AppliedFrame DesiredFrame(HWND window) {
     }
     bool active = window == g_foreground;
     WindowEffect effect = WindowEffectFor(g_windowSettings, active, dialog);
-    bool accent = hasCaption && !dialog && effect != WindowEffect::Default &&
-                  CaptionAccentEnabled();
+    if (effect == WindowEffect::Default || IsExcludedWindow(window, active)) {
+        return {};
+    }
+    bool accent = hasCaption && !dialog && CaptionAccentEnabled();
     auto frame = WindowFrameFor(g_windowSettings, active, dialog,
                                accent && ClientReachesTop(window), accent);
     AppliedFrame desired;
@@ -789,6 +969,7 @@ void CALLBACK OnWindowEvent(HWINEVENTHOOK, DWORD event, HWND window, LONG object
         return;
     }
     if (event == EVENT_OBJECT_DESTROY) {
+        g_windowOwners.erase(window);
         g_changedWindows.erase(window);
         g_pendingWindows.erase(window);
     } else if (event == EVENT_OBJECT_HIDE) {
@@ -841,6 +1022,10 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
         auto loadSettings = [] {
             std::lock_guard guard(g_windowSettingsMutex);
             g_windowSettings = g_requestedWindowSettings;
+            if (g_windowExceptions != g_requestedWindowExceptions) {
+                g_windowExceptions = g_requestedWindowExceptions;
+                g_windowOwners.clear();
+            }
         };
         loadSettings();
         RefreshWindows();
@@ -908,6 +1093,7 @@ DWORD WINAPI RunWindowWorker(void* stopParameter) {
         KillTimer(nullptr, std::exchange(g_frameTimer, 0));
     }
     g_pendingWindows.clear();
+    g_windowOwners.clear();
     for (auto [window, frame] : g_changedWindows) {
         if (frame.border != DWMWA_COLOR_DEFAULT) {
             SetFrameColor(window, DWMWA_BORDER_COLOR, DWMWA_COLOR_DEFAULT);
@@ -1625,6 +1811,28 @@ WindowEffect ReadSetting(PCWSTR name) {
     return WindowEffect::Default;
 }
 
+std::vector<ProcessException> ReadProcessExceptions() {
+    std::vector<ProcessException> entries;
+    for (int i = 0;; ++i) {
+        auto process = WindhawkUtils::StringSetting::make(L"processExceptions[%d].process", i);
+        auto mode = WindhawkUtils::StringSetting::make(L"processExceptions[%d].scope", i);
+        std::wstring_view name = process.get();
+        std::wstring_view scope = mode.get();
+        if (name.empty() && scope.empty()) {
+            break;
+        }
+        auto first = name.find_first_not_of(L" \t\r\n");
+        if (first != std::wstring_view::npos) {
+            name = name.substr(first, name.find_last_not_of(L" \t\r\n") - first + 1);
+            auto exception = scope == L"active" ? WindowException::Active
+                           : scope == L"inactive" ? WindowException::Inactive
+                                                  : WindowException::Both;
+            entries.push_back({std::wstring(name), exception});
+        }
+    }
+    return entries;
+}
+
 void ApplySettings() {
     if (g_windowSettingsChanged) {
         WindowSettings settings{
@@ -1632,11 +1840,16 @@ void ApplySettings() {
             ReadSetting(L"inactiveWindow") == WindowEffect::HideBorder,
             ReadSetting(L"dialog") == WindowEffect::HideBorder,
         };
+        auto exceptions = settings.AnyEnabled() ? ReadProcessExceptions() : std::vector<ProcessException>{};
         WindowUpdate update;
         {
             std::lock_guard guard(g_windowSettingsMutex);
             update = WindowSettingsUpdate(g_requestedWindowSettings, settings);
             g_requestedWindowSettings = settings;
+            if (update == WindowUpdate::None && g_requestedWindowExceptions != exceptions) {
+                update = WindowUpdate::Refresh;
+            }
+            g_requestedWindowExceptions = std::move(exceptions);
         }
         if (update == WindowUpdate::Stop) {
             g_windowWorker.Stop();
