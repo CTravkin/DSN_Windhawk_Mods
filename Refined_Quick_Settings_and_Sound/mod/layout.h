@@ -42,7 +42,7 @@ struct AppRow {
 inline sound::Snapshot lastAudio;
 inline bool soundOpenedOnce = false;
 class SoundPage {
-  X::FrameworkElement page_{nullptr}, outputAnchor_{nullptr}, frame_{nullptr};
+  X::FrameworkElement page_{nullptr}, frame_{nullptr};
   Journal journal_;
   // L2Frame outlives the page (it hosts every Sound page): its changes are kept
   // apart so an abandoned page still gives the frame its native height back.
@@ -484,8 +484,6 @@ class SoundPage {
       frame_.Height(target);
     }
   }
-  // No custom value tooltip: the native Slider thumb tooltip is the only one
-  // (IsThumbToolTipEnabled), as in the stock shell.
   void Add(C::Panel const &parent, X::UIElement const &child, uint32_t index = UINT_MAX) {
     parent.Children().InsertAt(std::min(index, parent.Children().Size()), child);
     journal_.undo.push_back([parent, child] {
@@ -645,8 +643,15 @@ class SoundPage {
       throw winrt::hresult_error(E_UNEXPECTED);
     auto m = Picker(parent, kind, heading.Text());
     m->list = list;
-    journal_.Save(list, X::FrameworkElement::DataContextProperty());
-    list.DataContext(list.DataContext());
+    auto context = X::FrameworkElement::DataContextProperty();
+    if (list.ReadLocalValue(context) == X::DependencyProperty::UnsetValue()) {
+      journal_.Save(list, context);
+      D::Binding inherited;
+      inherited.Mode(D::BindingMode::OneWay);
+      inherited.Source(parent);
+      inherited.Path(X::PropertyPath(L"DataContext"));
+      list.SetBinding(context, inherited);
+    }
     journal_.Save(list, X::FrameworkElement::WidthProperty());
     journal_.Save(list, X::FrameworkElement::MaxHeightProperty());
     Compact(list);
@@ -1290,9 +1295,10 @@ public:
       MasterGlyph(state.master, state.muted);
   }
   X::FrameworkElement Page() const { return page_; }
-  bool Alive() const {
-    return page_ && page_.IsLoaded() && outputAnchor_ && outputAnchor_.IsLoaded() &&
-           Named(page_, L"OutputGroupTitle") == outputAnchor_;
+  bool Loaded() const {
+    // Headings live in a virtualized list and may unload while the footer
+    // and other controls are still active.
+    return page_ && page_.IsLoaded();
   }
   bool Apply() {
     auto outputTitle = Named(page_, L"OutputGroupTitle");
@@ -1316,7 +1322,6 @@ public:
           return border && border.BorderThickness().Top > 0;
         }))
       return false;
-    outputAnchor_ = outputTitle;
     if (auto original = output.ItemContainerStyle())
       pickerBase_ = original.BasedOn();
     for (auto heading : {outputTitle, spatialTitle, mixer})

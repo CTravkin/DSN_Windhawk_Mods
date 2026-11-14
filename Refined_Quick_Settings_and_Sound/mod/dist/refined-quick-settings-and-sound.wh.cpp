@@ -7,7 +7,7 @@
 // @description:de-DE Anpassbare Kachelzeilen, Verknüpfungen und Symbole mit Lautstärkemixer per Klick
 // @description:pt-BR Linhas de blocos, atalhos e ícones personalizáveis e mixer de volume a um clique
 // @description:zh-CN 自定义磁贴行数、快捷方式和图标，一键打开音量合成器
-// @version 0.5.0
+// @version 0.5.1
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 160
+// Build: 161
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -913,10 +913,15 @@ class Audio final {
     }
     return name;
   }
-  std::vector<Device> Devices(EDataFlow flow, std::wstring &defaultId) {
+  std::wstring DefaultDevice(EDataFlow flow) {
     winrt::com_ptr<IMMDevice> current;
-    enumerator_->GetDefaultAudioEndpoint(flow, eMultimedia, current.put());
-    defaultId = Id(current.get());
+    auto result = enumerator_->GetDefaultAudioEndpoint(flow, eMultimedia, current.put());
+    if (result == HRESULT_FROM_WIN32(ERROR_NOT_FOUND))
+      return {};
+    winrt::check_hresult(result);
+    return Id(current.get());
+  }
+  std::vector<Device> Devices(EDataFlow flow, std::wstring const &defaultId) {
     std::vector<Device> result;
     winrt::com_ptr<IMMDeviceCollection> devices;
     winrt::check_hresult(enumerator_->EnumAudioEndpoints(flow, DEVICE_STATE_ACTIVE, devices.put()));
@@ -1039,13 +1044,12 @@ class Audio final {
       SetDefault(cmd.id);
     }
   }
-  void Read() {
+  bool Read() {
     Snapshot state;
     state.revision = ++revision_;
     state.applied = applied_;
     state.error = error_;
-    state.output = Devices(eRender, state.outputId);
-    state.input = Devices(eCapture, state.inputId);
+    state.outputId = DefaultDevice(eRender);
     BindMaster(state.outputId);
     if (master_) {
       BOOL mute = FALSE;
@@ -1060,8 +1064,31 @@ class Audio final {
           master_->UnregisterControlChangeNotify(volumeObserver_.get());
         volumeObserver_ = nullptr;
         master_ = nullptr;
+        std::lock_guard lock(volumeFeed_->mutex);
+        volumeFeed_->available = false;
       }
     }
+    bool retry = !state.outputId.empty() && !state.masterAvailable;
+    // The input list and the endpoint volume have independent failure modes.
+    // Publish the current volume even if an endpoint collection is unavailable.
+    for (auto flow : {eRender, eCapture})
+      try {
+        if (flow == eRender)
+          state.output = Devices(flow, state.outputId);
+        else {
+          state.inputId = DefaultDevice(flow);
+          state.input = Devices(flow, state.inputId);
+        }
+      } catch (winrt::hresult_error const &) {
+        retry = true;
+        std::lock_guard lock(mutex_);
+        if (flow == eRender && snapshot_.outputId == state.outputId)
+          state.output = snapshot_.output;
+        else if (flow == eCapture) {
+          state.inputId = snapshot_.inputId;
+          state.input = snapshot_.input;
+        }
+      }
     // The shell's own lists serve output devices, application sessions and
     // spatial sound; this worker serves the added input selector, the master
     // volume and the tray.
@@ -1071,6 +1098,7 @@ class Audio final {
     }
     if (publish_)
       publish_();
+    return retry;
   }
   void Run() noexcept {
     bool apartment = false;
@@ -1098,8 +1126,9 @@ class Audio final {
           }
           applied_ = cmd.serial;
         }
+        bool retry = true;
         try {
-          Read();
+          retry = Read();
         } catch (winrt::hresult_error const &ex) {
           {
             std::lock_guard lock(mutex_);
@@ -1111,9 +1140,13 @@ class Audio final {
             publish_();
         }
         std::unique_lock lock(wake_->mutex);
-        // No polling: endpoint, default-device and master volume changes arrive
-        // as notifications (Notify, VolumeNotify), commands through Send.
-        wake_->cv.wait(lock, [&] { return stop_ || wake_->changed; });
+        auto signalled = [&] { return stop_ || wake_->changed; };
+        // Failed reads and endpoint activation may have no notification to
+        // wake the worker again. Retry only until the audio state recovers.
+        if (retry)
+          wake_->cv.wait_for(lock, std::chrono::seconds(1), signalled);
+        else
+          wake_->cv.wait(lock, signalled);
         wake_->changed = false;
       }
       enumerator_->UnregisterEndpointNotificationCallback(observer.get());
@@ -1927,15 +1960,37 @@ public:
 
 
 namespace native {
-// A wheel gesture doesn't enter the Slider's native thumb-drag state.
-// Use the same XAML control and anchor as the drag tooltip.
+// The native thumb tooltip belongs to the drag gesture. A XAML popup keeps
+// the wheel value visible independently and stays above scrollable rows.
 class WheelToolTip {
-  C::ToolTip tip_{nullptr};
+  P::Popup popup_{nullptr};
+  C::Border plate_{nullptr};
+  C::TextBlock label_{nullptr};
   X::DispatcherTimer timer_{nullptr};
   X::DispatcherTimer::Tick_revoker tick_;
   X::FrameworkElement::Unloaded_revoker unloaded_;
+  X::FrameworkElement::LayoutUpdated_revoker layout_;
   C::Slider slider_{nullptr};
   IInspectable pressed_{nullptr};
+
+  void Position() {
+    auto root = slider_.XamlRoot();
+    if (!root)
+      return;
+    auto thumb = Named(slider_, L"HorizontalThumb");
+    auto anchor = thumb ? thumb : slider_.as<X::FrameworkElement>();
+    auto point = anchor.TransformToVisual(root.Content()).TransformPoint(
+        {float(anchor.ActualWidth() / 2), 0});
+    plate_.Measure({INFINITY, INFINITY});
+    auto size = plate_.DesiredSize();
+    auto left = std::clamp(point.X - size.Width / 2, 0.f,
+                           std::max(0.f, root.Size().Width - size.Width));
+    auto top = std::max(0.f, point.Y - size.Height - 4);
+    if (std::abs(popup_.HorizontalOffset() - left) > .25)
+      popup_.HorizontalOffset(left);
+    if (std::abs(popup_.VerticalOffset() - top) > .25)
+      popup_.VerticalOffset(top);
+  }
 
 public:
   void Hide() noexcept {
@@ -1946,6 +2001,7 @@ public:
         Wh_Log(L"WheelTooltipTimerStopError %08X", winrt::to_hresult());
       }
     unloaded_.revoke();
+    layout_.revoke();
     if (slider_) {
       try {
         slider_.RemoveHandler(X::UIElement::PointerPressedEvent(), pressed_);
@@ -1955,10 +2011,9 @@ public:
       slider_ = nullptr;
       pressed_ = nullptr;
     }
-    if (tip_)
+    if (popup_)
       try {
-        tip_.IsOpen(false);
-        tip_.PlacementTarget(nullptr);
+        popup_.IsOpen(false);
       } catch (...) {
         Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
       }
@@ -1967,12 +2022,20 @@ public:
     auto root = slider.XamlRoot();
     if (!root)
       return;
-    if (!tip_ || tip_.XamlRoot() != root) {
+    if (!popup_ || popup_.XamlRoot() != root) {
       Hide();
-      tip_ = C::ToolTip();
-      tip_.XamlRoot(root);
-      tip_.Placement(P::PlacementMode::Top);
-      tip_.IsHitTestVisible(false);
+      popup_ = P::Popup();
+      popup_.XamlRoot(root);
+      popup_.IsHitTestVisible(false);
+      plate_ = C::Border();
+      plate_.IsHitTestVisible(false);
+      plate_.CornerRadius({4, 4, 4, 4});
+      plate_.Padding({8, 4, 8, 4});
+      plate_.BorderThickness({1, 1, 1, 1});
+      label_ = C::TextBlock();
+      label_.FontSize(12);
+      plate_.Child(label_);
+      popup_.Child(plate_);
     }
     if (slider_ != slider) {
       Hide();
@@ -1982,24 +2045,38 @@ public:
       slider_ = slider;
       pressed_ = handler;
       unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
+      layout_ = slider.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
+        try {
+          if (slider_ && popup_.IsOpen())
+            Position();
+        } catch (...) {
+          Hide();
+        }
+      });
+      const auto dark = DarkTheme(slider);
+      const auto themedBrush = [&](PCWSTR key, uint8_t shade) {
+        auto brush = Resource(slider, key).try_as<M::Brush>();
+        if (!brush)
+          brush = M::SolidColorBrush(winrt::Windows::UI::Color{255, shade, shade, shade});
+        return brush;
+      };
+      plate_.Background(themedBrush(L"ToolTipBackground", dark ? 44 : 250));
+      plate_.BorderBrush(themedBrush(L"ToolTipBorderBrush", dark ? 85 : 220));
+      label_.Foreground(themedBrush(L"ToolTipForeground", dark ? 255 : 26));
     }
-    auto thumb = Named(slider, L"HorizontalThumb");
-    auto target = thumb ? thumb.as<X::UIElement>() : slider.as<X::UIElement>();
-    if (tip_.PlacementTarget() != target) {
-      tip_.IsOpen(false);
-      tip_.PlacementTarget(target);
-    }
-    auto content = winrt::box_value(std::to_wstring(std::lround(value)));
+    auto content = std::to_wstring(std::lround(value));
     if (auto converter = slider.ThumbToolTipValueConverter())
       try {
         if (auto converted = converter.Convert(winrt::box_value(value),
                                                winrt::xaml_typename<winrt::hstring>(), nullptr,
                                                L""))
-          content = converted;
+          if (auto convertedText = String(converted); !convertedText.empty())
+            content = std::move(convertedText);
       } catch (...) {
       }
-    tip_.Content(content);
-    tip_.IsOpen(true);
+    label_.Text(content);
+    Position();
+    popup_.IsOpen(true);
     if (!timer_) {
       timer_ = X::DispatcherTimer();
       timer_.Interval(std::chrono::milliseconds(900));
@@ -2537,7 +2614,7 @@ struct AppRow {
 inline sound::Snapshot lastAudio;
 inline bool soundOpenedOnce = false;
 class SoundPage {
-  X::FrameworkElement page_{nullptr}, outputAnchor_{nullptr}, frame_{nullptr};
+  X::FrameworkElement page_{nullptr}, frame_{nullptr};
   Journal journal_;
   // L2Frame outlives the page (it hosts every Sound page): its changes are kept
   // apart so an abandoned page still gives the frame its native height back.
@@ -2979,8 +3056,6 @@ class SoundPage {
       frame_.Height(target);
     }
   }
-  // No custom value tooltip: the native Slider thumb tooltip is the only one
-  // (IsThumbToolTipEnabled), as in the stock shell.
   void Add(C::Panel const &parent, X::UIElement const &child, uint32_t index = UINT_MAX) {
     parent.Children().InsertAt(std::min(index, parent.Children().Size()), child);
     journal_.undo.push_back([parent, child] {
@@ -3140,8 +3215,15 @@ class SoundPage {
       throw winrt::hresult_error(E_UNEXPECTED);
     auto m = Picker(parent, kind, heading.Text());
     m->list = list;
-    journal_.Save(list, X::FrameworkElement::DataContextProperty());
-    list.DataContext(list.DataContext());
+    auto context = X::FrameworkElement::DataContextProperty();
+    if (list.ReadLocalValue(context) == X::DependencyProperty::UnsetValue()) {
+      journal_.Save(list, context);
+      D::Binding inherited;
+      inherited.Mode(D::BindingMode::OneWay);
+      inherited.Source(parent);
+      inherited.Path(X::PropertyPath(L"DataContext"));
+      list.SetBinding(context, inherited);
+    }
     journal_.Save(list, X::FrameworkElement::WidthProperty());
     journal_.Save(list, X::FrameworkElement::MaxHeightProperty());
     Compact(list);
@@ -3785,9 +3867,10 @@ public:
       MasterGlyph(state.master, state.muted);
   }
   X::FrameworkElement Page() const { return page_; }
-  bool Alive() const {
-    return page_ && page_.IsLoaded() && outputAnchor_ && outputAnchor_.IsLoaded() &&
-           Named(page_, L"OutputGroupTitle") == outputAnchor_;
+  bool Loaded() const {
+    // Headings live in a virtualized list and may unload while the footer
+    // and other controls are still active.
+    return page_ && page_.IsLoaded();
   }
   bool Apply() {
     auto outputTitle = Named(page_, L"OutputGroupTitle");
@@ -3811,7 +3894,6 @@ public:
           return border && border.BorderThickness().Top > 0;
         }))
       return false;
-    outputAnchor_ = outputTitle;
     if (auto original = output.ItemContainerStyle())
       pickerBase_ = original.BasedOn();
     for (auto heading : {outputTitle, spatialTitle, mixer})
@@ -6502,6 +6584,7 @@ class QuickPage {
             s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
             wheelTip_.Show(s, s.Value());
           } catch (...) {
+            Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
         }));
     if (own)
@@ -7121,8 +7204,12 @@ struct Runtime {
     l2frame = nullptr;
     frameToken = 0;
   }
+  bool IsCurrentPage(X::FrameworkElement const &page) const {
+    auto frame = l2frame.get().try_as<C::ContentControl>();
+    return !frame || frame.Content() == page;
+  }
   void PreparePage(X::FrameworkElement const &page, bool opening) {
-    if (Retired(page))
+    if (Retired(page) || !IsCurrentPage(page))
       return;
     for (auto const &item : pages)
       if (item->Page() == page) {
@@ -7134,6 +7221,7 @@ struct Runtime {
       }
     if ((!page.IsLoaded() && !Parent(page)) || !Named(page, L"OutputGroupTitle"))
       return;
+    RetireOthers(page);
     auto pulse = volumePulse;
     auto patch = std::make_unique<SoundPage>(page, window, [pulse] {
       if (pulse)
@@ -7156,7 +7244,6 @@ struct Runtime {
     busy = true;
     try {
       EnsureVolumePulse();
-      RetirePending();
       PreparePage(page, opening);
     } catch (...) {
       Wh_Log(L"Initial native layout: %08X", winrt::to_hresult());
@@ -7168,10 +7255,8 @@ struct Runtime {
         volumePulse->Post();
     }
   }
-  // Windows builds a new Sound FullScreenPage for every opening and the old one
-  // stays loaded. If every old page kept its patch, timers and layout handlers,
-  // each opening would get slower. A newly created page retires all others:
-  // patch restored, handlers removed, never patched again.
+  // The shell can retain old page objects. Only a new current Sound page
+  // retires them and stops their handlers.
   std::vector<winrt::weak_ref<X::FrameworkElement>> retired;
   bool Retired(X::FrameworkElement const &page) {
     for (auto it = retired.begin(); it != retired.end();) {
@@ -7212,7 +7297,6 @@ struct Runtime {
       it = pages.erase(it);
     }
   }
-  winrt::weak_ref<X::FrameworkElement> newestPage;
   // Same for Quick Settings, in case the shell also rebuilds ControlCenterView.
   winrt::weak_ref<X::FrameworkElement> newestQuick;
   void RetireQuick() {
@@ -7229,14 +7313,9 @@ struct Runtime {
       it = quickPages.erase(it);
     }
   }
-  void RetirePending() {
-    if (auto page = newestPage.get()) {
-      newestPage = nullptr;
-      RetireOthers(page);
-    }
-  }
   void WatchPage(X::FrameworkElement const &page) {
-    if (Retired(page))
+    // Discovery also visits pages that the shell is building off-screen.
+    if (Retired(page) || !IsCurrentPage(page))
       return;
     for (auto it = pageWatches.begin(); it != pageWatches.end();)
       if (auto existing = it->page.get()) {
@@ -7245,9 +7324,6 @@ struct Runtime {
         ++it;
       } else
         it = pageWatches.erase(it);
-    // Retirement is deferred until BeforeDisplay or Refresh. BeforeDisplay
-    // (Loaded/LayoutUpdated of the new page) and Refresh retire the others.
-    newestPage = winrt::make_weak(page);
     auto weak = winrt::make_weak(page);
     PageWatch watch;
     watch.page = weak;
@@ -7407,19 +7483,16 @@ struct Runtime {
     busy = true;
     try {
       EnsureVolumePulse();
-      RetirePending();
       RetireQuick();
       for (auto &watch : pageWatches)
         if (watch.firstFrame && GetTickCount64() - watch.hiddenAt >= 400)
           watch.firstFrame.reset();
-      for (auto it = pages.begin(); it != pages.end();)
-        if (!(*it)->Alive()) {
-          (*it)->Abandon();
-          it = pages.erase(it);
-        } else {
-          (*it)->Refresh();
-          ++it;
-        }
+      // Loading and layout events can temporarily detach the page or its
+      // output heading while the frame still owns it. Preserve its controls
+      // and handlers. RetireOthers handles replacement of the frame content.
+      for (auto const &page : pages)
+        if (page->Loaded())
+          page->Refresh();
       for (auto const &q : quickPages)
         q->Refresh();
     } catch (...) {

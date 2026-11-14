@@ -1,15 +1,37 @@
 #pragma once
 #include "common.h"
 namespace native {
-// A wheel gesture doesn't enter the Slider's native thumb-drag state.
-// Use the same XAML control and anchor as the drag tooltip.
+// The native thumb tooltip belongs to the drag gesture. A XAML popup keeps
+// the wheel value visible independently and stays above scrollable rows.
 class WheelToolTip {
-  C::ToolTip tip_{nullptr};
+  P::Popup popup_{nullptr};
+  C::Border plate_{nullptr};
+  C::TextBlock label_{nullptr};
   X::DispatcherTimer timer_{nullptr};
   X::DispatcherTimer::Tick_revoker tick_;
   X::FrameworkElement::Unloaded_revoker unloaded_;
+  X::FrameworkElement::LayoutUpdated_revoker layout_;
   C::Slider slider_{nullptr};
   IInspectable pressed_{nullptr};
+
+  void Position() {
+    auto root = slider_.XamlRoot();
+    if (!root)
+      return;
+    auto thumb = Named(slider_, L"HorizontalThumb");
+    auto anchor = thumb ? thumb : slider_.as<X::FrameworkElement>();
+    auto point = anchor.TransformToVisual(root.Content()).TransformPoint(
+        {float(anchor.ActualWidth() / 2), 0});
+    plate_.Measure({INFINITY, INFINITY});
+    auto size = plate_.DesiredSize();
+    auto left = std::clamp(point.X - size.Width / 2, 0.f,
+                           std::max(0.f, root.Size().Width - size.Width));
+    auto top = std::max(0.f, point.Y - size.Height - 4);
+    if (std::abs(popup_.HorizontalOffset() - left) > .25)
+      popup_.HorizontalOffset(left);
+    if (std::abs(popup_.VerticalOffset() - top) > .25)
+      popup_.VerticalOffset(top);
+  }
 
 public:
   void Hide() noexcept {
@@ -20,6 +42,7 @@ public:
         Wh_Log(L"WheelTooltipTimerStopError %08X", winrt::to_hresult());
       }
     unloaded_.revoke();
+    layout_.revoke();
     if (slider_) {
       try {
         slider_.RemoveHandler(X::UIElement::PointerPressedEvent(), pressed_);
@@ -29,10 +52,9 @@ public:
       slider_ = nullptr;
       pressed_ = nullptr;
     }
-    if (tip_)
+    if (popup_)
       try {
-        tip_.IsOpen(false);
-        tip_.PlacementTarget(nullptr);
+        popup_.IsOpen(false);
       } catch (...) {
         Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
       }
@@ -41,12 +63,20 @@ public:
     auto root = slider.XamlRoot();
     if (!root)
       return;
-    if (!tip_ || tip_.XamlRoot() != root) {
+    if (!popup_ || popup_.XamlRoot() != root) {
       Hide();
-      tip_ = C::ToolTip();
-      tip_.XamlRoot(root);
-      tip_.Placement(P::PlacementMode::Top);
-      tip_.IsHitTestVisible(false);
+      popup_ = P::Popup();
+      popup_.XamlRoot(root);
+      popup_.IsHitTestVisible(false);
+      plate_ = C::Border();
+      plate_.IsHitTestVisible(false);
+      plate_.CornerRadius({4, 4, 4, 4});
+      plate_.Padding({8, 4, 8, 4});
+      plate_.BorderThickness({1, 1, 1, 1});
+      label_ = C::TextBlock();
+      label_.FontSize(12);
+      plate_.Child(label_);
+      popup_.Child(plate_);
     }
     if (slider_ != slider) {
       Hide();
@@ -56,24 +86,38 @@ public:
       slider_ = slider;
       pressed_ = handler;
       unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
+      layout_ = slider.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
+        try {
+          if (slider_ && popup_.IsOpen())
+            Position();
+        } catch (...) {
+          Hide();
+        }
+      });
+      const auto dark = DarkTheme(slider);
+      const auto themedBrush = [&](PCWSTR key, uint8_t shade) {
+        auto brush = Resource(slider, key).try_as<M::Brush>();
+        if (!brush)
+          brush = M::SolidColorBrush(winrt::Windows::UI::Color{255, shade, shade, shade});
+        return brush;
+      };
+      plate_.Background(themedBrush(L"ToolTipBackground", dark ? 44 : 250));
+      plate_.BorderBrush(themedBrush(L"ToolTipBorderBrush", dark ? 85 : 220));
+      label_.Foreground(themedBrush(L"ToolTipForeground", dark ? 255 : 26));
     }
-    auto thumb = Named(slider, L"HorizontalThumb");
-    auto target = thumb ? thumb.as<X::UIElement>() : slider.as<X::UIElement>();
-    if (tip_.PlacementTarget() != target) {
-      tip_.IsOpen(false);
-      tip_.PlacementTarget(target);
-    }
-    auto content = winrt::box_value(std::to_wstring(std::lround(value)));
+    auto content = std::to_wstring(std::lround(value));
     if (auto converter = slider.ThumbToolTipValueConverter())
       try {
         if (auto converted = converter.Convert(winrt::box_value(value),
                                                winrt::xaml_typename<winrt::hstring>(), nullptr,
                                                L""))
-          content = converted;
+          if (auto convertedText = String(converted); !convertedText.empty())
+            content = std::move(convertedText);
       } catch (...) {
       }
-    tip_.Content(content);
-    tip_.IsOpen(true);
+    label_.Text(content);
+    Position();
+    popup_.IsOpen(true);
     if (!timer_) {
       timer_ = X::DispatcherTimer();
       timer_.Interval(std::chrono::milliseconds(900));

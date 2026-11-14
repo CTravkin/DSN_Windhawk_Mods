@@ -229,8 +229,12 @@ struct Runtime {
     l2frame = nullptr;
     frameToken = 0;
   }
+  bool IsCurrentPage(X::FrameworkElement const &page) const {
+    auto frame = l2frame.get().try_as<C::ContentControl>();
+    return !frame || frame.Content() == page;
+  }
   void PreparePage(X::FrameworkElement const &page, bool opening) {
-    if (Retired(page))
+    if (Retired(page) || !IsCurrentPage(page))
       return;
     for (auto const &item : pages)
       if (item->Page() == page) {
@@ -242,6 +246,7 @@ struct Runtime {
       }
     if ((!page.IsLoaded() && !Parent(page)) || !Named(page, L"OutputGroupTitle"))
       return;
+    RetireOthers(page);
     auto pulse = volumePulse;
     auto patch = std::make_unique<SoundPage>(page, window, [pulse] {
       if (pulse)
@@ -264,7 +269,6 @@ struct Runtime {
     busy = true;
     try {
       EnsureVolumePulse();
-      RetirePending();
       PreparePage(page, opening);
     } catch (...) {
       Wh_Log(L"Initial native layout: %08X", winrt::to_hresult());
@@ -276,10 +280,8 @@ struct Runtime {
         volumePulse->Post();
     }
   }
-  // Windows builds a new Sound FullScreenPage for every opening and the old one
-  // stays loaded. If every old page kept its patch, timers and layout handlers,
-  // each opening would get slower. A newly created page retires all others:
-  // patch restored, handlers removed, never patched again.
+  // The shell can retain old page objects. Only a new current Sound page
+  // retires them and stops their handlers.
   std::vector<winrt::weak_ref<X::FrameworkElement>> retired;
   bool Retired(X::FrameworkElement const &page) {
     for (auto it = retired.begin(); it != retired.end();) {
@@ -320,7 +322,6 @@ struct Runtime {
       it = pages.erase(it);
     }
   }
-  winrt::weak_ref<X::FrameworkElement> newestPage;
   // Same for Quick Settings, in case the shell also rebuilds ControlCenterView.
   winrt::weak_ref<X::FrameworkElement> newestQuick;
   void RetireQuick() {
@@ -337,14 +338,9 @@ struct Runtime {
       it = quickPages.erase(it);
     }
   }
-  void RetirePending() {
-    if (auto page = newestPage.get()) {
-      newestPage = nullptr;
-      RetireOthers(page);
-    }
-  }
   void WatchPage(X::FrameworkElement const &page) {
-    if (Retired(page))
+    // Discovery also visits pages that the shell is building off-screen.
+    if (Retired(page) || !IsCurrentPage(page))
       return;
     for (auto it = pageWatches.begin(); it != pageWatches.end();)
       if (auto existing = it->page.get()) {
@@ -353,9 +349,6 @@ struct Runtime {
         ++it;
       } else
         it = pageWatches.erase(it);
-    // Retirement is deferred until BeforeDisplay or Refresh. BeforeDisplay
-    // (Loaded/LayoutUpdated of the new page) and Refresh retire the others.
-    newestPage = winrt::make_weak(page);
     auto weak = winrt::make_weak(page);
     PageWatch watch;
     watch.page = weak;
@@ -515,19 +508,16 @@ struct Runtime {
     busy = true;
     try {
       EnsureVolumePulse();
-      RetirePending();
       RetireQuick();
       for (auto &watch : pageWatches)
         if (watch.firstFrame && GetTickCount64() - watch.hiddenAt >= 400)
           watch.firstFrame.reset();
-      for (auto it = pages.begin(); it != pages.end();)
-        if (!(*it)->Alive()) {
-          (*it)->Abandon();
-          it = pages.erase(it);
-        } else {
-          (*it)->Refresh();
-          ++it;
-        }
+      // Loading and layout events can temporarily detach the page or its
+      // output heading while the frame still owns it. Preserve its controls
+      // and handlers. RetireOthers handles replacement of the frame content.
+      for (auto const &page : pages)
+        if (page->Loaded())
+          page->Refresh();
       for (auto const &q : quickPages)
         q->Refresh();
     } catch (...) {

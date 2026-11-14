@@ -1241,6 +1241,7 @@ class QuickPage {
             s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
             wheelTip_.Show(s, s.Value());
           } catch (...) {
+            Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
         }));
     if (own)
