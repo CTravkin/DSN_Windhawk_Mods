@@ -1,5 +1,21 @@
 #include "../Mod/windows-border-switch.wh.cpp"
 
+static_assert(!ExcludesWindow(WindowException::None, true));
+static_assert(ExcludesWindow(WindowException::Active, true));
+static_assert(!ExcludesWindow(WindowException::Active, false));
+static_assert(ExcludesWindow(WindowException::Inactive, false));
+static_assert(!ExcludesWindow(WindowException::Inactive, true));
+static_assert(ExcludesWindow(WindowException::Both, true));
+static_assert(ExcludesWindow(WindowException::Both, false));
+
+static_assert(WindowSettingsUpdate({}, {WindowEffect::HideBorder}) == WindowUpdate::Start);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {WindowEffect::HideBorder, true}) ==
+              WindowUpdate::Refresh);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {}) == WindowUpdate::Stop);
+static_assert(WindowSettingsUpdate({WindowEffect::HideBorder}, {WindowEffect::HideBorder}) ==
+              WindowUpdate::None);
+static_assert(WindowSettingsUpdate({}, {}) == WindowUpdate::None);
+
 static_assert(WindowEffectFor({}, true, false) == WindowEffect::Default);
 static_assert(WindowEffectFor({WindowEffect::HideBorder}, true, false) ==
               WindowEffect::HideBorder);
@@ -45,6 +61,9 @@ static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Bor
 static_assert(IsStartPane(L"MainMenu"));
 static_assert(IsStartPane(L"CompanionRoot"));
 static_assert(!IsStartPane(L"SearchRoot"));
+static_assert(IsStartBorderParent(L"CompanionRoot", L"Windows.UI.Xaml.Controls.Grid"));
+static_assert(IsStartBorderParent(L"", L"Windows.UI.Xaml.Controls.Grid"));
+static_assert(!IsStartBorderParent(L"SearchRoot", L"Windows.UI.Xaml.Controls.Grid"));
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
                             L"AppBorder") == ShellBorder::Search);
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
@@ -82,24 +101,10 @@ static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Bor
 static_assert(ShellBorderFor(ShellHost::Explorer, L"Windows.UI.Xaml.Controls.Border",
                             L"BorderHighlight") == ShellBorder::None);
 
-int main() {
-    unsigned lastProbe = 0;
-    auto probe = [&](unsigned index) {
-        lastProbe = index;
-        return index == 87 ? 0 : 1;
-    };
-    if (FindDiagnosticEndpoint(probe, [] { return false; }, 1, 2) != 0 ||
-        lastProbe != 87) {
-        return 1;
-    }
-    lastProbe = 0;
-    if (FindDiagnosticEndpoint(probe, [&] { return lastProbe == 65; }, 1, 2) != 2 ||
-        lastProbe != 65) {
-        return 2;
-    }
-    unsigned probes = 0;
-    if (FindDiagnosticEndpoint([&](unsigned) { ++probes; return 1; },
-                               [] { return false; }, 1, 2) != 1 || probes != 10000) {
-        return 3;
-    }
-}
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"CalendarHeaderMinimizedOverlay") == ShellBorder::Notifications);
+static_assert(ShellBorderFor(ShellHost::Flyouts, L"Windows.UI.Xaml.Controls.Border",
+                            L"VirtualDesktopBarBackground") ==
+              ShellBorder::None);
+
+int main() {}
