@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.0.24
+// @version         1.0.25
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 39
+// Build: 40
 
 // ==WindhawkModReadme==
 /*
@@ -1351,26 +1351,33 @@ void ScanShellOnUiThread(bool refresh) noexcept try {
 
 using MeasureTaskbarFrame = HRESULT(WINAPI*)(IUnknown*, Foundation::Size, Foundation::Size*);
 MeasureTaskbarFrame g_measureTaskbarFrame;
-bool g_taskbarLayoutHookAttempted;
+bool g_taskbarLayoutHookInstalled;
 
 void ApplyMeasuredTaskbar(Xaml::FrameworkElement const& frame, unsigned mask) {
     const DWORD thread = GetCurrentThreadId();
+    Xaml::FrameworkElement stroke{nullptr};
     {
         std::lock_guard guard(g_sourcesMutex);
         auto entry = std::find_if(g_measuredTaskbars.begin(), g_measuredTaskbars.end(),
                                   [&](auto const& item) { return item.thread == thread && item.frame.get() == frame; });
         if (entry != g_measuredTaskbars.end()) {
-            if (auto stroke = entry->stroke.get(); stroke && stroke.IsLoaded()) {
-                return;
+            stroke = entry->stroke.get();
+            if (!stroke || !stroke.IsLoaded()) {
+                stroke = nullptr;
+                g_measuredTaskbars.erase(entry);
             }
-            g_measuredTaskbars.erase(entry);
         }
-        std::erase_if(g_measuredTaskbars, [thread](auto const& item) {
-            return item.thread == thread && !item.frame.get();
-        });
+        if (!stroke) {
+            std::erase_if(g_measuredTaskbars, [thread](auto const& item) {
+                return item.thread == thread && !item.frame.get();
+            });
+        }
+    }
+    if (stroke) {
+        HideXamlBorder(stroke, ShellBorder::Taskbar);
+        return;
     }
 
-    Xaml::FrameworkElement stroke{nullptr};
     ScanShellTree(frame, mask, 0, &stroke);
     if (stroke) {
         std::lock_guard guard(g_sourcesMutex);
@@ -1394,32 +1401,84 @@ HRESULT WINAPI MeasureTaskbarFrameHook(IUnknown* self, Foundation::Size availabl
     return hr;
 }
 
-void HookTaskbarLayout() {
-    if (g_taskbarLayoutHookAttempted) {
-        return;
-    }
-    DWORD owner = 0;
-    GetWindowThreadProcessId(FindWindowW(L"Shell_TrayWnd", nullptr), &owner);
-    if (owner != GetCurrentProcessId()) {
-        return;
-    }
-    HMODULE taskbar = GetModuleHandleW(L"Taskbar.View.dll");
-    if (!taskbar) {
-        taskbar = GetModuleHandleW(L"ExplorerExtensions.dll");
-    }
-    if (!taskbar) {
-        return;
-    }
-    g_taskbarLayoutHookAttempted = true;
+enum class TaskbarHookResult { Installed, Missing, Retry };
+
+TaskbarHookResult HookTaskbarLayout(HMODULE module) {
+    void* measure = nullptr;
     const WindhawkUtils::SYMBOL_HOOK hook[] = {
         {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::Taskbar::implementation::TaskbarFrame,struct winrt::Windows::UI::Xaml::IFrameworkElementOverrides>::MeasureOverride(struct winrt::Windows::Foundation::Size,struct winrt::Windows::Foundation::Size *))"},
-         &g_measureTaskbarFrame, MeasureTaskbarFrameHook, true},
+         &measure, nullptr, true},
     };
-    if (WindhawkUtils::HookSymbols(taskbar, hook, ARRAYSIZE(hook)) && g_measureTaskbarFrame) {
-        Wh_ApplyHookOperations();
-        Wh_Log(L"Taskbar layout hook installed");
+    if (!WindhawkUtils::HookSymbols(module, hook, ARRAYSIZE(hook))) {
+        return TaskbarHookResult::Retry;
     }
+    if (!measure) {
+        return TaskbarHookResult::Missing;
+    }
+    std::lock_guard guard(g_factoryMutex);
+    // Windhawk removes disabled hooks after applying, including failed installs.
+    return WindhawkUtils::SetFunctionHook(reinterpret_cast<MeasureTaskbarFrame>(measure),
+                                          MeasureTaskbarFrameHook, &g_measureTaskbarFrame) &&
+                   Wh_ApplyHookOperations()
+        ? TaskbarHookResult::Installed
+        : TaskbarHookResult::Retry;
 }
+
+struct TaskbarLayoutRetry {
+    std::pair<HMODULE, HMODULE> modules{};
+    size_t retries = 0;
+    ULONGLONG nextAttempt = 0;
+
+    DWORD Update() {
+        if (g_taskbarLayoutHookInstalled) {
+            return INFINITE;
+        }
+        DWORD owner = 0;
+        GetWindowThreadProcessId(FindWindowW(L"Shell_TrayWnd", nullptr), &owner);
+        if (owner != GetCurrentProcessId()) {
+            return INFINITE;
+        }
+
+        const std::pair loaded{GetModuleHandleW(L"Taskbar.View.dll"),
+                               GetModuleHandleW(L"ExplorerExtensions.dll")};
+        if (modules != loaded) {
+            *this = TaskbarLayoutRetry{loaded};
+        }
+        const ULONGLONG now = GetTickCount64();
+        if (nextAttempt > now) {
+            return static_cast<DWORD>(nextAttempt - now);
+        }
+
+        // Windhawk can cache a lookup failure for one minute, or four hours on startup.
+        constexpr DWORD delays[] = {2'000, 65'000, 4 * 60 * 60 * 1'000 + 2'000};
+        if (retries > ARRAYSIZE(delays)) {
+            return INFINITE;
+        }
+        for (HMODULE module : {modules.first, modules.second}) {
+            if (!module) {
+                continue;
+            }
+            switch (HookTaskbarLayout(module)) {
+                case TaskbarHookResult::Installed:
+                    g_taskbarLayoutHookInstalled = true;
+                    Wh_Log(L"Taskbar layout hook installed");
+                    return INFINITE;
+                case TaskbarHookResult::Missing:
+                    continue;
+                case TaskbarHookResult::Retry:
+                    Wh_Log(L"Taskbar layout hook could not be installed");
+                    if (retries < ARRAYSIZE(delays)) {
+                        const DWORD delay = delays[retries++];
+                        nextAttempt = GetTickCount64() + delay;
+                        return delay;
+                    }
+                    continue;
+            }
+        }
+        retries = ARRAYSIZE(delays) + 1;
+        return INFINITE;
+    }
+};
 
 UINT ShellScanMessage() {
     static const UINT message = RegisterWindowMessageW(L"Windhawk.WindowsBorderSwitch.ScanShellXaml");
@@ -1506,11 +1565,13 @@ DWORD WINAPI RunShellXamlWorker(void* parameter) {
     const auto uncloak = SetWinEventHook(EVENT_OBJECT_UNCLOAKED, EVENT_OBJECT_UNCLOAKED, nullptr,
                                          OnShellXamlWindow, pid, 0, WINEVENT_OUTOFCONTEXT);
     RefreshShellXamlWindows(false);
-    for (;;) {
-        if (g_shellHost == ShellHost::Explorer) {
-            HookTaskbarLayout();
+    TaskbarLayoutRetry taskbarLayout;
+    while (WaitForSingleObject(stop, 0) == WAIT_TIMEOUT) {
+        const DWORD timeout = g_shellHost == ShellHost::Explorer ? taskbarLayout.Update() : INFINITE;
+        const DWORD result = MsgWaitForMultipleObjects(1, &stop, FALSE, timeout, QS_ALLINPUT);
+        if (result == WAIT_TIMEOUT) {
+            continue;
         }
-        const DWORD result = MsgWaitForMultipleObjects(1, &stop, FALSE, INFINITE, QS_ALLINPUT);
         if (result != WAIT_OBJECT_0 + 1) {
             break;
         }
