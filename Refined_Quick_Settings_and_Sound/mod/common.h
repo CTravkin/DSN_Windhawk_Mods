@@ -43,8 +43,11 @@ inline HMODULE module = nullptr;
 inline std::vector<std::wstring> hidden;
 inline bool brightnessEnabled = true;
 inline int quickActionRows = 2;
-inline bool showNightLight = true;
-inline bool showDisplaySettings = true;
+inline sound::QuickShortcutSlots quickShortcuts{};
+inline bool quickSoundAccess = true;
+inline bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
+            altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
+            altAppUnmute = true;
 inline UINT volumePulseMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.VolumePulse.1");
 // Used only while unloading. Wait for the asynchronous operation itself,
 // not an event set inside its delegate: the DLL must outlive the delegate's return.

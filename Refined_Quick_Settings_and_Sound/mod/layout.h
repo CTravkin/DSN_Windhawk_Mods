@@ -841,7 +841,8 @@ class SoundPage {
       settings.MinHeight(0);
       settings.Padding({0, 0, 0, 0});
       settings.Margin({0, 11, 20, 0});
-      settings.Content(Icon(L"sliders-horizontal"));
+      if (altSoundMixer)
+        settings.Content(Icon(L"sliders-horizontal"));
     }
     journal_.Save(mixerList_, X::UIElement::VisibilityProperty());
     journal_.Save(mixerList_, X::FrameworkElement::HeightProperty());
@@ -1153,12 +1154,13 @@ class SoundPage {
     FooterMargins();
     masterIcon_ = Button(page_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
     masterIcon_.Content(VolumeGlyph(page_, 3));
-    try {
-      masterAnimation_ = std::make_shared<AnimatedVolume>();
-      masterIcon_.Content(masterAnimation_->Isolated());
-    } catch (...) {
-      Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
-    }
+    if (altSoundVolume)
+      try {
+        masterAnimation_ = std::make_shared<AnimatedVolume>();
+        masterIcon_.Content(masterAnimation_->Isolated());
+      } catch (...) {
+        Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
+      }
     footer_.Children().Append(masterIcon_);
     master_ = C::Slider();
     master_.Style(sliderStyle);
@@ -2097,14 +2099,15 @@ public:
     row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
     row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
     row->levelMute.Margin({0, 0, -44, 0});
-    try {
-      row->levelIcon = std::make_shared<AnimatedVolume>();
-      row->levelIcon->Update(0, true);
-      row->levelMute.Content(row->levelIcon->Isolated());
-    } catch (...) {
-      row->levelIcon.reset();
-      row->levelMute.Content(VolumeGlyph(page_, 0, 16));
-    }
+    row->levelMute.Content(VolumeGlyph(page_, 0, 16));
+    if (altAppUnmute)
+      try {
+        row->levelIcon = std::make_shared<AnimatedVolume>();
+        row->levelIcon->Update(0, true);
+        row->levelMute.Content(row->levelIcon->Isolated());
+      } catch (...) {
+        row->levelIcon.reset();
+      }
     {
       auto weakToggle = winrt::make_weak(toggle);
       Keep(row->levelMute.Click(winrt::auto_revoke, [weakToggle](auto &&, auto &&) {

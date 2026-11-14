@@ -5,10 +5,41 @@
 #include "exit.h"
 #include "quick-volume.h"
 #include "ddc.h"
+#include <cstring>
 #include <winrt/Windows.UI.Text.h>
 #include <winrt/Windows.UI.Xaml.Automation.Peers.h>
 #include <winrt/Windows.UI.Xaml.Automation.Provider.h>
 namespace native {
+// This ControlCenter build keeps page height, count and offsets in the native
+// PaginatedGridView. Resolve its methods only for the image whose ABI was checked.
+using SetQuickRows = void(WINAPI *)(void *, int);
+using UpdateQuickExtent = void(WINAPI *)(void *);
+inline SetQuickRows setQuickRows = nullptr, originalSetQuickRows = nullptr;
+inline UpdateQuickExtent updateQuickExtent = nullptr;
+inline void *quickGridVtable = nullptr;
+inline void WINAPI KeepQuickRows(void *self, int rows) {
+  originalSetQuickRows(self, stopping ? rows : quickActionRows);
+  updateQuickExtent(self);
+}
+inline void HookQuickRows(HMODULE dll) {
+  auto image = reinterpret_cast<BYTE *>(dll);
+  auto dos = reinterpret_cast<IMAGE_DOS_HEADER *>(image);
+  auto nt = reinterpret_cast<IMAGE_NT_HEADERS *>(image + dos->e_lfanew);
+  constexpr BYTE signature[] = {0x40, 0x53, 0x48, 0x83, 0xec, 0x20, 0x48, 0x8b, 0xd9,
+                                0x39, 0x91, 0xa8, 0, 0, 0, 0x74, 0x5a, 0x89, 0x91};
+  if (nt->FileHeader.TimeDateStamp != 1878679008 || nt->OptionalHeader.SizeOfImage != 4313088 ||
+      std::memcmp(image + 0x29424c, signature, sizeof(signature)) != 0) {
+    Wh_Log(L"Native Quick Settings row override unavailable for this ControlCenter image");
+    return;
+  }
+  auto setter = reinterpret_cast<SetQuickRows>(image + 0x29424c);
+  if (*reinterpret_cast<void **>(image + 0x37f518) != image + 0x1018c0)
+    return;
+  updateQuickExtent = reinterpret_cast<UpdateQuickExtent>(image + 0x2944d0);
+  quickGridVtable = image + 0x37f518;
+  if (WindhawkUtils::SetFunctionHook(setter, KeepQuickRows, &originalSetQuickRows))
+    setQuickRows = setter;
+}
 // Quick Settings main page (ControlCenter.ControlCenterView). L1Grid holds a
 // light Border spanning TogglesGroup + SlidersGroup, then FooterGrid
 // (LeftFooter: battery on laptops; RightFooter: the native All settings
@@ -32,7 +63,11 @@ class QuickPage {
   bool dirty_ = true, restoring_ = false;
   int pagerTheme_ = -1;
   X::Style normalPip_{nullptr}, selectedPip_{nullptr};
+  winrt::weak_ref<X::FrameworkElement> tiledView_;
   C::Grid settingsRow_{nullptr};
+  C::StackPanel shortcuts_{nullptr};
+  std::vector<sound::QuickShortcut> visibleShortcuts_;
+  std::map<sound::QuickShortcut, C::Button> shortcutButtons_;
   C::Button title_{nullptr};
   winrt::weak_ref<C::Button> nativeSettings_;
   // The Night light button stays available when the DDC/CI row is hidden.
@@ -46,7 +81,6 @@ class QuickPage {
   U::AnimatedIcon nightIcon_{nullptr};
   U::IAnimatedIconStatics statics_{nullptr};
   bool reapplying_ = false;
-  std::vector<std::shared_ptr<AnimatedVolume>> volumeIcons_;
   std::wstring nightState_, nightTip_;
   int nightRegistry_ = -1;
   U::PipsPager nightPager_{nullptr};
@@ -60,7 +94,6 @@ class QuickPage {
   unsigned seenRevision_ = 0;
   ULONGLONG lastRead_ = 0, lastUser_ = 0;
   bool sync_ = false, visible_ = false;
-  static constexpr double settingsActionWidth = 40.;
   static inline std::map<HMONITOR, int> brightCache; // -1: no DDC/CI
   template <class R> void Keep(R &&r) {
     auto revoker = std::make_shared<std::decay_t<R>>(std::forward<R>(r));
@@ -241,7 +274,7 @@ class QuickPage {
   }
   C::Grid SettingsRow() {
     // 38 DIP steps: 5.6 + 38.4 lands on whole pixels at 125% (7 + 48 px).
-    auto row = Grid(L"40,*,40,40");
+    auto row = Grid(L"Auto,*,Auto");
     row.UseLayoutRounding(true);
     row.Height(38.4);
     row.Margin({0, 5.6, 0, 0});
@@ -272,17 +305,17 @@ class QuickPage {
     title_.Content(text);
     X::Automation::AutomationProperties::SetName(title_, name);
     C::Grid::SetColumn(title_, 0);
-    C::Grid::SetColumnSpan(title_, 2);
     row.Children().Append(title_);
     Keep(title_.Click(winrt::auto_revoke, [this](auto &&, auto &&) { OpenSettings(); }));
-    display_ = IconButton(sound::Text(L"Display settings", L"Параметры дисплея",
-                                     L"Configuración de pantalla", L"Anzeigeeinstellungen",
-                                     L"Configurações de exibição", L"显示设置"));
-    display_.Content(SymbolGlyph(view_, 0xe7f4));
-    Keep(display_.Click(winrt::auto_revoke, [](auto &&, auto &&) {
-      ShellExecuteW(nullptr, L"open", L"ms-settings:display", nullptr, nullptr, SW_SHOWNORMAL);
-    }));
+    shortcuts_ = C::StackPanel();
+    shortcuts_.Orientation(C::Orientation::Horizontal);
+    C::Grid::SetColumn(shortcuts_, 2);
+    row.Children().Append(shortcuts_);
+    display_ = ShortcutButton(sound::QuickShortcut::Display);
     NightButton();
+    shortcutButtons_ = {{sound::QuickShortcut::Display, display_},
+                        {sound::QuickShortcut::Night, night_}};
+    visibleShortcuts_.clear();
     settingsRow_ = row;
     return row;
   }
@@ -317,8 +350,49 @@ class QuickPage {
     C::ToolTipService::SetToolTip(b, winrt::box_value(name));
     return b;
   }
+  C::Button ShortcutButton(sound::QuickShortcut action) {
+    using S = sound::QuickShortcut;
+    PCWSTR name = nullptr, uri = nullptr;
+    wchar_t glyph = 0;
+    switch (action) {
+    case S::Display:
+      name = sound::Text(L"Display settings", L"Параметры дисплея", L"Configuración de pantalla",
+                         L"Anzeigeeinstellungen", L"Configurações de exibição", L"显示设置");
+      uri = L"ms-settings:display";
+      glyph = 0xe7f4;
+      break;
+    case S::Network:
+      name = sound::Text(L"Network & internet", L"Сеть и Интернет", L"Red e Internet",
+                         L"Netzwerk und Internet", L"Rede e Internet", L"网络和 Internet");
+      uri = L"ms-settings:network-status";
+      glyph = 0xe968;
+      break;
+    case S::Bluetooth:
+      name = sound::Text(L"Bluetooth & devices", L"Bluetooth и устройства", L"Bluetooth y dispositivos",
+                         L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和其他设备");
+      uri = L"ms-settings:bluetooth";
+      glyph = 0xe702;
+      break;
+    case S::Apps:
+      name = sound::Text(L"Installed apps", L"Установленные приложения", L"Aplicaciones instaladas",
+                         L"Installierte Apps", L"Aplicativos instalados", L"已安装的应用");
+      uri = L"ms-settings:appsfeatures";
+      glyph = 0xe71d;
+      break;
+    default:
+      return nullptr;
+    }
+    auto button = IconButton(name);
+    button.Margin({4, 0, 4, 0});
+    button.Content(SymbolGlyph(view_, glyph));
+    Keep(button.Click(winrt::auto_revoke, [uri](auto &&, auto &&) {
+      ShellExecuteW(nullptr, L"open", uri, nullptr, nullptr, SW_SHOWNORMAL);
+    }));
+    return button;
+  }
   void NightButton() {
     night_ = IconButton(sound::Text(L"Night light", L"Ночной свет", L"Luz nocturna", L"Nachtmodus", L"Luz noturna", L"夜间模式"));
+    night_.Margin({4, 0, 4, 0});
     try {
       nightIcon_ = NativeIcon(L"ControlCenter.QA_Nightlight");
       night_.Content(nightIcon_);
@@ -654,32 +728,35 @@ class QuickPage {
              String(button.CommandParameter()) == L"ms-settings:display";
     });
     bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto place = [&](C::Button const &button, bool enabled, bool native, int upper, int lower) {
-      C::Grid target{nullptr};
-      if (!native) {
-        if (ddcVisible)
-          target = brightRow_;
-        else if (enabled)
-          target = settingsRow_;
-      }
-      for (auto const &row : {settingsRow_, brightRow_}) {
-        if (!row)
-          continue;
+    auto shortcuts = sound::QuickShortcuts(quickShortcuts, nativeDisplay || ddcVisible,
+                                          nativeNight || ddcVisible);
+    bool changed = shortcuts != visibleShortcuts_;
+    if (changed)
+      shortcuts_.Children().Clear();
+    if (brightRow_) {
+      auto place = [&](C::Button const &button, int column) {
         uint32_t index = 0;
-        if (row.Children().IndexOf(button, index)) {
-          if (row == target)
-            return;
-          row.Children().RemoveAt(index);
-          break;
+        bool attached = brightRow_.Children().IndexOf(button, index);
+        if (ddcVisible && !attached) {
+          C::Grid::SetColumn(button, column);
+          brightRow_.Children().Append(button);
+        } else if (!ddcVisible && attached) {
+          brightRow_.Children().RemoveAt(index);
         }
+      };
+      place(display_, 2);
+      place(night_, 0);
+    }
+    if (changed) {
+      for (auto action : shortcuts) {
+        auto it = shortcutButtons_.find(action);
+        if (it == shortcutButtons_.end())
+          it = shortcutButtons_.emplace(action, ShortcutButton(action)).first;
+        if (it->second)
+          shortcuts_.Children().Append(it->second);
       }
-      if (target) {
-        C::Grid::SetColumn(button, target == brightRow_ ? lower : upper);
-        target.Children().Append(button);
-      }
-    };
-    place(display_, showDisplaySettings, nativeDisplay, 2, 2);
-    place(night_, showNightLight, nativeNight, 3, 0);
+      visibleShortcuts_ = std::move(shortcuts);
+    }
     if (brightnessGlyph_) {
       auto visibility = ddcVisible ? X::Visibility::Collapsed : X::Visibility::Visible;
       if (brightnessGlyph_.Visibility() != visibility)
@@ -863,10 +940,10 @@ class QuickPage {
       }
       return false; // Visit all native buttons without stopping the traversal.
     });
-    // Reserve both action slots and the battery width.
+    // Reserve the occupied action slots and the battery width.
     if (title_ && settingsRow_.ActualWidth() > 0) {
       double available = std::max(
-          0., settingsRow_.ActualWidth() - 2 * settingsActionWidth - left.ActualWidth() - 6. - 12.);
+          0., settingsRow_.ActualWidth() - shortcuts_.ActualWidth() - left.ActualWidth() - 6. - 12.);
       if (title_.MaxWidth() != available)
         title_.MaxWidth(available);
     }
@@ -971,34 +1048,40 @@ class QuickPage {
         pip(selectedPip_, 1., selectedPx / pipScale));
   }
   void TileRows(C::Grid const &l1) {
-    if (quickActionRows == 2)
+    if (!setQuickRows)
       return;
-    auto group = Named(l1, L"TogglesGroup");
-    auto paginated = Find(group, [](auto const &e) {
+    auto paginated = Find(Named(l1, L"TogglesGroup"), [](auto const &e) {
       return Class(e) == L"ControlCenter.PaginatedGridView";
     });
+    if (!paginated || paginated == tiledView_.get())
+      return;
+    // The IPaginatedGridView subobject at +0x10 is returned by this image's
+    // QueryInterface. Verify the complete object's vtable before calling it.
+    constexpr GUID iid{0xab1ce38d, 0x0d8e, 0x55a0, {0x87, 0xb5, 0x89, 0x0c, 0xd5, 0x4f, 0x67, 0x22}};
+    winrt::com_ptr<::IUnknown> iface;
+    if (FAILED(winrt::get_unknown(paginated)->QueryInterface(iid, iface.put_void())))
+      return;
+    auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
+    if (*reinterpret_cast<void **>(self) != quickGridVtable)
+      return;
+    int rows = *reinterpret_cast<int const *>(self + 0xa8);
     auto grid = Named(paginated, L"RootGridView").try_as<C::GridView>();
-    if (!grid || grid.ActualHeight() <= 0)
+    if (!grid)
       return;
-    auto scroll = Find(grid, [](auto const &e) {
-      return bool(e.template try_as<C::ScrollViewer>());
-    }).try_as<C::ScrollViewer>();
-    if (!scroll || !First(grid, 77))
-      return;
-    double height = grid.ActualHeight();
-    double pitch = height / 2;
-    auto first = grid.ContainerFromIndex(0).try_as<X::FrameworkElement>();
-    auto fourth = grid.ContainerFromIndex(3).try_as<X::FrameworkElement>();
-    if (first && fourth) {
-      double delta = fourth.TransformToVisual(grid).TransformPoint({}).Y -
-                     first.TransformToVisual(grid).TransformPoint({}).Y;
-      if (delta > 0)
-        pitch = delta;
-    }
-    Set(grid, X::FrameworkElement::HeightProperty(),
-        winrt::box_value(double(sound::QuickActionRowsHeight(quickActionRows, height, pitch))));
-    Set(scroll, C::ScrollViewer::VerticalScrollBarVisibilityProperty(),
-        winrt::box_value(C::ScrollBarVisibility::Hidden));
+    // Native layouts use one or two rows depending on available height.
+    int nativeRows = rows == 1 ? 1 : 2;
+    if (auto pager = Named(view_, L"QuickActionsPager").try_as<U::PipsPager>();
+        pager && rows != quickActionRows && pager.SelectedPageIndex() > 0)
+      pager.SelectedPageIndex(0);
+    setQuickRows(self, quickActionRows);
+    tiledView_ = winrt::make_weak(paginated);
+    Wh_Log(L"Quick Settings pagination set to %d rows, %u tiles", quickActionRows,
+           grid.Items().Size());
+    journal_.undo.push_back([iface, nativeRows] {
+      auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
+      originalSetQuickRows(self, nativeRows);
+      updateQuickExtent(self);
+    });
   }
   // Mute button of the volume row: a button of the mod's own in the same Grid
   // cell, with the system QA_Volume asset driven by Core Audio and the slider.
@@ -1022,15 +1105,12 @@ class QuickPage {
     }
     if (!mute || !slider || !First(mute, 5))
       return;
-    std::shared_ptr<AnimatedVolume> icon;
-    try {
-      icon = std::make_shared<AnimatedVolume>();
-    } catch (...) {
-      Wh_Log(L"QuickVolumeIconError %08X", winrt::to_hresult());
-      return;
-    }
-    volumeIcons_.push_back(icon);
-    quickIcon_ = icon;
+    if (altQuickVolume)
+      try {
+        quickIcon_ = std::make_shared<AnimatedVolume>();
+      } catch (...) {
+        Wh_Log(L"QuickVolumeIconError %08X", winrt::to_hresult());
+      }
     auto hide = [this](X::UIElement const &e) {
       Set(e, X::UIElement::OpacityProperty(), winrt::box_value(0.));
       Set(e, X::UIElement::IsHitTestVisibleProperty(), winrt::box_value(false));
@@ -1053,14 +1133,15 @@ class QuickPage {
     };
     // Mute button, built as SV's on the Sound page (Button(), IconButtonStyle,
     // 32 DIP, the isolated system QA_Volume icon), in the toggle's Grid cell.
-    auto own = Button(view_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
-    own.Margin(mute.Margin());
-    own.HorizontalAlignment(mute.HorizontalAlignment());
-    own.VerticalAlignment(X::VerticalAlignment::Center);
-    C::Grid::SetColumn(own, C::Grid::GetColumn(mute));
-    C::Grid::SetRow(own, C::Grid::GetRow(mute));
-    own.Content(icon->Isolated());
-    {
+    C::Button own{nullptr};
+    if (quickIcon_) {
+      own = Button(view_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
+      own.Margin(mute.Margin());
+      own.HorizontalAlignment(mute.HorizontalAlignment());
+      own.VerticalAlignment(X::VerticalAlignment::Center);
+      C::Grid::SetColumn(own, C::Grid::GetColumn(mute));
+      C::Grid::SetRow(own, C::Grid::GetRow(mute));
+      own.Content(quickIcon_->Isolated());
       uint32_t index = 0;
       if (row.Children().IndexOf(mute, index)) {
         row.Children().RemoveAt(index);
@@ -1077,8 +1158,8 @@ class QuickPage {
             r.Children().InsertAt(std::min(index, r.Children().Size()), mute);
         }
       });
+      quickMute_ = own;
     }
-    quickMute_ = own;
     // Slider: as master_ on the Sound page; geometry and thin look follow in Sliders().
     C::Slider mine;
     if (auto style = Resource(view_, L"HeaderIconSliderStyle").try_as<X::Style>())
@@ -1148,16 +1229,17 @@ class QuickPage {
           } catch (...) {
           }
         }));
-    Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
-      try {
-        if (quickVolume_)
-          quickVolume_->ToggleMute();
-      } catch (...) {
-        Wh_Log(L"QuickMuteToggleError %08X", winrt::to_hresult());
-      }
-      quickUserAt_ = 0;
-      RefreshVolume();
-    }));
+    if (own)
+      Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+        try {
+          if (quickVolume_)
+            quickVolume_->ToggleMute();
+        } catch (...) {
+          Wh_Log(L"QuickMuteToggleError %08X", winrt::to_hresult());
+        }
+        quickUserAt_ = 0;
+        RefreshVolume();
+      }));
   }
   void Sliders(C::Grid const &l1) {
     auto group = Named(l1, L"SlidersGroup");
@@ -1206,7 +1288,8 @@ class QuickPage {
       return;
     if (First(l2, 4)) {
       SmallButton(l2);
-      Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
+      if (altQuickMixer)
+        Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
       if (X::Automation::AutomationProperties::GetName(l2).empty()) {
         auto name = sound::Text(L"Sound settings", L"Параметры звука", L"Configuración de sonido",
                                 L"Soundeinstellungen", L"Configurações de som", L"声音设置");
@@ -1443,11 +1526,11 @@ class QuickPage {
         });
       }
       DarkBlock(l1);
-      Pager();
       TileRows(l1);
+      Pager();
       Sliders(l1);
-      Footer();
       PlaceDisplayActions();
+      Footer();
       FrameReveal();
       if (bright_ && bright_.IsLoaded() && !thinSliders_.count(winrt::get_abi(bright_))) {
         auto look = Look();

@@ -7,7 +7,7 @@
 // @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
 // @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
 // @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.2.2
+// @version 0.3.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 157
+// Build: 158
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -40,8 +40,8 @@ customizations are restored when the mod is unloaded.
 **Quick Settings**
 
 - Display brightness defaults to Auto and can be disabled. Auto keeps the Windows slider or adds one for a display with a usable DDC/CI range.
-- The Settings row opens Windows Settings. It can also show Display settings and Night light when those buttons do not already appear in the brightness controls.
-- Quick Settings can show one to four rows of tiles. The default is two.
+- The Settings row opens Windows Settings and can show up to five ordered shortcuts. Empty slots, repeat choices and actions already visible in the brightness controls are skipped.
+- Quick Settings can show one to four rows of tiles. Pages follow the number of available tiles. The row override is currently supported on Windows build 26300.9974.
 
 **Sound**
 
@@ -56,8 +56,8 @@ customizations are restored when the mod is unloaded.
 
 **Taskbar**
 
-- Click the volume icon to open Sound directly.
-- The system's animated volume glyph and an Ethernet glyph for wired networks.
+- Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
+- Alternative mixer, volume and Ethernet icons can be enabled individually.
 
 ## Compatibility
 
@@ -94,6 +94,19 @@ in this source file.
 // ==/WindhawkModReadme==
 // ==WindhawkModSettings==
 /*
+- quickSoundAccess: true
+  $name: "Quick access to Sound"
+  $name:ru-RU: "Быстрый доступ к настройкам звука"
+  $name:es-ES: "Acceso rápido al sonido"
+  $name:de-DE: "Schnellzugriff auf Sound"
+  $name:pt-BR: "Acesso rápido ao som"
+  $name:zh-CN: "快速访问声音设置"
+  $description: "Click the taskbar volume icon to open Sound directly."
+  $description:ru-RU: "Нажатие на значок громкости на панели задач сразу открывает панель «Звук»"
+  $description:es-ES: "Abre directamente Sonido al pulsar el icono de volumen de la barra de tareas."
+  $description:de-DE: "Ein Klick auf das Lautstärkesymbol in der Taskleiste öffnet direkt das Soundfenster."
+  $description:pt-BR: "Clicar no ícone de volume na barra de tarefas abre diretamente o painel Som."
+  $description:zh-CN: "单击任务栏上的音量图标可直接打开“声音”面板"
 - brightnessMode: auto
   $name: Display brightness
   $name:ru-RU: Яркость дисплея
@@ -137,20 +150,314 @@ in this source file.
   - "2": "2"
   - "3": "3"
   - "4": "4"
-- showNightLight: true
-  $name: Night light button
-  $name:ru-RU: Кнопка «Ночной свет»
-  $name:es-ES: Botón de luz nocturna
-  $name:de-DE: Schaltfläche für den Nachtmodus
-  $name:pt-BR: Botão de luz noturna
-  $name:zh-CN: 夜间模式按钮
-- showDisplaySettings: true
-  $name: Display settings button
-  $name:ru-RU: Кнопка «Параметры дисплея»
-  $name:es-ES: Botón de configuración de pantalla
-  $name:de-DE: Schaltfläche für die Anzeigeeinstellungen
-  $name:pt-BR: Botão de configurações de exibição
-  $name:zh-CN: 显示设置按钮
+- quickSettings:
+  - shortcut1: display
+    $name: "Shortcut 1"
+    $name:ru-RU: "Переход 1"
+    $name:es-ES: "Acceso directo 1"
+    $name:de-DE: "Verknüpfung 1"
+    $name:pt-BR: "Atalho 1"
+    $name:zh-CN: "快捷方式 1"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut2: night
+    $name: "Shortcut 2"
+    $name:ru-RU: "Переход 2"
+    $name:es-ES: "Acceso directo 2"
+    $name:de-DE: "Verknüpfung 2"
+    $name:pt-BR: "Atalho 2"
+    $name:zh-CN: "快捷方式 2"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut3: none
+    $name: "Shortcut 3"
+    $name:ru-RU: "Переход 3"
+    $name:es-ES: "Acceso directo 3"
+    $name:de-DE: "Verknüpfung 3"
+    $name:pt-BR: "Atalho 3"
+    $name:zh-CN: "快捷方式 3"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut4: none
+    $name: "Shortcut 4"
+    $name:ru-RU: "Переход 4"
+    $name:es-ES: "Acceso directo 4"
+    $name:de-DE: "Verknüpfung 4"
+    $name:pt-BR: "Atalho 4"
+    $name:zh-CN: "快捷方式 4"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut5: none
+    $name: "Shortcut 5"
+    $name:ru-RU: "Переход 5"
+    $name:es-ES: "Acceso directo 5"
+    $name:de-DE: "Verknüpfung 5"
+    $name:pt-BR: "Atalho 5"
+    $name:zh-CN: "快捷方式 5"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  $name: "Quick Settings"
+  $name:ru-RU: "Быстрые настройки"
+  $name:es-ES: "Configuración rápida"
+  $name:de-DE: "Schnelleinstellungen"
+  $name:pt-BR: "Configurações rápidas"
+  $name:zh-CN: "快速设置"
+- alternativeIcons:
+  - quickMixer: true
+    $name: "Mixer button in Quick Settings"
+    $name:ru-RU: "Кнопка микшера в быстрых настройках"
+    $name:es-ES: "Botón del mezclador en Configuración rápida"
+    $name:de-DE: "Lautstärkemixer-Schaltfläche in den Schnelleinstellungen"
+    $name:pt-BR: "Botão do mixer nas Configurações rápidas"
+    $name:zh-CN: "快速设置中的音量合成器按钮"
+  - soundMixer: true
+    $name: "Mixer settings button in Sound"
+    $name:ru-RU: "Кнопка параметров микшера в панели «Звук»"
+    $name:es-ES: "Botón de configuración del mezclador en Sonido"
+    $name:de-DE: "Mixer-Einstellungen im Soundfenster"
+    $name:pt-BR: "Botão de configurações do mixer no painel Som"
+    $name:zh-CN: "声音面板中的音量合成器设置按钮"
+  - trayVolume: true
+    $name: "Volume icon on the taskbar"
+    $name:ru-RU: "Значок громкости на панели задач"
+    $name:es-ES: "Icono de volumen en la barra de tareas"
+    $name:de-DE: "Lautstärkesymbol in der Taskleiste"
+    $name:pt-BR: "Ícone de volume na barra de tarefas"
+    $name:zh-CN: "任务栏音量图标"
+  - trayEthernet: true
+    $name: "Ethernet icon on the taskbar"
+    $name:ru-RU: "Значок Ethernet на панели задач"
+    $name:es-ES: "Icono de Ethernet en la barra de tareas"
+    $name:de-DE: "Ethernet-Symbol in der Taskleiste"
+    $name:pt-BR: "Ícone de Ethernet na barra de tarefas"
+    $name:zh-CN: "任务栏以太网图标"
+  - quickVolume: true
+    $name: "Volume icon in Quick Settings"
+    $name:ru-RU: "Значок громкости в быстрых настройках"
+    $name:es-ES: "Icono de volumen en Configuración rápida"
+    $name:de-DE: "Lautstärkesymbol in den Schnelleinstellungen"
+    $name:pt-BR: "Ícone de volume nas Configurações rápidas"
+    $name:zh-CN: "快速设置中的音量图标"
+  - soundVolume: true
+    $name: "System volume icon in Sound"
+    $name:ru-RU: "Значок общей громкости в панели «Звук»"
+    $name:es-ES: "Icono de volumen del sistema en Sonido"
+    $name:de-DE: "Systemlautstärkesymbol im Soundfenster"
+    $name:pt-BR: "Ícone de volume do sistema no painel Som"
+    $name:zh-CN: "声音面板中的系统音量图标"
+  - appUnmute: true
+    $name: "App unmute icon in the mixer"
+    $name:ru-RU: "Значок включения звука приложения в микшере"
+    $name:es-ES: "Icono para reactivar el sonido de una aplicación en el mezclador"
+    $name:de-DE: "Symbol zum Aufheben der App-Stummschaltung im Mixer"
+    $name:pt-BR: "Ícone para ativar o som de um aplicativo no mixer"
+    $name:zh-CN: "音量合成器中的应用取消静音图标"
+  $name: "Alternative icons"
+  $name:ru-RU: "Альтернативные иконки"
+  $name:es-ES: "Iconos alternativos"
+  $name:de-DE: "Alternative Symbole"
+  $name:pt-BR: "Ícones alternativos"
+  $name:zh-CN: "备用图标"
 - hiddenApps: ""
   $name: Hidden applications
   $name:ru-RU: Скрытые приложения
@@ -216,9 +523,11 @@ in this source file.
 #include <thread>
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cwctype>
 #include <string>
+#include <string_view>
 #include <vector>
 namespace sound {
 inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german,
@@ -233,9 +542,26 @@ inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german
   }
 }
 
-inline int QuickActionRowsHeight(int rows, double nativeHeight, double rowPitch) {
-  int count = rows >= 1 && rows <= 4 ? rows : 2;
-  return int(std::lround(nativeHeight + (count - 2) * rowPitch));
+enum class QuickShortcut { None, Display, Night, Network, Bluetooth, Apps };
+using QuickShortcutSlots = std::array<QuickShortcut, 5>;
+inline QuickShortcut ParseQuickShortcut(std::wstring_view value) {
+  if (value == L"display") return QuickShortcut::Display;
+  if (value == L"night") return QuickShortcut::Night;
+  if (value == L"network") return QuickShortcut::Network;
+  if (value == L"bluetooth") return QuickShortcut::Bluetooth;
+  if (value == L"apps") return QuickShortcut::Apps;
+  return QuickShortcut::None;
+}
+inline std::vector<QuickShortcut> QuickShortcuts(QuickShortcutSlots const &slots,
+                                                bool displayBelow, bool nightBelow) {
+  std::vector<QuickShortcut> result;
+  for (auto action : slots)
+    if (action != QuickShortcut::None &&
+        !(action == QuickShortcut::Display && displayBelow) &&
+        !(action == QuickShortcut::Night && nightBelow) &&
+        std::find(result.begin(), result.end(), action) == result.end())
+      result.push_back(action);
+  return result;
 }
 
 // Adapted from the hidden-applications parser of the Sound Output Direct and
@@ -832,8 +1158,11 @@ inline HMODULE module = nullptr;
 inline std::vector<std::wstring> hidden;
 inline bool brightnessEnabled = true;
 inline int quickActionRows = 2;
-inline bool showNightLight = true;
-inline bool showDisplaySettings = true;
+inline sound::QuickShortcutSlots quickShortcuts{};
+inline bool quickSoundAccess = true;
+inline bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
+            altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
+            altAppUnmute = true;
 inline UINT volumePulseMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.VolumePulse.1");
 // Used only while unloading. Wait for the asynchronous operation itself,
 // not an event set inside its delegate: the DLL must outlive the delegate's return.
@@ -2805,7 +3134,8 @@ class SoundPage {
       settings.MinHeight(0);
       settings.Padding({0, 0, 0, 0});
       settings.Margin({0, 11, 20, 0});
-      settings.Content(Icon(L"sliders-horizontal"));
+      if (altSoundMixer)
+        settings.Content(Icon(L"sliders-horizontal"));
     }
     journal_.Save(mixerList_, X::UIElement::VisibilityProperty());
     journal_.Save(mixerList_, X::FrameworkElement::HeightProperty());
@@ -3117,12 +3447,13 @@ class SoundPage {
     FooterMargins();
     masterIcon_ = Button(page_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
     masterIcon_.Content(VolumeGlyph(page_, 3));
-    try {
-      masterAnimation_ = std::make_shared<AnimatedVolume>();
-      masterIcon_.Content(masterAnimation_->Isolated());
-    } catch (...) {
-      Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
-    }
+    if (altSoundVolume)
+      try {
+        masterAnimation_ = std::make_shared<AnimatedVolume>();
+        masterIcon_.Content(masterAnimation_->Isolated());
+      } catch (...) {
+        Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
+      }
     footer_.Children().Append(masterIcon_);
     master_ = C::Slider();
     master_.Style(sliderStyle);
@@ -4061,14 +4392,15 @@ public:
     row->levelMute.HorizontalAlignment(X::HorizontalAlignment::Right);
     row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
     row->levelMute.Margin({0, 0, -44, 0});
-    try {
-      row->levelIcon = std::make_shared<AnimatedVolume>();
-      row->levelIcon->Update(0, true);
-      row->levelMute.Content(row->levelIcon->Isolated());
-    } catch (...) {
-      row->levelIcon.reset();
-      row->levelMute.Content(VolumeGlyph(page_, 0, 16));
-    }
+    row->levelMute.Content(VolumeGlyph(page_, 0, 16));
+    if (altAppUnmute)
+      try {
+        row->levelIcon = std::make_shared<AnimatedVolume>();
+        row->levelIcon->Update(0, true);
+        row->levelMute.Content(row->levelIcon->Isolated());
+      } catch (...) {
+        row->levelIcon.reset();
+      }
     {
       auto weakToggle = winrt::make_weak(toggle);
       Keep(row->levelMute.Click(winrt::auto_revoke, [weakToggle](auto &&, auto &&) {
@@ -4727,8 +5059,39 @@ public:
 };
 } // namespace native
 
+#include <cstring>
 #include <winrt/Windows.UI.Text.h>
 namespace native {
+// This ControlCenter build keeps page height, count and offsets in the native
+// PaginatedGridView. Resolve its methods only for the image whose ABI was checked.
+using SetQuickRows = void(WINAPI *)(void *, int);
+using UpdateQuickExtent = void(WINAPI *)(void *);
+inline SetQuickRows setQuickRows = nullptr, originalSetQuickRows = nullptr;
+inline UpdateQuickExtent updateQuickExtent = nullptr;
+inline void *quickGridVtable = nullptr;
+inline void WINAPI KeepQuickRows(void *self, int rows) {
+  originalSetQuickRows(self, stopping ? rows : quickActionRows);
+  updateQuickExtent(self);
+}
+inline void HookQuickRows(HMODULE dll) {
+  auto image = reinterpret_cast<BYTE *>(dll);
+  auto dos = reinterpret_cast<IMAGE_DOS_HEADER *>(image);
+  auto nt = reinterpret_cast<IMAGE_NT_HEADERS *>(image + dos->e_lfanew);
+  constexpr BYTE signature[] = {0x40, 0x53, 0x48, 0x83, 0xec, 0x20, 0x48, 0x8b, 0xd9,
+                                0x39, 0x91, 0xa8, 0, 0, 0, 0x74, 0x5a, 0x89, 0x91};
+  if (nt->FileHeader.TimeDateStamp != 1878679008 || nt->OptionalHeader.SizeOfImage != 4313088 ||
+      std::memcmp(image + 0x29424c, signature, sizeof(signature)) != 0) {
+    Wh_Log(L"Native Quick Settings row override unavailable for this ControlCenter image");
+    return;
+  }
+  auto setter = reinterpret_cast<SetQuickRows>(image + 0x29424c);
+  if (*reinterpret_cast<void **>(image + 0x37f518) != image + 0x1018c0)
+    return;
+  updateQuickExtent = reinterpret_cast<UpdateQuickExtent>(image + 0x2944d0);
+  quickGridVtable = image + 0x37f518;
+  if (WindhawkUtils::SetFunctionHook(setter, KeepQuickRows, &originalSetQuickRows))
+    setQuickRows = setter;
+}
 // Quick Settings main page (ControlCenter.ControlCenterView). L1Grid holds a
 // light Border spanning TogglesGroup + SlidersGroup, then FooterGrid
 // (LeftFooter: battery on laptops; RightFooter: the native All settings
@@ -4752,7 +5115,11 @@ class QuickPage {
   bool dirty_ = true, restoring_ = false;
   int pagerTheme_ = -1;
   X::Style normalPip_{nullptr}, selectedPip_{nullptr};
+  winrt::weak_ref<X::FrameworkElement> tiledView_;
   C::Grid settingsRow_{nullptr};
+  C::StackPanel shortcuts_{nullptr};
+  std::vector<sound::QuickShortcut> visibleShortcuts_;
+  std::map<sound::QuickShortcut, C::Button> shortcutButtons_;
   C::Button title_{nullptr};
   winrt::weak_ref<C::Button> nativeSettings_;
   // The Night light button stays available when the DDC/CI row is hidden.
@@ -4766,7 +5133,6 @@ class QuickPage {
   U::AnimatedIcon nightIcon_{nullptr};
   U::IAnimatedIconStatics statics_{nullptr};
   bool reapplying_ = false;
-  std::vector<std::shared_ptr<AnimatedVolume>> volumeIcons_;
   std::wstring nightState_, nightTip_;
   int nightRegistry_ = -1;
   U::PipsPager nightPager_{nullptr};
@@ -4780,7 +5146,6 @@ class QuickPage {
   unsigned seenRevision_ = 0;
   ULONGLONG lastRead_ = 0, lastUser_ = 0;
   bool sync_ = false, visible_ = false;
-  static constexpr double settingsActionWidth = 40.;
   static inline std::map<HMONITOR, int> brightCache; // -1: no DDC/CI
   template <class R> void Keep(R &&r) {
     auto revoker = std::make_shared<std::decay_t<R>>(std::forward<R>(r));
@@ -4961,7 +5326,7 @@ class QuickPage {
   }
   C::Grid SettingsRow() {
     // 38 DIP steps: 5.6 + 38.4 lands on whole pixels at 125% (7 + 48 px).
-    auto row = Grid(L"40,*,40,40");
+    auto row = Grid(L"Auto,*,Auto");
     row.UseLayoutRounding(true);
     row.Height(38.4);
     row.Margin({0, 5.6, 0, 0});
@@ -4992,17 +5357,17 @@ class QuickPage {
     title_.Content(text);
     X::Automation::AutomationProperties::SetName(title_, name);
     C::Grid::SetColumn(title_, 0);
-    C::Grid::SetColumnSpan(title_, 2);
     row.Children().Append(title_);
     Keep(title_.Click(winrt::auto_revoke, [this](auto &&, auto &&) { OpenSettings(); }));
-    display_ = IconButton(sound::Text(L"Display settings", L"Параметры дисплея",
-                                     L"Configuración de pantalla", L"Anzeigeeinstellungen",
-                                     L"Configurações de exibição", L"显示设置"));
-    display_.Content(SymbolGlyph(view_, 0xe7f4));
-    Keep(display_.Click(winrt::auto_revoke, [](auto &&, auto &&) {
-      ShellExecuteW(nullptr, L"open", L"ms-settings:display", nullptr, nullptr, SW_SHOWNORMAL);
-    }));
+    shortcuts_ = C::StackPanel();
+    shortcuts_.Orientation(C::Orientation::Horizontal);
+    C::Grid::SetColumn(shortcuts_, 2);
+    row.Children().Append(shortcuts_);
+    display_ = ShortcutButton(sound::QuickShortcut::Display);
     NightButton();
+    shortcutButtons_ = {{sound::QuickShortcut::Display, display_},
+                        {sound::QuickShortcut::Night, night_}};
+    visibleShortcuts_.clear();
     settingsRow_ = row;
     return row;
   }
@@ -5037,8 +5402,49 @@ class QuickPage {
     C::ToolTipService::SetToolTip(b, winrt::box_value(name));
     return b;
   }
+  C::Button ShortcutButton(sound::QuickShortcut action) {
+    using S = sound::QuickShortcut;
+    PCWSTR name = nullptr, uri = nullptr;
+    wchar_t glyph = 0;
+    switch (action) {
+    case S::Display:
+      name = sound::Text(L"Display settings", L"Параметры дисплея", L"Configuración de pantalla",
+                         L"Anzeigeeinstellungen", L"Configurações de exibição", L"显示设置");
+      uri = L"ms-settings:display";
+      glyph = 0xe7f4;
+      break;
+    case S::Network:
+      name = sound::Text(L"Network & internet", L"Сеть и Интернет", L"Red e Internet",
+                         L"Netzwerk und Internet", L"Rede e Internet", L"网络和 Internet");
+      uri = L"ms-settings:network-status";
+      glyph = 0xe968;
+      break;
+    case S::Bluetooth:
+      name = sound::Text(L"Bluetooth & devices", L"Bluetooth и устройства", L"Bluetooth y dispositivos",
+                         L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和其他设备");
+      uri = L"ms-settings:bluetooth";
+      glyph = 0xe702;
+      break;
+    case S::Apps:
+      name = sound::Text(L"Installed apps", L"Установленные приложения", L"Aplicaciones instaladas",
+                         L"Installierte Apps", L"Aplicativos instalados", L"已安装的应用");
+      uri = L"ms-settings:appsfeatures";
+      glyph = 0xe71d;
+      break;
+    default:
+      return nullptr;
+    }
+    auto button = IconButton(name);
+    button.Margin({4, 0, 4, 0});
+    button.Content(SymbolGlyph(view_, glyph));
+    Keep(button.Click(winrt::auto_revoke, [uri](auto &&, auto &&) {
+      ShellExecuteW(nullptr, L"open", uri, nullptr, nullptr, SW_SHOWNORMAL);
+    }));
+    return button;
+  }
   void NightButton() {
     night_ = IconButton(sound::Text(L"Night light", L"Ночной свет", L"Luz nocturna", L"Nachtmodus", L"Luz noturna", L"夜间模式"));
+    night_.Margin({4, 0, 4, 0});
     try {
       nightIcon_ = NativeIcon(L"ControlCenter.QA_Nightlight");
       night_.Content(nightIcon_);
@@ -5374,32 +5780,35 @@ class QuickPage {
              String(button.CommandParameter()) == L"ms-settings:display";
     });
     bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto place = [&](C::Button const &button, bool enabled, bool native, int upper, int lower) {
-      C::Grid target{nullptr};
-      if (!native) {
-        if (ddcVisible)
-          target = brightRow_;
-        else if (enabled)
-          target = settingsRow_;
-      }
-      for (auto const &row : {settingsRow_, brightRow_}) {
-        if (!row)
-          continue;
+    auto shortcuts = sound::QuickShortcuts(quickShortcuts, nativeDisplay || ddcVisible,
+                                          nativeNight || ddcVisible);
+    bool changed = shortcuts != visibleShortcuts_;
+    if (changed)
+      shortcuts_.Children().Clear();
+    if (brightRow_) {
+      auto place = [&](C::Button const &button, int column) {
         uint32_t index = 0;
-        if (row.Children().IndexOf(button, index)) {
-          if (row == target)
-            return;
-          row.Children().RemoveAt(index);
-          break;
+        bool attached = brightRow_.Children().IndexOf(button, index);
+        if (ddcVisible && !attached) {
+          C::Grid::SetColumn(button, column);
+          brightRow_.Children().Append(button);
+        } else if (!ddcVisible && attached) {
+          brightRow_.Children().RemoveAt(index);
         }
+      };
+      place(display_, 2);
+      place(night_, 0);
+    }
+    if (changed) {
+      for (auto action : shortcuts) {
+        auto it = shortcutButtons_.find(action);
+        if (it == shortcutButtons_.end())
+          it = shortcutButtons_.emplace(action, ShortcutButton(action)).first;
+        if (it->second)
+          shortcuts_.Children().Append(it->second);
       }
-      if (target) {
-        C::Grid::SetColumn(button, target == brightRow_ ? lower : upper);
-        target.Children().Append(button);
-      }
-    };
-    place(display_, showDisplaySettings, nativeDisplay, 2, 2);
-    place(night_, showNightLight, nativeNight, 3, 0);
+      visibleShortcuts_ = std::move(shortcuts);
+    }
     if (brightnessGlyph_) {
       auto visibility = ddcVisible ? X::Visibility::Collapsed : X::Visibility::Visible;
       if (brightnessGlyph_.Visibility() != visibility)
@@ -5583,10 +5992,10 @@ class QuickPage {
       }
       return false; // Visit all native buttons without stopping the traversal.
     });
-    // Reserve both action slots and the battery width.
+    // Reserve the occupied action slots and the battery width.
     if (title_ && settingsRow_.ActualWidth() > 0) {
       double available = std::max(
-          0., settingsRow_.ActualWidth() - 2 * settingsActionWidth - left.ActualWidth() - 6. - 12.);
+          0., settingsRow_.ActualWidth() - shortcuts_.ActualWidth() - left.ActualWidth() - 6. - 12.);
       if (title_.MaxWidth() != available)
         title_.MaxWidth(available);
     }
@@ -5691,34 +6100,40 @@ class QuickPage {
         pip(selectedPip_, 1., selectedPx / pipScale));
   }
   void TileRows(C::Grid const &l1) {
-    if (quickActionRows == 2)
+    if (!setQuickRows)
       return;
-    auto group = Named(l1, L"TogglesGroup");
-    auto paginated = Find(group, [](auto const &e) {
+    auto paginated = Find(Named(l1, L"TogglesGroup"), [](auto const &e) {
       return Class(e) == L"ControlCenter.PaginatedGridView";
     });
+    if (!paginated || paginated == tiledView_.get())
+      return;
+    // The IPaginatedGridView subobject at +0x10 is returned by this image's
+    // QueryInterface. Verify the complete object's vtable before calling it.
+    constexpr GUID iid{0xab1ce38d, 0x0d8e, 0x55a0, {0x87, 0xb5, 0x89, 0x0c, 0xd5, 0x4f, 0x67, 0x22}};
+    winrt::com_ptr<::IUnknown> iface;
+    if (FAILED(winrt::get_unknown(paginated)->QueryInterface(iid, iface.put_void())))
+      return;
+    auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
+    if (*reinterpret_cast<void **>(self) != quickGridVtable)
+      return;
+    int rows = *reinterpret_cast<int const *>(self + 0xa8);
     auto grid = Named(paginated, L"RootGridView").try_as<C::GridView>();
-    if (!grid || grid.ActualHeight() <= 0)
+    if (!grid)
       return;
-    auto scroll = Find(grid, [](auto const &e) {
-      return bool(e.template try_as<C::ScrollViewer>());
-    }).try_as<C::ScrollViewer>();
-    if (!scroll || !First(grid, 77))
-      return;
-    double height = grid.ActualHeight();
-    double pitch = height / 2;
-    auto first = grid.ContainerFromIndex(0).try_as<X::FrameworkElement>();
-    auto fourth = grid.ContainerFromIndex(3).try_as<X::FrameworkElement>();
-    if (first && fourth) {
-      double delta = fourth.TransformToVisual(grid).TransformPoint({}).Y -
-                     first.TransformToVisual(grid).TransformPoint({}).Y;
-      if (delta > 0)
-        pitch = delta;
-    }
-    Set(grid, X::FrameworkElement::HeightProperty(),
-        winrt::box_value(double(sound::QuickActionRowsHeight(quickActionRows, height, pitch))));
-    Set(scroll, C::ScrollViewer::VerticalScrollBarVisibilityProperty(),
-        winrt::box_value(C::ScrollBarVisibility::Hidden));
+    // Native layouts use one or two rows depending on available height.
+    int nativeRows = rows == 1 ? 1 : 2;
+    if (auto pager = Named(view_, L"QuickActionsPager").try_as<U::PipsPager>();
+        pager && rows != quickActionRows && pager.SelectedPageIndex() > 0)
+      pager.SelectedPageIndex(0);
+    setQuickRows(self, quickActionRows);
+    tiledView_ = winrt::make_weak(paginated);
+    Wh_Log(L"Quick Settings pagination set to %d rows, %u tiles", quickActionRows,
+           grid.Items().Size());
+    journal_.undo.push_back([iface, nativeRows] {
+      auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
+      originalSetQuickRows(self, nativeRows);
+      updateQuickExtent(self);
+    });
   }
   // Mute button of the volume row: a button of the mod's own in the same Grid
   // cell, with the system QA_Volume asset driven by Core Audio and the slider.
@@ -5742,15 +6157,12 @@ class QuickPage {
     }
     if (!mute || !slider || !First(mute, 5))
       return;
-    std::shared_ptr<AnimatedVolume> icon;
-    try {
-      icon = std::make_shared<AnimatedVolume>();
-    } catch (...) {
-      Wh_Log(L"QuickVolumeIconError %08X", winrt::to_hresult());
-      return;
-    }
-    volumeIcons_.push_back(icon);
-    quickIcon_ = icon;
+    if (altQuickVolume)
+      try {
+        quickIcon_ = std::make_shared<AnimatedVolume>();
+      } catch (...) {
+        Wh_Log(L"QuickVolumeIconError %08X", winrt::to_hresult());
+      }
     auto hide = [this](X::UIElement const &e) {
       Set(e, X::UIElement::OpacityProperty(), winrt::box_value(0.));
       Set(e, X::UIElement::IsHitTestVisibleProperty(), winrt::box_value(false));
@@ -5773,14 +6185,15 @@ class QuickPage {
     };
     // Mute button, built as SV's on the Sound page (Button(), IconButtonStyle,
     // 32 DIP, the isolated system QA_Volume icon), in the toggle's Grid cell.
-    auto own = Button(view_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
-    own.Margin(mute.Margin());
-    own.HorizontalAlignment(mute.HorizontalAlignment());
-    own.VerticalAlignment(X::VerticalAlignment::Center);
-    C::Grid::SetColumn(own, C::Grid::GetColumn(mute));
-    C::Grid::SetRow(own, C::Grid::GetRow(mute));
-    own.Content(icon->Isolated());
-    {
+    C::Button own{nullptr};
+    if (quickIcon_) {
+      own = Button(view_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
+      own.Margin(mute.Margin());
+      own.HorizontalAlignment(mute.HorizontalAlignment());
+      own.VerticalAlignment(X::VerticalAlignment::Center);
+      C::Grid::SetColumn(own, C::Grid::GetColumn(mute));
+      C::Grid::SetRow(own, C::Grid::GetRow(mute));
+      own.Content(quickIcon_->Isolated());
       uint32_t index = 0;
       if (row.Children().IndexOf(mute, index)) {
         row.Children().RemoveAt(index);
@@ -5797,8 +6210,8 @@ class QuickPage {
             r.Children().InsertAt(std::min(index, r.Children().Size()), mute);
         }
       });
+      quickMute_ = own;
     }
-    quickMute_ = own;
     // Slider: as master_ on the Sound page; geometry and thin look follow in Sliders().
     C::Slider mine;
     if (auto style = Resource(view_, L"HeaderIconSliderStyle").try_as<X::Style>())
@@ -5868,16 +6281,17 @@ class QuickPage {
           } catch (...) {
           }
         }));
-    Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
-      try {
-        if (quickVolume_)
-          quickVolume_->ToggleMute();
-      } catch (...) {
-        Wh_Log(L"QuickMuteToggleError %08X", winrt::to_hresult());
-      }
-      quickUserAt_ = 0;
-      RefreshVolume();
-    }));
+    if (own)
+      Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+        try {
+          if (quickVolume_)
+            quickVolume_->ToggleMute();
+        } catch (...) {
+          Wh_Log(L"QuickMuteToggleError %08X", winrt::to_hresult());
+        }
+        quickUserAt_ = 0;
+        RefreshVolume();
+      }));
   }
   void Sliders(C::Grid const &l1) {
     auto group = Named(l1, L"SlidersGroup");
@@ -5926,7 +6340,8 @@ class QuickPage {
       return;
     if (First(l2, 4)) {
       SmallButton(l2);
-      Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
+      if (altQuickMixer)
+        Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
       if (X::Automation::AutomationProperties::GetName(l2).empty()) {
         auto name = sound::Text(L"Sound settings", L"Параметры звука", L"Configuración de sonido",
                                 L"Soundeinstellungen", L"Configurações de som", L"声音设置");
@@ -6163,11 +6578,11 @@ class QuickPage {
         });
       }
       DarkBlock(l1);
-      Pager();
       TileRows(l1);
+      Pager();
       Sliders(l1);
-      Footer();
       PlaceDisplayActions();
+      Footer();
       FrameReveal();
       if (bright_ && bright_.IsLoaded() && !thinSliders_.count(winrt::get_abi(bright_))) {
         auto look = Look();
@@ -6360,7 +6775,9 @@ struct Runtime {
   std::vector<std::unique_ptr<QuickPage>> quickPages;
   struct PageWatch {
     winrt::weak_ref<X::FrameworkElement> page;
-    winrt::event_token loaded{}, layout{};
+    winrt::event_token loading{}, loaded{}, layout{};
+    std::unique_ptr<Journal> firstFrame;
+    ULONGLONG hiddenAt = 0;
   };
   std::vector<PageWatch> pageWatches;
   struct ViewWatch {
@@ -6454,8 +6871,7 @@ struct Runtime {
       return;
     WatchPage(page);
     Wake();
-    if (page.IsLoaded())
-      BeforeDisplay(page, true);
+    BeforeDisplay(page, true);
   }
   void WatchFrame(X::FrameworkElement const &frame) {
     if (auto current = l2frame.get(); current && current == frame)
@@ -6484,7 +6900,7 @@ struct Runtime {
     frameToken = 0;
   }
   void PreparePage(X::FrameworkElement const &page, bool opening) {
-    if (!page.IsLoaded() || Retired(page))
+    if (Retired(page))
       return;
     for (auto const &item : pages)
       if (item->Page() == page) {
@@ -6494,7 +6910,7 @@ struct Runtime {
           item->BeforeRender();
         return;
       }
-    if (!Named(page, L"OutputGroupTitle"))
+    if ((!page.IsLoaded() && !Parent(page)) || !Named(page, L"OutputGroupTitle"))
       return;
     auto pulse = volumePulse;
     auto patch = std::make_unique<SoundPage>(page, window, [pulse] {
@@ -6502,7 +6918,12 @@ struct Runtime {
         pulse->Post();
     });
     if (patch->Apply()) {
+      if (auto watch = std::find_if(pageWatches.begin(), pageWatches.end(),
+                                   [&](auto const &item) { return item.page.get() == page; });
+          watch != pageWatches.end())
+        watch->firstFrame.reset();
       patch->PrepareInitialLayout();
+      patch->BeforeRender();
       pages.push_back(std::move(patch));
       Wh_Log(L"Sound page attached through ControlCenter symbols");
     }
@@ -6551,6 +6972,7 @@ struct Runtime {
         continue;
       }
       if (existing) {
+        existing.Loading(it->loading);
         existing.Loaded(it->loaded);
         existing.LayoutUpdated(it->layout);
         retired.push_back(it->page);
@@ -6607,6 +7029,19 @@ struct Runtime {
     auto weak = winrt::make_weak(page);
     PageWatch watch;
     watch.page = weak;
+    // Content can be assigned before Loaded, and its stock layout can be
+    // rendered during the native entrance. Hold that content until Apply()
+    // has rebuilt it. The native surface and its animation remain active.
+    if (page.FindName(L"OutputGroupTitle") || Named(page, L"OutputGroupTitle")) {
+      watch.firstFrame = std::make_unique<Journal>();
+      watch.firstFrame->Save(page, X::UIElement::OpacityProperty());
+      page.Opacity(0);
+      watch.hiddenAt = GetTickCount64();
+    }
+    watch.loading = page.Loading([this, weak](auto &&, auto &&) {
+      if (auto page = weak.get())
+        BeforeDisplay(page, true);
+    });
     watch.loaded = page.Loaded([this, weak](auto &&, auto &&) {
       if (auto page = weak.get())
         BeforeDisplay(page, true);
@@ -6752,6 +7187,9 @@ struct Runtime {
       EnsureVolumePulse();
       RetirePending();
       RetireQuick();
+      for (auto &watch : pageWatches)
+        if (watch.firstFrame && GetTickCount64() - watch.hiddenAt >= 400)
+          watch.firstFrame.reset();
       for (auto it = pages.begin(); it != pages.end();)
         if (!(*it)->Alive()) {
           (*it)->Abandon();
@@ -6809,6 +7247,7 @@ struct Runtime {
     viewWatches.clear();
     for (auto const &watch : pageWatches)
       if (auto page = watch.page.get()) {
+        page.Loading(watch.loading);
         page.Loaded(watch.loaded);
         page.LayoutUpdated(watch.layout);
       }
@@ -6963,6 +7402,8 @@ inline bool HookControlCenter(HMODULE controlCenter, bool applyNow) {
   };
   bool ok = WindhawkUtils::HookSymbols(controlCenter, controlCenterDllHooks,
                                        ARRAYSIZE(controlCenterDllHooks));
+  if (ok)
+    HookQuickRows(controlCenter);
   if (ok && applyNow)
     ok = Wh_ApplyHookOperations();
   discoveryState = ok ? 2 : 3;
@@ -7487,8 +7928,10 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
     // Use the outermost Grid within this IconView. The replacement must
     // remain outside every native glyph/template branch that we suppress.
     int kind = 1;
-    auto leaf = Find(icon, [](auto const &node) { return VolumeLeaf(node); });
-    if (!leaf) {
+    X::FrameworkElement leaf{nullptr};
+    if (altTrayVolume)
+      leaf = Find(icon, [](auto const &node) { return VolumeLeaf(node); });
+    if (!leaf && altTrayEthernet) {
       int wired = -1;
       leaf = Find(icon, [&wired](auto const &node) {
         int s = NetworkLeaf(node);
@@ -7786,7 +8229,7 @@ inline void *WINAPI Constructed(void *self) {
   }
   return result;
 }
-inline void OpenNativeSound() {
+inline bool OpenNativeSound() {
   INPUT input[6]{};
   UINT count = 0;
   bool winHeld = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0,
@@ -7808,6 +8251,7 @@ inline void OpenNativeSound() {
     key(VK_LWIN, true);
   auto sent = SendInput(count, input, sizeof(INPUT));
   Wh_Log(L"Native Sound shortcut: %u/%u events", sent, count);
+  return sent == count;
 }
 // The native handler takes TappedRoutedEventArgs by value. In the MSVC ABI the
 // caller passes the address of a temporary and the callee destroys it; the
@@ -7818,7 +8262,7 @@ using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
-  if (!stopping)
+  if (!stopping && quickSoundAccess)
     try {
       // Intercept the shell's own handler, before it activates Quick Settings.
       // A later UIElement.Tapped subscription cannot cancel an action already
@@ -7828,10 +8272,10 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
         X::FrameworkElement icon{nullptr};
         (*address)->QueryInterface(winrt::guid_of<X::FrameworkElement>(), winrt::put_abi(icon));
         if (icon && InControlCenter(icon) &&
-            Find(icon, [](auto const &child) { return VolumeLeaf(child); })) {
+            Find(icon, [](auto const &child) { return VolumeLeaf(child); }) &&
+            OpenNativeSound()) {
           args.Handled(true);
           Wh_Log(L"Sound panel: native volume click intercepted");
-          OpenNativeSound();
           try {
             for (auto taskbar : Taskbars())
               if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
@@ -8049,8 +8493,25 @@ inline void Settings() {
   std::wstring_view rowCount(rows.get());
   quickActionRows = rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4'
                         ? rowCount.front() - L'0' : 2;
-  showNightLight = Wh_GetIntSetting(L"showNightLight") != 0;
-  showDisplaySettings = Wh_GetIntSetting(L"showDisplaySettings") != 0;
+  using S = sound::QuickShortcut;
+  auto first = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut1");
+  if (*first.get()) {
+    for (int i = 0; i < int(quickShortcuts.size()); ++i) {
+      auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut%d", i + 1);
+      quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
+    }
+    quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
+    altQuickMixer = Wh_GetIntSetting(L"alternativeIcons.quickMixer") != 0;
+    altSoundMixer = Wh_GetIntSetting(L"alternativeIcons.soundMixer") != 0;
+    altTrayVolume = Wh_GetIntSetting(L"alternativeIcons.trayVolume") != 0;
+    altTrayEthernet = Wh_GetIntSetting(L"alternativeIcons.trayEthernet") != 0;
+    altQuickVolume = Wh_GetIntSetting(L"alternativeIcons.quickVolume") != 0;
+    altSoundVolume = Wh_GetIntSetting(L"alternativeIcons.soundVolume") != 0;
+    altAppUnmute = Wh_GetIntSetting(L"alternativeIcons.appUnmute") != 0;
+  } else {
+    quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
+                      Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};
+  }
 }
 } // namespace native
 BOOL Wh_ModInit() {

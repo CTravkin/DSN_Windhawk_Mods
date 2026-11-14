@@ -12,10 +12,10 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 
 **Quick Settings**
 
-- Settings opens Windows Settings. The Display settings and Night light buttons can be enabled separately. A button already shown by the brightness controls is shown there only.
+- Settings opens Windows Settings. Choose up to five shortcuts to its right: Display settings, Night light, Network & internet, Bluetooth & devices, and Installed apps. Empty slots, repeats and shortcuts already visible in the brightness controls are skipped.
 - Night light uses the native quick action when available. If Windows cannot expose the action, the button opens the Night light settings page.
 - **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
-- Set **Quick Settings tile rows** to 1–4. The default is two.
+- Set **Quick Settings tile rows** to 1–4. Pages follow the number of available tiles. The override is currently supported on Windows build 26300.9974.
 
 **Sound**
 
@@ -27,8 +27,8 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 
 **Taskbar**
 
-- Click the volume icon to open Sound directly.
-- The system's animated volume glyph and an Ethernet glyph for wired networks.
+- **Quick access to Sound** opens Sound with a click on the taskbar volume icon.
+- **Alternative icons** selects individual replacements for the mixer, volume, and wired network icons. All are enabled by default.
 
 Mod ID: `refined-quick-settings-and-sound`. The version is in `mod/sound-native.wh.cpp`.
 

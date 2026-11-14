@@ -7,7 +7,7 @@
 // @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
 // @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
 // @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.2.2
+// @version 0.3.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 157
+// Build: 158
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -40,8 +40,8 @@ customizations are restored when the mod is unloaded.
 **Quick Settings**
 
 - Display brightness defaults to Auto and can be disabled. Auto keeps the Windows slider or adds one for a display with a usable DDC/CI range.
-- The Settings row opens Windows Settings. It can also show Display settings and Night light when those buttons do not already appear in the brightness controls.
-- Quick Settings can show one to four rows of tiles. The default is two.
+- The Settings row opens Windows Settings and can show up to five ordered shortcuts. Empty slots, repeat choices and actions already visible in the brightness controls are skipped.
+- Quick Settings can show one to four rows of tiles. Pages follow the number of available tiles. The row override is currently supported on Windows build 26300.9974.
 
 **Sound**
 
@@ -56,8 +56,8 @@ customizations are restored when the mod is unloaded.
 
 **Taskbar**
 
-- Click the volume icon to open Sound directly.
-- The system's animated volume glyph and an Ethernet glyph for wired networks.
+- Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
+- Alternative mixer, volume and Ethernet icons can be enabled individually.
 
 ## Compatibility
 
@@ -94,6 +94,19 @@ in this source file.
 // ==/WindhawkModReadme==
 // ==WindhawkModSettings==
 /*
+- quickSoundAccess: true
+  $name: "Quick access to Sound"
+  $name:ru-RU: "Быстрый доступ к настройкам звука"
+  $name:es-ES: "Acceso rápido al sonido"
+  $name:de-DE: "Schnellzugriff auf Sound"
+  $name:pt-BR: "Acesso rápido ao som"
+  $name:zh-CN: "快速访问声音设置"
+  $description: "Click the taskbar volume icon to open Sound directly."
+  $description:ru-RU: "Нажатие на значок громкости на панели задач сразу открывает панель «Звук»"
+  $description:es-ES: "Abre directamente Sonido al pulsar el icono de volumen de la barra de tareas."
+  $description:de-DE: "Ein Klick auf das Lautstärkesymbol in der Taskleiste öffnet direkt das Soundfenster."
+  $description:pt-BR: "Clicar no ícone de volume na barra de tarefas abre diretamente o painel Som."
+  $description:zh-CN: "单击任务栏上的音量图标可直接打开“声音”面板"
 - brightnessMode: auto
   $name: Display brightness
   $name:ru-RU: Яркость дисплея
@@ -137,20 +150,314 @@ in this source file.
   - "2": "2"
   - "3": "3"
   - "4": "4"
-- showNightLight: true
-  $name: Night light button
-  $name:ru-RU: Кнопка «Ночной свет»
-  $name:es-ES: Botón de luz nocturna
-  $name:de-DE: Schaltfläche für den Nachtmodus
-  $name:pt-BR: Botão de luz noturna
-  $name:zh-CN: 夜间模式按钮
-- showDisplaySettings: true
-  $name: Display settings button
-  $name:ru-RU: Кнопка «Параметры дисплея»
-  $name:es-ES: Botón de configuración de pantalla
-  $name:de-DE: Schaltfläche für die Anzeigeeinstellungen
-  $name:pt-BR: Botão de configurações de exibição
-  $name:zh-CN: 显示设置按钮
+- quickSettings:
+  - shortcut1: display
+    $name: "Shortcut 1"
+    $name:ru-RU: "Переход 1"
+    $name:es-ES: "Acceso directo 1"
+    $name:de-DE: "Verknüpfung 1"
+    $name:pt-BR: "Atalho 1"
+    $name:zh-CN: "快捷方式 1"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut2: night
+    $name: "Shortcut 2"
+    $name:ru-RU: "Переход 2"
+    $name:es-ES: "Acceso directo 2"
+    $name:de-DE: "Verknüpfung 2"
+    $name:pt-BR: "Atalho 2"
+    $name:zh-CN: "快捷方式 2"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut3: none
+    $name: "Shortcut 3"
+    $name:ru-RU: "Переход 3"
+    $name:es-ES: "Acceso directo 3"
+    $name:de-DE: "Verknüpfung 3"
+    $name:pt-BR: "Atalho 3"
+    $name:zh-CN: "快捷方式 3"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut4: none
+    $name: "Shortcut 4"
+    $name:ru-RU: "Переход 4"
+    $name:es-ES: "Acceso directo 4"
+    $name:de-DE: "Verknüpfung 4"
+    $name:pt-BR: "Atalho 4"
+    $name:zh-CN: "快捷方式 4"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  - shortcut5: none
+    $name: "Shortcut 5"
+    $name:ru-RU: "Переход 5"
+    $name:es-ES: "Acceso directo 5"
+    $name:de-DE: "Verknüpfung 5"
+    $name:pt-BR: "Atalho 5"
+    $name:zh-CN: "快捷方式 5"
+    $options:
+    - none: "None"
+    - display: "Display settings"
+    - night: "Night light"
+    - network: "Network & internet"
+    - bluetooth: "Bluetooth & devices"
+    - apps: "Installed apps"
+    $options:ru-RU:
+    - none: "Нет"
+    - display: "Параметры дисплея"
+    - night: "Ночной свет"
+    - network: "Сеть и Интернет"
+    - bluetooth: "Bluetooth и устройства"
+    - apps: "Установленные приложения"
+    $options:es-ES:
+    - none: "Ninguno"
+    - display: "Configuración de pantalla"
+    - night: "Luz nocturna"
+    - network: "Red e Internet"
+    - bluetooth: "Bluetooth y dispositivos"
+    - apps: "Aplicaciones instaladas"
+    $options:de-DE:
+    - none: "Keine"
+    - display: "Anzeigeeinstellungen"
+    - night: "Nachtmodus"
+    - network: "Netzwerk und Internet"
+    - bluetooth: "Bluetooth und Geräte"
+    - apps: "Installierte Apps"
+    $options:pt-BR:
+    - none: "Nenhum"
+    - display: "Configurações de exibição"
+    - night: "Luz noturna"
+    - network: "Rede e Internet"
+    - bluetooth: "Bluetooth e dispositivos"
+    - apps: "Aplicativos instalados"
+    $options:zh-CN:
+    - none: "无"
+    - display: "显示设置"
+    - night: "夜间模式"
+    - network: "网络和 Internet"
+    - bluetooth: "蓝牙和其他设备"
+    - apps: "已安装的应用"
+  $name: "Quick Settings"
+  $name:ru-RU: "Быстрые настройки"
+  $name:es-ES: "Configuración rápida"
+  $name:de-DE: "Schnelleinstellungen"
+  $name:pt-BR: "Configurações rápidas"
+  $name:zh-CN: "快速设置"
+- alternativeIcons:
+  - quickMixer: true
+    $name: "Mixer button in Quick Settings"
+    $name:ru-RU: "Кнопка микшера в быстрых настройках"
+    $name:es-ES: "Botón del mezclador en Configuración rápida"
+    $name:de-DE: "Lautstärkemixer-Schaltfläche in den Schnelleinstellungen"
+    $name:pt-BR: "Botão do mixer nas Configurações rápidas"
+    $name:zh-CN: "快速设置中的音量合成器按钮"
+  - soundMixer: true
+    $name: "Mixer settings button in Sound"
+    $name:ru-RU: "Кнопка параметров микшера в панели «Звук»"
+    $name:es-ES: "Botón de configuración del mezclador en Sonido"
+    $name:de-DE: "Mixer-Einstellungen im Soundfenster"
+    $name:pt-BR: "Botão de configurações do mixer no painel Som"
+    $name:zh-CN: "声音面板中的音量合成器设置按钮"
+  - trayVolume: true
+    $name: "Volume icon on the taskbar"
+    $name:ru-RU: "Значок громкости на панели задач"
+    $name:es-ES: "Icono de volumen en la barra de tareas"
+    $name:de-DE: "Lautstärkesymbol in der Taskleiste"
+    $name:pt-BR: "Ícone de volume na barra de tarefas"
+    $name:zh-CN: "任务栏音量图标"
+  - trayEthernet: true
+    $name: "Ethernet icon on the taskbar"
+    $name:ru-RU: "Значок Ethernet на панели задач"
+    $name:es-ES: "Icono de Ethernet en la barra de tareas"
+    $name:de-DE: "Ethernet-Symbol in der Taskleiste"
+    $name:pt-BR: "Ícone de Ethernet na barra de tarefas"
+    $name:zh-CN: "任务栏以太网图标"
+  - quickVolume: true
+    $name: "Volume icon in Quick Settings"
+    $name:ru-RU: "Значок громкости в быстрых настройках"
+    $name:es-ES: "Icono de volumen en Configuración rápida"
+    $name:de-DE: "Lautstärkesymbol in den Schnelleinstellungen"
+    $name:pt-BR: "Ícone de volume nas Configurações rápidas"
+    $name:zh-CN: "快速设置中的音量图标"
+  - soundVolume: true
+    $name: "System volume icon in Sound"
+    $name:ru-RU: "Значок общей громкости в панели «Звук»"
+    $name:es-ES: "Icono de volumen del sistema en Sonido"
+    $name:de-DE: "Systemlautstärkesymbol im Soundfenster"
+    $name:pt-BR: "Ícone de volume do sistema no painel Som"
+    $name:zh-CN: "声音面板中的系统音量图标"
+  - appUnmute: true
+    $name: "App unmute icon in the mixer"
+    $name:ru-RU: "Значок включения звука приложения в микшере"
+    $name:es-ES: "Icono para reactivar el sonido de una aplicación en el mezclador"
+    $name:de-DE: "Symbol zum Aufheben der App-Stummschaltung im Mixer"
+    $name:pt-BR: "Ícone para ativar o som de um aplicativo no mixer"
+    $name:zh-CN: "音量合成器中的应用取消静音图标"
+  $name: "Alternative icons"
+  $name:ru-RU: "Альтернативные иконки"
+  $name:es-ES: "Iconos alternativos"
+  $name:de-DE: "Alternative Symbole"
+  $name:pt-BR: "Ícones alternativos"
+  $name:zh-CN: "备用图标"
 - hiddenApps: ""
   $name: Hidden applications
   $name:ru-RU: Скрытые приложения
@@ -179,8 +486,25 @@ inline void Settings() {
   std::wstring_view rowCount(rows.get());
   quickActionRows = rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4'
                         ? rowCount.front() - L'0' : 2;
-  showNightLight = Wh_GetIntSetting(L"showNightLight") != 0;
-  showDisplaySettings = Wh_GetIntSetting(L"showDisplaySettings") != 0;
+  using S = sound::QuickShortcut;
+  auto first = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut1");
+  if (*first.get()) {
+    for (int i = 0; i < int(quickShortcuts.size()); ++i) {
+      auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut%d", i + 1);
+      quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
+    }
+    quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
+    altQuickMixer = Wh_GetIntSetting(L"alternativeIcons.quickMixer") != 0;
+    altSoundMixer = Wh_GetIntSetting(L"alternativeIcons.soundMixer") != 0;
+    altTrayVolume = Wh_GetIntSetting(L"alternativeIcons.trayVolume") != 0;
+    altTrayEthernet = Wh_GetIntSetting(L"alternativeIcons.trayEthernet") != 0;
+    altQuickVolume = Wh_GetIntSetting(L"alternativeIcons.quickVolume") != 0;
+    altSoundVolume = Wh_GetIntSetting(L"alternativeIcons.soundVolume") != 0;
+    altAppUnmute = Wh_GetIntSetting(L"alternativeIcons.appUnmute") != 0;
+  } else {
+    quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
+                      Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};
+  }
 }
 } // namespace native
 BOOL Wh_ModInit() {

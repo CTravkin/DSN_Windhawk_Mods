@@ -1,9 +1,11 @@
 #pragma once
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cwctype>
 #include <map>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <windows.h>
 namespace sound {
@@ -19,9 +21,26 @@ inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german
   }
 }
 
-inline int QuickActionRowsHeight(int rows, double nativeHeight, double rowPitch) {
-  int count = rows >= 1 && rows <= 4 ? rows : 2;
-  return int(std::lround(nativeHeight + (count - 2) * rowPitch));
+enum class QuickShortcut { None, Display, Night, Network, Bluetooth, Apps };
+using QuickShortcutSlots = std::array<QuickShortcut, 5>;
+inline QuickShortcut ParseQuickShortcut(std::wstring_view value) {
+  if (value == L"display") return QuickShortcut::Display;
+  if (value == L"night") return QuickShortcut::Night;
+  if (value == L"network") return QuickShortcut::Network;
+  if (value == L"bluetooth") return QuickShortcut::Bluetooth;
+  if (value == L"apps") return QuickShortcut::Apps;
+  return QuickShortcut::None;
+}
+inline std::vector<QuickShortcut> QuickShortcuts(QuickShortcutSlots const &slots,
+                                                bool displayBelow, bool nightBelow) {
+  std::vector<QuickShortcut> result;
+  for (auto action : slots)
+    if (action != QuickShortcut::None &&
+        !(action == QuickShortcut::Display && displayBelow) &&
+        !(action == QuickShortcut::Night && nightBelow) &&
+        std::find(result.begin(), result.end(), action) == result.end())
+      result.push_back(action);
+  return result;
 }
 
 // Adapted from the hidden-applications parser of the Sound Output Direct and

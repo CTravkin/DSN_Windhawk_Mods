@@ -105,7 +105,9 @@ struct Runtime {
   std::vector<std::unique_ptr<QuickPage>> quickPages;
   struct PageWatch {
     winrt::weak_ref<X::FrameworkElement> page;
-    winrt::event_token loaded{}, layout{};
+    winrt::event_token loading{}, loaded{}, layout{};
+    std::unique_ptr<Journal> firstFrame;
+    ULONGLONG hiddenAt = 0;
   };
   std::vector<PageWatch> pageWatches;
   struct ViewWatch {
@@ -199,8 +201,7 @@ struct Runtime {
       return;
     WatchPage(page);
     Wake();
-    if (page.IsLoaded())
-      BeforeDisplay(page, true);
+    BeforeDisplay(page, true);
   }
   void WatchFrame(X::FrameworkElement const &frame) {
     if (auto current = l2frame.get(); current && current == frame)
@@ -229,7 +230,7 @@ struct Runtime {
     frameToken = 0;
   }
   void PreparePage(X::FrameworkElement const &page, bool opening) {
-    if (!page.IsLoaded() || Retired(page))
+    if (Retired(page))
       return;
     for (auto const &item : pages)
       if (item->Page() == page) {
@@ -239,7 +240,7 @@ struct Runtime {
           item->BeforeRender();
         return;
       }
-    if (!Named(page, L"OutputGroupTitle"))
+    if ((!page.IsLoaded() && !Parent(page)) || !Named(page, L"OutputGroupTitle"))
       return;
     auto pulse = volumePulse;
     auto patch = std::make_unique<SoundPage>(page, window, [pulse] {
@@ -247,7 +248,12 @@ struct Runtime {
         pulse->Post();
     });
     if (patch->Apply()) {
+      if (auto watch = std::find_if(pageWatches.begin(), pageWatches.end(),
+                                   [&](auto const &item) { return item.page.get() == page; });
+          watch != pageWatches.end())
+        watch->firstFrame.reset();
       patch->PrepareInitialLayout();
+      patch->BeforeRender();
       pages.push_back(std::move(patch));
       Wh_Log(L"Sound page attached through ControlCenter symbols");
     }
@@ -296,6 +302,7 @@ struct Runtime {
         continue;
       }
       if (existing) {
+        existing.Loading(it->loading);
         existing.Loaded(it->loaded);
         existing.LayoutUpdated(it->layout);
         retired.push_back(it->page);
@@ -352,6 +359,19 @@ struct Runtime {
     auto weak = winrt::make_weak(page);
     PageWatch watch;
     watch.page = weak;
+    // Content can be assigned before Loaded, and its stock layout can be
+    // rendered during the native entrance. Hold that content until Apply()
+    // has rebuilt it. The native surface and its animation remain active.
+    if (page.FindName(L"OutputGroupTitle") || Named(page, L"OutputGroupTitle")) {
+      watch.firstFrame = std::make_unique<Journal>();
+      watch.firstFrame->Save(page, X::UIElement::OpacityProperty());
+      page.Opacity(0);
+      watch.hiddenAt = GetTickCount64();
+    }
+    watch.loading = page.Loading([this, weak](auto &&, auto &&) {
+      if (auto page = weak.get())
+        BeforeDisplay(page, true);
+    });
     watch.loaded = page.Loaded([this, weak](auto &&, auto &&) {
       if (auto page = weak.get())
         BeforeDisplay(page, true);
@@ -497,6 +517,9 @@ struct Runtime {
       EnsureVolumePulse();
       RetirePending();
       RetireQuick();
+      for (auto &watch : pageWatches)
+        if (watch.firstFrame && GetTickCount64() - watch.hiddenAt >= 400)
+          watch.firstFrame.reset();
       for (auto it = pages.begin(); it != pages.end();)
         if (!(*it)->Alive()) {
           (*it)->Abandon();
@@ -554,6 +577,7 @@ struct Runtime {
     viewWatches.clear();
     for (auto const &watch : pageWatches)
       if (auto page = watch.page.get()) {
+        page.Loading(watch.loading);
         page.Loaded(watch.loaded);
         page.LayoutUpdated(watch.layout);
       }

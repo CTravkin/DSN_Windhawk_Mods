@@ -72,16 +72,24 @@ struct Model : winrt::implements<Model, native::D::ICustomPropertyProvider> {
 };
 int main() {
   try {
-    // The native height includes the list's fixed inset, outside the rows.
-    if (sound::QuickActionRowsHeight(1, 164, 78) != 86 ||
-        sound::QuickActionRowsHeight(2, 164, 78) != 164 ||
-        sound::QuickActionRowsHeight(3, 164, 78) != 242 ||
-        sound::QuickActionRowsHeight(4, 164, 78) != 320 ||
-        sound::QuickActionRowsHeight(8, 164, 78) != 164) {
-      std::puts("FAIL: Quick Settings tile rows");
-      return 4;
+    using Shortcut = sound::QuickShortcut;
+    auto buttons = sound::QuickShortcuts(
+        {Shortcut::Display, Shortcut::None, Shortcut::Display, Shortcut::Night, Shortcut::Night},
+        false, false);
+    auto withoutDisplay = sound::QuickShortcuts(
+        {Shortcut::Display, Shortcut::Network, Shortcut::Night, Shortcut::None, Shortcut::Bluetooth},
+        true, false);
+    auto empty = sound::QuickShortcuts(
+        {Shortcut::Display, Shortcut::Display, Shortcut::Display, Shortcut::Night, Shortcut::Night},
+        true, true);
+    if (buttons != std::vector{Shortcut::Display, Shortcut::Night} ||
+        withoutDisplay != std::vector{Shortcut::Network, Shortcut::Night, Shortcut::Bluetooth} ||
+        !empty.empty() || sound::ParseQuickShortcut(L"apps") != Shortcut::Apps ||
+        sound::ParseQuickShortcut(L"unknown") != Shortcut::None) {
+      std::puts("FAIL: Quick Settings shortcut order and visibility");
+      return 5;
     }
-    std::puts("PASS: Quick Settings tile rows 1 through 4 and an invalid setting");
+    std::puts("PASS: Quick Settings shortcuts skip gaps, duplicates and visible slider commands");
     winrt::init_apartment();
     for (auto kind : {F::PropertyType::Int32, F::PropertyType::UInt32, F::PropertyType::Single,
                       F::PropertyType::Double}) {

@@ -476,8 +476,10 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
     // Use the outermost Grid within this IconView. The replacement must
     // remain outside every native glyph/template branch that we suppress.
     int kind = 1;
-    auto leaf = Find(icon, [](auto const &node) { return VolumeLeaf(node); });
-    if (!leaf) {
+    X::FrameworkElement leaf{nullptr};
+    if (altTrayVolume)
+      leaf = Find(icon, [](auto const &node) { return VolumeLeaf(node); });
+    if (!leaf && altTrayEthernet) {
       int wired = -1;
       leaf = Find(icon, [&wired](auto const &node) {
         int s = NetworkLeaf(node);
@@ -775,7 +777,7 @@ inline void *WINAPI Constructed(void *self) {
   }
   return result;
 }
-inline void OpenNativeSound() {
+inline bool OpenNativeSound() {
   INPUT input[6]{};
   UINT count = 0;
   bool winHeld = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0,
@@ -797,6 +799,7 @@ inline void OpenNativeSound() {
     key(VK_LWIN, true);
   auto sent = SendInput(count, input, sizeof(INPUT));
   Wh_Log(L"Native Sound shortcut: %u/%u events", sent, count);
+  return sent == count;
 }
 // The native handler takes TappedRoutedEventArgs by value. In the MSVC ABI the
 // caller passes the address of a temporary and the callee destroys it; the
@@ -807,7 +810,7 @@ using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
-  if (!stopping)
+  if (!stopping && quickSoundAccess)
     try {
       // Intercept the shell's own handler, before it activates Quick Settings.
       // A later UIElement.Tapped subscription cannot cancel an action already
@@ -817,10 +820,10 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
         X::FrameworkElement icon{nullptr};
         (*address)->QueryInterface(winrt::guid_of<X::FrameworkElement>(), winrt::put_abi(icon));
         if (icon && InControlCenter(icon) &&
-            Find(icon, [](auto const &child) { return VolumeLeaf(child); })) {
+            Find(icon, [](auto const &child) { return VolumeLeaf(child); }) &&
+            OpenNativeSound()) {
           args.Handled(true);
           Wh_Log(L"Sound panel: native volume click intercepted");
-          OpenNativeSound();
           try {
             for (auto taskbar : Taskbars())
               if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
