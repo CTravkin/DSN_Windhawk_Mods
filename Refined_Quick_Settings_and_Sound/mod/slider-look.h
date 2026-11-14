@@ -1,9 +1,9 @@
 #pragma once
 #include "common.h"
+#include <optional>
 namespace native {
-// The native thumb tooltip belongs to the drag gesture. Draw the wheel value
-// over the panel's content without opening another shell surface.
-class WheelToolTip {
+// Draw the same value over the panel for both wheel and thumb gestures.
+class VolumeToolTip {
   C::Grid host_{nullptr};
   C::Canvas overlay_{nullptr};
   C::Border plate_{nullptr};
@@ -13,7 +13,7 @@ class WheelToolTip {
   X::FrameworkElement::Unloaded_revoker unloaded_;
   X::FrameworkElement::LayoutUpdated_revoker layout_;
   C::Slider slider_{nullptr};
-  IInspectable pressed_{nullptr};
+  std::optional<uint32_t> pointer_;
 
   void Position() {
     auto thumb = Named(slider_, L"HorizontalThumb");
@@ -35,30 +35,23 @@ class WheelToolTip {
 
 public:
   void Hide() noexcept {
+    pointer_.reset();
     if (timer_)
       try {
         timer_.Stop();
       } catch (...) {
-        Wh_Log(L"WheelTooltipTimerStopError %08X", winrt::to_hresult());
+        Wh_Log(L"VolumeTooltipTimerStopError %08X", winrt::to_hresult());
       }
     unloaded_.revoke();
     layout_.revoke();
-    if (slider_) {
-      try {
-        slider_.RemoveHandler(X::UIElement::PointerPressedEvent(), pressed_);
-      } catch (...) {
-        Wh_Log(L"WheelTooltipHandlerRemovalError %08X", winrt::to_hresult());
-      }
-      slider_ = nullptr;
-      pressed_ = nullptr;
-    }
+    slider_ = nullptr;
     if (host_)
       try {
         uint32_t index;
         if (host_.Children().IndexOf(overlay_, index))
           host_.Children().RemoveAt(index);
       } catch (...) {
-        Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
+        Wh_Log(L"VolumeTooltipCloseError %08X", winrt::to_hresult());
       }
     host_ = nullptr;
   }
@@ -94,11 +87,7 @@ public:
       C::Grid::SetRowSpan(overlay_, std::max(1u, host_.RowDefinitions().Size()));
       C::Grid::SetColumnSpan(overlay_, std::max(1u, host_.ColumnDefinitions().Size()));
       host_.Children().Append(overlay_);
-      auto handler = winrt::box_value(X::Input::PointerEventHandler(
-          [this](auto &&, auto &&) { Hide(); }));
-      slider.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
       slider_ = slider;
-      pressed_ = handler;
       unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
       layout_ = slider.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
         try {
@@ -137,7 +126,63 @@ public:
       tick_ = timer_.Tick(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
     }
     timer_.Stop();
-    timer_.Start();
+    if (!pointer_)
+      timer_.Start();
+  }
+  void Watch(X::FrameworkElement const &page, C::Slider const &slider, Journal &journal,
+             std::vector<std::function<void()>> &revoke) {
+    auto listen = [&](X::RoutedEvent const &event, X::Input::PointerEventHandler const &callback) {
+      auto handler = winrt::box_value(callback);
+      slider.AddHandler(event, handler, true);
+      revoke.push_back([slider, event, handler] { slider.RemoveHandler(event, handler); });
+    };
+    auto weakPage = winrt::make_weak(page);
+    listen(X::UIElement::PointerPressedEvent(),
+           [this, weakPage](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+             try {
+               auto slider = sender.as<C::Slider>();
+               auto point = args.GetCurrentPoint(slider);
+               if (!slider.IsEnabled() || !point.Properties().IsLeftButtonPressed())
+                 return;
+               if (auto page = weakPage.get()) {
+                 Show(page, slider, slider.Value());
+                 if (slider_ == slider) {
+                   pointer_ = point.PointerId();
+                   timer_.Stop();
+                 }
+               }
+             } catch (...) {
+               Hide();
+             }
+           });
+    X::Input::PointerEventHandler finish =
+        [this](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+          try {
+            if (pointer_ && sender == slider_ && *pointer_ == args.Pointer().PointerId()) {
+              pointer_.reset();
+              timer_.Start();
+            }
+          } catch (...) {
+            Hide();
+          }
+        };
+    listen(X::UIElement::PointerReleasedEvent(), finish);
+    listen(X::UIElement::PointerCanceledEvent(), finish);
+    listen(X::UIElement::PointerCaptureLostEvent(), finish);
+    auto changed = slider.ValueChanged(
+        winrt::auto_revoke, [this, weakPage](IInspectable const &sender, auto const &args) {
+          try {
+            if (pointer_ && sender == slider_)
+              if (auto page = weakPage.get())
+                Show(page, slider_, args.NewValue());
+          } catch (...) {
+            Hide();
+          }
+        });
+    auto revoker = std::make_shared<decltype(changed)>(std::move(changed));
+    revoke.push_back([revoker] { revoker->revoke(); });
+    journal.Save(slider, C::Slider::IsThumbToolTipEnabledProperty());
+    slider.IsThumbToolTipEnabled(false);
   }
 };
 

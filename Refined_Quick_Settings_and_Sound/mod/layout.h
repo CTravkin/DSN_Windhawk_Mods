@@ -70,7 +70,7 @@ class SoundPage {
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
   sound::WheelVolume masterWheel_;
-  WheelToolTip wheelTip_;
+  VolumeToolTip volumeTip_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
@@ -769,9 +769,13 @@ class SoundPage {
       inputSignature_ = signature;
     }
     C::ListViewItem selected{nullptr};
+    winrt::hstring label = sound::Text(
+        L"No input device selected", L"Устройство ввода не выбрано",
+        L"Ningún dispositivo de entrada seleccionado", L"Kein Eingabegerät ausgewählt",
+        L"Nenhum dispositivo de entrada selecionado", L"未选择输入设备");
     for (auto const &device : state.input)
       if (device.current) {
-        input_->label.Text(device.name);
+        label = winrt::hstring(device.name);
         for (auto const &entry : input_->list.Items())
           if (auto item = entry.try_as<C::ListViewItem>();
               item && String(item.Tag()) == device.id) {
@@ -780,7 +784,9 @@ class SoundPage {
           }
         break;
       }
-    if (selected && input_->list.SelectedItem() != selected)
+    if (input_->label.Text() != label)
+      input_->label.Text(label);
+    if (input_->list.SelectedItem() != selected)
       input_->list.SelectedItem(selected);
     input_->button.IsEnabled(!state.input.empty());
     if (pendingInput_ && state.applied >= pendingInput_) {
@@ -924,8 +930,12 @@ class SoundPage {
       arrow_.RenderTransform(rotation);
     }
     arrowStart_ = rotation.Angle();
-    X::Automation::AutomationProperties::SetHelpText(mixerButton_,
-                                                     expanded_ ? L"Expanded" : L"Collapsed");
+    X::Automation::AutomationProperties::SetHelpText(
+        mixerButton_, expanded_
+                          ? sound::Text(L"Expanded", L"Развернут", L"Expandido", L"Erweitert",
+                                        L"Expandido", L"已展开")
+                          : sound::Text(L"Collapsed", L"Свернут", L"Contraído", L"Eingeklappt",
+                                        L"Recolhido", L"已折叠"));
     if (!animate || !winrt::Windows::UI::ViewManagement::UISettings().AnimationsEnabled()) {
       hideUnnamed_ = false;
       rotation.Angle(expanded_ ? 180 : 0);
@@ -1202,7 +1212,6 @@ class SoundPage {
     master_.Margin({12, 0, 12, 0});
     master_.Maximum(100);
     master_.StepFrequency(1);
-    master_.IsThumbToolTipEnabled(true);
     C::Grid::SetColumn(master_, 1);
     footer_.Children().Append(master_);
     X::Automation::AutomationProperties::SetName(master_, sound::Text(L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke", L"Volume do sistema", L"系统音量"));
@@ -1227,6 +1236,7 @@ class SoundPage {
         MasterGlyph(value, value <= 0);
       }
     }));
+    volumeTip_.Watch(page_, master_, journal_, revoke_);
     ListenVolumeWheel(
         master_, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -1239,13 +1249,13 @@ class SoundPage {
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(page_, master_, master_.Value());
+              volumeTip_.Show(page_, master_, master_.Value());
               return;
             }
             args.Handled(true);
             master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
                                            master_.Maximum(), delta, settings_.volumeWheelStep));
-            wheelTip_.Show(page_, master_, master_.Value());
+            volumeTip_.Show(page_, master_, master_.Value());
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
           }
@@ -2248,6 +2258,7 @@ public:
     // Mouse wheel as on SV. Written to the session's model like mute/restore;
     // quick notches add up on the last requested value instead of a slider that
     // has not caught up yet.
+    volumeTip_.Watch(page_, slider, journal_, revoke_);
     ListenVolumeWheel(
         slider, [this, row](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -2261,7 +2272,7 @@ public:
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(page_, s, s.Value());
+              volumeTip_.Show(page_, s, s.Value());
               return;
             }
             args.Handled(true);
@@ -2282,7 +2293,7 @@ public:
               if (!WriteVolume(s, row->model, next))
                 s.Value(next);
             }
-            wheelTip_.Show(page_, s, next);
+            volumeTip_.Show(page_, s, next);
           } catch (...) {
             Wh_Log(L"MixerWheelError %08X", winrt::to_hresult());
           }
@@ -2324,7 +2335,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);
@@ -2380,7 +2391,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);

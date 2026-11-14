@@ -74,6 +74,9 @@ class QuickPage {
   std::unique_ptr<Ddc> ddc_;
   C::StackPanel header_{nullptr};
   C::Grid brightRow_{nullptr};
+  Journal unavailableBrightness_;
+  winrt::weak_ref<X::FrameworkElement> hiddenBrightnessRow_;
+  bool nativeBrightnessAvailable_ = false;
   C::Button night_{nullptr}, display_{nullptr};
   X::FrameworkElement brightnessGlyph_{nullptr};
   C::Slider bright_{nullptr};
@@ -116,7 +119,7 @@ class QuickPage {
   IInspectable originalMixerIcon_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
   sound::WheelVolume volumeWheel_;
-  WheelToolTip wheelTip_;
+  VolumeToolTip volumeTip_;
   int quickGlyph_ = -2;
   bool quickSync_ = false, quickAvailable_ = false;
   ULONGLONG quickUserAt_ = 0;
@@ -742,14 +745,50 @@ class QuickPage {
         return parent;
     return nullptr;
   }
+  static C::Slider NativeBrightnessSlider(X::FrameworkElement const &row) {
+    return Find(row, [](auto const &element) { return !!element.template try_as<C::Slider>(); })
+        .try_as<C::Slider>();
+  }
+  bool NativeBrightnessUsable(C::Slider const &slider) {
+    if (!slider || !slider.IsEnabled() || slider.Maximum() <= slider.Minimum())
+      return false;
+    for (auto element = slider.as<X::FrameworkElement>(); element; element = Parent(element)) {
+      if (element.Visibility() != X::Visibility::Visible)
+        return false;
+      if (element == view_)
+        return true;
+    }
+    return false;
+  }
+  void HideUnavailableBrightness(X::FrameworkElement const &row, bool hide) {
+    auto hidden = hiddenBrightnessRow_.get();
+    if (hidden && row == hidden && hide)
+      return;
+    unavailableBrightness_.Restore();
+    hiddenBrightnessRow_ = nullptr;
+    if (!hide)
+      return;
+    // Keep the native visibility binding and slider state live so a monitor
+    // change can bring the native row back while Quick Settings is open.
+    unavailableBrightness_.Save(row, X::FrameworkElement::MinHeightProperty());
+    unavailableBrightness_.Save(row, X::FrameworkElement::MaxHeightProperty());
+    unavailableBrightness_.Save(row, X::UIElement::IsHitTestVisibleProperty());
+    hiddenBrightnessRow_ = winrt::make_weak(row);
+    row.MinHeight(0);
+    row.MaxHeight(0);
+    row.IsHitTestVisible(false);
+  }
   void PlaceDisplayActions() {
     if (!settingsRow_ || !night_ || !display_)
       return;
     auto nativeRow = NativeBrightnessRow();
     if (!settings_.brightnessEnabled && nativeRow && First(nativeRow, 76))
       Set(nativeRow, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    bool nativeVisible = settings_.brightnessEnabled && nativeRow &&
-                         nativeRow.Visibility() == X::Visibility::Visible;
+    auto nativeSlider = NativeBrightnessSlider(nativeRow);
+    bool nativeVisible = settings_.brightnessEnabled && NativeBrightnessUsable(nativeSlider);
+    HideUnavailableBrightness(nativeRow, settings_.brightnessEnabled && nativeSlider &&
+                                            nativeRow.Visibility() == X::Visibility::Visible &&
+                                            !nativeVisible);
     if (nativeVisible && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible) {
       brightRow_.Visibility(X::Visibility::Collapsed);
       alignPasses_ = 0;
@@ -795,10 +834,10 @@ class QuickPage {
     }
   }
   bool PanelVisible() { return WindowShown(host_); }
-  void ApplyBright(int value) {
+  void ApplyBright(int value, bool nativeAvailable) {
     if (!brightRow_)
       return;
-    bool show = value >= 0 && !NativeBrightnessRow();
+    bool show = value >= 0 && !nativeAvailable;
     auto want = show ? X::Visibility::Visible : X::Visibility::Collapsed;
     if (brightRow_.Visibility() != want) {
       brightRow_.Visibility(want);
@@ -820,13 +859,16 @@ class QuickPage {
       return;
     auto now = GetTickCount64();
     auto monitor = MonitorFromWindow(host_, MONITOR_DEFAULTTONEAREST);
-    if (monitor != monitor_) {
+    bool nativeAvailable = NativeBrightnessUsable(NativeBrightnessSlider(NativeBrightnessRow()));
+    bool availabilityChanged = nativeBrightnessAvailable_ != nativeAvailable;
+    nativeBrightnessAvailable_ = nativeAvailable;
+    if (monitor != monitor_ || availabilityChanged) {
       monitor_ = monitor;
       lastRead_ = 0;
       auto cached = brightCache.find(monitor);
-      ApplyBright(cached != brightCache.end() ? cached->second : -1);
+      ApplyBright(cached != brightCache.end() ? cached->second : -1, nativeAvailable);
     }
-    if (!NativeBrightnessRow() && (opening || now - lastRead_ > 3000) && now - lastUser_ > 1500 &&
+    if (!nativeAvailable && (opening || now - lastRead_ > 3000) && now - lastUser_ > 1500 &&
         (opening || visible_)) {
       lastRead_ = now;
       ddc_->Read(monitor_);
@@ -838,7 +880,7 @@ class QuickPage {
         int value = r.supported ? r.value : -1;
         brightCache[monitor_] = value;
         if (now - lastUser_ > 1500 || !r.supported)
-          ApplyBright(value);
+          ApplyBright(value, nativeAvailable);
       }
     }
   }
@@ -1181,7 +1223,6 @@ class QuickPage {
     mine.StepFrequency(1);
     mine.SmallChange(slider.SmallChange() > 0 ? slider.SmallChange() : 2);
     mine.LargeChange(10);
-    mine.IsThumbToolTipEnabled(true);
     mine.Margin(slider.Margin());
     mine.HorizontalAlignment(X::HorizontalAlignment::Stretch);
     mine.VerticalAlignment(X::VerticalAlignment::Center);
@@ -1219,6 +1260,7 @@ class QuickPage {
                              }
                              QuickGlyph(value, value <= 0);
                            }));
+    volumeTip_.Watch(view_, mine, journal_, revoke_);
     ListenVolumeWheel(
         mine, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -1232,13 +1274,13 @@ class QuickPage {
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(view_, s, s.Value());
+              volumeTip_.Show(view_, s, s.Value());
               return;
             }
             args.Handled(true);
             s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta,
                                       settings_.volumeWheelStep));
-            wheelTip_.Show(view_, s, s.Value());
+            volumeTip_.Show(view_, s, s.Value());
           } catch (...) {
             Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
@@ -1625,7 +1667,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     try {
       FinishNightSearch();
     } catch (...) {
@@ -1645,6 +1687,7 @@ public:
       } catch (...) {
       }
     revoke_.clear();
+    unavailableBrightness_.Restore();
     journal_.Restore();
     view_ = nullptr;
   }

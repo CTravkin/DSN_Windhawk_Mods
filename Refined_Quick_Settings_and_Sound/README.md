@@ -22,7 +22,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - The "Sound output" page is now simply "Sound".
 - Change the output and input devices and the spatial sound provider from dropdown lists.
 - Below them, a reworked Volume mixer for the apps. It is collapsible and remembers its last state.
-- Scrolling over a system or app volume slider shows the new value. The default step is 2 percentage points.
+- Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - Hide apps from the mixer by name or executable, one app per row.
 

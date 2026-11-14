@@ -161,6 +161,15 @@ inline X::XamlRoot Root(HWND taskbar) {
     decref(shared[1]);
   return root;
 }
+struct SoundTap {
+  void *self;
+  X::FrameworkElement icon;
+  IInspectable sender;
+  X::Input::TappedRoutedEventArgs args;
+  bool handled;
+  HWND foreground;
+  ULONGLONG deadline;
+};
 struct Record {
   DWORD thread = 0;
   HWND taskbar = nullptr;
@@ -173,6 +182,7 @@ struct Record {
   IInspectable middleGesture{nullptr};
   bool suppressMiddleTap = false;
   ULONGLONG middleReleasedAt = 0;
+  std::optional<SoundTap> pendingSound;
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -902,15 +912,16 @@ inline void RefreshSettings() {
         }
     });
 }
-inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
+inline void PollSoundTap(Record &record);
+inline std::shared_ptr<Record> Observe(X::FrameworkElement const &element, HWND taskbar) {
   if (!element || stopping)
-    return;
+    return nullptr;
   EnsurePulse(taskbar);
   {
     std::lock_guard lock(recordsMutex);
     for (auto const &r : records)
-      if (auto current = r->icon.get(); current && current.as<IUnknown>() == element.as<IUnknown>())
-        return;
+      if (r->thread == GetCurrentThreadId() && r->icon.get() == element)
+        return r;
   }
   auto record = std::make_shared<Record>();
   record->thread = GetCurrentThreadId();
@@ -934,6 +945,7 @@ inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   record->tick = record->timer.Tick([weak](auto &&, auto &&) {
     if (auto r = weak.lock())
       try {
+        PollSoundTap(*r);
         Refresh(r);
       } catch (...) {
         Wh_Log(L"TrayAnimationError %08X", winrt::to_hresult());
@@ -948,6 +960,7 @@ inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   Refresh(record);
   if (record->attached || InControlCenter(element))
     record->timer.Start();
+  return record;
 }
 inline void Walk(X::DependencyObject const &node, HWND taskbar) {
   if (auto element = node.try_as<X::FrameworkElement>())
@@ -997,10 +1010,14 @@ inline void *WINAPI Constructed(void *self) {
   return result;
 }
 inline bool OpenNativeSound() {
+  auto down = [](int code) { return (GetAsyncKeyState(code) & 0x8000) != 0; };
+  // The shell registers Win+Ctrl+V, including the absence of Alt and Shift.
+  // Let the original tap run if the user's keys would change that chord.
+  if (down(VK_MENU) || down(VK_SHIFT) || down('V'))
+    return false;
   INPUT input[6]{};
   UINT count = 0;
-  bool winHeld = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0,
-       ctrlHeld = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+  bool winHeld = down(VK_LWIN) || down(VK_RWIN), ctrlHeld = down(VK_CONTROL);
   auto key = [&](WORD code, bool up) {
     input[count].type = INPUT_KEYBOARD;
     input[count].ki.wVk = code;
@@ -1027,6 +1044,34 @@ inline bool OpenNativeSound() {
 // releases the object.
 using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
+inline bool ControlCenterShown() {
+  for (HWND window = nullptr;
+       (window = FindWindowExW(nullptr, window, L"ControlCenterWindow", nullptr));)
+    if (WindowShown(window))
+      return true;
+  return false;
+}
+inline void PollSoundTap(Record &record) {
+  if (!record.pendingSound)
+    return;
+  auto const &pending = *record.pendingSound;
+  auto foreground = GetForegroundWindow();
+  if (stopping || !SettingsSnapshot().quickSoundAccess || ControlCenterShown() ||
+      !pending.icon.IsLoaded() || (foreground != pending.foreground && foreground != record.taskbar)) {
+    record.pendingSound.reset();
+    return;
+  }
+  if (GetTickCount64() < pending.deadline)
+    return;
+  auto tap = std::move(*record.pendingSound);
+  record.pendingSound.reset();
+  tap.args.Handled(tap.handled);
+  // The projected icon keeps the native object alive until the replay. The
+  // original callee releases the reference in this ABI argument slot.
+  auto slot = winrt::detach_abi(tap.args);
+  Wh_Log(L"Native Sound shortcut left the panel closed; replaying the tray tap");
+  originalTapped(tap.self, tap.sender, &slot);
+}
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
   auto settings = SettingsSnapshot();
@@ -1050,20 +1095,27 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
             args = nullptr; // the callee's share of the by-value argument
             return;
           }
-          if (settings.quickSoundAccess && OpenNativeSound()) {
-            args.Handled(true);
-            Wh_Log(L"Sound panel: native volume click intercepted");
-            try {
-              for (auto taskbar : Taskbars())
-                if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
-                  Observe(icon, taskbar);
-                  break;
+          if (settings.quickSoundAccess) {
+            for (auto taskbar : Taskbars())
+              if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
+                if (auto record = Observe(icon, taskbar)) {
+                  record->pendingSound.reset();
+                  bool alreadyShown = ControlCenterShown();
+                  SoundTap tap{self, icon, sender, args, args.Handled(), GetForegroundWindow(),
+                               GetTickCount64() + 1000};
+                  if (!alreadyShown)
+                    record->timer.Start();
+                  if (OpenNativeSound()) {
+                    if (!alreadyShown)
+                      record->pendingSound.emplace(std::move(tap));
+                    args.Handled(true);
+                    Wh_Log(L"Sound panel: native volume click intercepted");
+                    args = nullptr; // the callee's share of the by-value argument
+                    return;
+                  }
                 }
-            } catch (...) {
-              Wh_Log(L"Lazy volume icon styling failed; click was still handled");
-            }
-            args = nullptr; // the callee's share of the by-value argument
-            return;
+                break;
+              }
           }
         }
       }
@@ -1197,6 +1249,7 @@ inline void CleanupThreadRecords() {
     }
   for (auto const &record : local)
     try {
+      record->pendingSound.reset();
       if (record->timer) {
         record->timer.Stop();
         record->timer.Tick(record->tick);

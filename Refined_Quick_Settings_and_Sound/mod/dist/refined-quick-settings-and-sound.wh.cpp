@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.6.2
+// @version 0.6.3
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 167
+// Build: 168
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -50,7 +50,7 @@ customizations are restored when the mod is unloaded.
   dropdown lists.
 - Below them, a reworked Volume mixer for the apps. It is collapsible and
   remembers its last state.
-- Scroll over a volume slider to adjust it and see the new value. The default step is 2 percentage points.
+- Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - Hide apps from the mixer by name or executable, one app per row.
 
@@ -2094,10 +2094,10 @@ public:
 
 
 
+#include <optional>
 namespace native {
-// The native thumb tooltip belongs to the drag gesture. Draw the wheel value
-// over the panel's content without opening another shell surface.
-class WheelToolTip {
+// Draw the same value over the panel for both wheel and thumb gestures.
+class VolumeToolTip {
   C::Grid host_{nullptr};
   C::Canvas overlay_{nullptr};
   C::Border plate_{nullptr};
@@ -2107,7 +2107,7 @@ class WheelToolTip {
   X::FrameworkElement::Unloaded_revoker unloaded_;
   X::FrameworkElement::LayoutUpdated_revoker layout_;
   C::Slider slider_{nullptr};
-  IInspectable pressed_{nullptr};
+  std::optional<uint32_t> pointer_;
 
   void Position() {
     auto thumb = Named(slider_, L"HorizontalThumb");
@@ -2129,30 +2129,23 @@ class WheelToolTip {
 
 public:
   void Hide() noexcept {
+    pointer_.reset();
     if (timer_)
       try {
         timer_.Stop();
       } catch (...) {
-        Wh_Log(L"WheelTooltipTimerStopError %08X", winrt::to_hresult());
+        Wh_Log(L"VolumeTooltipTimerStopError %08X", winrt::to_hresult());
       }
     unloaded_.revoke();
     layout_.revoke();
-    if (slider_) {
-      try {
-        slider_.RemoveHandler(X::UIElement::PointerPressedEvent(), pressed_);
-      } catch (...) {
-        Wh_Log(L"WheelTooltipHandlerRemovalError %08X", winrt::to_hresult());
-      }
-      slider_ = nullptr;
-      pressed_ = nullptr;
-    }
+    slider_ = nullptr;
     if (host_)
       try {
         uint32_t index;
         if (host_.Children().IndexOf(overlay_, index))
           host_.Children().RemoveAt(index);
       } catch (...) {
-        Wh_Log(L"WheelTooltipCloseError %08X", winrt::to_hresult());
+        Wh_Log(L"VolumeTooltipCloseError %08X", winrt::to_hresult());
       }
     host_ = nullptr;
   }
@@ -2188,11 +2181,7 @@ public:
       C::Grid::SetRowSpan(overlay_, std::max(1u, host_.RowDefinitions().Size()));
       C::Grid::SetColumnSpan(overlay_, std::max(1u, host_.ColumnDefinitions().Size()));
       host_.Children().Append(overlay_);
-      auto handler = winrt::box_value(X::Input::PointerEventHandler(
-          [this](auto &&, auto &&) { Hide(); }));
-      slider.AddHandler(X::UIElement::PointerPressedEvent(), handler, true);
       slider_ = slider;
-      pressed_ = handler;
       unloaded_ = slider.Unloaded(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
       layout_ = slider.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
         try {
@@ -2231,7 +2220,63 @@ public:
       tick_ = timer_.Tick(winrt::auto_revoke, [this](auto &&, auto &&) { Hide(); });
     }
     timer_.Stop();
-    timer_.Start();
+    if (!pointer_)
+      timer_.Start();
+  }
+  void Watch(X::FrameworkElement const &page, C::Slider const &slider, Journal &journal,
+             std::vector<std::function<void()>> &revoke) {
+    auto listen = [&](X::RoutedEvent const &event, X::Input::PointerEventHandler const &callback) {
+      auto handler = winrt::box_value(callback);
+      slider.AddHandler(event, handler, true);
+      revoke.push_back([slider, event, handler] { slider.RemoveHandler(event, handler); });
+    };
+    auto weakPage = winrt::make_weak(page);
+    listen(X::UIElement::PointerPressedEvent(),
+           [this, weakPage](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+             try {
+               auto slider = sender.as<C::Slider>();
+               auto point = args.GetCurrentPoint(slider);
+               if (!slider.IsEnabled() || !point.Properties().IsLeftButtonPressed())
+                 return;
+               if (auto page = weakPage.get()) {
+                 Show(page, slider, slider.Value());
+                 if (slider_ == slider) {
+                   pointer_ = point.PointerId();
+                   timer_.Stop();
+                 }
+               }
+             } catch (...) {
+               Hide();
+             }
+           });
+    X::Input::PointerEventHandler finish =
+        [this](IInspectable const &sender, X::Input::PointerRoutedEventArgs const &args) {
+          try {
+            if (pointer_ && sender == slider_ && *pointer_ == args.Pointer().PointerId()) {
+              pointer_.reset();
+              timer_.Start();
+            }
+          } catch (...) {
+            Hide();
+          }
+        };
+    listen(X::UIElement::PointerReleasedEvent(), finish);
+    listen(X::UIElement::PointerCanceledEvent(), finish);
+    listen(X::UIElement::PointerCaptureLostEvent(), finish);
+    auto changed = slider.ValueChanged(
+        winrt::auto_revoke, [this, weakPage](IInspectable const &sender, auto const &args) {
+          try {
+            if (pointer_ && sender == slider_)
+              if (auto page = weakPage.get())
+                Show(page, slider_, args.NewValue());
+          } catch (...) {
+            Hide();
+          }
+        });
+    auto revoker = std::make_shared<decltype(changed)>(std::move(changed));
+    revoke.push_back([revoker] { revoker->revoke(); });
+    journal.Save(slider, C::Slider::IsThumbToolTipEnabledProperty());
+    slider.IsThumbToolTipEnabled(false);
   }
 };
 
@@ -2798,7 +2843,7 @@ class SoundPage {
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
   sound::WheelVolume masterWheel_;
-  WheelToolTip wheelTip_;
+  VolumeToolTip volumeTip_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
@@ -3497,9 +3542,13 @@ class SoundPage {
       inputSignature_ = signature;
     }
     C::ListViewItem selected{nullptr};
+    winrt::hstring label = sound::Text(
+        L"No input device selected", L"Устройство ввода не выбрано",
+        L"Ningún dispositivo de entrada seleccionado", L"Kein Eingabegerät ausgewählt",
+        L"Nenhum dispositivo de entrada selecionado", L"未选择输入设备");
     for (auto const &device : state.input)
       if (device.current) {
-        input_->label.Text(device.name);
+        label = winrt::hstring(device.name);
         for (auto const &entry : input_->list.Items())
           if (auto item = entry.try_as<C::ListViewItem>();
               item && String(item.Tag()) == device.id) {
@@ -3508,7 +3557,9 @@ class SoundPage {
           }
         break;
       }
-    if (selected && input_->list.SelectedItem() != selected)
+    if (input_->label.Text() != label)
+      input_->label.Text(label);
+    if (input_->list.SelectedItem() != selected)
       input_->list.SelectedItem(selected);
     input_->button.IsEnabled(!state.input.empty());
     if (pendingInput_ && state.applied >= pendingInput_) {
@@ -3652,8 +3703,12 @@ class SoundPage {
       arrow_.RenderTransform(rotation);
     }
     arrowStart_ = rotation.Angle();
-    X::Automation::AutomationProperties::SetHelpText(mixerButton_,
-                                                     expanded_ ? L"Expanded" : L"Collapsed");
+    X::Automation::AutomationProperties::SetHelpText(
+        mixerButton_, expanded_
+                          ? sound::Text(L"Expanded", L"Развернут", L"Expandido", L"Erweitert",
+                                        L"Expandido", L"已展开")
+                          : sound::Text(L"Collapsed", L"Свернут", L"Contraído", L"Eingeklappt",
+                                        L"Recolhido", L"已折叠"));
     if (!animate || !winrt::Windows::UI::ViewManagement::UISettings().AnimationsEnabled()) {
       hideUnnamed_ = false;
       rotation.Angle(expanded_ ? 180 : 0);
@@ -3930,7 +3985,6 @@ class SoundPage {
     master_.Margin({12, 0, 12, 0});
     master_.Maximum(100);
     master_.StepFrequency(1);
-    master_.IsThumbToolTipEnabled(true);
     C::Grid::SetColumn(master_, 1);
     footer_.Children().Append(master_);
     X::Automation::AutomationProperties::SetName(master_, sound::Text(L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke", L"Volume do sistema", L"系统音量"));
@@ -3955,6 +4009,7 @@ class SoundPage {
         MasterGlyph(value, value <= 0);
       }
     }));
+    volumeTip_.Watch(page_, master_, journal_, revoke_);
     ListenVolumeWheel(
         master_, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -3967,13 +4022,13 @@ class SoundPage {
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(page_, master_, master_.Value());
+              volumeTip_.Show(page_, master_, master_.Value());
               return;
             }
             args.Handled(true);
             master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
                                            master_.Maximum(), delta, settings_.volumeWheelStep));
-            wheelTip_.Show(page_, master_, master_.Value());
+            volumeTip_.Show(page_, master_, master_.Value());
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
           }
@@ -4976,6 +5031,7 @@ public:
     // Mouse wheel as on SV. Written to the session's model like mute/restore;
     // quick notches add up on the last requested value instead of a slider that
     // has not caught up yet.
+    volumeTip_.Watch(page_, slider, journal_, revoke_);
     ListenVolumeWheel(
         slider, [this, row](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -4989,7 +5045,7 @@ public:
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(page_, s, s.Value());
+              volumeTip_.Show(page_, s, s.Value());
               return;
             }
             args.Handled(true);
@@ -5010,7 +5066,7 @@ public:
               if (!WriteVolume(s, row->model, next))
                 s.Value(next);
             }
-            wheelTip_.Show(page_, s, next);
+            volumeTip_.Show(page_, s, next);
           } catch (...) {
             Wh_Log(L"MixerWheelError %08X", winrt::to_hresult());
           }
@@ -5052,7 +5108,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);
@@ -5108,7 +5164,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     if (gate_) {
       gate_.Stop();
       gate_.Tick(gateTick_);
@@ -5639,6 +5695,9 @@ class QuickPage {
   std::unique_ptr<Ddc> ddc_;
   C::StackPanel header_{nullptr};
   C::Grid brightRow_{nullptr};
+  Journal unavailableBrightness_;
+  winrt::weak_ref<X::FrameworkElement> hiddenBrightnessRow_;
+  bool nativeBrightnessAvailable_ = false;
   C::Button night_{nullptr}, display_{nullptr};
   X::FrameworkElement brightnessGlyph_{nullptr};
   C::Slider bright_{nullptr};
@@ -5681,7 +5740,7 @@ class QuickPage {
   IInspectable originalMixerIcon_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
   sound::WheelVolume volumeWheel_;
-  WheelToolTip wheelTip_;
+  VolumeToolTip volumeTip_;
   int quickGlyph_ = -2;
   bool quickSync_ = false, quickAvailable_ = false;
   ULONGLONG quickUserAt_ = 0;
@@ -6307,14 +6366,50 @@ class QuickPage {
         return parent;
     return nullptr;
   }
+  static C::Slider NativeBrightnessSlider(X::FrameworkElement const &row) {
+    return Find(row, [](auto const &element) { return !!element.template try_as<C::Slider>(); })
+        .try_as<C::Slider>();
+  }
+  bool NativeBrightnessUsable(C::Slider const &slider) {
+    if (!slider || !slider.IsEnabled() || slider.Maximum() <= slider.Minimum())
+      return false;
+    for (auto element = slider.as<X::FrameworkElement>(); element; element = Parent(element)) {
+      if (element.Visibility() != X::Visibility::Visible)
+        return false;
+      if (element == view_)
+        return true;
+    }
+    return false;
+  }
+  void HideUnavailableBrightness(X::FrameworkElement const &row, bool hide) {
+    auto hidden = hiddenBrightnessRow_.get();
+    if (hidden && row == hidden && hide)
+      return;
+    unavailableBrightness_.Restore();
+    hiddenBrightnessRow_ = nullptr;
+    if (!hide)
+      return;
+    // Keep the native visibility binding and slider state live so a monitor
+    // change can bring the native row back while Quick Settings is open.
+    unavailableBrightness_.Save(row, X::FrameworkElement::MinHeightProperty());
+    unavailableBrightness_.Save(row, X::FrameworkElement::MaxHeightProperty());
+    unavailableBrightness_.Save(row, X::UIElement::IsHitTestVisibleProperty());
+    hiddenBrightnessRow_ = winrt::make_weak(row);
+    row.MinHeight(0);
+    row.MaxHeight(0);
+    row.IsHitTestVisible(false);
+  }
   void PlaceDisplayActions() {
     if (!settingsRow_ || !night_ || !display_)
       return;
     auto nativeRow = NativeBrightnessRow();
     if (!settings_.brightnessEnabled && nativeRow && First(nativeRow, 76))
       Set(nativeRow, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    bool nativeVisible = settings_.brightnessEnabled && nativeRow &&
-                         nativeRow.Visibility() == X::Visibility::Visible;
+    auto nativeSlider = NativeBrightnessSlider(nativeRow);
+    bool nativeVisible = settings_.brightnessEnabled && NativeBrightnessUsable(nativeSlider);
+    HideUnavailableBrightness(nativeRow, settings_.brightnessEnabled && nativeSlider &&
+                                            nativeRow.Visibility() == X::Visibility::Visible &&
+                                            !nativeVisible);
     if (nativeVisible && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible) {
       brightRow_.Visibility(X::Visibility::Collapsed);
       alignPasses_ = 0;
@@ -6360,10 +6455,10 @@ class QuickPage {
     }
   }
   bool PanelVisible() { return WindowShown(host_); }
-  void ApplyBright(int value) {
+  void ApplyBright(int value, bool nativeAvailable) {
     if (!brightRow_)
       return;
-    bool show = value >= 0 && !NativeBrightnessRow();
+    bool show = value >= 0 && !nativeAvailable;
     auto want = show ? X::Visibility::Visible : X::Visibility::Collapsed;
     if (brightRow_.Visibility() != want) {
       brightRow_.Visibility(want);
@@ -6385,13 +6480,16 @@ class QuickPage {
       return;
     auto now = GetTickCount64();
     auto monitor = MonitorFromWindow(host_, MONITOR_DEFAULTTONEAREST);
-    if (monitor != monitor_) {
+    bool nativeAvailable = NativeBrightnessUsable(NativeBrightnessSlider(NativeBrightnessRow()));
+    bool availabilityChanged = nativeBrightnessAvailable_ != nativeAvailable;
+    nativeBrightnessAvailable_ = nativeAvailable;
+    if (monitor != monitor_ || availabilityChanged) {
       monitor_ = monitor;
       lastRead_ = 0;
       auto cached = brightCache.find(monitor);
-      ApplyBright(cached != brightCache.end() ? cached->second : -1);
+      ApplyBright(cached != brightCache.end() ? cached->second : -1, nativeAvailable);
     }
-    if (!NativeBrightnessRow() && (opening || now - lastRead_ > 3000) && now - lastUser_ > 1500 &&
+    if (!nativeAvailable && (opening || now - lastRead_ > 3000) && now - lastUser_ > 1500 &&
         (opening || visible_)) {
       lastRead_ = now;
       ddc_->Read(monitor_);
@@ -6403,7 +6501,7 @@ class QuickPage {
         int value = r.supported ? r.value : -1;
         brightCache[monitor_] = value;
         if (now - lastUser_ > 1500 || !r.supported)
-          ApplyBright(value);
+          ApplyBright(value, nativeAvailable);
       }
     }
   }
@@ -6746,7 +6844,6 @@ class QuickPage {
     mine.StepFrequency(1);
     mine.SmallChange(slider.SmallChange() > 0 ? slider.SmallChange() : 2);
     mine.LargeChange(10);
-    mine.IsThumbToolTipEnabled(true);
     mine.Margin(slider.Margin());
     mine.HorizontalAlignment(X::HorizontalAlignment::Stretch);
     mine.VerticalAlignment(X::VerticalAlignment::Center);
@@ -6784,6 +6881,7 @@ class QuickPage {
                              }
                              QuickGlyph(value, value <= 0);
                            }));
+    volumeTip_.Watch(view_, mine, journal_, revoke_);
     ListenVolumeWheel(
         mine, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
           try {
@@ -6797,13 +6895,13 @@ class QuickPage {
             if (!delta)
               return;
             if (args.Handled()) {
-              wheelTip_.Show(view_, s, s.Value());
+              volumeTip_.Show(view_, s, s.Value());
               return;
             }
             args.Handled(true);
             s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta,
                                       settings_.volumeWheelStep));
-            wheelTip_.Show(view_, s, s.Value());
+            volumeTip_.Show(view_, s, s.Value());
           } catch (...) {
             Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
@@ -7190,7 +7288,7 @@ public:
     if (restoring_)
       return;
     restoring_ = true;
-    wheelTip_.Hide();
+    volumeTip_.Hide();
     try {
       FinishNightSearch();
     } catch (...) {
@@ -7210,6 +7308,7 @@ public:
       } catch (...) {
       }
     revoke_.clear();
+    unavailableBrightness_.Restore();
     journal_.Restore();
     view_ = nullptr;
   }
@@ -8023,7 +8122,6 @@ inline void StopHost() {
 
 #include <ws2ipdef.h>
 #include <iphlpapi.h>
-#include <optional>
 namespace native::tray {
 inline std::atomic<bool> stopping{false}, moduleHooked{false};
 
@@ -8181,6 +8279,15 @@ inline X::XamlRoot Root(HWND taskbar) {
     decref(shared[1]);
   return root;
 }
+struct SoundTap {
+  void *self;
+  X::FrameworkElement icon;
+  IInspectable sender;
+  X::Input::TappedRoutedEventArgs args;
+  bool handled;
+  HWND foreground;
+  ULONGLONG deadline;
+};
 struct Record {
   DWORD thread = 0;
   HWND taskbar = nullptr;
@@ -8193,6 +8300,7 @@ struct Record {
   IInspectable middleGesture{nullptr};
   bool suppressMiddleTap = false;
   ULONGLONG middleReleasedAt = 0;
+  std::optional<SoundTap> pendingSound;
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -8922,15 +9030,16 @@ inline void RefreshSettings() {
         }
     });
 }
-inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
+inline void PollSoundTap(Record &record);
+inline std::shared_ptr<Record> Observe(X::FrameworkElement const &element, HWND taskbar) {
   if (!element || stopping)
-    return;
+    return nullptr;
   EnsurePulse(taskbar);
   {
     std::lock_guard lock(recordsMutex);
     for (auto const &r : records)
-      if (auto current = r->icon.get(); current && current.as<IUnknown>() == element.as<IUnknown>())
-        return;
+      if (r->thread == GetCurrentThreadId() && r->icon.get() == element)
+        return r;
   }
   auto record = std::make_shared<Record>();
   record->thread = GetCurrentThreadId();
@@ -8954,6 +9063,7 @@ inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   record->tick = record->timer.Tick([weak](auto &&, auto &&) {
     if (auto r = weak.lock())
       try {
+        PollSoundTap(*r);
         Refresh(r);
       } catch (...) {
         Wh_Log(L"TrayAnimationError %08X", winrt::to_hresult());
@@ -8968,6 +9078,7 @@ inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   Refresh(record);
   if (record->attached || InControlCenter(element))
     record->timer.Start();
+  return record;
 }
 inline void Walk(X::DependencyObject const &node, HWND taskbar) {
   if (auto element = node.try_as<X::FrameworkElement>())
@@ -9017,10 +9128,14 @@ inline void *WINAPI Constructed(void *self) {
   return result;
 }
 inline bool OpenNativeSound() {
+  auto down = [](int code) { return (GetAsyncKeyState(code) & 0x8000) != 0; };
+  // The shell registers Win+Ctrl+V, including the absence of Alt and Shift.
+  // Let the original tap run if the user's keys would change that chord.
+  if (down(VK_MENU) || down(VK_SHIFT) || down('V'))
+    return false;
   INPUT input[6]{};
   UINT count = 0;
-  bool winHeld = (GetAsyncKeyState(VK_LWIN) & 0x8000) != 0,
-       ctrlHeld = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+  bool winHeld = down(VK_LWIN) || down(VK_RWIN), ctrlHeld = down(VK_CONTROL);
   auto key = [&](WORD code, bool up) {
     input[count].type = INPUT_KEYBOARD;
     input[count].ki.wVk = code;
@@ -9047,6 +9162,34 @@ inline bool OpenNativeSound() {
 // releases the object.
 using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
+inline bool ControlCenterShown() {
+  for (HWND window = nullptr;
+       (window = FindWindowExW(nullptr, window, L"ControlCenterWindow", nullptr));)
+    if (WindowShown(window))
+      return true;
+  return false;
+}
+inline void PollSoundTap(Record &record) {
+  if (!record.pendingSound)
+    return;
+  auto const &pending = *record.pendingSound;
+  auto foreground = GetForegroundWindow();
+  if (stopping || !SettingsSnapshot().quickSoundAccess || ControlCenterShown() ||
+      !pending.icon.IsLoaded() || (foreground != pending.foreground && foreground != record.taskbar)) {
+    record.pendingSound.reset();
+    return;
+  }
+  if (GetTickCount64() < pending.deadline)
+    return;
+  auto tap = std::move(*record.pendingSound);
+  record.pendingSound.reset();
+  tap.args.Handled(tap.handled);
+  // The projected icon keeps the native object alive until the replay. The
+  // original callee releases the reference in this ABI argument slot.
+  auto slot = winrt::detach_abi(tap.args);
+  Wh_Log(L"Native Sound shortcut left the panel closed; replaying the tray tap");
+  originalTapped(tap.self, tap.sender, &slot);
+}
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
   auto settings = SettingsSnapshot();
@@ -9070,20 +9213,27 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
             args = nullptr; // the callee's share of the by-value argument
             return;
           }
-          if (settings.quickSoundAccess && OpenNativeSound()) {
-            args.Handled(true);
-            Wh_Log(L"Sound panel: native volume click intercepted");
-            try {
-              for (auto taskbar : Taskbars())
-                if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
-                  Observe(icon, taskbar);
-                  break;
+          if (settings.quickSoundAccess) {
+            for (auto taskbar : Taskbars())
+              if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
+                if (auto record = Observe(icon, taskbar)) {
+                  record->pendingSound.reset();
+                  bool alreadyShown = ControlCenterShown();
+                  SoundTap tap{self, icon, sender, args, args.Handled(), GetForegroundWindow(),
+                               GetTickCount64() + 1000};
+                  if (!alreadyShown)
+                    record->timer.Start();
+                  if (OpenNativeSound()) {
+                    if (!alreadyShown)
+                      record->pendingSound.emplace(std::move(tap));
+                    args.Handled(true);
+                    Wh_Log(L"Sound panel: native volume click intercepted");
+                    args = nullptr; // the callee's share of the by-value argument
+                    return;
+                  }
                 }
-            } catch (...) {
-              Wh_Log(L"Lazy volume icon styling failed; click was still handled");
-            }
-            args = nullptr; // the callee's share of the by-value argument
-            return;
+                break;
+              }
           }
         }
       }
@@ -9217,6 +9367,7 @@ inline void CleanupThreadRecords() {
     }
   for (auto const &record : local)
     try {
+      record->pendingSound.reset();
       if (record->timer) {
         record->timer.Stop();
         record->timer.Tick(record->tick);
