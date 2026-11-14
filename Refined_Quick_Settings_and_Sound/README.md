@@ -64,4 +64,6 @@ cd mod
 
 ## Licenses
 
+Modifications in this repository © 2026 Constantine Travkin (CTravkin)
+
 The mod is [GPL-3.0-only](LICENSE). The UI-thread dispatch technique follows m417z's Notification Center Styler (GPL-3.0); the hidden-apps parser is adapted from the Sound Output Direct and Taller mod. Lucide icons are ISC licensed, see [third-party notices](docs/THIRD-PARTY-NOTICES.md) and `mod/LUCIDE-LICENSE.txt`.

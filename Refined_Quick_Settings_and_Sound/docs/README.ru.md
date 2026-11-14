@@ -62,4 +62,6 @@ cd mod
 
 ## Лицензии
 
+Доработки в этом репозитории © 2026 Constantine Travkin (CTravkin)
+
 Мод распространяется по [GPL-3.0-only](../LICENSE). Подход к диспетчеризации в UI-поток основан на Notification Center Styler от m417z (GPL-3.0); парсер скрытых приложений адаптирован из мода Sound Output Direct and Taller. Значки Lucide — под лицензией ISC, см. `mod/LUCIDE-LICENSE.txt`.
