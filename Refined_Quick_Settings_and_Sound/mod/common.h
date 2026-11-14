@@ -59,6 +59,16 @@ inline ModSettings SettingsSnapshot() {
   return modSettings;
 }
 inline UINT volumePulseMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.VolumePulse.1");
+inline UINT soundShownMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.SoundShown.1");
+inline constexpr WCHAR soundRequestProperty[] = L"Windhawk.NativeSound.SoundRequest.1";
+inline constexpr WCHAR soundPageProperty[] = L"Windhawk.NativeSound.SoundPage.1";
+inline constexpr UINT_PTR SoundRequestToken(ULONGLONG now, UINT_PTR sequence) {
+  return static_cast<UINT_PTR>(now << 16) | (sequence & 0xffff);
+}
+inline constexpr bool SoundEventMatchesRequest(UINT_PTR token, DWORD shownAt) {
+  // WinEvent timestamps wrap at 32 bits. A request only lives for 1.2 seconds.
+  return static_cast<LONG>(shownAt - static_cast<DWORD>(token >> 16)) >= 0;
+}
 // Used only while unloading. Wait for the asynchronous operation itself,
 // not an event set inside its delegate: the DLL must outlive the delegate's return.
 inline bool DispatchCleanup(winrt::Windows::UI::Core::CoreDispatcher const &dispatcher,

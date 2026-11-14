@@ -76,6 +76,8 @@ class QuickPage {
   C::Grid brightRow_{nullptr};
   Journal unavailableBrightness_;
   winrt::weak_ref<X::FrameworkElement> hiddenBrightnessRow_;
+  winrt::weak_ref<X::FrameworkElement> missingBrightnessSlider_;
+  ULONGLONG missingBrightnessSince_ = 0;
   bool nativeBrightnessAvailable_ = false;
   C::Button night_{nullptr}, display_{nullptr};
   X::FrameworkElement brightnessGlyph_{nullptr};
@@ -778,6 +780,26 @@ class QuickPage {
     row.MaxHeight(0);
     row.IsHitTestVisible(false);
   }
+  bool BrightnessTemplateMissing(X::FrameworkElement const &row, C::Slider const &slider) {
+    if (!row || slider || row.Visibility() != X::Visibility::Visible) {
+      missingBrightnessSlider_ = nullptr;
+      return false;
+    }
+    if (hiddenBrightnessRow_.get() == row)
+      return true;
+    if (!PanelVisible()) {
+      missingBrightnessSlider_ = nullptr;
+      return false;
+    }
+    // The shell can load the icon before the slider. Leave this row alone for
+    // one layout interval, then hide it unless the real control has arrived.
+    auto now = GetTickCount64();
+    if (missingBrightnessSlider_.get() != row) {
+      missingBrightnessSlider_ = winrt::make_weak(row);
+      missingBrightnessSince_ = now;
+    }
+    return now - missingBrightnessSince_ >= 250;
+  }
   void PlaceDisplayActions() {
     if (!settingsRow_ || !night_ || !display_)
       return;
@@ -786,9 +808,11 @@ class QuickPage {
       Set(nativeRow, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
     auto nativeSlider = NativeBrightnessSlider(nativeRow);
     bool nativeVisible = settings_.brightnessEnabled && NativeBrightnessUsable(nativeSlider);
-    HideUnavailableBrightness(nativeRow, settings_.brightnessEnabled && nativeSlider &&
+    bool missingSlider = settings_.brightnessEnabled &&
+                         BrightnessTemplateMissing(nativeRow, nativeSlider);
+    HideUnavailableBrightness(nativeRow, settings_.brightnessEnabled && nativeRow &&
                                             nativeRow.Visibility() == X::Visibility::Visible &&
-                                            !nativeVisible);
+                                            !nativeVisible && (nativeSlider || missingSlider));
     if (nativeVisible && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible) {
       brightRow_.Visibility(X::Visibility::Collapsed);
       alignPasses_ = 0;

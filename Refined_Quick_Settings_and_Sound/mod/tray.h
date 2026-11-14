@@ -162,14 +162,25 @@ inline X::XamlRoot Root(HWND taskbar) {
   return root;
 }
 struct SoundTap {
+  HWND taskbar;
+  HMONITOR monitor;
+  UINT_PTR token;
   void *self;
   X::FrameworkElement icon;
   IInspectable sender;
   X::Input::TappedRoutedEventArgs args;
   bool handled;
   HWND foreground;
-  ULONGLONG deadline;
 };
+[[clang::no_destroy]] inline thread_local std::optional<SoundTap> soundTap;
+inline std::atomic<UINT_PTR> nextSoundTap{0};
+inline void CancelSoundTap() {
+  if (!soundTap)
+    return;
+  KillTimer(soundTap->taskbar, soundTap->token);
+  RemovePropW(soundTap->taskbar, soundRequestProperty);
+  soundTap.reset();
+}
 struct Record {
   DWORD thread = 0;
   HWND taskbar = nullptr;
@@ -182,7 +193,6 @@ struct Record {
   IInspectable middleGesture{nullptr};
   bool suppressMiddleTap = false;
   ULONGLONG middleReleasedAt = 0;
-  std::optional<SoundTap> pendingSound;
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -831,7 +841,22 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
 }
 inline std::mutex pulsesMutex;
 inline std::map<HWND, std::shared_ptr<VolumePulse>> pulses;
+inline void RetrySoundTap();
 inline LRESULT CALLBACK VolumeProc(HWND window, UINT message, WPARAM w, LPARAM l, DWORD_PTR) {
+  if (message == soundShownMessage) {
+    if (soundTap && soundTap->taskbar == window && soundTap->token == w &&
+        reinterpret_cast<LPARAM>(soundTap->monitor) == l)
+      CancelSoundTap();
+    return 0;
+  }
+  if (message == WM_TIMER && soundTap && soundTap->taskbar == window && soundTap->token == w) {
+    try {
+      RetrySoundTap();
+    } catch (...) {
+      Wh_Log(L"Native Sound fallback: %08X", winrt::to_hresult());
+    }
+    return 0;
+  }
   if (message == volumePulseMessage) {
     {
       std::lock_guard lock(pulsesMutex);
@@ -862,6 +887,8 @@ inline LRESULT CALLBACK VolumeProc(HWND window, UINT message, WPARAM w, LPARAM l
     return 0;
   }
   if (message == WM_NCDESTROY) {
+    if (soundTap && soundTap->taskbar == window)
+      CancelSoundTap();
     {
       std::lock_guard lock(pulsesMutex);
       if (auto it = pulses.find(window); it != pulses.end()) {
@@ -873,16 +900,18 @@ inline LRESULT CALLBACK VolumeProc(HWND window, UINT message, WPARAM w, LPARAM l
   }
   return DefSubclassProc(window, message, w, l);
 }
-inline void EnsurePulse(HWND window) {
+inline bool EnsurePulse(HWND window) {
   {
     std::lock_guard lock(pulsesMutex);
     if (pulses.contains(window))
-      return;
+      return true;
   }
   if (WindhawkUtils::SetWindowSubclassFromAnyThread(window, VolumeProc, 0)) {
     std::lock_guard lock(pulsesMutex);
     pulses.emplace(window, std::make_shared<VolumePulse>(window));
+    return true;
   }
+  return false;
 }
 inline void VolumeChanged() {
   std::vector<std::shared_ptr<VolumePulse>> copy;
@@ -912,16 +941,15 @@ inline void RefreshSettings() {
         }
     });
 }
-inline void PollSoundTap(Record &record);
-inline std::shared_ptr<Record> Observe(X::FrameworkElement const &element, HWND taskbar) {
+inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   if (!element || stopping)
-    return nullptr;
+    return;
   EnsurePulse(taskbar);
   {
     std::lock_guard lock(recordsMutex);
     for (auto const &r : records)
       if (r->thread == GetCurrentThreadId() && r->icon.get() == element)
-        return r;
+        return;
   }
   auto record = std::make_shared<Record>();
   record->thread = GetCurrentThreadId();
@@ -945,7 +973,6 @@ inline std::shared_ptr<Record> Observe(X::FrameworkElement const &element, HWND 
   record->tick = record->timer.Tick([weak](auto &&, auto &&) {
     if (auto r = weak.lock())
       try {
-        PollSoundTap(*r);
         Refresh(r);
       } catch (...) {
         Wh_Log(L"TrayAnimationError %08X", winrt::to_hresult());
@@ -960,7 +987,6 @@ inline std::shared_ptr<Record> Observe(X::FrameworkElement const &element, HWND 
   Refresh(record);
   if (record->attached || InControlCenter(element))
     record->timer.Start();
-  return record;
 }
 inline void Walk(X::DependencyObject const &node, HWND taskbar) {
   if (auto element = node.try_as<X::FrameworkElement>())
@@ -1044,36 +1070,67 @@ inline bool OpenNativeSound() {
 // releases the object.
 using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
-inline bool ControlCenterShown() {
-  for (HWND window = nullptr;
-       (window = FindWindowExW(nullptr, window, L"ControlCenterWindow", nullptr));)
-    if (WindowShown(window))
+inline bool SoundPageShown(HMONITOR monitor) {
+  for (HWND window = nullptr; (window = FindWindowExW(nullptr, window, nullptr, nullptr));)
+    if (GetPropW(window, soundPageProperty) == monitor && WindowShown(window) &&
+        MonitorFromWindow(window, MONITOR_DEFAULTTONULL) == monitor)
       return true;
   return false;
 }
-inline void PollSoundTap(Record &record) {
-  if (!record.pendingSound)
-    return;
-  auto const &pending = *record.pendingSound;
-  auto foreground = GetForegroundWindow();
-  if (stopping || !SettingsSnapshot().quickSoundAccess || ControlCenterShown() ||
-      !pending.icon.IsLoaded() || (foreground != pending.foreground && foreground != record.taskbar)) {
-    record.pendingSound.reset();
-    return;
+inline HWND SoundTaskbar(X::FrameworkElement const &icon, bool mouse) {
+  auto root = icon.XamlRoot();
+  POINT cursor{};
+  bool haveCursor = mouse && GetCursorPos(&cursor);
+  HWND only = nullptr, underCursor = nullptr;
+  bool multiple = false;
+  for (auto taskbar : Taskbars()) {
+    if (GetWindowThreadProcessId(taskbar, nullptr) != GetCurrentThreadId())
+      continue;
+    if (root && Root(taskbar) == root)
+      return taskbar;
+    RECT bounds{};
+    if (haveCursor && GetWindowRect(taskbar, &bounds) && PtInRect(&bounds, cursor))
+      underCursor = taskbar;
+    multiple |= only != nullptr;
+    only = taskbar;
   }
-  if (GetTickCount64() < pending.deadline)
+  return multiple ? underCursor : only;
+}
+inline bool AwaitSoundPage(SoundTap tap) {
+  if (!soundShownMessage || !EnsurePulse(tap.taskbar) ||
+      !SetPropW(tap.taskbar, soundRequestProperty, reinterpret_cast<HANDLE>(tap.token)))
+    return false;
+  soundTap.emplace(std::move(tap));
+  if (!SetTimer(soundTap->taskbar, soundTap->token, 1200, nullptr)) {
+    CancelSoundTap();
+    return false;
+  }
+  return true;
+}
+inline bool IsControlCenterWindow(HWND window) {
+  WCHAR name[48]{};
+  return GetClassNameW(window, name, ARRAYSIZE(name)) && !_wcsicmp(name, L"ControlCenterWindow");
+}
+inline void RetrySoundTap() {
+  auto tap = std::move(*soundTap);
+  CancelSoundTap();
+  auto foreground = GetForegroundWindow();
+  if (stopping || !SettingsSnapshot().quickSoundAccess || !tap.icon.IsLoaded() ||
+      MonitorFromWindow(tap.taskbar, MONITOR_DEFAULTTONULL) != tap.monitor ||
+      SoundPageShown(tap.monitor) ||
+      (foreground != tap.foreground && foreground != tap.taskbar &&
+       !IsControlCenterWindow(foreground)))
     return;
-  auto tap = std::move(*record.pendingSound);
-  record.pendingSound.reset();
   tap.args.Handled(tap.handled);
   // The projected icon keeps the native object alive until the replay. The
   // original callee releases the reference in this ABI argument slot.
   auto slot = winrt::detach_abi(tap.args);
-  Wh_Log(L"Native Sound shortcut left the panel closed; replaying the tray tap");
+  Wh_Log(L"No Sound page confirmed on the target monitor; replaying the tray tap");
   originalTapped(tap.self, tap.sender, &slot);
 }
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
+  CancelSoundTap();
   auto settings = SettingsSnapshot();
   if (!stopping && (settings.quickSoundAccess || settings.trayMiddleClickMute))
     try {
@@ -1086,42 +1143,39 @@ inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot
         (*address)->QueryInterface(winrt::guid_of<X::FrameworkElement>(), winrt::put_abi(icon));
         if (icon && InControlCenter(icon) &&
             Find(icon, [](auto const &child) { return VolumeLeaf(child); })) {
+          bool mouse =
+              args.PointerDeviceType() == winrt::Windows::Devices::Input::PointerDeviceType::Mouse;
           // Tapped is independent of the handled flag on the pointer events.
-          if (settings.trayMiddleClickMute &&
-              args.PointerDeviceType() == winrt::Windows::Devices::Input::PointerDeviceType::Mouse &&
-              ConsumeMiddleTap(icon)) {
+          if (settings.trayMiddleClickMute && mouse && ConsumeMiddleTap(icon)) {
             args.Handled(true);
             Wh_Log(L"Tray middle click: suppressed the panel tap");
             args = nullptr; // the callee's share of the by-value argument
             return;
           }
-          if (settings.quickSoundAccess) {
-            for (auto taskbar : Taskbars())
-              if (GetWindowThreadProcessId(taskbar, nullptr) == GetCurrentThreadId()) {
-                if (auto record = Observe(icon, taskbar)) {
-                  record->pendingSound.reset();
-                  bool alreadyShown = ControlCenterShown();
-                  SoundTap tap{self, icon, sender, args, args.Handled(), GetForegroundWindow(),
-                               GetTickCount64() + 1000};
-                  if (!alreadyShown)
-                    record->timer.Start();
-                  if (OpenNativeSound()) {
-                    if (!alreadyShown)
-                      record->pendingSound.emplace(std::move(tap));
-                    args.Handled(true);
-                    Wh_Log(L"Sound panel: native volume click intercepted");
-                    args = nullptr; // the callee's share of the by-value argument
-                    return;
-                  }
+          if (settings.quickSoundAccess)
+            if (auto taskbar = SoundTaskbar(icon, mouse)) {
+              auto monitor = MonitorFromWindow(taskbar, MONITOR_DEFAULTTONULL);
+              auto token = SoundRequestToken(GetTickCount64(), ++nextSoundTap);
+              if (monitor && (SoundPageShown(monitor) ||
+                              AwaitSoundPage({taskbar, monitor, token, self, icon, sender,
+                                              args, args.Handled(), GetForegroundWindow()})) &&
+                  OpenNativeSound()) {
+                args.Handled(true);
+                args = nullptr; // the callee's share of the by-value argument
+                try {
+                  Observe(icon, taskbar);
+                } catch (...) {
+                  Wh_Log(L"Lazy volume icon styling failed; click was still handled");
                 }
-                break;
+                return;
               }
-          }
+            }
         }
       }
     } catch (winrt::hresult_error const &error) {
       Wh_Log(L"Native volume handler: 0x%08X", error.code().value);
     }
+  CancelSoundTap();
   originalTapped(self, sender, argsSlot);
 }
 inline bool HookTray(HMODULE module) {
@@ -1217,6 +1271,7 @@ inline void AttachExisting() {
 // All XAML cleanup and the final Record destruction stay on the owner thread.
 // Leave a record in the no_destroy vector if cleanup fails partway through.
 inline void CleanupThreadRecords() {
+  CancelSoundTap();
   std::vector<std::shared_ptr<Record>> local;
   std::vector<MenuEntry> menus;
   {
@@ -1249,7 +1304,6 @@ inline void CleanupThreadRecords() {
     }
   for (auto const &record : local)
     try {
-      record->pendingSound.reset();
       if (record->timer) {
         record->timer.Stop();
         record->timer.Tick(record->tick);

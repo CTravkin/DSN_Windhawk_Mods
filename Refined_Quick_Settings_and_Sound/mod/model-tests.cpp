@@ -72,6 +72,15 @@ struct Model : winrt::implements<Model, native::D::ICustomPropertyProvider> {
 };
 int main() {
   try {
+    auto soundRequest = native::SoundRequestToken(0xfffffff0, 1);
+    if (soundRequest == native::SoundRequestToken(0xfffffff0, 2) ||
+        native::SoundEventMatchesRequest(soundRequest, 0xffffffef) ||
+        !native::SoundEventMatchesRequest(soundRequest, 0xfffffff0) ||
+        !native::SoundEventMatchesRequest(soundRequest, 1)) {
+      std::puts("FAIL: Sound request ignores earlier shell events across tick wraparound");
+      return 9;
+    }
+    std::puts("PASS: Sound request tokens distinguish taps and reject stale shell events");
     using Shortcut = sound::QuickShortcut;
     auto buttons = sound::QuickShortcuts(
         {Shortcut::Display, Shortcut::None, Shortcut::Display, Shortcut::Power, Shortcut::Power},
