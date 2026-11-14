@@ -7,6 +7,23 @@
 #include <vector>
 #include <windows.h>
 namespace sound {
+inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german,
+                   PCWSTR portuguese, PCWSTR chinese) {
+  switch (PRIMARYLANGID(GetUserDefaultUILanguage())) {
+  case LANG_RUSSIAN: return russian;
+  case LANG_SPANISH: return spanish;
+  case LANG_GERMAN: return german;
+  case LANG_PORTUGUESE: return portuguese;
+  case LANG_CHINESE: return chinese;
+  default: return english;
+  }
+}
+
+inline int QuickActionRowsHeight(int rows, double nativeHeight, double rowPitch) {
+  int count = rows >= 1 && rows <= 4 ? rows : 2;
+  return int(std::lround(nativeHeight + (count - 2) * rowPitch));
+}
+
 // Adapted from the hidden-applications parser of the Sound Output Direct and
 // Taller Windhawk mod; the only code taken from it.
 // Matching happens before a row is created, so hidden apps occupy no space.

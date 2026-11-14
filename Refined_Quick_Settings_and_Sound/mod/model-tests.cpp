@@ -72,6 +72,16 @@ struct Model : winrt::implements<Model, native::D::ICustomPropertyProvider> {
 };
 int main() {
   try {
+    // The native height includes the list's fixed inset, outside the rows.
+    if (sound::QuickActionRowsHeight(1, 164, 78) != 86 ||
+        sound::QuickActionRowsHeight(2, 164, 78) != 164 ||
+        sound::QuickActionRowsHeight(3, 164, 78) != 242 ||
+        sound::QuickActionRowsHeight(4, 164, 78) != 320 ||
+        sound::QuickActionRowsHeight(8, 164, 78) != 164) {
+      std::puts("FAIL: Quick Settings tile rows");
+      return 4;
+    }
+    std::puts("PASS: Quick Settings tile rows 1 through 4 and an invalid setting");
     winrt::init_apartment();
     for (auto kind : {F::PropertyType::Int32, F::PropertyType::UInt32, F::PropertyType::Single,
                       F::PropertyType::Double}) {

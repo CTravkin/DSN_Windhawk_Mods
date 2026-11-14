@@ -10,3 +10,4 @@ DSN Windhawk Mods — набор модов Windhawk для Windows. Кажды�
 | --- | --- | --- |
 | [Explorer Item Pins](Explorer_Item_Pins/README.ru.md) | `explorer-item-pins` | Закрепление файлов и подпапок внутри открытой папки Проводника |
 | [Windows Border Switch](Windows_Border_Switch/README.ru.md) | `windows-border-switch` | Управление рамками окон, диалогов, меню «Пуск» и панели задач |
+| [Refined Quick Settings and Sound](Refined_Quick_Settings_and_Sound/docs/README.ru.md) | `dsn-refined-quick-settings-and-sound` | Быстрые настройки и микшер Windows 11 с кнопками дисплея и ночного света |

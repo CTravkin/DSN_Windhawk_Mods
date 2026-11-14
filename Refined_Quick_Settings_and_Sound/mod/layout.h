@@ -6,7 +6,10 @@
 #include <winrt/Windows.UI.Xaml.Automation.Peers.h>
 #include <winrt/Windows.UI.Xaml.Automation.Provider.h>
 namespace native {
+enum class MenuKind { Output, Input, Spatial };
+
 struct Menu {
+  MenuKind kind;
   C::Button button{nullptr};
   C::TextBlock label{nullptr};
   C::FontIcon endpointIcon{nullptr};
@@ -376,8 +379,7 @@ class SoundPage {
                 winrt::box_value(X::Thickness{menu == input_ ? 8. : 0., 0, 0, 0}));
             Set(text, X::FrameworkElement::VerticalAlignmentProperty(),
                 winrt::box_value(X::VerticalAlignment::Center));
-          } else if (!wcscmp(X::Automation::AutomationProperties::GetName(menu->button).c_str(),
-                             L"Output device") &&
+           } else if (menu->kind == MenuKind::Output &&
                      text.Text().size() == 1 && Parent(text).template try_as<C::Grid>() &&
                      Parent(text).template as<C::Grid>().ColumnDefinitions().Size() == 3) {
             Set(text, X::FrameworkElement::WidthProperty(), winrt::box_value(16.));
@@ -498,14 +500,13 @@ class SoundPage {
           if (auto title = Named(container, L"TitleText").try_as<C::TextBlock>())
             text = title.Text();
     }
-    if (text.empty() && X::Automation::AutomationProperties::GetName(m->button) == L"Output device")
+    if (text.empty() && m->kind == MenuKind::Output)
       for (auto const &device : latest_.output)
         if (device.current) {
           text = device.name;
           break;
         }
-    if (m->endpointIcon &&
-        X::Automation::AutomationProperties::GetName(m->button) == L"Output device") {
+    if (m->endpointIcon && m->kind == MenuKind::Output) {
       auto code = String(ModelValue(selected, L"EndpointIcon"));
       if (code.size() == 1)
         m->endpointIcon.Glyph(code);
@@ -527,8 +528,10 @@ class SoundPage {
     m->label.Text(text.empty() ? L"—" : text);
     m->button.IsEnabled(m->list.IsEnabled() && m->list.Items().Size() > 0);
   }
-  std::shared_ptr<Menu> Picker(X::FrameworkElement const &owner, PCWSTR name) {
+  std::shared_ptr<Menu> Picker(X::FrameworkElement const &owner, MenuKind kind,
+                               winrt::hstring const &nativeName = {}) {
     auto m = std::make_shared<Menu>();
+    m->kind = kind;
     m->button = C::Button();
     m->button.Height(32);
     m->button.MinHeight(32);
@@ -537,15 +540,18 @@ class SoundPage {
     m->button.Margin({20, 0, 20, 18});
     m->button.HorizontalAlignment(X::HorizontalAlignment::Stretch);
     m->button.HorizontalContentAlignment(X::HorizontalAlignment::Stretch);
-    X::Automation::AutomationProperties::SetName(m->button, name);
+    auto name = kind == MenuKind::Input ? sound::Text(L"Input device", L"Устройство ввода", L"Dispositivo de entrada", L"Eingabegerät", L"Dispositivo de entrada", L"输入设备")
+              : kind == MenuKind::Spatial ? sound::Text(L"Spatial sound", L"Пространственный звук", L"Sonido espacial", L"Raumklang", L"Som espacial", L"空间音效")
+                                          : sound::Text(L"Output device", L"Устройство вывода", L"Dispositivo de salida", L"Ausgabegerät", L"Dispositivo de saída", L"输出设备");
+    X::Automation::AutomationProperties::SetName(m->button, nativeName.empty() ? name : nativeName.c_str());
     m->button.VerticalContentAlignment(X::VerticalAlignment::Center);
     auto g = Grid(L"17,*,12");
-    if (!wcscmp(name, L"Spatial sound")) {
+    if (kind == MenuKind::Spatial) {
       auto phones = SymbolGlyph(owner, 0xe7f6, 16);
       phones.Margin({0, -buttonGlyphRaise, 0, buttonGlyphRaise});
       g.Children().Append(phones);
     } else {
-      m->endpointIcon = SymbolGlyph(owner, !wcscmp(name, L"Input device") ? 0xe720 : 0xe7f5);
+      m->endpointIcon = SymbolGlyph(owner, kind == MenuKind::Input ? 0xe720 : 0xe7f5);
       m->endpointIcon.Margin({0, -buttonGlyphRaise, 0, buttonGlyphRaise});
       g.Children().Append(m->endpointIcon);
     }
@@ -626,12 +632,12 @@ class SoundPage {
     Set(list, C::ScrollViewer::VerticalScrollBarVisibilityProperty(),
         winrt::box_value(C::ScrollBarVisibility::Auto));
   }
-  void ConvertList(C::ListView const &list, PCWSTR title) {
+  void ConvertList(C::ListView const &list, MenuKind kind, C::TextBlock const &heading) {
     auto parent = Parent(list).as<C::Panel>();
     uint32_t index = 0;
     if (!parent.Children().IndexOf(list, index))
       throw winrt::hresult_error(E_UNEXPECTED);
-    auto m = Picker(parent, title);
+    auto m = Picker(parent, kind, heading.Text());
     m->list = list;
     journal_.Save(list, X::FrameworkElement::DataContextProperty());
     list.DataContext(list.DataContext());
@@ -658,12 +664,12 @@ class SoundPage {
     inputBlock_.BorderThickness({0, 1, 0, 0});
     PaintDivider(inputBlock_, parent);
     C::TextBlock heading;
-    heading.Text(L"Input device");
+    heading.Text(sound::Text(L"Input device", L"Устройство ввода", L"Dispositivo de entrada", L"Eingabegerät", L"Dispositivo de entrada", L"输入设备"));
     heading.FontWeight({600});
     TextLine(heading, 19.6);
     heading.Margin({20, 10, 20, HeadingBottom()});
     inputBlock_.Children().Append(heading);
-    input_ = Picker(parent, L"Input device");
+    input_ = Picker(parent, MenuKind::Input);
     input_->list = C::ListView();
     input_->list.SelectionMode(C::ListViewSelectionMode::Single);
     input_->list.IsItemClickEnabled(true);
@@ -1145,7 +1151,7 @@ class SoundPage {
     footer_ = Grid(L"32,*,32");
     footer_.Name(L"NativeSoundMasterRow");
     FooterMargins();
-    masterIcon_ = Button(page_, L"Mute system volume");
+    masterIcon_ = Button(page_, sound::Text(L"Mute system volume", L"Переключить звук", L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten", L"Ativar ou desativar o som", L"打开或关闭声音"));
     masterIcon_.Content(VolumeGlyph(page_, 3));
     try {
       masterAnimation_ = std::make_shared<AnimatedVolume>();
@@ -1165,8 +1171,8 @@ class SoundPage {
     master_.IsThumbToolTipEnabled(true);
     C::Grid::SetColumn(master_, 1);
     footer_.Children().Append(master_);
-    X::Automation::AutomationProperties::SetName(master_, L"System volume");
-    auto settings = Button(page_, L"More volume settings");
+    X::Automation::AutomationProperties::SetName(master_, sound::Text(L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke", L"Volume do sistema", L"系统音量"));
+    auto settings = Button(page_, sound::Text(L"More volume settings", L"Дополнительные параметры звука", L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen", L"Mais configurações de som", L"更多声音设置"));
     SettingsGear(settings);
     C::Grid::SetColumn(settings, 2);
     footer_.Children().Append(settings);
@@ -1303,9 +1309,9 @@ public:
       heading.Margin({20, 10, 20, HeadingBottom()});
       TextLine(heading.as<C::TextBlock>(), 19.6);
     }
-    ConvertList(output, L"Output device");
+    ConvertList(output, MenuKind::Output, outputTitle.as<C::TextBlock>());
     Input(Parent(outputTitle).as<C::Panel>());
-    ConvertList(spatial, L"Spatial sound");
+    ConvertList(spatial, MenuKind::Spatial, spatialTitle.as<C::TextBlock>());
     Mixer();
     Master(oldFooter, style);
     if (auto back = Named(page_, L"BackButton").try_as<C::Button>()) {
@@ -1412,7 +1418,7 @@ public:
     for (auto name : {L"PageTitleText", L"PageTitle"})
       if (auto t = Named(page_, name).try_as<C::TextBlock>()) {
         journal_.Save(t, C::TextBlock::TextProperty());
-        t.Text(L"Sound");
+        t.Text(sound::Text(L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"));
         TextLine(t, 19.6);
       }
     journal_.Save(page_, X::FrameworkElement::HeightProperty());
@@ -1482,14 +1488,14 @@ public:
   // First opening in a shell session: the native view models load asynchronously
   // ("No output devices found", empty Spatial/VM, then the panel grows). Keep the
   // page content transparent until the data and VM rows are present, max 300 ms.
-  std::shared_ptr<Menu> MenuNamed(PCWSTR name) {
+  std::shared_ptr<Menu> MenuFor(MenuKind kind) {
     for (auto const &m : menus_)
-      if (X::Automation::AutomationProperties::GetName(m->button) == name)
+      if (m->kind == kind)
         return m;
     return nullptr;
   }
   bool DataReady(bool rows) {
-    auto out = MenuNamed(L"Output device"), spatial = MenuNamed(L"Spatial sound");
+    auto out = MenuFor(MenuKind::Output), spatial = MenuFor(MenuKind::Spatial);
     if (!out || !out->list.Items().Size() || !out->list.SelectedItem())
       return false;
     // The shell first selects a provisional endpoint (seen: Steam Streaming
@@ -2037,7 +2043,7 @@ public:
     // button: pressing it (1-99) sets the app's volume to 100, written to the
     // session's model like the mouse wheel. At 100 it takes no input; at 0 the
     // mute button takes its place.
-    row->levelButton = Button(page_, L"Set volume to 100");
+    row->levelButton = Button(page_, sound::Text(L"Set volume to 100", L"Установить громкость на 100 %", L"Establecer el volumen al 100 %", L"Lautstärke auf 100 % einstellen", L"Definir o volume como 100%", L"将音量设为 100%"));
     row->levelButton.HorizontalAlignment(X::HorizontalAlignment::Right);
     row->levelButton.VerticalAlignment(X::VerticalAlignment::Center);
     row->levelButton.Margin({0, 0, -44, 0});
