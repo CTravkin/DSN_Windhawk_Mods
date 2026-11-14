@@ -70,7 +70,6 @@ class QuickPage {
   std::map<sound::QuickShortcut, C::Button> shortcutButtons_;
   C::Button title_{nullptr};
   winrt::weak_ref<C::Button> nativeSettings_;
-  // The Night light button stays available when the DDC/CI row is hidden.
   HWND host_ = nullptr;
   std::unique_ptr<Ddc> ddc_;
   C::StackPanel header_{nullptr};
@@ -323,8 +322,7 @@ class QuickPage {
     row.Children().Append(shortcuts_);
     display_ = ShortcutButton(sound::QuickShortcut::Display);
     NightButton();
-    shortcutButtons_ = {{sound::QuickShortcut::Display, display_},
-                        {sound::QuickShortcut::Night, night_}};
+    shortcutButtons_ = {{sound::QuickShortcut::Display, display_}};
     visibleShortcuts_.clear();
     settingsRow_ = row;
     return row;
@@ -388,6 +386,37 @@ class QuickPage {
                          L"Installierte Apps", L"Aplicativos instalados", L"已安装的应用");
       uri = L"ms-settings:appsfeatures";
       glyph = 0xe71d;
+      break;
+    case S::Notifications:
+      name = sound::Text(L"Notifications", L"Уведомления", L"Notificaciones",
+                         L"Benachrichtigungen", L"Notificações", L"通知");
+      uri = L"ms-settings:notifications";
+      glyph = 0xea8f;
+      break;
+    case S::Graphics:
+      name = sound::Text(L"Graphics", L"Графика", L"Gráficos", L"Grafik",
+                         L"Elementos gráficos", L"图形");
+      uri = L"ms-settings:display-advancedgraphics";
+      glyph = 0xe7f4;
+      break;
+    case S::NetworkSettings:
+      name = sound::Text(L"Advanced network settings", L"Сетевые параметры",
+                         L"Configuración de red avanzada", L"Erweiterte Netzwerkeinstellungen",
+                         L"Configurações avançadas de rede", L"高级网络设置");
+      uri = L"ms-settings:network-advancedsettings";
+      glyph = 0xe839;
+      break;
+    case S::Power:
+      name = sound::Text(L"Power", L"Питание", L"Energía", L"Strom",
+                         L"Energia", L"电源");
+      uri = L"ms-settings:powersleep";
+      glyph = 0xe7e8;
+      break;
+    case S::Update:
+      name = sound::Text(L"Windows Update", L"Центр обновления", L"Windows Update",
+                         L"Windows Update", L"Windows Update", L"Windows 更新");
+      uri = L"ms-settings:windowsupdate";
+      glyph = 0xe777;
       break;
     default:
       return nullptr;
@@ -725,21 +754,13 @@ class QuickPage {
       brightRow_.Visibility(X::Visibility::Collapsed);
       alignPasses_ = 0;
     }
-    bool nativeNight = nativeVisible && Find(nativeRow, [](auto const &e) {
-      auto icon = e.template try_as<U::AnimatedIcon>();
-      return e.Visibility() == X::Visibility::Visible &&
-             ((icon && Class(icon.Source()) == L"ControlCenter.QA_Nightlight") ||
-              X::Automation::AutomationProperties::GetAutomationId(e) ==
-                  L"Microsoft.QuickAction.BlueLightReduction");
-    });
     bool nativeDisplay = nativeVisible && Find(nativeRow, [](auto const &e) {
       auto button = e.template try_as<C::Button>();
       return button && button.Visibility() == X::Visibility::Visible &&
              String(button.CommandParameter()) == L"ms-settings:display";
     });
     bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible,
-                                          nativeNight || ddcVisible);
+    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible);
     bool changed = shortcuts != visibleShortcuts_;
     if (changed)
       shortcuts_.Children().Clear();

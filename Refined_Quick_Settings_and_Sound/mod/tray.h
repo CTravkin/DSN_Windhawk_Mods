@@ -173,9 +173,6 @@ struct Record {
   IInspectable middleGesture{nullptr};
   bool suppressMiddleTap = false;
   ULONGLONG middleReleasedAt = 0;
-  winrt::weak_ref<C::MenuFlyout> menu;
-  C::MenuFlyoutItem soundSettingsItem{nullptr};
-  winrt::event_token soundSettingsClick{};
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -187,6 +184,15 @@ struct Record {
   bool networkSeen = false; // kind: 1 volume, 2 wired network
 };
 [[clang::no_destroy]] inline std::vector<std::shared_ptr<Record>> records;
+struct MenuEntry {
+  DWORD thread;
+  winrt::Windows::UI::Core::CoreDispatcher dispatcher;
+  winrt::weak_ref<C::MenuFlyout> menu;
+  winrt::weak_ref<C::MenuFlyoutItem> item;
+  winrt::weak_ref<C::MenuFlyoutSeparator> separator;
+  winrt::event_token click;
+};
+[[clang::no_destroy]] inline std::vector<MenuEntry> menuEntries;
 inline bool VolumeLeaf(X::DependencyObject const &node) {
   winrt::hstring value;
   if (auto text = node.try_as<C::TextBlock>())
@@ -334,19 +340,6 @@ inline bool InControlCenter(X::FrameworkElement element) {
   }
   return false;
 }
-inline void DetachSoundSettings(Record &record) {
-  if (!record.soundSettingsItem)
-    return;
-  if (auto menu = record.menu.get()) {
-    auto items = menu.Items();
-    uint32_t index;
-    if (items.IndexOf(record.soundSettingsItem, index))
-      items.RemoveAt(index);
-  }
-  record.soundSettingsItem.Click(record.soundSettingsClick);
-  record.soundSettingsItem = nullptr;
-  record.menu = nullptr;
-}
 inline void AttachMiddleMute(std::shared_ptr<Record> const &record, X::FrameworkElement const &icon) {
   std::weak_ptr<Record> weak = record;
   auto handler = winrt::box_value(X::Input::PointerEventHandler(
@@ -397,30 +390,54 @@ inline bool ConsumeMiddleTap(X::FrameworkElement const &icon) {
     }
   return false;
 }
-inline void AppendSoundSettings(Record &record, C::MenuFlyout const &menu) {
-  if (menu == record.menu.get())
-    return;
-  DetachSoundSettings(record);
-  for (auto const &entry : menu.Items())
-    if (entry.Name() == L"RefinedSoundControlPanel")
+inline void AppendTrayMenuEntry(C::MenuFlyout const &menu, bool soundMenu) {
+  PCWSTR name = soundMenu ? L"RefinedSoundControlPanel" : L"RefinedDeviceManager";
+  auto items = menu.Items();
+  for (auto const &entry : items)
+    if (entry.Name() == name)
       return;
   C::MenuFlyoutItem item;
-  item.Name(L"RefinedSoundControlPanel");
-  item.Text(sound::Text(L"More sound settings", L"Дополнительные параметры звука",
-                        L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen",
-                        L"Mais configurações de som", L"更多声音设置"));
-  auto click = item.Click([](auto &&, auto &&) {
-    ShellExecuteW(nullptr, L"open", L"control.exe", L"mmsys.cpl", nullptr, SW_SHOWNORMAL);
+  item.Name(name);
+  item.Text(soundMenu
+                ? sound::Text(L"More sound settings", L"Дополнительные параметры звука",
+                             L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen",
+                             L"Mais configurações de som", L"更多声音设置")
+                : sound::Text(L"Device Manager", L"Диспетчер устройств",
+                             L"Administrador de dispositivos", L"Geräte-Manager",
+                             L"Gerenciador de Dispositivos", L"设备管理器"));
+  C::FontIcon icon;
+  icon.FontFamily(M::FontFamily(L"Segoe Fluent Icons"));
+  icon.Glyph(soundMenu ? L"\ue767" : L"\ue772");
+  item.Icon(icon);
+  C::MenuFlyoutSeparator separator{nullptr};
+  if (items.Size() && !items.GetAt(items.Size() - 1).try_as<C::MenuFlyoutSeparator>())
+    separator = C::MenuFlyoutSeparator();
+  MenuEntry entry{GetCurrentThreadId(), item.Dispatcher(), winrt::make_weak(menu),
+                  winrt::make_weak(item), winrt::make_weak(separator), {}};
+  entry.click = item.Click([soundMenu](auto &&, auto &&) {
+    ShellExecuteW(nullptr, L"open", soundMenu ? L"control.exe" : L"devmgmt.msc",
+                  soundMenu ? L"mmsys.cpl" : nullptr, nullptr, SW_SHOWNORMAL);
   });
   try {
-    menu.Items().Append(item);
+    std::lock_guard lock(recordsMutex);
+    std::erase_if(menuEntries, [&](auto const &e) {
+      return e.thread == entry.thread && !e.item.get() && !e.separator.get();
+    });
+    menuEntries.push_back(entry);
   } catch (...) {
-    item.Click(click);
+    item.Click(entry.click);
     throw;
   }
-  record.menu = winrt::make_weak(menu);
-  record.soundSettingsItem = item;
-  record.soundSettingsClick = click;
+  try {
+    if (separator)
+      items.Append(separator);
+    items.Append(item);
+  } catch (...) {
+    uint32_t index;
+    if (separator && items.IndexOf(separator, index))
+      items.RemoveAt(index);
+    throw;
+  }
 }
 inline std::wstring TrayString(PCWSTR key) {
   WCHAR file[MAX_PATH]{};
@@ -436,60 +453,52 @@ inline std::wstring TrayString(PCWSTR key) {
     return {};
   return value;
 }
-inline void ExtendVolumeMenu(void *self) {
+inline bool TrayMenuHas(C::MenuFlyout const &menu, PCWSTR key) {
+  auto text = TrayString(key);
+  if (!text.empty())
+    for (auto const &entry : menu.Items())
+      if (auto item = entry.try_as<C::MenuFlyoutItem>(); item && item.Text() == text)
+        return true;
+  return false;
+}
+inline void ExtendTrayMenu(void *self) {
   if (stopping)
     return;
   try {
     IInspectable flyout{nullptr};
     winrt::copy_from_abi(flyout, self);
     auto menu = flyout.try_as<C::MenuFlyout>();
-    if (!menu || menu.Items().Size() < 2)
+    if (!menu || !menu.Items().Size())
       return;
-    // Identify the original volume menu by both shell resource strings.
-    // The same XAML ShowAt implementation also opens other tray flyouts.
-    auto mixer = TrayString(L"VolumeContextMenuVolumeMixer");
-    auto settings = TrayString(L"VolumeContextMenuSoundSettings");
-    if (mixer.empty() || settings.empty())
+    auto windows = Taskbars();
+    if (std::none_of(windows.begin(), windows.end(), [](auto window) {
+          return GetWindowThreadProcessId(window, nullptr) == GetCurrentThreadId();
+        }))
       return;
-    bool hasMixer = false, hasSettings = false;
-    for (auto const &entry : menu.Items())
-      if (auto item = entry.try_as<C::MenuFlyoutItem>()) {
-        auto label = item.Text();
-        hasMixer |= label == mixer;
-        hasSettings |= label == settings;
-      }
-    if (!hasMixer || !hasSettings)
-      return;
-    std::vector<std::shared_ptr<Record>> local;
-    {
-      std::lock_guard lock(recordsMutex);
-      for (auto const &record : records)
-        if (record->thread == GetCurrentThreadId())
-          local.push_back(record);
-    }
-    for (auto const &record : local)
-      if (auto icon = record->icon.get(); icon && InControlCenter(icon) &&
-          Find(icon, [](auto const &node) { return VolumeLeaf(node); })) {
-        AppendSoundSettings(*record, menu);
-        return;
-      }
+    // ShowAt is shared by other tray flyouts. Match the native command labels.
+    if (TrayMenuHas(menu, L"VolumeContextMenuVolumeMixer") &&
+        TrayMenuHas(menu, L"VolumeContextMenuSoundSettings"))
+      AppendTrayMenuEntry(menu, true);
+    else if (TrayMenuHas(menu, L"NetworkContextMenuSettings") ||
+             TrayMenuHas(menu, L"BatteryContextMenuPowerSettings"))
+      AppendTrayMenuEntry(menu, false);
   } catch (...) {
-    Wh_Log(L"TrayVolumeMenuError %08X", winrt::to_hresult());
+    Wh_Log(L"TrayMenuError %08X", winrt::to_hresult());
   }
 }
 using ShowFlyout = HRESULT(WINAPI *)(void *, void *);
 using ShowFlyoutWithOptions = HRESULT(WINAPI *)(void *, void *, void *);
 inline ShowFlyout originalShowFlyout = nullptr;
 inline ShowFlyoutWithOptions originalShowFlyoutWithOptions = nullptr;
-inline HRESULT WINAPI ShowVolumeFlyout(void *self, void *target) {
-  ExtendVolumeMenu(self);
+inline HRESULT WINAPI ShowTrayFlyout(void *self, void *target) {
+  ExtendTrayMenu(self);
   return originalShowFlyout(self, target);
 }
-inline HRESULT WINAPI ShowVolumeFlyoutWithOptions(void *self, void *target, void *options) {
-  ExtendVolumeMenu(self);
+inline HRESULT WINAPI ShowTrayFlyoutWithOptions(void *self, void *target, void *options) {
+  ExtendTrayMenu(self);
   return originalShowFlyoutWithOptions(self, target, options);
 }
-inline void HookVolumeMenus() {
+inline void HookTrayMenus() {
   try {
     C::MenuFlyout flyout;
     auto base = flyout.as<P::IFlyoutBase>();
@@ -498,14 +507,14 @@ inline void HookVolumeMenus() {
     auto table = *reinterpret_cast<void ***>(winrt::get_abi(base));
     auto table5 = *reinterpret_cast<void ***>(winrt::get_abi(withOptions));
     bool basic = WindhawkUtils::SetFunctionHook(reinterpret_cast<ShowFlyout>(table[14]),
-                                               ShowVolumeFlyout, &originalShowFlyout);
+                                               ShowTrayFlyout, &originalShowFlyout);
     bool options = WindhawkUtils::SetFunctionHook(
-        reinterpret_cast<ShowFlyoutWithOptions>(table5[12]), ShowVolumeFlyoutWithOptions,
+        reinterpret_cast<ShowFlyoutWithOptions>(table5[12]), ShowTrayFlyoutWithOptions,
         &originalShowFlyoutWithOptions);
     if (!(basic || options) || !Wh_ApplyHookOperations())
-      Wh_Log(L"Tray volume menu hook unavailable");
+      Wh_Log(L"Tray menu hook unavailable");
   } catch (...) {
-    Wh_Log(L"TrayVolumeMenuHookError %08X", winrt::to_hresult());
+    Wh_Log(L"TrayMenuHookError %08X", winrt::to_hresult());
   }
 }
 inline void CopySlot(X::FrameworkElement const &to, X::FrameworkElement const &from) {
@@ -1139,7 +1148,7 @@ inline void AttachExisting() {
       if (root) {
         Walk(root.Content(), taskbar);
         if (!menuHooked) {
-          HookVolumeMenus();
+          HookTrayMenus();
           menuHooked = true;
         }
       }
@@ -1157,12 +1166,35 @@ inline void AttachExisting() {
 // Leave a record in the no_destroy vector if cleanup fails partway through.
 inline void CleanupThreadRecords() {
   std::vector<std::shared_ptr<Record>> local;
+  std::vector<MenuEntry> menus;
   {
     std::lock_guard lock(recordsMutex);
     for (auto const &record : records)
       if (record->thread == GetCurrentThreadId())
         local.push_back(record);
+    std::erase_if(menuEntries, [&](auto &entry) {
+      if (entry.thread != GetCurrentThreadId())
+        return false;
+      menus.push_back(std::move(entry));
+      return true;
+    });
   }
+  for (auto const &entry : menus)
+    try {
+      auto item = entry.item.get();
+      if (item)
+        item.Click(entry.click);
+      if (auto menu = entry.menu.get()) {
+        uint32_t index;
+        auto items = menu.Items();
+        if (item && items.IndexOf(item, index))
+          items.RemoveAt(index);
+        if (auto separator = entry.separator.get(); separator && items.IndexOf(separator, index))
+          items.RemoveAt(index);
+      }
+    } catch (...) {
+      Wh_Log(L"Tray menu cleanup on UI thread %u: %08X", entry.thread, winrt::to_hresult());
+    }
   for (auto const &record : local)
     try {
       if (record->timer) {
@@ -1181,7 +1213,6 @@ inline void CleanupThreadRecords() {
         }
       }
       record->middleGesture = nullptr;
-      DetachSoundSettings(*record);
       RestoreGlyphs(record);
       RemoveVisual(record);
       record->animated.reset();
@@ -1235,6 +1266,8 @@ inline void Shutdown() {
     std::lock_guard lock(recordsMutex);
     for (auto const &record : records)
       remaining.try_emplace(record->thread, record->dispatcher);
+    for (auto const &entry : menuEntries)
+      remaining.try_emplace(entry.thread, entry.dispatcher);
   }
   for (auto const &[thread, dispatcher] : remaining) {
     auto threadHandle = OpenThread(SYNCHRONIZE, FALSE, thread);
@@ -1260,6 +1293,8 @@ inline void Shutdown() {
       records.shrink_to_fit();
     else
       Wh_Log(L"Retaining %zu tray records on unreachable UI threads", records.size());
+    if (!menuEntries.empty())
+      Wh_Log(L"Retaining %zu tray menu entries on unreachable UI threads", menuEntries.size());
   }
   audio.reset();
 }

@@ -74,17 +74,24 @@ int main() {
   try {
     using Shortcut = sound::QuickShortcut;
     auto buttons = sound::QuickShortcuts(
-        {Shortcut::Display, Shortcut::None, Shortcut::Display, Shortcut::Night, Shortcut::Night},
-        false, false);
+        {Shortcut::Display, Shortcut::None, Shortcut::Display, Shortcut::Power, Shortcut::Power},
+        false);
     auto withoutDisplay = sound::QuickShortcuts(
-        {Shortcut::Display, Shortcut::Network, Shortcut::Night, Shortcut::None, Shortcut::Bluetooth},
-        true, false);
+        {Shortcut::Display, Shortcut::Network, Shortcut::NetworkSettings, Shortcut::None,
+         Shortcut::Bluetooth}, true);
     auto empty = sound::QuickShortcuts(
-        {Shortcut::Display, Shortcut::Display, Shortcut::Display, Shortcut::Night, Shortcut::Night},
-        true, true);
-    if (buttons != std::vector{Shortcut::Display, Shortcut::Night} ||
-        withoutDisplay != std::vector{Shortcut::Network, Shortcut::Night, Shortcut::Bluetooth} ||
-        !empty.empty() || sound::ParseQuickShortcut(L"apps") != Shortcut::Apps ||
+        {Shortcut::Display, Shortcut::Display, sound::ParseQuickShortcut(L"night")}, true);
+    auto added = sound::QuickShortcuts(
+        {sound::ParseQuickShortcut(L"notifications"), sound::ParseQuickShortcut(L"graphics"),
+         sound::ParseQuickShortcut(L"networkSettings"), sound::ParseQuickShortcut(L"power"),
+         sound::ParseQuickShortcut(L"update")}, false);
+    if (buttons != std::vector{Shortcut::Display, Shortcut::Power} ||
+        withoutDisplay != std::vector{Shortcut::Network, Shortcut::NetworkSettings,
+                                      Shortcut::Bluetooth} ||
+        !empty.empty() ||
+        added != std::vector{Shortcut::Notifications, Shortcut::Graphics, Shortcut::NetworkSettings,
+                             Shortcut::Power, Shortcut::Update} ||
+        sound::ParseQuickShortcut(L"apps") != Shortcut::Apps ||
         sound::ParseQuickShortcut(L"unknown") != Shortcut::None) {
       std::puts("FAIL: Quick Settings shortcut order and visibility");
       return 5;

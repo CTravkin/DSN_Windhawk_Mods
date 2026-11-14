@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.5.4
+// @version 0.6.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 164
+// Build: 165
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -40,7 +40,7 @@ customizations are restored when the mod is unloaded.
 **Quick Settings**
 
 - Display brightness defaults to Auto and can be disabled. Auto keeps the Windows slider or adds one for a display with a usable DDC/CI range.
-- The Settings row opens Windows Settings and can show up to five ordered shortcuts. Empty slots, repeat choices and actions already visible in the brightness controls are skipped.
+- The Settings row opens Windows Settings and can show up to five ordered shortcuts, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots, repeat choices and actions already visible in the brightness controls are skipped. Night light is available in the brightness row when it is shown.
 - Quick Settings can show one to four rows of tiles. Pages follow the number of available tiles. The row override is currently supported on Windows build 26300.9974.
 
 **Sound**
@@ -59,6 +59,7 @@ customizations are restored when the mod is unloaded.
 - Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
 - Enable Middle-click to mute to toggle the sound without changing the volume level.
 - More sound settings in the volume icon menu opens the classic Sound Control Panel.
+- Device Manager is available in the network and battery icon menus.
 - The Alternative icons switches select the icon for each location.
 
 ## Compatibility
@@ -195,46 +196,70 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
-  - shortcut2: night
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
+  - shortcut2: none
     $name: "Shortcut 2"
     $name:ru-RU: "Переход 2"
     $name:es-ES: "Acceso directo 2"
@@ -244,45 +269,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut3: none
     $name: "Shortcut 3"
     $name:ru-RU: "Переход 3"
@@ -293,45 +342,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut4: none
     $name: "Shortcut 4"
     $name:ru-RU: "Переход 4"
@@ -342,45 +415,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut5: none
     $name: "Shortcut 5"
     $name:ru-RU: "Переход 5"
@@ -391,45 +488,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   $name: "Additional shortcuts"
   $name:ru-RU: "Дополнительные переходы"
   $name:es-ES: "Accesos directos adicionales"
@@ -546,12 +667,12 @@ in this source file.
   $name:de-DE: "Im Lautstärkemixer ausblenden"
   $name:pt-BR: "Ocultar no mixer de volume"
   $name:zh-CN: "在音量合成器中隐藏"
-  $description: "One app per row, by name or executable, for example Steam or steam.exe"
-  $description:ru-RU: "По одному названию или имени файла на строку, например Steam или steam.exe"
-  $description:es-ES: "Una aplicación por fila, por nombre o archivo ejecutable, por ejemplo, Steam o steam.exe"
-  $description:de-DE: "Eine App pro Zeile anhand ihres Namens oder ihrer ausführbaren Datei, etwa Steam oder steam.exe"
-  $description:pt-BR: "Um aplicativo por linha, pelo nome ou executável, como Steam ou steam.exe"
-  $description:zh-CN: "每行填写一个应用名称或可执行文件名，例如 Steam 或 steam.exe"
+  $description: "One app per row, by name or executable, for example iCloud or iCloudHome.exe"
+  $description:ru-RU: "По одному названию или имени файла на строку, например iCloud или iCloudHome.exe"
+  $description:es-ES: "Una aplicación por fila, por nombre o archivo ejecutable, por ejemplo, iCloud o iCloudHome.exe"
+  $description:de-DE: "Eine App pro Zeile anhand ihres Namens oder ihrer ausführbaren Datei, etwa iCloud oder iCloudHome.exe"
+  $description:pt-BR: "Um aplicativo por linha, pelo nome ou executável, como iCloud ou iCloudHome.exe"
+  $description:zh-CN: "每行填写一个应用名称或可执行文件名，例如 iCloud 或 iCloudHome.exe"
 */
 // ==/WindhawkModSettings==
 
@@ -624,23 +745,28 @@ inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german
   }
 }
 
-enum class QuickShortcut { None, Display, Night, Network, Bluetooth, Apps };
+enum class QuickShortcut {
+  None, Display, Network, Bluetooth, Apps, Notifications, Graphics, NetworkSettings, Power, Update
+};
 using QuickShortcutSlots = std::array<QuickShortcut, 5>;
 inline QuickShortcut ParseQuickShortcut(std::wstring_view value) {
   if (value == L"display") return QuickShortcut::Display;
-  if (value == L"night") return QuickShortcut::Night;
   if (value == L"network") return QuickShortcut::Network;
   if (value == L"bluetooth") return QuickShortcut::Bluetooth;
   if (value == L"apps") return QuickShortcut::Apps;
+  if (value == L"notifications") return QuickShortcut::Notifications;
+  if (value == L"graphics") return QuickShortcut::Graphics;
+  if (value == L"networkSettings") return QuickShortcut::NetworkSettings;
+  if (value == L"power") return QuickShortcut::Power;
+  if (value == L"update") return QuickShortcut::Update;
   return QuickShortcut::None;
 }
 inline std::vector<QuickShortcut> QuickShortcuts(QuickShortcutSlots const &slots,
-                                                bool displayBelow, bool nightBelow) {
+                                                bool displayBelow) {
   std::vector<QuickShortcut> result;
   for (auto action : slots)
     if (action != QuickShortcut::None &&
         !(action == QuickShortcut::Display && displayBelow) &&
-        !(action == QuickShortcut::Night && nightBelow) &&
         std::find(result.begin(), result.end(), action) == result.end())
       result.push_back(action);
   return result;
@@ -5509,7 +5635,6 @@ class QuickPage {
   std::map<sound::QuickShortcut, C::Button> shortcutButtons_;
   C::Button title_{nullptr};
   winrt::weak_ref<C::Button> nativeSettings_;
-  // The Night light button stays available when the DDC/CI row is hidden.
   HWND host_ = nullptr;
   std::unique_ptr<Ddc> ddc_;
   C::StackPanel header_{nullptr};
@@ -5762,8 +5887,7 @@ class QuickPage {
     row.Children().Append(shortcuts_);
     display_ = ShortcutButton(sound::QuickShortcut::Display);
     NightButton();
-    shortcutButtons_ = {{sound::QuickShortcut::Display, display_},
-                        {sound::QuickShortcut::Night, night_}};
+    shortcutButtons_ = {{sound::QuickShortcut::Display, display_}};
     visibleShortcuts_.clear();
     settingsRow_ = row;
     return row;
@@ -5827,6 +5951,37 @@ class QuickPage {
                          L"Installierte Apps", L"Aplicativos instalados", L"已安装的应用");
       uri = L"ms-settings:appsfeatures";
       glyph = 0xe71d;
+      break;
+    case S::Notifications:
+      name = sound::Text(L"Notifications", L"Уведомления", L"Notificaciones",
+                         L"Benachrichtigungen", L"Notificações", L"通知");
+      uri = L"ms-settings:notifications";
+      glyph = 0xea8f;
+      break;
+    case S::Graphics:
+      name = sound::Text(L"Graphics", L"Графика", L"Gráficos", L"Grafik",
+                         L"Elementos gráficos", L"图形");
+      uri = L"ms-settings:display-advancedgraphics";
+      glyph = 0xe7f4;
+      break;
+    case S::NetworkSettings:
+      name = sound::Text(L"Advanced network settings", L"Сетевые параметры",
+                         L"Configuración de red avanzada", L"Erweiterte Netzwerkeinstellungen",
+                         L"Configurações avançadas de rede", L"高级网络设置");
+      uri = L"ms-settings:network-advancedsettings";
+      glyph = 0xe839;
+      break;
+    case S::Power:
+      name = sound::Text(L"Power", L"Питание", L"Energía", L"Strom",
+                         L"Energia", L"电源");
+      uri = L"ms-settings:powersleep";
+      glyph = 0xe7e8;
+      break;
+    case S::Update:
+      name = sound::Text(L"Windows Update", L"Центр обновления", L"Windows Update",
+                         L"Windows Update", L"Windows Update", L"Windows 更新");
+      uri = L"ms-settings:windowsupdate";
+      glyph = 0xe777;
       break;
     default:
       return nullptr;
@@ -6164,21 +6319,13 @@ class QuickPage {
       brightRow_.Visibility(X::Visibility::Collapsed);
       alignPasses_ = 0;
     }
-    bool nativeNight = nativeVisible && Find(nativeRow, [](auto const &e) {
-      auto icon = e.template try_as<U::AnimatedIcon>();
-      return e.Visibility() == X::Visibility::Visible &&
-             ((icon && Class(icon.Source()) == L"ControlCenter.QA_Nightlight") ||
-              X::Automation::AutomationProperties::GetAutomationId(e) ==
-                  L"Microsoft.QuickAction.BlueLightReduction");
-    });
     bool nativeDisplay = nativeVisible && Find(nativeRow, [](auto const &e) {
       auto button = e.template try_as<C::Button>();
       return button && button.Visibility() == X::Visibility::Visible &&
              String(button.CommandParameter()) == L"ms-settings:display";
     });
     bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible,
-                                          nativeNight || ddcVisible);
+    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible);
     bool changed = shortcuts != visibleShortcuts_;
     if (changed)
       shortcuts_.Children().Clear();
@@ -8046,9 +8193,6 @@ struct Record {
   IInspectable middleGesture{nullptr};
   bool suppressMiddleTap = false;
   ULONGLONG middleReleasedAt = 0;
-  winrt::weak_ref<C::MenuFlyout> menu;
-  C::MenuFlyoutItem soundSettingsItem{nullptr};
-  winrt::event_token soundSettingsClick{};
   Journal glyphJournal;
   std::shared_ptr<AnimatedVolume> animated;
   unsigned redrawn = 0;
@@ -8060,6 +8204,15 @@ struct Record {
   bool networkSeen = false; // kind: 1 volume, 2 wired network
 };
 [[clang::no_destroy]] inline std::vector<std::shared_ptr<Record>> records;
+struct MenuEntry {
+  DWORD thread;
+  winrt::Windows::UI::Core::CoreDispatcher dispatcher;
+  winrt::weak_ref<C::MenuFlyout> menu;
+  winrt::weak_ref<C::MenuFlyoutItem> item;
+  winrt::weak_ref<C::MenuFlyoutSeparator> separator;
+  winrt::event_token click;
+};
+[[clang::no_destroy]] inline std::vector<MenuEntry> menuEntries;
 inline bool VolumeLeaf(X::DependencyObject const &node) {
   winrt::hstring value;
   if (auto text = node.try_as<C::TextBlock>())
@@ -8207,19 +8360,6 @@ inline bool InControlCenter(X::FrameworkElement element) {
   }
   return false;
 }
-inline void DetachSoundSettings(Record &record) {
-  if (!record.soundSettingsItem)
-    return;
-  if (auto menu = record.menu.get()) {
-    auto items = menu.Items();
-    uint32_t index;
-    if (items.IndexOf(record.soundSettingsItem, index))
-      items.RemoveAt(index);
-  }
-  record.soundSettingsItem.Click(record.soundSettingsClick);
-  record.soundSettingsItem = nullptr;
-  record.menu = nullptr;
-}
 inline void AttachMiddleMute(std::shared_ptr<Record> const &record, X::FrameworkElement const &icon) {
   std::weak_ptr<Record> weak = record;
   auto handler = winrt::box_value(X::Input::PointerEventHandler(
@@ -8270,30 +8410,54 @@ inline bool ConsumeMiddleTap(X::FrameworkElement const &icon) {
     }
   return false;
 }
-inline void AppendSoundSettings(Record &record, C::MenuFlyout const &menu) {
-  if (menu == record.menu.get())
-    return;
-  DetachSoundSettings(record);
-  for (auto const &entry : menu.Items())
-    if (entry.Name() == L"RefinedSoundControlPanel")
+inline void AppendTrayMenuEntry(C::MenuFlyout const &menu, bool soundMenu) {
+  PCWSTR name = soundMenu ? L"RefinedSoundControlPanel" : L"RefinedDeviceManager";
+  auto items = menu.Items();
+  for (auto const &entry : items)
+    if (entry.Name() == name)
       return;
   C::MenuFlyoutItem item;
-  item.Name(L"RefinedSoundControlPanel");
-  item.Text(sound::Text(L"More sound settings", L"Дополнительные параметры звука",
-                        L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen",
-                        L"Mais configurações de som", L"更多声音设置"));
-  auto click = item.Click([](auto &&, auto &&) {
-    ShellExecuteW(nullptr, L"open", L"control.exe", L"mmsys.cpl", nullptr, SW_SHOWNORMAL);
+  item.Name(name);
+  item.Text(soundMenu
+                ? sound::Text(L"More sound settings", L"Дополнительные параметры звука",
+                             L"Más opciones de configuración de sonido", L"Weitere Soundeinstellungen",
+                             L"Mais configurações de som", L"更多声音设置")
+                : sound::Text(L"Device Manager", L"Диспетчер устройств",
+                             L"Administrador de dispositivos", L"Geräte-Manager",
+                             L"Gerenciador de Dispositivos", L"设备管理器"));
+  C::FontIcon icon;
+  icon.FontFamily(M::FontFamily(L"Segoe Fluent Icons"));
+  icon.Glyph(soundMenu ? L"\ue767" : L"\ue772");
+  item.Icon(icon);
+  C::MenuFlyoutSeparator separator{nullptr};
+  if (items.Size() && !items.GetAt(items.Size() - 1).try_as<C::MenuFlyoutSeparator>())
+    separator = C::MenuFlyoutSeparator();
+  MenuEntry entry{GetCurrentThreadId(), item.Dispatcher(), winrt::make_weak(menu),
+                  winrt::make_weak(item), winrt::make_weak(separator), {}};
+  entry.click = item.Click([soundMenu](auto &&, auto &&) {
+    ShellExecuteW(nullptr, L"open", soundMenu ? L"control.exe" : L"devmgmt.msc",
+                  soundMenu ? L"mmsys.cpl" : nullptr, nullptr, SW_SHOWNORMAL);
   });
   try {
-    menu.Items().Append(item);
+    std::lock_guard lock(recordsMutex);
+    std::erase_if(menuEntries, [&](auto const &e) {
+      return e.thread == entry.thread && !e.item.get() && !e.separator.get();
+    });
+    menuEntries.push_back(entry);
   } catch (...) {
-    item.Click(click);
+    item.Click(entry.click);
     throw;
   }
-  record.menu = winrt::make_weak(menu);
-  record.soundSettingsItem = item;
-  record.soundSettingsClick = click;
+  try {
+    if (separator)
+      items.Append(separator);
+    items.Append(item);
+  } catch (...) {
+    uint32_t index;
+    if (separator && items.IndexOf(separator, index))
+      items.RemoveAt(index);
+    throw;
+  }
 }
 inline std::wstring TrayString(PCWSTR key) {
   WCHAR file[MAX_PATH]{};
@@ -8309,60 +8473,52 @@ inline std::wstring TrayString(PCWSTR key) {
     return {};
   return value;
 }
-inline void ExtendVolumeMenu(void *self) {
+inline bool TrayMenuHas(C::MenuFlyout const &menu, PCWSTR key) {
+  auto text = TrayString(key);
+  if (!text.empty())
+    for (auto const &entry : menu.Items())
+      if (auto item = entry.try_as<C::MenuFlyoutItem>(); item && item.Text() == text)
+        return true;
+  return false;
+}
+inline void ExtendTrayMenu(void *self) {
   if (stopping)
     return;
   try {
     IInspectable flyout{nullptr};
     winrt::copy_from_abi(flyout, self);
     auto menu = flyout.try_as<C::MenuFlyout>();
-    if (!menu || menu.Items().Size() < 2)
+    if (!menu || !menu.Items().Size())
       return;
-    // Identify the original volume menu by both shell resource strings.
-    // The same XAML ShowAt implementation also opens other tray flyouts.
-    auto mixer = TrayString(L"VolumeContextMenuVolumeMixer");
-    auto settings = TrayString(L"VolumeContextMenuSoundSettings");
-    if (mixer.empty() || settings.empty())
+    auto windows = Taskbars();
+    if (std::none_of(windows.begin(), windows.end(), [](auto window) {
+          return GetWindowThreadProcessId(window, nullptr) == GetCurrentThreadId();
+        }))
       return;
-    bool hasMixer = false, hasSettings = false;
-    for (auto const &entry : menu.Items())
-      if (auto item = entry.try_as<C::MenuFlyoutItem>()) {
-        auto label = item.Text();
-        hasMixer |= label == mixer;
-        hasSettings |= label == settings;
-      }
-    if (!hasMixer || !hasSettings)
-      return;
-    std::vector<std::shared_ptr<Record>> local;
-    {
-      std::lock_guard lock(recordsMutex);
-      for (auto const &record : records)
-        if (record->thread == GetCurrentThreadId())
-          local.push_back(record);
-    }
-    for (auto const &record : local)
-      if (auto icon = record->icon.get(); icon && InControlCenter(icon) &&
-          Find(icon, [](auto const &node) { return VolumeLeaf(node); })) {
-        AppendSoundSettings(*record, menu);
-        return;
-      }
+    // ShowAt is shared by other tray flyouts. Match the native command labels.
+    if (TrayMenuHas(menu, L"VolumeContextMenuVolumeMixer") &&
+        TrayMenuHas(menu, L"VolumeContextMenuSoundSettings"))
+      AppendTrayMenuEntry(menu, true);
+    else if (TrayMenuHas(menu, L"NetworkContextMenuSettings") ||
+             TrayMenuHas(menu, L"BatteryContextMenuPowerSettings"))
+      AppendTrayMenuEntry(menu, false);
   } catch (...) {
-    Wh_Log(L"TrayVolumeMenuError %08X", winrt::to_hresult());
+    Wh_Log(L"TrayMenuError %08X", winrt::to_hresult());
   }
 }
 using ShowFlyout = HRESULT(WINAPI *)(void *, void *);
 using ShowFlyoutWithOptions = HRESULT(WINAPI *)(void *, void *, void *);
 inline ShowFlyout originalShowFlyout = nullptr;
 inline ShowFlyoutWithOptions originalShowFlyoutWithOptions = nullptr;
-inline HRESULT WINAPI ShowVolumeFlyout(void *self, void *target) {
-  ExtendVolumeMenu(self);
+inline HRESULT WINAPI ShowTrayFlyout(void *self, void *target) {
+  ExtendTrayMenu(self);
   return originalShowFlyout(self, target);
 }
-inline HRESULT WINAPI ShowVolumeFlyoutWithOptions(void *self, void *target, void *options) {
-  ExtendVolumeMenu(self);
+inline HRESULT WINAPI ShowTrayFlyoutWithOptions(void *self, void *target, void *options) {
+  ExtendTrayMenu(self);
   return originalShowFlyoutWithOptions(self, target, options);
 }
-inline void HookVolumeMenus() {
+inline void HookTrayMenus() {
   try {
     C::MenuFlyout flyout;
     auto base = flyout.as<P::IFlyoutBase>();
@@ -8371,14 +8527,14 @@ inline void HookVolumeMenus() {
     auto table = *reinterpret_cast<void ***>(winrt::get_abi(base));
     auto table5 = *reinterpret_cast<void ***>(winrt::get_abi(withOptions));
     bool basic = WindhawkUtils::SetFunctionHook(reinterpret_cast<ShowFlyout>(table[14]),
-                                               ShowVolumeFlyout, &originalShowFlyout);
+                                               ShowTrayFlyout, &originalShowFlyout);
     bool options = WindhawkUtils::SetFunctionHook(
-        reinterpret_cast<ShowFlyoutWithOptions>(table5[12]), ShowVolumeFlyoutWithOptions,
+        reinterpret_cast<ShowFlyoutWithOptions>(table5[12]), ShowTrayFlyoutWithOptions,
         &originalShowFlyoutWithOptions);
     if (!(basic || options) || !Wh_ApplyHookOperations())
-      Wh_Log(L"Tray volume menu hook unavailable");
+      Wh_Log(L"Tray menu hook unavailable");
   } catch (...) {
-    Wh_Log(L"TrayVolumeMenuHookError %08X", winrt::to_hresult());
+    Wh_Log(L"TrayMenuHookError %08X", winrt::to_hresult());
   }
 }
 inline void CopySlot(X::FrameworkElement const &to, X::FrameworkElement const &from) {
@@ -9012,7 +9168,7 @@ inline void AttachExisting() {
       if (root) {
         Walk(root.Content(), taskbar);
         if (!menuHooked) {
-          HookVolumeMenus();
+          HookTrayMenus();
           menuHooked = true;
         }
       }
@@ -9030,12 +9186,35 @@ inline void AttachExisting() {
 // Leave a record in the no_destroy vector if cleanup fails partway through.
 inline void CleanupThreadRecords() {
   std::vector<std::shared_ptr<Record>> local;
+  std::vector<MenuEntry> menus;
   {
     std::lock_guard lock(recordsMutex);
     for (auto const &record : records)
       if (record->thread == GetCurrentThreadId())
         local.push_back(record);
+    std::erase_if(menuEntries, [&](auto &entry) {
+      if (entry.thread != GetCurrentThreadId())
+        return false;
+      menus.push_back(std::move(entry));
+      return true;
+    });
   }
+  for (auto const &entry : menus)
+    try {
+      auto item = entry.item.get();
+      if (item)
+        item.Click(entry.click);
+      if (auto menu = entry.menu.get()) {
+        uint32_t index;
+        auto items = menu.Items();
+        if (item && items.IndexOf(item, index))
+          items.RemoveAt(index);
+        if (auto separator = entry.separator.get(); separator && items.IndexOf(separator, index))
+          items.RemoveAt(index);
+      }
+    } catch (...) {
+      Wh_Log(L"Tray menu cleanup on UI thread %u: %08X", entry.thread, winrt::to_hresult());
+    }
   for (auto const &record : local)
     try {
       if (record->timer) {
@@ -9054,7 +9233,6 @@ inline void CleanupThreadRecords() {
         }
       }
       record->middleGesture = nullptr;
-      DetachSoundSettings(*record);
       RestoreGlyphs(record);
       RemoveVisual(record);
       record->animated.reset();
@@ -9108,6 +9286,8 @@ inline void Shutdown() {
     std::lock_guard lock(recordsMutex);
     for (auto const &record : records)
       remaining.try_emplace(record->thread, record->dispatcher);
+    for (auto const &entry : menuEntries)
+      remaining.try_emplace(entry.thread, entry.dispatcher);
   }
   for (auto const &[thread, dispatcher] : remaining) {
     auto threadHandle = OpenThread(SYNCHRONIZE, FALSE, thread);
@@ -9133,6 +9313,8 @@ inline void Shutdown() {
       records.shrink_to_fit();
     else
       Wh_Log(L"Retaining %zu tray records on unreachable UI threads", records.size());
+    if (!menuEntries.empty())
+      Wh_Log(L"Retaining %zu tray menu entries on unreachable UI threads", menuEntries.size());
   }
   audio.reset();
 }
@@ -9205,8 +9387,7 @@ inline ModSettings ReadSettings() {
     }
     settings.quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
   } else {
-    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
-                      Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};
+    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None};
   }
   return settings;
 }

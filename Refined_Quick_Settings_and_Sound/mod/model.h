@@ -22,23 +22,28 @@ inline PCWSTR Text(PCWSTR english, PCWSTR russian, PCWSTR spanish, PCWSTR german
   }
 }
 
-enum class QuickShortcut { None, Display, Night, Network, Bluetooth, Apps };
+enum class QuickShortcut {
+  None, Display, Network, Bluetooth, Apps, Notifications, Graphics, NetworkSettings, Power, Update
+};
 using QuickShortcutSlots = std::array<QuickShortcut, 5>;
 inline QuickShortcut ParseQuickShortcut(std::wstring_view value) {
   if (value == L"display") return QuickShortcut::Display;
-  if (value == L"night") return QuickShortcut::Night;
   if (value == L"network") return QuickShortcut::Network;
   if (value == L"bluetooth") return QuickShortcut::Bluetooth;
   if (value == L"apps") return QuickShortcut::Apps;
+  if (value == L"notifications") return QuickShortcut::Notifications;
+  if (value == L"graphics") return QuickShortcut::Graphics;
+  if (value == L"networkSettings") return QuickShortcut::NetworkSettings;
+  if (value == L"power") return QuickShortcut::Power;
+  if (value == L"update") return QuickShortcut::Update;
   return QuickShortcut::None;
 }
 inline std::vector<QuickShortcut> QuickShortcuts(QuickShortcutSlots const &slots,
-                                                bool displayBelow, bool nightBelow) {
+                                                bool displayBelow) {
   std::vector<QuickShortcut> result;
   for (auto action : slots)
     if (action != QuickShortcut::None &&
         !(action == QuickShortcut::Display && displayBelow) &&
-        !(action == QuickShortcut::Night && nightBelow) &&
         std::find(result.begin(), result.end(), action) == result.end())
       result.push_back(action);
   return result;

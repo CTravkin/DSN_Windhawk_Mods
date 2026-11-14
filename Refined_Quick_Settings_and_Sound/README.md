@@ -12,7 +12,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 
 **Quick Settings**
 
-- Settings opens Windows Settings. Choose up to five shortcuts to its right: Display settings, Night light, Network & internet, Bluetooth & devices, and Installed apps. Empty slots, repeats and shortcuts already visible in the brightness controls are skipped.
+- Settings opens Windows Settings. Choose up to five shortcuts to its right, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots, repeats and shortcuts already visible in the brightness controls are skipped. Night light is available in the brightness row when it is shown.
 - Night light uses the native quick action when available. If Windows cannot expose the action, the button opens the Night light settings page.
 - **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
 - Set **Quick Settings tile rows** to 1–4. Pages follow the number of available tiles. The override is currently supported on Windows build 26300.9974.
@@ -31,6 +31,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - **Quick access to Sound** opens Sound with a click on the taskbar volume icon.
 - **Middle-click to mute** toggles sound from the volume icon and preserves the volume level. Off by default.
 - **More sound settings** in the volume icon menu opens the classic Sound Control Panel.
+- **Device Manager** is available in the network and battery icon menus.
 - **Alternative icons** provides a switch per location. Switching one off uses the Windows icon there.
 
 When Windhawk adds the icon switches during a standard upgrade from 0.4.0, it starts them enabled. Apply any previous icon choices to the new switches.

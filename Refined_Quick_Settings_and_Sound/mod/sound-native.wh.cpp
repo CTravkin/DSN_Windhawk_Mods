@@ -1,4 +1,4 @@
-﻿// ==WindhawkMod==
+// ==WindhawkMod==
 // @id refined-quick-settings-and-sound
 // @name Refined Quick Settings and Sound
 // @description More options for Quick Settings and direct access to sound settings
@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.5.4
+// @version 0.6.0
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 164
+// Build: 165
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -40,7 +40,7 @@ customizations are restored when the mod is unloaded.
 **Quick Settings**
 
 - Display brightness defaults to Auto and can be disabled. Auto keeps the Windows slider or adds one for a display with a usable DDC/CI range.
-- The Settings row opens Windows Settings and can show up to five ordered shortcuts. Empty slots, repeat choices and actions already visible in the brightness controls are skipped.
+- The Settings row opens Windows Settings and can show up to five ordered shortcuts, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots, repeat choices and actions already visible in the brightness controls are skipped. Night light is available in the brightness row when it is shown.
 - Quick Settings can show one to four rows of tiles. Pages follow the number of available tiles. The row override is currently supported on Windows build 26300.9974.
 
 **Sound**
@@ -59,6 +59,7 @@ customizations are restored when the mod is unloaded.
 - Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
 - Enable Middle-click to mute to toggle the sound without changing the volume level.
 - More sound settings in the volume icon menu opens the classic Sound Control Panel.
+- Device Manager is available in the network and battery icon menus.
 - The Alternative icons switches select the icon for each location.
 
 ## Compatibility
@@ -195,46 +196,70 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
-  - shortcut2: night
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
+  - shortcut2: none
     $name: "Shortcut 2"
     $name:ru-RU: "Переход 2"
     $name:es-ES: "Acceso directo 2"
@@ -244,45 +269,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut3: none
     $name: "Shortcut 3"
     $name:ru-RU: "Переход 3"
@@ -293,45 +342,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut4: none
     $name: "Shortcut 4"
     $name:ru-RU: "Переход 4"
@@ -342,45 +415,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   - shortcut5: none
     $name: "Shortcut 5"
     $name:ru-RU: "Переход 5"
@@ -391,45 +488,69 @@ in this source file.
     $options:
     - none: "None"
     - display: "Display settings"
-    - night: "Night light"
     - network: "Network & internet"
     - bluetooth: "Bluetooth & devices"
     - apps: "Installed apps"
+    - notifications: "Notifications"
+    - graphics: "Graphics"
+    - networkSettings: "Advanced network settings"
+    - power: "Power"
+    - update: "Windows Update"
     $options:ru-RU:
     - none: "Нет"
     - display: "Параметры дисплея"
-    - night: "Ночной свет"
     - network: "Сеть и Интернет"
     - bluetooth: "Bluetooth и устройства"
     - apps: "Установленные приложения"
+    - notifications: "Уведомления"
+    - graphics: "Графика"
+    - networkSettings: "Сетевые параметры"
+    - power: "Питание"
+    - update: "Центр обновления"
     $options:es-ES:
     - none: "Ninguno"
     - display: "Configuración de pantalla"
-    - night: "Luz nocturna"
     - network: "Red e Internet"
     - bluetooth: "Bluetooth y dispositivos"
     - apps: "Aplicaciones instaladas"
+    - notifications: "Notificaciones"
+    - graphics: "Gráficos"
+    - networkSettings: "Configuración de red avanzada"
+    - power: "Energía"
+    - update: "Windows Update"
     $options:de-DE:
     - none: "Keine"
     - display: "Anzeigeeinstellungen"
-    - night: "Nachtmodus"
     - network: "Netzwerk und Internet"
     - bluetooth: "Bluetooth und Geräte"
     - apps: "Installierte Apps"
+    - notifications: "Benachrichtigungen"
+    - graphics: "Grafik"
+    - networkSettings: "Erweiterte Netzwerkeinstellungen"
+    - power: "Strom"
+    - update: "Windows Update"
     $options:pt-BR:
     - none: "Nenhum"
     - display: "Configurações de exibição"
-    - night: "Luz noturna"
     - network: "Rede e Internet"
     - bluetooth: "Bluetooth e dispositivos"
     - apps: "Aplicativos instalados"
+    - notifications: "Notificações"
+    - graphics: "Elementos gráficos"
+    - networkSettings: "Configurações avançadas de rede"
+    - power: "Energia"
+    - update: "Windows Update"
     $options:zh-CN:
     - none: "无"
     - display: "显示设置"
-    - night: "夜间模式"
     - network: "网络和 Internet"
     - bluetooth: "蓝牙和设备"
     - apps: "已安装的应用"
+    - notifications: "通知"
+    - graphics: "图形"
+    - networkSettings: "高级网络设置"
+    - power: "电源"
+    - update: "Windows 更新"
   $name: "Additional shortcuts"
   $name:ru-RU: "Дополнительные переходы"
   $name:es-ES: "Accesos directos adicionales"
@@ -546,12 +667,12 @@ in this source file.
   $name:de-DE: "Im Lautstärkemixer ausblenden"
   $name:pt-BR: "Ocultar no mixer de volume"
   $name:zh-CN: "在音量合成器中隐藏"
-  $description: "One app per row, by name or executable, for example Steam or steam.exe"
-  $description:ru-RU: "По одному названию или имени файла на строку, например Steam или steam.exe"
-  $description:es-ES: "Una aplicación por fila, por nombre o archivo ejecutable, por ejemplo, Steam o steam.exe"
-  $description:de-DE: "Eine App pro Zeile anhand ihres Namens oder ihrer ausführbaren Datei, etwa Steam oder steam.exe"
-  $description:pt-BR: "Um aplicativo por linha, pelo nome ou executável, como Steam ou steam.exe"
-  $description:zh-CN: "每行填写一个应用名称或可执行文件名，例如 Steam 或 steam.exe"
+  $description: "One app per row, by name or executable, for example iCloud or iCloudHome.exe"
+  $description:ru-RU: "По одному названию или имени файла на строку, например iCloud или iCloudHome.exe"
+  $description:es-ES: "Una aplicación por fila, por nombre o archivo ejecutable, por ejemplo, iCloud o iCloudHome.exe"
+  $description:de-DE: "Eine App pro Zeile anhand ihres Namens oder ihrer ausführbaren Datei, etwa iCloud oder iCloudHome.exe"
+  $description:pt-BR: "Um aplicativo por linha, pelo nome ou executável, como iCloud ou iCloudHome.exe"
+  $description:zh-CN: "每行填写一个应用名称或可执行文件名，例如 iCloud 或 iCloudHome.exe"
 */
 // ==/WindhawkModSettings==
 #include "host.h"
@@ -623,8 +744,7 @@ inline ModSettings ReadSettings() {
     }
     settings.quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
   } else {
-    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
-                      Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};
+    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None};
   }
   return settings;
 }
