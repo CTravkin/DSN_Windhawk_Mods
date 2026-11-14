@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.1.0
+// @version         1.1.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 41
+// Build: 42
 
 // ==WindhawkModReadme==
 /*
@@ -63,9 +63,9 @@ Requires Windows 11 x64 or ARM64.
 
 ## Usage
 
-Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Default** to restore Windows styling for a setting.
+Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Windows-defined** to restore Windows styling for a setting.
 
-Under **Window exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
+Under **Exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
 
 ## Links
 
@@ -76,291 +76,298 @@ Under **Window exceptions**, add an executable name such as `steam.exe` and sele
 
 // ==WindhawkModSettings==
 /*
-- activeWindow: caption
-  $name: Active window
-  $name:ru-RU: Активное окно
-  $name:es-ES: Ventana activa
-  $name:de-DE: Aktives Fenster
-  $name:pt-BR: Janela ativa
-  $name:zh-CN: 活动窗口
-  $description: Focused window border or title bar accent color
-  $description:ru-RU: Рамка окна в фокусе или акцентный цвет его заголовка
-  $description:es-ES: Borde de la ventana con el foco o color de énfasis de su barra de título
-  $description:de-DE: Rahmen des fokussierten Fensters oder Akzentfarbe seiner Titelleiste
-  $description:pt-BR: Borda da janela em foco ou cor de destaque da barra de título
-  $description:zh-CN: 焦点窗口的边框或标题栏主题色
-  $options:
-  - default: Default
-  - hide: Hide border
-  - caption: Disable title bar accent color
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  - caption: Отключить акцент заголовка
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  - caption: Desactivar el color de énfasis de la barra de título
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  - caption: Akzentfarbe der Titelleiste deaktivieren
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  - caption: Desativar a cor de destaque da barra de título
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-  - caption: 关闭标题栏主题色
-- inactiveWindow: hide
-  $name: Inactive windows
-  $name:ru-RU: Неактивные окна
-  $name:es-ES: Ventanas inactivas
-  $name:de-DE: Inaktive Fenster
-  $name:pt-BR: Janelas inativas
-  $name:zh-CN: 非活动窗口
-  $description: System-drawn borders of windows without focus
-  $description:ru-RU: Системные рамки окон вне фокуса
-  $description:es-ES: Bordes del sistema de las ventanas sin el foco
-  $description:de-DE: Systemrahmen von Fenstern ohne Fokus
-  $description:pt-BR: Bordas do sistema das janelas sem foco
-  $description:zh-CN: 未获得焦点的窗口的系统边框
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- dialog: hide
-  $name: Dialogs
-  $name:ru-RU: Диалоговые окна
-  $name:es-ES: Cuadros de diálogo
-  $name:de-DE: Dialogfelder
-  $name:pt-BR: Caixas de diálogo
-  $name:zh-CN: 对话框
-  $description: Classic Windows dialog borders, with or without focus
-  $description:ru-RU: Системные рамки классических диалогов вне зависимости от фокуса
-  $description:es-ES: Bordes de los cuadros de diálogo clásicos, con o sin el foco
-  $description:de-DE: Rahmen klassischer Dialogfelder mit oder ohne Fokus
-  $description:pt-BR: Bordas das caixas de diálogo clássicas, com ou sem foco
-  $description:zh-CN: 经典 Windows 对话框的边框，无论是否有焦点
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- taskbar: hide
-  $name: Taskbar
-  $name:ru-RU: Панель задач
-  $name:es-ES: Barra de tareas
-  $name:de-DE: Taskleiste
-  $name:pt-BR: Barra de tarefas
-  $name:zh-CN: 任务栏
-  $description: Taskbar edge and the desktops strip in Task View
-  $description:ru-RU: Кромка панели задач и панель рабочих столов в представлении задач
-  $description:es-ES: Borde de la barra de tareas y panel de escritorios en Vista de tareas
-  $description:de-DE: Kante der Taskleiste und Leiste der virtuellen Desktops in der Taskansicht
-  $description:pt-BR: Borda da barra de tarefas e faixa de áreas de trabalho na Visão de tarefas
-  $description:zh-CN: 任务栏边缘和任务视图中的桌面栏
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- startMenu: hide
-  $name: Start menu
-  $name:ru-RU: Меню «Пуск»
-  $name:es-ES: Menú Inicio
-  $name:de-DE: Startmenü
-  $name:pt-BR: Menu Iniciar
-  $name:zh-CN: “开始”菜单
-  $description: Start menu and its Phone Link panel
-  $description:ru-RU: Меню «Пуск» и его панель «Телефон»
-  $description:es-ES: Menú Inicio y su panel Enlace Móvil
-  $description:de-DE: Startmenü und sein Bereich Smartphone-Link
-  $description:pt-BR: Menu Iniciar e seu painel Vincular ao Celular
-  $description:zh-CN: “开始”菜单及其手机连接面板
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- search: hide
-  $name: Search
-  $name:ru-RU: Поиск
-  $name:es-ES: Búsqueda
-  $name:de-DE: Suche
-  $name:pt-BR: Pesquisa
-  $name:zh-CN: 搜索
-  $description: Outer border of the Windows Search panel
-  $description:ru-RU: Внешняя рамка панели поиска Windows
-  $description:es-ES: Borde exterior del panel de búsqueda de Windows
-  $description:de-DE: Außenrahmen des Windows-Suchbereichs
-  $description:pt-BR: Borda externa do painel de pesquisa do Windows
-  $description:zh-CN: Windows 搜索面板的外边框
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- notificationCenter: hide
-  $name: Notifications
-  $name:ru-RU: Уведомления
-  $name:es-ES: Notificaciones
-  $name:de-DE: Benachrichtigungen
-  $name:pt-BR: Notificações
-  $name:zh-CN: 通知
-  $description: Notification center, calendar, and desktop banners
-  $description:ru-RU: Центр уведомлений, календарь и баннеры на рабочем столе
-  $description:es-ES: Centro de notificaciones, calendario y banners del escritorio
-  $description:de-DE: Benachrichtigungscenter, Kalender und Desktopbanner
-  $description:pt-BR: Central de notificações, calendário e banners na área de trabalho
-  $description:zh-CN: 通知中心、日历和桌面横幅
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- quickSettings: hide
-  $name: Quick Settings
-  $name:ru-RU: Быстрые настройки
-  $name:es-ES: Configuración rápida
-  $name:de-DE: Schnelleinstellungen
-  $name:pt-BR: Configurações rápidas
-  $name:zh-CN: 快速设置
-  $description: Quick Settings and the media controls above them
-  $description:ru-RU: Панель быстрых настроек и управление воспроизведением над ней
-  $description:es-ES: Configuración rápida y los controles multimedia situados encima
-  $description:de-DE: Schnelleinstellungen und die Mediensteuerung darüber
-  $description:pt-BR: Configurações rápidas e os controles de mídia acima delas
-  $description:zh-CN: 快速设置及其上方的媒体控件
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
-- widgets: hide
-  $name: Widgets
-  $name:ru-RU: Мини-приложения
-  $name:es-ES: Widgets
-  $name:de-DE: Widgets
-  $name:pt-BR: Widgets
-  $name:zh-CN: 小组件
-  $description: Outer border of the widgets board
-  $description:ru-RU: Внешняя рамка панели мини-приложений
-  $description:es-ES: Borde exterior del panel de widgets
-  $description:de-DE: Außenrahmen des Widget-Boards
-  $description:pt-BR: Borda externa do painel de widgets
-  $description:zh-CN: 小组件面板的外边框
-  $options:
-  - default: Default
-  - hide: Hide border
-  $options:ru-RU:
-  - default: По умолчанию
-  - hide: Скрыть рамку
-  $options:es-ES:
-  - default: Predeterminado
-  - hide: Ocultar borde
-  $options:de-DE:
-  - default: Standard
-  - hide: Rahmen ausblenden
-  $options:pt-BR:
-  - default: Padrão
-  - hide: Ocultar borda
-  $options:zh-CN:
-  - default: 默认
-  - hide: 隐藏边框
+- borders:
+    - activeWindow: caption
+      $name: Active window
+      $name:ru-RU: Активное окно
+      $name:es-ES: Ventana activa
+      $name:de-DE: Aktives Fenster
+      $name:pt-BR: Janela ativa
+      $name:zh-CN: 活动窗口
+      $description: Focused window border or title bar accent color
+      $description:ru-RU: Рамка окна в фокусе или акцентный цвет его заголовка
+      $description:es-ES: Borde de la ventana con el foco o color de énfasis de su barra de título
+      $description:de-DE: Rahmen des fokussierten Fensters oder Akzentfarbe seiner Titelleiste
+      $description:pt-BR: Borda da janela em foco ou cor de destaque da barra de título
+      $description:zh-CN: 焦点窗口的边框或标题栏主题色
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      - caption: Disable title bar accent color
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      - caption: Отключить акцент заголовка
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      - caption: Desactivar el color de énfasis de la barra de título
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      - caption: Akzentfarbe der Titelleiste deaktivieren
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      - caption: Desativar a cor de destaque da barra de título
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+      - caption: 关闭标题栏主题色
+    - inactiveWindow: hide
+      $name: Inactive windows
+      $name:ru-RU: Неактивные окна
+      $name:es-ES: Ventanas inactivas
+      $name:de-DE: Inaktive Fenster
+      $name:pt-BR: Janelas inativas
+      $name:zh-CN: 非活动窗口
+      $description: System-drawn borders of windows without focus
+      $description:ru-RU: Системные рамки окон вне фокуса
+      $description:es-ES: Bordes del sistema de las ventanas sin el foco
+      $description:de-DE: Systemrahmen von Fenstern ohne Fokus
+      $description:pt-BR: Bordas do sistema das janelas sem foco
+      $description:zh-CN: 未获得焦点的窗口的系统边框
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - dialog: hide
+      $name: Dialogs
+      $name:ru-RU: Диалоговые окна
+      $name:es-ES: Cuadros de diálogo
+      $name:de-DE: Dialogfelder
+      $name:pt-BR: Caixas de diálogo
+      $name:zh-CN: 对话框
+      $description: Classic Windows dialog borders, with or without focus
+      $description:ru-RU: Системные рамки классических диалогов вне зависимости от фокуса
+      $description:es-ES: Bordes de los cuadros de diálogo clásicos, con o sin el foco
+      $description:de-DE: Rahmen klassischer Dialogfelder mit oder ohne Fokus
+      $description:pt-BR: Bordas das caixas de diálogo clássicas, com ou sem foco
+      $description:zh-CN: 经典 Windows 对话框的边框，无论是否有焦点
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - taskbar: hide
+      $name: Taskbar
+      $name:ru-RU: Панель задач
+      $name:es-ES: Barra de tareas
+      $name:de-DE: Taskleiste
+      $name:pt-BR: Barra de tarefas
+      $name:zh-CN: 任务栏
+      $description: Taskbar edge and the desktops strip in Task View
+      $description:ru-RU: Кромка панели задач и панель рабочих столов в представлении задач
+      $description:es-ES: Borde de la barra de tareas y panel de escritorios en Vista de tareas
+      $description:de-DE: Kante der Taskleiste und Leiste der virtuellen Desktops in der Taskansicht
+      $description:pt-BR: Borda da barra de tarefas e faixa de áreas de trabalho na Visão de tarefas
+      $description:zh-CN: 任务栏边缘和任务视图中的桌面栏
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - startMenu: hide
+      $name: Start menu
+      $name:ru-RU: Меню «Пуск»
+      $name:es-ES: Menú Inicio
+      $name:de-DE: Startmenü
+      $name:pt-BR: Menu Iniciar
+      $name:zh-CN: “开始”菜单
+      $description: Start menu and its Phone Link panel
+      $description:ru-RU: Меню «Пуск» и его панель «Телефон»
+      $description:es-ES: Menú Inicio y su panel Enlace Móvil
+      $description:de-DE: Startmenü und sein Bereich Smartphone-Link
+      $description:pt-BR: Menu Iniciar e seu painel Vincular ao Celular
+      $description:zh-CN: “开始”菜单及其手机连接面板
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - search: hide
+      $name: Search
+      $name:ru-RU: Поиск
+      $name:es-ES: Búsqueda
+      $name:de-DE: Suche
+      $name:pt-BR: Pesquisa
+      $name:zh-CN: 搜索
+      $description: Outer border of the Windows Search panel
+      $description:ru-RU: Внешняя рамка панели поиска Windows
+      $description:es-ES: Borde exterior del panel de búsqueda de Windows
+      $description:de-DE: Außenrahmen des Windows-Suchbereichs
+      $description:pt-BR: Borda externa do painel de pesquisa do Windows
+      $description:zh-CN: Windows 搜索面板的外边框
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - notificationCenter: hide
+      $name: Notifications
+      $name:ru-RU: Уведомления
+      $name:es-ES: Notificaciones
+      $name:de-DE: Benachrichtigungen
+      $name:pt-BR: Notificações
+      $name:zh-CN: 通知
+      $description: Notification center, calendar, and desktop banners
+      $description:ru-RU: Центр уведомлений, календарь и баннеры на рабочем столе
+      $description:es-ES: Centro de notificaciones, calendario y banners del escritorio
+      $description:de-DE: Benachrichtigungscenter, Kalender und Desktopbanner
+      $description:pt-BR: Central de notificações, calendário e banners na área de trabalho
+      $description:zh-CN: 通知中心、日历和桌面横幅
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - quickSettings: hide
+      $name: Quick Settings
+      $name:ru-RU: Быстрые настройки
+      $name:es-ES: Configuración rápida
+      $name:de-DE: Schnelleinstellungen
+      $name:pt-BR: Configurações rápidas
+      $name:zh-CN: 快速设置
+      $description: Quick Settings and the media controls above them
+      $description:ru-RU: Панель быстрых настроек и управление воспроизведением над ней
+      $description:es-ES: Configuración rápida y los controles multimedia situados encima
+      $description:de-DE: Schnelleinstellungen und die Mediensteuerung darüber
+      $description:pt-BR: Configurações rápidas e os controles de mídia acima delas
+      $description:zh-CN: 快速设置及其上方的媒体控件
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+    - widgets: hide
+      $name: Widgets
+      $name:ru-RU: Мини-приложения
+      $name:es-ES: Widgets
+      $name:de-DE: Widgets
+      $name:pt-BR: Widgets
+      $name:zh-CN: 小组件
+      $description: Outer border of the widgets board
+      $description:ru-RU: Внешняя рамка панели мини-приложений
+      $description:es-ES: Borde exterior del panel de widgets
+      $description:de-DE: Außenrahmen des Widget-Boards
+      $description:pt-BR: Borda externa do painel de widgets
+      $description:zh-CN: 小组件面板的外边框
+      $options:
+      - default: Windows-defined
+      - hide: Hide border
+      $options:ru-RU:
+      - default: Определено Windows
+      - hide: Скрыть рамку
+      $options:es-ES:
+      - default: Definido por Windows
+      - hide: Ocultar borde
+      $options:de-DE:
+      - default: Von Windows festgelegt
+      - hide: Rahmen ausblenden
+      $options:pt-BR:
+      - default: Definido pelo Windows
+      - hide: Ocultar borda
+      $options:zh-CN:
+      - default: 由 Windows 决定
+      - hide: 隐藏边框
+  $name: Border settings
+  $name:ru-RU: Настройка рамок
+  $name:es-ES: Configuración de bordes
+  $name:de-DE: Rahmeneinstellungen
+  $name:pt-BR: Configurações de borda
+  $name:zh-CN: 边框设置
 - processExceptions:
   - - process: ""
       $name: Process
@@ -376,48 +383,54 @@ Under **Window exceptions**, add an executable name such as `steam.exe` and sele
       $description:pt-BR: Nome do executável, por exemplo, steam.exe
       $description:zh-CN: 可执行文件名，例如 steam.exe
     - scope: both
-      $name: Exclude windows
-      $name:ru-RU: Какие окна исключить
-      $name:es-ES: Ventanas que se excluyen
-      $name:de-DE: Ausgeschlossene Fenster
-      $name:pt-BR: Janelas excluídas
-      $name:zh-CN: 排除的窗口
+      $name: Hide border
+      $name:ru-RU: Скрыть рамку
+      $name:es-ES: Ocultar borde
+      $name:de-DE: Rahmen ausblenden
+      $name:pt-BR: Ocultar borda
+      $name:zh-CN: 隐藏边框
+      $description: The selected windows keep their system border
+      $description:ru-RU: У выбранных окон сохраняется системная рамка
+      $description:es-ES: Las ventanas seleccionadas conservan el borde del sistema
+      $description:de-DE: Die ausgewählten Fenster behalten ihren Systemrahmen
+      $description:pt-BR: As janelas selecionadas mantêm a borda do sistema
+      $description:zh-CN: 所选窗口保留系统边框
       $options:
       - both: All windows
-      - active: Active only
-      - inactive: Inactive only
+      - active: Active windows
+      - inactive: Inactive windows
       $options:ru-RU:
       - both: Все окна
-      - active: Только активные
-      - inactive: Только неактивные
+      - active: Активные окна
+      - inactive: Неактивные окна
       $options:es-ES:
       - both: Todas las ventanas
-      - active: Solo activas
-      - inactive: Solo inactivas
+      - active: Ventanas activas
+      - inactive: Ventanas inactivas
       $options:de-DE:
       - both: Alle Fenster
-      - active: Nur aktive
-      - inactive: Nur inaktive
+      - active: Aktive Fenster
+      - inactive: Inaktive Fenster
       $options:pt-BR:
       - both: Todas as janelas
-      - active: Apenas ativas
-      - inactive: Apenas inativas
+      - active: Janelas ativas
+      - inactive: Janelas inativas
       $options:zh-CN:
       - both: 所有窗口
-      - active: 仅活动窗口
-      - inactive: 仅非活动窗口
-  $name: Window exceptions
-  $name:ru-RU: Исключения для окон
-  $name:es-ES: Excepciones para ventanas
-  $name:de-DE: Fensterausnahmen
-  $name:pt-BR: Exceções para janelas
-  $name:zh-CN: 窗口例外
-  $description: Keep the usual window border and title bar for selected processes
-  $description:ru-RU: Сохраняют обычные рамки и заголовки окон выбранных процессов
-  $description:es-ES: Conservan los bordes y las barras de título habituales de los procesos seleccionados
-  $description:de-DE: Behält bei ausgewählten Prozessen die üblichen Fensterrahmen und Titelleisten bei
-  $description:pt-BR: Preservam as bordas e barras de título habituais dos processos selecionados
-  $description:zh-CN: 为选定进程保留原有窗口边框和标题栏
+      - active: 活动窗口
+      - inactive: 非活动窗口
+  $name: Exceptions
+  $name:ru-RU: Исключения
+  $name:es-ES: Excepciones
+  $name:de-DE: Ausnahmen
+  $name:pt-BR: Exceções
+  $name:zh-CN: 例外
+  $description: Windows from the listed apps follow special rules
+  $description:ru-RU: Окна указанных приложений следуют особым правилам
+  $description:es-ES: Las ventanas de las aplicaciones indicadas siguen reglas especiales
+  $description:de-DE: Für Fenster der angegebenen Apps gelten besondere Regeln
+  $description:pt-BR: As janelas dos aplicativos indicados seguem regras especiais
+  $description:zh-CN: 指定应用的窗口遵循特殊规则
 */
 // ==/WindhawkModSettings==
 
@@ -1800,7 +1813,10 @@ void ApplyShellXamlSettings(unsigned mask) {
 }
 
 WindowEffect ReadSetting(PCWSTR name) {
-    auto value = WindhawkUtils::StringSetting::make(name);
+    auto value = WindhawkUtils::StringSetting::make(L"borders.%s", name);
+    if (!*value.get()) {
+        value = WindhawkUtils::StringSetting::make(name);
+    }
     const std::wstring_view setting = value.get();
     if (setting == L"hide") {
         return WindowEffect::HideBorder;
