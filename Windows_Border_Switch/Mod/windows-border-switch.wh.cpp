@@ -7,7 +7,7 @@
 // @description:de-DE Blendet die Rahmen von Fenstern, dem Startmenü, der Taskleiste und anderen Systemelementen aus
 // @description:pt-BR Oculta as bordas das janelas, do menu Iniciar, da barra de tarefas e de outros elementos do sistema
 // @description:zh-CN 隐藏窗口、“开始”菜单、任务栏和其他系统元素的边框
-// @version         1.1.1
+// @version         1.1.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -ldwmapi -lole32 -loleaut32 -lruntimeobject -luuid -ladvapi32
 // ==/WindhawkMod==
-// Build: 42
+// Build: 43
 
 // ==WindhawkModReadme==
 /*
@@ -39,33 +39,34 @@ Windows Border Switch hides system-drawn borders around windows and panels in Wi
 
 | Setting | Controls |
 | --- | --- |
-| Active window border | The focused window's system border or its title bar accent color |
-| Inactive window borders | System borders of windows without focus |
-| Dialog borders | System borders of classic Win32 dialogs, with or without focus |
-| Taskbar border | The taskbar edge and the virtual desktops strip at the bottom of Task View |
-| Start menu border | The Start menu and its Phone Link panel |
-| Search border | The Windows Search panel |
-| Notification borders | The notification center, calendar, and notification banners on the desktop |
-| Quick Settings border | Quick Settings and the media controls above them |
-| Widgets board border | The outer border of the Widgets board |
+| Active window | The focused window's system border or its title bar accent color |
+| Inactive windows | System borders of windows without focus |
+| Dialogs | System borders of classic Win32 dialogs, with or without focus |
+| Taskbar | The taskbar edge and the virtual desktops strip at the bottom of Task View |
+| Start menu | The Start menu and its Phone Link panel |
+| Search | The Windows Search panel |
+| Notifications | The notification center, calendar, and notification banners on the desktop |
+| Quick Settings | Quick Settings and the media controls above them |
+| Widgets | The outer border of the Widgets board |
+| Exceptions | Keep the usual border and title bar for active, inactive, or all windows of selected apps |
 
 The interface is available in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
+
+### Limitations
+
+- Shell borders depend on the Windows build and Windows Web Experience Pack. After enabling or updating the mod, some panels may require restarting Windows Explorer or signing out and back in.
+- Apps running as administrator, including Windhawk, may retain their borders. Apps that draw their own frames control their appearance.
+- Mods that change the same border or title bar can override each other, including Windows 11 Accent Window Border.
 
 ## Platforms
 
 Requires Windows 11 x64 or ARM64.
 
-### Limitations
-
-- Shell borders depend on the Windows build and Windows Web Experience Pack. After enabling or updating the mod, some panels may require restarting Windows Explorer or signing out and back in.
-- Windows running as administrator, including Windhawk when elevated, may retain their borders. Apps that draw their own frames control their appearance.
-- Mods that change the same border or title bar can override each other, including Windows 11 Accent Window Border.
-
 ## Usage
 
 Open the mod's **Settings** to change each setting independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. Choose **Windows-defined** to restore Windows styling for a setting.
 
-Under **Exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
+Under **Exceptions**, add an executable name such as `steam.exe` and select which windows to exempt under **Do not hide border**.
 
 ## Links
 
@@ -186,7 +187,7 @@ Under **Exceptions**, add an executable name such as `steam.exe` and select acti
       $description: Taskbar edge and the desktops strip in Task View
       $description:ru-RU: Кромка панели задач и панель рабочих столов в представлении задач
       $description:es-ES: Borde de la barra de tareas y panel de escritorios en Vista de tareas
-      $description:de-DE: Kante der Taskleiste und Leiste der virtuellen Desktops in der Taskansicht
+      $description:de-DE: Kante der Taskleiste und Leiste der virtuellen Desktops in der Aufgabenansicht
       $description:pt-BR: Borda da barra de tarefas e faixa de áreas de trabalho na Visão de tarefas
       $description:zh-CN: 任务栏边缘和任务视图中的桌面栏
       $options:
@@ -383,18 +384,18 @@ Under **Exceptions**, add an executable name such as `steam.exe` and select acti
       $description:pt-BR: Nome do executável, por exemplo, steam.exe
       $description:zh-CN: 可执行文件名，例如 steam.exe
     - scope: both
-      $name: Hide border
-      $name:ru-RU: Скрыть рамку
-      $name:es-ES: Ocultar borde
-      $name:de-DE: Rahmen ausblenden
-      $name:pt-BR: Ocultar borda
-      $name:zh-CN: 隐藏边框
-      $description: The selected windows keep their system border
-      $description:ru-RU: У выбранных окон сохраняется системная рамка
-      $description:es-ES: Las ventanas seleccionadas conservan el borde del sistema
-      $description:de-DE: Die ausgewählten Fenster behalten ihren Systemrahmen
-      $description:pt-BR: As janelas selecionadas mantêm a borda do sistema
-      $description:zh-CN: 所选窗口保留系统边框
+      $name: Do not hide border
+      $name:ru-RU: Не скрывать рамку
+      $name:es-ES: No ocultar el borde
+      $name:de-DE: Rahmen nicht ausblenden
+      $name:pt-BR: Não ocultar a borda
+      $name:zh-CN: 不隐藏边框
+      $description: Selected windows keep their usual border and title bar
+      $description:ru-RU: У выбранных окон сохраняется обычное оформление рамки и заголовка
+      $description:es-ES: Las ventanas seleccionadas conservan su borde y su barra de título habituales
+      $description:de-DE: Die ausgewählten Fenster behalten ihren üblichen Rahmen und ihre Titelleiste
+      $description:pt-BR: As janelas selecionadas mantêm a borda e a barra de título habituais
+      $description:zh-CN: 所选窗口保留原有的边框和标题栏
       $options:
       - both: All windows
       - active: Active windows

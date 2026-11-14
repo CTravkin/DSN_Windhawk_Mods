@@ -11,27 +11,28 @@ Windows Border Switch hides system-drawn borders around windows and panels in Wi
 
 | Setting | Controls |
 | --- | --- |
-| Active window border | The focused window's system border or its title bar accent color |
-| Inactive window borders | System borders of windows without focus |
-| Dialog borders | System borders of classic Win32 dialogs, with or without focus |
-| Taskbar border | The taskbar edge and the virtual desktops strip at the bottom of Task View |
-| Start menu border | The Start menu and its Phone Link panel |
-| Search border | The Windows Search panel |
-| Notification borders | The notification center, calendar, and notification banners on the desktop |
-| Quick Settings border | Quick Settings and the media controls above them |
-| Widgets board border | The outer border of the Widgets board |
+| Active window | The focused window's system border or its title bar accent color |
+| Inactive windows | System borders of windows without focus |
+| Dialogs | System borders of classic Win32 dialogs, with or without focus |
+| Taskbar | The taskbar edge and the virtual desktops strip at the bottom of Task View |
+| Start menu | The Start menu and its Phone Link panel |
+| Search | The Windows Search panel |
+| Notifications | The notification center, calendar, and notification banners on the desktop |
+| Quick Settings | Quick Settings and the media controls above them |
+| Widgets | The outer border of the Widgets board |
+| Exceptions | Keep the usual border and title bar for active, inactive, or all windows of selected apps |
 
 The interface is available in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
-
-## Platforms
-
-Requires Windows 11 x64 or ARM64 and [Windhawk](https://windhawk.net/).
 
 ### Limitations
 
 - Shell borders depend on the Windows build and Windows Web Experience Pack. After enabling or updating the mod, some panels may require restarting Windows Explorer or signing out and back in.
-- Windows running as administrator, including Windhawk when elevated, may retain their borders. Apps that draw their own frames control their appearance.
+- Apps running as administrator, including Windhawk, may retain their borders. Apps that draw their own frames control their appearance.
 - Mods that change the same border or title bar can override each other, including Windows 11 Accent Window Border.
+
+## Platforms
+
+Requires Windows 11 x64 or ARM64 and [Windhawk](https://windhawk.net/).
 
 ## Operations
 
@@ -49,7 +50,7 @@ To update a local installation, open its editor, replace the source, and compile
 
 Open the mod's **Settings** in Windhawk. Each setting can be changed independently. Initially, the mod keeps the active window border, removes its title bar accent color, and hides the other listed borders. The title bar option applies when Windows uses the accent color for title bars.
 
-Under **Exceptions**, add an executable name such as `steam.exe` and select active windows, inactive windows, or both.
+Under **Exceptions**, add an executable name such as `steam.exe` and select which windows to exempt under **Do not hide border**.
 
 Returning a window setting to **Windows-defined** restores the system DWM color. Applications that set a custom DWM color can reapply it when the window reopens.
 
