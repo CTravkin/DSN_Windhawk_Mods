@@ -69,6 +69,13 @@ static_assert(!IsStartPane(L"SearchRoot"));
 static_assert(IsStartBorderParent(L"CompanionRoot", L"Windows.UI.Xaml.Controls.Grid"));
 static_assert(IsStartBorderParent(L"", L"Windows.UI.Xaml.Controls.Grid"));
 static_assert(!IsStartBorderParent(L"SearchRoot", L"Windows.UI.Xaml.Controls.Grid"));
+static_assert(IsKeyboardLayoutBorder(
+    L"Windows.UI.Xaml.Controls.Grid", L"Windows.UI.Xaml.Controls.ContentPresenter",
+    L"Windows.UI.Xaml.Controls.ContentControl",
+    L"WindowsInternal.ComposableShell.Experiences.TextInput.Common.InputSwitcher"));
+static_assert(!IsKeyboardLayoutBorder(
+    L"Windows.UI.Xaml.Controls.Grid", L"Windows.UI.Xaml.Controls.ContentPresenter",
+    L"Windows.UI.Xaml.Controls.ContentControl", L"ControlCenter.ControlCenterView"));
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",
                             L"AppBorder") == ShellBorder::Search);
 static_assert(ShellBorderFor(ShellHost::Search, L"Windows.UI.Xaml.Controls.Border",

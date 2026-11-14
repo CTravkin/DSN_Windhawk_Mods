@@ -19,6 +19,7 @@ Windows Border Switch hides system-drawn borders around windows and panels in Wi
 | Search | The Windows Search panel |
 | Notifications | The notification center, calendar, and notification banners on the desktop |
 | Quick Settings | Quick Settings and the media controls above them |
+| Keyboard layout | The outer border of the keyboard layout selector |
 | Widgets | The outer border of the Widgets board |
 | Exceptions | Keep the usual border and title bar for active, inactive, or all windows of selected apps |
 
