@@ -7,7 +7,7 @@
 // @description:de-DE Passt die Schnelleinstellungen und den Sound von Windows 11 an, einschließlich Helligkeit, Kachelzeilen und Verknüpfungen
 // @description:pt-BR Personaliza as configurações rápidas e de som do Windows 11, incluindo brilho, linhas e atalhos
 // @description:zh-CN 自定义 Windows 11 快速设置和声音，包括亮度、磁贴行数和快捷按钮
-// @version 0.2.0
+// @version 0.2.1
 // @author Constantine Travkin, based on HeyOkay's mod
 // @github https://github.com/CTravkin
 // @homepage https://github.com/CTravkin/DSN_Windhawk_Mods
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 155
+// Build: 156
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -125,16 +125,18 @@ in this source file.
   $options:zh-CN:
   - auto: 自动
   - disabled: 禁用
-- quickActionRows: 2
+- quickActionRows: "2"
   $name: Quick Settings tile rows
   $name:ru-RU: Строки плиток быстрых настроек
   $name:es-ES: Filas de iconos de configuración rápida
   $name:de-DE: Kachelzeilen in den Schnelleinstellungen
   $name:pt-BR: Linhas de blocos nas configurações rápidas
   $name:zh-CN: 快速设置磁贴行数
-  $min: 1
-  $max: 4
-  $format: slider
+  $options:
+  - "1": "1"
+  - "2": "2"
+  - "3": "3"
+  - "4": "4"
 - showNightLight: true
   $name: Night light button
   $name:ru-RU: Кнопка «Ночной свет»
@@ -8043,7 +8045,10 @@ inline void Settings() {
   hidden = sound::ParseHidden(setting.get());
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
-  quickActionRows = Wh_GetIntSetting(L"quickActionRows");
+  auto rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
+  std::wstring_view rowCount(rows.get());
+  quickActionRows = rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4'
+                        ? rowCount.front() - L'0' : 2;
   showNightLight = Wh_GetIntSetting(L"showNightLight") != 0;
   showDisplaySettings = Wh_GetIntSetting(L"showDisplaySettings") != 0;
 }
