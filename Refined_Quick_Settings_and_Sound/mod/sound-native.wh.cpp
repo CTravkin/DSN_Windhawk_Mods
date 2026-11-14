@@ -7,7 +7,7 @@
 // @description:de-DE Anpassbare Kachelzeilen, Verknüpfungen und Symbole mit Lautstärkemixer per Klick
 // @description:pt-BR Linhas de blocos, atalhos e ícones personalizáveis e mixer de volume a um clique
 // @description:zh-CN 自定义磁贴行数、快捷方式和图标，一键打开音量合成器
-// @version 0.5.2
+// @version 0.5.3
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 162
+// Build: 163
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -558,7 +558,7 @@ in this source file.
 #include "tray.h"
 namespace native {
 inline bool explorer = false;
-inline void ReadHiddenApps() {
+inline void ReadHiddenApps(std::vector<std::wstring> &hidden) {
   hidden.clear();
   // Windhawk exposes indexed values but no array length. Allow empty rows
   // between names, including rows left blank in the settings editor.
@@ -579,16 +579,17 @@ inline void ReadHiddenApps() {
     hidden = sound::ParseHidden(legacy.get());
   }
 }
-inline void Settings() {
-  ReadHiddenApps();
-  volumeWheelStep = sound::VolumeWheelStep(Wh_GetIntSetting(L"volumeWheelStep"));
-  trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
+inline ModSettings ReadSettings() {
+  ModSettings settings;
+  ReadHiddenApps(settings.hidden);
+  settings.volumeWheelStep = sound::VolumeWheelStep(Wh_GetIntSetting(L"volumeWheelStep"));
+  settings.trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
-  brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
+  settings.brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
   auto rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
   std::wstring_view rowCount(rows.get());
-  quickActionRows = rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4'
-                        ? rowCount.front() - L'0' : 2;
+  if (rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4')
+    settings.quickActionRows = rowCount.front() - L'0';
   using S = sound::QuickShortcut;
   auto first = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut1");
   const auto oldIcon = [&](PCWSTR key) { return !*first.get() || Wh_GetIntSetting(key) != 0; };
@@ -605,25 +606,27 @@ inline void Settings() {
   unsigned volumePlaces = sound::IconPlaces(volume.get(), 15,
       oldIcon(L"alternativeIcons.trayVolume") | (oldIcon(L"alternativeIcons.quickVolume") << 1) |
       (oldIcon(L"alternativeIcons.soundVolume") << 2) | (oldIcon(L"alternativeIcons.appUnmute") << 3));
-  altQuickMixer = icon(L"alternativeIcons.mixer.quick", mixerPlaces & 1);
-  altSoundMixer = icon(L"alternativeIcons.mixer.sound", mixerPlaces & 2);
-  altTrayVolume = icon(L"alternativeIcons.volume.taskbar", volumePlaces & 1);
-  altQuickVolume = icon(L"alternativeIcons.volume.quick", volumePlaces & 2);
-  altSoundVolume = icon(L"alternativeIcons.volume.sound", volumePlaces & 4);
-  altAppUnmute = icon(L"alternativeIcons.volume.apps", volumePlaces & 8);
-  altTrayEthernet = icon(L"alternativeIcons.ethernet.taskbar",
-                        sound::IconPlaces(ethernet.get(), 1, oldIcon(L"alternativeIcons.trayEthernet")));
-  altSoundGear = icon(L"alternativeIcons.gear.sound", sound::IconPlaces(gear.get(), 1, 1));
+  settings.altQuickMixer = icon(L"alternativeIcons.mixer.quick", mixerPlaces & 1);
+  settings.altSoundMixer = icon(L"alternativeIcons.mixer.sound", mixerPlaces & 2);
+  settings.altTrayVolume = icon(L"alternativeIcons.volume.taskbar", volumePlaces & 1);
+  settings.altQuickVolume = icon(L"alternativeIcons.volume.quick", volumePlaces & 2);
+  settings.altSoundVolume = icon(L"alternativeIcons.volume.sound", volumePlaces & 4);
+  settings.altAppUnmute = icon(L"alternativeIcons.volume.apps", volumePlaces & 8);
+  settings.altTrayEthernet = icon(
+      L"alternativeIcons.ethernet.taskbar",
+      sound::IconPlaces(ethernet.get(), 1, oldIcon(L"alternativeIcons.trayEthernet")));
+  settings.altSoundGear = icon(L"alternativeIcons.gear.sound", sound::IconPlaces(gear.get(), 1, 1));
   if (*first.get()) {
-    for (int i = 0; i < int(quickShortcuts.size()); ++i) {
+    for (int i = 0; i < int(settings.quickShortcuts.size()); ++i) {
       auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.shortcut%d", i + 1);
-      quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
+      settings.quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
     }
-    quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
+    settings.quickSoundAccess = Wh_GetIntSetting(L"quickSoundAccess") != 0;
   } else {
-    quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
+    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None,
                       Wh_GetIntSetting(L"showNightLight") ? S::Night : S::None};
   }
+  return settings;
 }
 } // namespace native
 BOOL Wh_ModInit() {
@@ -635,7 +638,7 @@ BOOL Wh_ModInit() {
   GetModuleFileNameW(nullptr, path, 32768);
   explorer = !_wcsicmp(PathFindFileNameW(path), L"explorer.exe");
   stopping = false;
-  Settings();
+  modSettings = ReadSettings();
   if (explorer) {
     if (!tray::Initialize(module)) {
       tray::Shutdown();
@@ -659,6 +662,18 @@ void Wh_ModUninit() {
     native::StopHost();
 }
 BOOL Wh_ModSettingsChanged(BOOL *reload) {
-  *reload = TRUE;
+  using namespace native;
+  *reload = FALSE;
+  auto next = ReadSettings();
+  {
+    std::lock_guard lock(settingsMutex);
+    if (next == modSettings)
+      return TRUE;
+    modSettings = std::move(next);
+  }
+  if (explorer)
+    tray::RefreshSettings();
+  else
+    RefreshHostSettings();
   return TRUE;
 }

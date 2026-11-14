@@ -40,15 +40,24 @@ namespace D = X::Data;
 using winrt::Windows::Foundation::IInspectable;
 inline std::atomic<bool> stopping = false;
 inline HMODULE module = nullptr;
-inline std::vector<std::wstring> hidden;
-inline bool brightnessEnabled = true;
-inline int quickActionRows = 2;
-inline sound::QuickShortcutSlots quickShortcuts{};
-inline bool quickSoundAccess = true, trayMiddleClickMute = false;
-inline int volumeWheelStep = 2;
-inline bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
-            altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
-            altAppUnmute = true, altSoundGear = true;
+struct ModSettings {
+  std::vector<std::wstring> hidden;
+  bool brightnessEnabled = true;
+  int quickActionRows = 2;
+  sound::QuickShortcutSlots quickShortcuts{};
+  bool quickSoundAccess = true, trayMiddleClickMute = false;
+  int volumeWheelStep = 2;
+  bool altQuickMixer = true, altSoundMixer = true, altTrayVolume = true,
+       altTrayEthernet = true, altQuickVolume = true, altSoundVolume = true,
+       altAppUnmute = true, altSoundGear = true;
+  bool operator==(ModSettings const &) const = default;
+};
+inline std::mutex settingsMutex;
+inline ModSettings modSettings;
+inline ModSettings SettingsSnapshot() {
+  std::lock_guard lock(settingsMutex);
+  return modSettings;
+}
 inline UINT volumePulseMessage = RegisterWindowMessageW(L"Windhawk.NativeSound.VolumePulse.1");
 // Used only while unloading. Wait for the asynchronous operation itself,
 // not an event set inside its delegate: the DLL must outlive the delegate's return.

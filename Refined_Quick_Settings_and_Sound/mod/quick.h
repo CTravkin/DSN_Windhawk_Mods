@@ -18,7 +18,7 @@ inline SetQuickRows setQuickRows = nullptr, originalSetQuickRows = nullptr;
 inline UpdateQuickExtent updateQuickExtent = nullptr;
 inline void *quickGridVtable = nullptr;
 inline void WINAPI KeepQuickRows(void *self, int rows) {
-  originalSetQuickRows(self, stopping ? rows : quickActionRows);
+  originalSetQuickRows(self, stopping ? rows : SettingsSnapshot().quickActionRows);
   updateQuickExtent(self);
 }
 inline void HookQuickRows(HMODULE dll) {
@@ -110,8 +110,11 @@ class QuickPage {
   SliderLook Look() { return {journal_, revoke_, thinSliders_}; }
   // The volume row's own slider and mute button (QuickVolume).
   std::unique_ptr<QuickVolume> quickVolume_;
+  ModSettings settings_;
   C::Slider quickSlider_{nullptr};
   P::ButtonBase quickMute_{nullptr};
+  C::Button quickMixerButton_{nullptr};
+  IInspectable originalMixerIcon_{nullptr};
   std::shared_ptr<AnimatedVolume> quickIcon_;
   sound::WheelVolume volumeWheel_;
   WheelToolTip wheelTip_;
@@ -135,8 +138,6 @@ class QuickPage {
     }
     if (quickSlider_.IsEnabled() != available)
       quickSlider_.IsEnabled(available);
-    if (quickIcon_ && quickMute_ && quickMute_.IsEnabled() != available)
-      quickMute_.IsEnabled(available);
     if (dragging) {
       value = float(quickSlider_.Value() / 100);
       muted = value <= 0;
@@ -716,9 +717,9 @@ class QuickPage {
     if (!settingsRow_ || !night_ || !display_)
       return;
     auto nativeRow = NativeBrightnessRow();
-    if (!brightnessEnabled && nativeRow && First(nativeRow, 76))
+    if (!settings_.brightnessEnabled && nativeRow && First(nativeRow, 76))
       Set(nativeRow, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    bool nativeVisible = brightnessEnabled && nativeRow &&
+    bool nativeVisible = settings_.brightnessEnabled && nativeRow &&
                          nativeRow.Visibility() == X::Visibility::Visible;
     if (nativeVisible && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible) {
       brightRow_.Visibility(X::Visibility::Collapsed);
@@ -737,7 +738,7 @@ class QuickPage {
              String(button.CommandParameter()) == L"ms-settings:display";
     });
     bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto shortcuts = sound::QuickShortcuts(quickShortcuts, nativeDisplay || ddcVisible,
+    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible,
                                           nativeNight || ddcVisible);
     bool changed = shortcuts != visibleShortcuts_;
     if (changed)
@@ -1080,11 +1081,11 @@ class QuickPage {
     // Native layouts use one or two rows depending on available height.
     int nativeRows = rows == 1 ? 1 : 2;
     if (auto pager = Named(view_, L"QuickActionsPager").try_as<U::PipsPager>();
-        pager && rows != quickActionRows && pager.SelectedPageIndex() > 0)
+        pager && rows != settings_.quickActionRows && pager.SelectedPageIndex() > 0)
       pager.SelectedPageIndex(0);
-    setQuickRows(self, quickActionRows);
+    setQuickRows(self, settings_.quickActionRows);
     tiledView_ = winrt::make_weak(paginated);
-    Wh_Log(L"Quick Settings pagination set to %d rows, %u tiles", quickActionRows,
+    Wh_Log(L"Quick Settings pagination set to %d rows, %u tiles", settings_.quickActionRows,
            grid.Items().Size());
     journal_.undo.push_back([iface, nativeRows] {
       auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
@@ -1114,7 +1115,7 @@ class QuickPage {
     }
     if (!mute || !slider || !First(mute, 5))
       return;
-    if (altQuickVolume)
+    if (settings_.altQuickVolume)
       try {
         quickIcon_ = std::make_shared<AnimatedVolume>();
       } catch (...) {
@@ -1140,40 +1141,12 @@ class QuickPage {
         }
       });
     };
-    // Keep the native toggle and its command for the Windows glyph.
-    C::Button own{nullptr};
-    if (quickIcon_) {
-      own = Button(view_, sound::Text(L"Turn sound on or off", L"Включить или выключить звук",
-                   L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten",
-                   L"Ativar ou desativar o som", L"打开或关闭声音"));
-      own.Margin(mute.Margin());
-      own.HorizontalAlignment(mute.HorizontalAlignment());
-      own.VerticalAlignment(X::VerticalAlignment::Center);
-      C::Grid::SetColumn(own, C::Grid::GetColumn(mute));
-      C::Grid::SetRow(own, C::Grid::GetRow(mute));
-      own.Content(quickIcon_->Isolated());
-      uint32_t index = 0;
-      if (row.Children().IndexOf(mute, index)) {
-        row.Children().RemoveAt(index);
-        row.Children().InsertAt(index, own);
-      } else
-        row.Children().Append(own);
-      auto weakRow = winrt::make_weak(row);
-      journal_.undo.push_back([weakRow, own, mute, index] {
-        if (auto r = weakRow.get()) {
-          uint32_t i = 0;
-          if (r.Children().IndexOf(own, i))
-            r.Children().RemoveAt(i);
-          if (!r.Children().IndexOf(mute, i))
-            r.Children().InsertAt(std::min(index, r.Children().Size()), mute);
-        }
-      });
-      quickMute_ = own;
-    } else {
-      journal_.Save(mute, C::ContentControl::ContentProperty());
-      quickMute_ = mute;
-      quickGlyph_ = -2;
-    }
+    // Both glyphs share the Windows toggle and its original command.
+    journal_.Save(mute, C::ContentControl::ContentProperty());
+    quickMute_ = mute;
+    quickGlyph_ = -2;
+    if (quickIcon_)
+      mute.Content(quickIcon_->Isolated());
     // Slider: as master_ on the Sound page; geometry and thin look follow in Sliders().
     C::Slider mine;
     if (auto style = Resource(view_, L"HeaderIconSliderStyle").try_as<X::Style>())
@@ -1242,23 +1215,16 @@ class QuickPage {
               return;
             }
             args.Handled(true);
-            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta, volumeWheelStep));
+            s.Value(volumeWheel_.Next(s.Value(), s.Minimum(), s.Maximum(), delta,
+                                      settings_.volumeWheelStep));
             wheelTip_.Show(view_, s, s.Value());
           } catch (...) {
             Wh_Log(L"QuickVolumeWheelError %08X", winrt::to_hresult());
           }
         }, revoke_);
-    if (own)
-      Keep(own.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
-        try {
-          if (quickVolume_)
-            quickVolume_->ToggleMute();
-        } catch (...) {
-          Wh_Log(L"QuickMuteToggleError %08X", winrt::to_hresult());
-        }
-        quickUserAt_ = 0;
-        RefreshVolume();
-      }));
+    Keep(mute.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+      quickUserAt_ = 0;
+    }));
   }
   void Sliders(C::Grid const &l1) {
     auto group = Named(l1, L"SlidersGroup");
@@ -1307,8 +1273,11 @@ class QuickPage {
       return;
     if (First(l2, 4)) {
       SmallButton(l2);
-      if (altQuickMixer)
-        Set(l2, C::ContentControl::ContentProperty(), Icon(L"sliders-horizontal"));
+      quickMixerButton_ = l2;
+      originalMixerIcon_ = l2.Content();
+      journal_.Save(l2, C::ContentControl::ContentProperty());
+      if (settings_.altQuickMixer)
+        l2.Content(Icon(L"sliders-horizontal"));
       auto name = winrt::box_value(sound::Text(L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"));
       Set(l2, X::Automation::AutomationProperties::NameProperty(), name);
       Set(l2, C::ToolTipService::ToolTipProperty(), name);
@@ -1560,8 +1529,9 @@ class QuickPage {
   }
 
 public:
-  QuickPage(X::FrameworkElement const &view, HWND host) : view_(view), host_(host) {
-    if (brightnessEnabled) {
+  QuickPage(X::FrameworkElement const &view, HWND host)
+      : view_(view), host_(host), settings_(SettingsSnapshot()) {
+    if (settings_.brightnessEnabled) {
       try {
         ddc_ = std::make_unique<Ddc>();
       } catch (...) {
@@ -1595,6 +1565,30 @@ public:
   }
   X::FrameworkElement View() const { return view_; }
   void Dirty() { dirty_ = true; }
+  bool ApplySettings(ModSettings const &next) {
+    if (settings_.brightnessEnabled != next.brightnessEnabled ||
+        settings_.quickActionRows != next.quickActionRows ||
+        settings_.quickShortcuts != next.quickShortcuts)
+      return false;
+    auto previous = std::exchange(settings_, next);
+    if (quickMixerButton_ && previous.altQuickMixer != next.altQuickMixer)
+      quickMixerButton_.Content(next.altQuickMixer ? IInspectable(Icon(L"sliders-horizontal"))
+                                                 : originalMixerIcon_);
+    if (quickMute_ && previous.altQuickVolume != next.altQuickVolume) {
+      quickIcon_.reset();
+      quickGlyph_ = -2;
+      if (next.altQuickVolume)
+        try {
+          quickIcon_ = std::make_shared<AnimatedVolume>();
+          quickMute_.Content(quickIcon_->Isolated());
+        } catch (...) {
+          quickIcon_.reset();
+          Wh_Log(L"QuickVolumeIconError %08X", winrt::to_hresult());
+        }
+      RefreshVolume();
+    }
+    return true;
+  }
   void Refresh() {
     visible_ = PanelVisible();
     if (dirty_ || visible_)

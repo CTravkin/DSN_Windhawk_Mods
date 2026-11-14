@@ -25,6 +25,8 @@ struct AppRow {
   winrt::weak_ref<P::ToggleButton> toggle;
   C::TextBlock level{nullptr};
   C::Button levelButton{nullptr}, levelMute{nullptr};
+  Journal badgeJournal;
+  bool alternateMute = false;
   std::shared_ptr<AnimatedVolume> levelIcon;
   sound::WheelVolume wheel;
   double last = 50, before = 0, expected = NAN;
@@ -57,6 +59,9 @@ class SoundPage {
   C::Button mixerButton_{nullptr};
   X::FrameworkElement arrow_{nullptr};
   C::StackPanel inputBlock_{nullptr};
+  C::Button mixerSettings_{nullptr}, soundSettings_{nullptr};
+  Journal gearJournal_;
+  ModSettings settings_;
   std::shared_ptr<Menu> input_;
   C::Slider master_{nullptr};
   C::Button masterIcon_{nullptr};
@@ -128,13 +133,14 @@ class SoundPage {
   // Settings gear: it turns while the button is held.
   void SettingsGear(C::Button const &button) {
     try {
+      gearJournal_.Restore();
       if (auto style = Resource(page_, L"FooterIconButtonStyle").try_as<X::Style>()) {
         button.Style(style);
         button.Width(36);
         button.Height(36);
         button.Margin({-2, -2, -2, -2});
       }
-      if (!altSoundGear) {
+      if (!settings_.altSoundGear) {
         button.Content(SymbolGlyph(page_, 0xe713, 16));
         return;
       }
@@ -156,7 +162,7 @@ class SoundPage {
             } catch (...) {
             }
           });
-      revoke_.push_back([button, statics, token] {
+      gearJournal_.undo.push_back([button, statics, token] {
         button.UnregisterPropertyChangedCallback(statics.StateProperty(), token);
       });
     } catch (...) {
@@ -856,11 +862,8 @@ class SoundPage {
                                                L"Lautstärke", L"Volume", L"音量"));
       Set(settings, X::Automation::AutomationProperties::NameProperty(), name);
       Set(settings, C::ToolTipService::ToolTipProperty(), name);
-      if (altSoundMixer)
-        settings.Content(Icon(L"sliders-horizontal"));
-      else
-        // SystemSettings_Audio_MixerLink uses the Segoe Fluent Volume3 glyph.
-        settings.Content(SymbolGlyph(page_, 0xe995));
+      mixerSettings_ = settings;
+      MixerSettingsIcon();
     }
     journal_.Save(mixerList_, X::UIElement::VisibilityProperty());
     journal_.Save(mixerList_, X::FrameworkElement::HeightProperty());
@@ -894,6 +897,15 @@ class SoundPage {
     mixerList_.ItemContainerStyle(itemStyle);
     Set(mixerList_, C::Control::PaddingProperty(), winrt::box_value(X::Thickness{}));
     Set(mixerList_, X::FrameworkElement::MarginProperty(), winrt::box_value(X::Thickness{}));
+  }
+  void MixerSettingsIcon() {
+    if (!mixerSettings_)
+      return;
+    if (settings_.altSoundMixer)
+      mixerSettings_.Content(Icon(L"sliders-horizontal"));
+    else
+      // SystemSettings_Audio_MixerLink uses the Segoe Fluent Volume3 glyph.
+      mixerSettings_.Content(SymbolGlyph(page_, 0xe995));
   }
   void ApplyExpanded(bool animate) {
     if (holding_) {
@@ -1108,7 +1120,7 @@ class SoundPage {
               X::Media::Animation::TransitionCollection());
         }
         journal_.Save(container, X::UIElement::VisibilityProperty());
-        container.Visibility(sound::Hidden(hidden, name, L"") ? X::Visibility::Collapsed
+        container.Visibility(sound::Hidden(settings_.hidden, name, L"") ? X::Visibility::Collapsed
                                                               : X::Visibility::Visible);
         journal_.Save(container, X::UIElement::OpacityProperty());
         container.Opacity(unnamed && hideUnnamed_ ? 0 : 1);
@@ -1174,7 +1186,7 @@ class SoundPage {
                           L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten",
                           L"Ativar ou desativar o som", L"打开或关闭声音"));
     masterIcon_.Content(VolumeGlyph(page_, 3));
-    if (altSoundVolume)
+    if (settings_.altSoundVolume)
       try {
         masterAnimation_ = std::make_shared<AnimatedVolume>();
         masterIcon_.Content(masterAnimation_->Isolated());
@@ -1197,6 +1209,7 @@ class SoundPage {
     auto settings = Button(page_, sound::Text(L"Sound settings", L"Параметры звука",
                            L"Configuración de sonido", L"Soundeinstellungen",
                            L"Configurações de som", L"声音设置"));
+    soundSettings_ = settings;
     SettingsGear(settings);
     C::Grid::SetColumn(settings, 2);
     footer_.Children().Append(settings);
@@ -1231,7 +1244,7 @@ class SoundPage {
             }
             args.Handled(true);
             master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
-                                           master_.Maximum(), delta, volumeWheelStep));
+                                           master_.Maximum(), delta, settings_.volumeWheelStep));
             wheelTip_.Show(page_, master_, master_.Value());
           } catch (...) {
             Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
@@ -1245,7 +1258,7 @@ class SoundPage {
 public:
   explicit SoundPage(X::FrameworkElement const &page, HWND host,
                      std::function<void()> volumeChanged)
-      : page_(page), host_(host),
+      : page_(page), host_(host), settings_(SettingsSnapshot()),
         volumeChanged_(std::move(volumeChanged)) {}
   void MasterGlyph(float value, bool muted) {
     if (masterAnimation_)
@@ -1266,6 +1279,34 @@ public:
   void RefreshMasterNow() {
     if (master_ && page_.IsLoaded())
       ApplyMaster(State());
+  }
+  void ApplySettings(ModSettings const &next) {
+    auto previous = std::exchange(settings_, next);
+    if (previous.altSoundMixer != next.altSoundMixer)
+      MixerSettingsIcon();
+    if (soundSettings_ && previous.altSoundGear != next.altSoundGear)
+      SettingsGear(soundSettings_);
+    if (masterIcon_ && previous.altSoundVolume != next.altSoundVolume) {
+      masterAnimation_.reset();
+      glyph_ = -2;
+      if (next.altSoundVolume)
+        try {
+          masterAnimation_ = std::make_shared<AnimatedVolume>();
+          masterIcon_.Content(masterAnimation_->Isolated());
+        } catch (...) {
+          Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
+        }
+      auto state = State();
+      MasterGlyph(state.master, state.muted);
+    }
+    if (previous.altAppUnmute != next.altAppUnmute)
+      for (auto const &row : rows_)
+        if (auto slider = row->slider.get()) {
+          SetAppMuteIcon(*row, slider);
+          ShowLevel(*row, slider.Value());
+        }
+    if (previous.hidden != next.hidden)
+      rowsDirty_ = true;
   }
   sound::Snapshot State() {
     auto s = audio_.Get();
@@ -1988,7 +2029,7 @@ public:
     if (row.level)
       row.level.Text(std::to_wstring(n));
     if (row.levelButton) {
-      row.levelButton.Visibility(n <= 0 && row.levelMute ? X::Visibility::Collapsed
+      row.levelButton.Visibility(n <= 0 && row.alternateMute ? X::Visibility::Collapsed
                                                        : X::Visibility::Visible);
       // At 100 the button is disabled rather than taken out of hit testing: a
       // hit-test change under the pointer leaves the button's pointer-over state
@@ -1998,7 +2039,34 @@ public:
         row.levelButton.IsEnabled(enabled);
     }
     if (row.levelMute)
-      row.levelMute.Visibility(n <= 0 ? X::Visibility::Visible : X::Visibility::Collapsed);
+      row.levelMute.Visibility(n <= 0 && row.alternateMute ? X::Visibility::Visible
+                                                          : X::Visibility::Collapsed);
+  }
+  void SetAppMuteIcon(AppRow &row, C::Slider const &slider) {
+    row.alternateMute = settings_.altAppUnmute;
+    row.badgeJournal.Restore();
+    if (!row.alternateMute)
+      return;
+    if (!row.levelIcon && row.levelMute)
+      try {
+        row.levelIcon = std::make_shared<AnimatedVolume>();
+        row.levelIcon->Update(0, true);
+        row.levelMute.Content(row.levelIcon->Isolated());
+      } catch (...) {
+        row.levelIcon.reset();
+        Wh_Log(L"AppMuteIconError %08X", winrt::to_hresult());
+      }
+    auto root = row.root.get();
+    auto toggle = row.toggle.get();
+    if (!root || !toggle)
+      return;
+    for (auto const &child : root.Children())
+      if (auto e = child.try_as<X::FrameworkElement>();
+          e && e != toggle && e != slider && e != row.levelButton &&
+          e != row.levelMute && C::Grid::GetColumn(e) == 0) {
+        row.badgeJournal.Save(e, X::UIElement::VisibilityProperty());
+        e.Visibility(X::Visibility::Collapsed);
+      }
   }
   void App(C::Slider const &slider, X::Style const &style) {
     if (appIds_.contains(winrt::get_abi(slider)))
@@ -2044,13 +2112,6 @@ public:
         winrt::box_value(X::HorizontalAlignment::Center));
     Set(toggle, C::Control::VerticalContentAlignmentProperty(),
         winrt::box_value(X::VerticalAlignment::Center));
-    // The alternative mute button next to the slider replaces the shell badge.
-    if (altAppUnmute) {
-      for (auto const &child : root.Children())
-        if (auto e = child.try_as<X::FrameworkElement>();
-            e && e != toggle && e != slider && C::Grid::GetColumn(e) == 0)
-          Set(e, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
-    }
     // The mute indicator replaces the number in the level column at 0. The
     // app's volume is shown as a number in the column under the SV settings
     // button: 32 DIP wide, 12 DIP after the slider, i.e. inside the row's 64 DIP
@@ -2109,7 +2170,7 @@ public:
     // size) replaces the number; pressing it unmutes like the app icon does: the
     // native toggle is toggled through UI Automation, so its command and the
     // mod's restore run exactly as for a click on the icon.
-    if (altAppUnmute) {
+    {
       auto unmute = sound::Text(L"Unmute", L"Включить звук", L"Activar sonido", L"Stummschaltung aufheben",
                               L"Ativar som", L"取消静音");
       row->levelMute = Button(page_, unmute);
@@ -2117,13 +2178,6 @@ public:
       row->levelMute.VerticalAlignment(X::VerticalAlignment::Center);
       row->levelMute.Margin({0, 0, -44, 0});
       row->levelMute.Content(VolumeGlyph(page_, -1));
-      try {
-        row->levelIcon = std::make_shared<AnimatedVolume>();
-        row->levelIcon->Update(0, true);
-        row->levelMute.Content(row->levelIcon->Isolated());
-      } catch (...) {
-        row->levelIcon.reset();
-      }
       auto weakToggle = winrt::make_weak(toggle);
       Keep(row->levelMute.Click(winrt::auto_revoke, [weakToggle](auto &&, auto &&) {
         try {
@@ -2141,6 +2195,7 @@ public:
       C::Grid::SetRowSpan(row->levelMute, std::max(1u, root.RowDefinitions().Size()));
       Add(root, row->levelMute);
     }
+    SetAppMuteIcon(*row, slider);
     ShowLevel(*row, slider.Value());
     // Application images and the native fallback FontIcon remain shell-owned.
     // ButtonBase can mark routed input handled before instance subscribers run.
@@ -2219,7 +2274,8 @@ public:
             double base = now - row->wheelAt < 400 && std::isfinite(row->wheelTarget)
                               ? row->wheelTarget
                               : s.Value();
-            double next = row->wheel.Next(base, s.Minimum(), s.Maximum(), delta, volumeWheelStep);
+            double next = row->wheel.Next(base, s.Minimum(), s.Maximum(), delta,
+                                         settings_.volumeWheelStep);
             if (next != base) {
               row->wheelTarget = next;
               row->wheelAt = now;
@@ -2298,6 +2354,7 @@ public:
     }
     if (gearStory_)
       gearStory_.Stop();
+    gearJournal_.Restore();
     for (auto const &menu : menus_) {
       menu->flyout.Hide();
       if (menu->arrowStory)
@@ -2354,6 +2411,7 @@ public:
     }
     if (gearStory_)
       gearStory_.Stop();
+    gearJournal_.Restore();
     for (auto const &menu : menus_) {
       menu->flyout.Hide();
       if (menu->arrowStory)

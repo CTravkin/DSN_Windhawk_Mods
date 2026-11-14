@@ -355,7 +355,8 @@ inline void AttachMiddleMute(Record &record, X::FrameworkElement const &icon) {
           if (point.Properties().PointerUpdateKind() != Kind::MiddleButtonPressed ||
               !Find(element, [](auto const &node) { return VolumeLeaf(node); }))
             return;
-          if (!stopping && audio && audio->Get().masterAvailable &&
+          if (!stopping && SettingsSnapshot().trayMiddleClickMute &&
+              audio && audio->Get().masterAvailable &&
               audio->Send({sound::Action::ToggleEndpointMute}))
             args.Handled(true);
         } catch (...) {
@@ -596,7 +597,8 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
       record->timer.Stop();
     return;
   }
-  if (trayMiddleClickMute && !record->middlePressed && InControlCenter(icon) &&
+  auto settings = SettingsSnapshot();
+  if (settings.trayMiddleClickMute && !record->middlePressed && InControlCenter(icon) &&
       Find(icon, [](auto const &node) { return VolumeLeaf(node); }))
     try {
       AttachMiddleMute(*record, icon);
@@ -605,7 +607,9 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
     }
   if (record->attached) {
     auto native = record->native.get();
-    if (!native || !native.IsLoaded()) {
+    if (!native || !native.IsLoaded() ||
+        (record->kind == 1 && !settings.altTrayVolume) ||
+        (record->kind == 2 && !settings.altTrayEthernet)) {
       if (auto parent = record->parent.get(); parent && record->visual) {
         uint32_t index;
         if (parent.Children().IndexOf(record->visual, index))
@@ -632,9 +636,9 @@ inline void Refresh(std::shared_ptr<Record> const &record) {
     // remain outside every native glyph/template branch that we suppress.
     int kind = 1;
     X::FrameworkElement leaf{nullptr};
-    if (altTrayVolume)
+    if (settings.altTrayVolume)
       leaf = Find(icon, [](auto const &node) { return VolumeLeaf(node); });
-    if (!leaf && altTrayEthernet) {
+    if (!leaf && settings.altTrayEthernet) {
       int wired = -1;
       leaf = Find(icon, [&wired](auto const &node) {
         int s = NetworkLeaf(node);
@@ -838,6 +842,24 @@ inline void VolumeChanged() {
   for (auto const &pulse : copy)
     pulse->Post();
 }
+inline void RefreshSettings() {
+  for (auto taskbar : Taskbars())
+    Dispatch(taskbar, [taskbar] {
+      std::vector<std::shared_ptr<Record>> local;
+      {
+        std::lock_guard lock(recordsMutex);
+        for (auto const &record : records)
+          if (record->taskbar == taskbar)
+            local.push_back(record);
+      }
+      for (auto const &record : local)
+        try {
+          Refresh(record);
+        } catch (...) {
+          Wh_Log(L"Tray settings refresh: %08X", winrt::to_hresult());
+        }
+    });
+}
 inline void Observe(X::FrameworkElement const &element, HWND taskbar) {
   if (!element || stopping)
     return;
@@ -965,7 +987,7 @@ using NativeTapped = void(WINAPI *)(void *, IInspectable const &, void *);
 inline NativeTapped originalTapped = nullptr;
 inline void WINAPI Tapped(void *self, IInspectable const &sender, void *argsSlot) {
   auto &args = *static_cast<X::Input::TappedRoutedEventArgs *>(argsSlot);
-  if (!stopping && quickSoundAccess)
+  if (!stopping && SettingsSnapshot().quickSoundAccess)
     try {
       // Intercept the shell's own handler, before it activates Quick Settings.
       // A later UIElement.Tapped subscription cannot cancel an action already

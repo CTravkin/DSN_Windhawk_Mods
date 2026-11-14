@@ -116,6 +116,7 @@ struct Runtime {
   };
   std::vector<ViewWatch> viewWatches;
   std::shared_ptr<VolumePulse> volumePulse;
+  ModSettings appliedSettings = SettingsSnapshot();
   bool volumeDuringRefresh = false;
   bool Hidden() const { return !WindowShown(window); }
   void Wake() {
@@ -509,6 +510,7 @@ struct Runtime {
     try {
       EnsureVolumePulse();
       RetireQuick();
+      ApplySettings();
       for (auto &watch : pageWatches)
         if (watch.firstFrame && GetTickCount64() - watch.hiddenAt >= 400)
           watch.firstFrame.reset();
@@ -538,6 +540,22 @@ struct Runtime {
       if (volumePulse)
         volumePulse->Post();
     }
+  }
+  void ApplySettings() {
+    auto next = SettingsSnapshot();
+    if (appliedSettings == next)
+      return;
+    for (auto const &page : pages)
+      page->ApplySettings(next);
+    for (auto &quick : quickPages)
+      if (!quick->ApplySettings(next)) {
+        auto view = quick->View();
+        quick->Restore();
+        quick = std::make_unique<QuickPage>(view, window);
+      }
+    appliedSettings = std::move(next);
+    Wh_Log(L"Applied settings to %zu Quick Settings views and %zu Sound pages",
+           quickPages.size(), pages.size());
   }
   void Stop() {
     if (timer) {
@@ -600,6 +618,20 @@ inline void CALLBACK PanelShown(HWINEVENTHOOK, DWORD, HWND handle, LONG object, 
   // This is only the visibility handle. EnsureVolumePulse owns pulseWindow.
   runtime->window = handle;
   runtime->Wake();
+}
+inline void RefreshHostSettings() {
+  std::vector<HWND> windows;
+  {
+    std::lock_guard lock(runtimesMutex);
+    for (auto const &[thread, state] : runtimes)
+      if (auto handle = ThreadWindow(thread))
+        windows.push_back(handle);
+  }
+  for (auto window : windows)
+    Dispatch(window, [] {
+      if (runtime)
+        runtime->Wake();
+    });
 }
 inline void StopBridge() {
   std::vector<std::pair<DWORD, Runtime *>> copy;
