@@ -6,7 +6,7 @@
 *.pdb
 __pycache__/
 .DS_Store
-tools/*.csv
+Tools/*.csv
 
 # Local preview capture takes; the mouse script JSON can be committed.
-tools/demo/local/
+Tools/Demo/Local/

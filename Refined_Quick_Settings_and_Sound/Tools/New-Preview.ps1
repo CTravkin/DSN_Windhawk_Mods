@@ -6,8 +6,9 @@ Requires FFmpeg, Python 3 and Pillow. F9 during movement aborts.
 [CmdletBinding()]
 param([string]$Output='')
 $ErrorActionPreference='Stop'
-if(!$Output){$Output=Join-Path $PSScriptRoot '..\docs\assets\preview.gif'}
-$takeDir=Join-Path $PSScriptRoot 'demo\local'
+$defaultOutput=!$Output
+if($defaultOutput){$Output=Join-Path $PSScriptRoot '..\Assets\Previews\Dark_Preview.gif'}
+$takeDir=Join-Path $PSScriptRoot 'Demo\Local'
 New-Item -ItemType Directory -Force -Path $takeDir,(Split-Path -Parent $Output) | Out-Null
 & python -c 'from PIL import Image'
 if($LASTEXITCODE){throw 'Python 3 with Pillow is required'}
@@ -101,11 +102,13 @@ try {
 if($p.ExitCode){throw "Capture failed: $($p.ExitCode)"}
 Write-Output ('VIDEO SAVED: '+$video)
 
-& python (Join-Path $PSScriptRoot 'demo\render-cursor.py') $takeDir
+& python (Join-Path $PSScriptRoot 'Demo\render_cursor.py') $takeDir
 if($LASTEXITCODE){throw 'Cursor rendering failed'}
-& python (Join-Path $PSScriptRoot 'demo\encode-hq-gif.py') $takeDir $Output
+& python (Join-Path $PSScriptRoot 'Demo\encode_hq_gif.py') $takeDir $Output
 if($LASTEXITCODE){throw 'GIF encoding failed'}
-$webp=[IO.Path]::ChangeExtension($Output,$null).TrimEnd('.')+'-lossless.webp'
+$webp=if($defaultOutput){[IO.Path]::ChangeExtension($Output,'.webp')}else{
+ [IO.Path]::ChangeExtension($Output,$null).TrimEnd('.')+'-lossless.webp'
+}
 & $ffmpeg -hide_banner -loglevel error -y -i (Join-Path $takeDir 'presentation-final.mkv') -c:v libwebp_anim -lossless 1 -compression_level 4 -q:v 100 -loop 0 $webp
 if($LASTEXITCODE){throw 'WebP encoding failed'}
 Write-Host ('GIF saved: '+$Output) -ForegroundColor Green

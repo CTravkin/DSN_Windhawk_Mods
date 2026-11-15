@@ -1,12 +1,18 @@
 # Refined Quick Settings and Sound
 
-[English](../README.md)
+[English](README.md)
 
 Этот «vanilla+» мод для Windhawk перерабатывает панели «Быстрые настройки» и «Микшер громкости» Windows 11 и делает их пригодными для ежедневного использования. Он следует языку дизайна Windows 11, дорабатывая существующие функции и добавляя новые: тонкие ползунки, ровный шаг рядов при любом масштабе экрана и плавный переход рамки к странице «Звук».
 
 Мод работает внутри панелей оболочки (ShellHost). Системный акрил, шрифты, темы и анимации сохраняются, а изменения оформления откатываются при выгрузке мода.
 
 Эта версия основана на [оригинальном моде HeyOkay](https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/Previews/Dark_Preview.webp">
+  <source media="(prefers-color-scheme: light)" srcset="Assets/Previews/Light_Preview.webp">
+  <img alt="Панели «Быстрые настройки» и «Звук» с микшером громкости" src="Assets/Previews/Dark_Preview.gif">
+</picture>
 
 ## Возможности
 
@@ -36,7 +42,7 @@
 
 При штатном обновлении с 0.4.0 Windhawk включает все новые переключатели иконок. Прежний выбор можно перенести в новые переключатели вручную.
 
-Идентификатор мода — `refined-quick-settings-and-sound`. Версия указана в `mod/sound-native.wh.cpp`.
+Идентификатор мода — `refined-quick-settings-and-sound`. Версия указана в `Mod/Source/sound-native.cpp`.
 
 ## Совместимость
 
@@ -49,23 +55,25 @@ Windows 11 24H2 и новее с быстрыми настройками в Shel
 ## Установка из исходника
 
 1. Установите [Windhawk](https://windhawk.net/).
-2. Откройте [единый файл исходника](../mod/dist/refined-quick-settings-and-sound.wh.cpp).
+2. Откройте [единый файл исходника](Mod/refined-quick-settings-and-sound.wh.cpp).
 3. Отключите оригинальный Refined Quick Settings and Sound. Создайте новый мод в Windhawk, замените шаблон исходником, скомпилируйте и включите мод.
 4. Если панели не обновились, перезапустите ShellHost. Диагностические ошибки доступны в журнале Windhawk.
 
 Готовая DLL не требуется. Быстрые настройки открываются через Win+A, Sound — через Win+Ctrl+V или значок громкости в трее.
 
+Запись анимации описана в [инструкции по записи превью](Preview.ru.md).
+
 ## Сборка
 
-Нужны Python 3 и установленный Windhawk (`build.ps1` использует `C:/Program Files/Windhawk/Compiler` и Engine 1.7.3; при другой установке поправьте пути).
+Запускайте из каталога мода. Нужны Python 3 в `PATH` и установленный Windhawk. `Build-Mod.ps1` использует `C:/Program Files/Windhawk/Compiler` и Engine 1.7.3.
 
 ```powershell
-cd mod
-.\build.ps1
+.\Tools\Build-Mod.ps1
+.\Tests\Test-Model.ps1
 ```
 
-`build.ps1` запускает `package.py`, который собирает единый исходник в `mod/dist/` из файлов в `mod/`. Проверка интерфейсов свойств запускается через `mod/test-model.ps1`. Для замера времени открытия панелей используется `tools/measure-panel-open.ps1`.
+`Build-Mod.ps1` запускает `package_mod.py`, который собирает единый исходник в `Mod/` из файлов в `Mod/Source/`. DLL сохраняется в `Builds/Refined_Quick_Settings_and_Sound/` в корне репозитория. Для замера времени открытия панелей используется `Tools/Measure-PanelOpen.ps1`.
 
 ## Лицензии
 
-Мод распространяется по [GPL-3.0-only](../LICENSE). Подход к диспетчеризации в UI-поток основан на Notification Center Styler от m417z (GPL-3.0); парсер скрытых приложений адаптирован из мода Sound Output Direct and Taller. Значки Lucide — под лицензией ISC, см. `mod/LUCIDE-LICENSE.txt`.
+Мод распространяется по [GPL-3.0-only](LICENSE). Подход к диспетчеризации в UI-поток основан на Notification Center Styler от m417z (GPL-3.0); парсер скрытых приложений адаптирован из мода Sound Output Direct and Taller. Значки Lucide — под лицензией ISC, см. [сторонние лицензии](THIRD-PARTY-NOTICES.md) и `Mod/LUCIDE-LICENSE.txt`.

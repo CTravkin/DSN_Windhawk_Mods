@@ -1,12 +1,18 @@
 # Refined Quick Settings and Sound
 
-[Русский](docs/README.ru.md)
+[Русский](README.ru.md)
 
 This "vanilla+" Windhawk mod reworks the Windows 11 "Quick Settings" and "Volume mixer" panels and makes them fit for daily use. It follows the Windows 11 design language, refining existing features and adding new ones: thin sliders, even row spacing at every display scale and a smooth frame transition to the Sound page.
 
 Everything runs inside the shell's own panels (ShellHost): no extra windows, the system Acrylic, fonts, themes, lists, bindings and animations are kept, and customizations are restored when the mod is unloaded.
 
 This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/Previews/Dark_Preview.webp">
+  <source media="(prefers-color-scheme: light)" srcset="Assets/Previews/Light_Preview.webp">
+  <img alt="Quick Settings and Sound panels with the volume mixer in use" src="Assets/Previews/Dark_Preview.gif">
+</picture>
 
 ## Features
 
@@ -36,7 +42,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 
 When Windhawk adds the icon switches during a standard upgrade from 0.4.0, it starts them enabled. Apply any previous icon choices to the new switches.
 
-Mod ID: `refined-quick-settings-and-sound`. The version is in `mod/sound-native.wh.cpp`.
+Mod ID: `refined-quick-settings-and-sound`. The version is in `Mod/Source/sound-native.cpp`.
 
 ## Compatibility
 
@@ -49,25 +55,25 @@ Control Center discovery uses COM-interface symbol hooks in ControlCenter.dll an
 ## Installation from source
 
 1. Install [Windhawk](https://windhawk.net/).
-2. Open [the standalone source](mod/dist/refined-quick-settings-and-sound.wh.cpp).
+2. Open [the standalone source](Mod/refined-quick-settings-and-sound.wh.cpp).
 3. Disable the original Refined Quick Settings and Sound. Create a new mod in Windhawk, replace the template with the standalone source, then compile and enable it.
 4. If the panels do not update, restart ShellHost. Windhawk logs contain diagnostic errors.
 
 No prebuilt DLL is required. Open Quick Settings with Win+A and Sound with Win+Ctrl+V or the taskbar volume icon.
 
-The repeatable mouse demo recorder is documented in [docs/PREVIEW.ru.md](docs/PREVIEW.ru.md).
+See the [preview recording guide](Preview.ru.md) to reproduce the demo.
 
 ## Building
 
-Requires Python 3 and an installed Windhawk (`build.ps1` uses `C:/Program Files/Windhawk/Compiler` and Engine 1.7.3; adjust the paths for another installation).
+Run from this mod directory with Python 3 on `PATH` and Windhawk installed. `Build-Mod.ps1` uses `C:/Program Files/Windhawk/Compiler` and Engine 1.7.3.
 
 ```powershell
-cd mod
-.\build.ps1
+.\Tools\Build-Mod.ps1
+.\Tests\Test-Model.ps1
 ```
 
-`build.ps1` first runs `package.py`, which assembles the standalone source in `mod/dist/` from the files in `mod/`. Run `mod/test-model.ps1` to check property access and `tools/measure-panel-open.ps1` to measure panel opening time.
+`Build-Mod.ps1` first runs `package_mod.py`, which assembles the standalone source in `Mod/` from `Mod/Source/`. The DLL goes to `Builds/Refined_Quick_Settings_and_Sound/` at the repository root. Use `Tools/Measure-PanelOpen.ps1` to measure panel opening time.
 
 ## Licenses
 
-The mod is [GPL-3.0-only](LICENSE). The UI-thread dispatch technique follows m417z's Notification Center Styler (GPL-3.0); the hidden-apps parser is adapted from the Sound Output Direct and Taller mod. Lucide icons are ISC licensed, see [third-party notices](docs/THIRD-PARTY-NOTICES.md) and `mod/LUCIDE-LICENSE.txt`.
+The mod is [GPL-3.0-only](LICENSE). The UI-thread dispatch technique follows m417z's Notification Center Styler (GPL-3.0); the hidden-apps parser is adapted from the Sound Output Direct and Taller mod. Lucide icons are ISC licensed, see [third-party notices](THIRD-PARTY-NOTICES.md) and `Mod/LUCIDE-LICENSE.txt`.

@@ -8,8 +8,8 @@
                (slide-in animation and late content included)
 
   Usage (normal PowerShell window, the panel opens on the primary monitor):
-    powershell -ExecutionPolicy Bypass -File tools\measure-panel-open.ps1 -Panel Quick
-    powershell -ExecutionPolicy Bypass -File tools\measure-panel-open.ps1 -Panel Sound -Runs 30
+    powershell -ExecutionPolicy Bypass -File Tools\Measure-PanelOpen.ps1 -Panel Quick
+    powershell -ExecutionPolicy Bypass -File Tools\Measure-PanelOpen.ps1 -Panel Sound -Runs 30
     ... -RestartShellHost   restart ShellHost first (AGENTS.md: do it before every timing series)
 
   Panel: Quick = Win+A (Quick Settings), Sound = Win+Ctrl+V (Sound page).

@@ -14,21 +14,21 @@ param(
     [string]$Ffmpeg='ffmpeg'
 )
 $ErrorActionPreference='Stop'
-if(!$Profile){$Profile=Join-Path $PSScriptRoot 'demo\mouse-script.json'}
-if(!$Output){$Output=Join-Path $PSScriptRoot '..\docs\assets\preview.gif'}
+if(!$Profile){$Profile=Join-Path $PSScriptRoot 'Demo\MouseScript.json'}
+if(!$Output){$Output=Join-Path $PSScriptRoot '..\Assets\Previews\Dark_Preview.gif'}
 # Replay needs the timeline created by a completed Record pass. Check before
 # loading the native helper or creating a capture process.
 if($Mode -eq 'Replay' -and !(Test-Path -LiteralPath $Profile -PathType Leaf)) {
     Write-Warning "No recorded mouse script found: $Profile"
     Write-Host 'First run Record, demonstrate the mod with the mouse, and press F8 to save.'
     Write-Host ('cd "'+(Split-Path -Parent $PSScriptRoot)+'"')
-    Write-Host '.\tools\capture-preview.ps1 -Mode Record' -ForegroundColor Cyan
+    Write-Host '.\Tools\Capture-Preview.ps1 -Mode Record' -ForegroundColor Cyan
     Write-Host 'After the message "Mouse script saved", restore the initial UI state and run Replay.'
     return
 }
 $ffmpegCommand=Get-Command $Ffmpeg -ErrorAction Stop
 $ffmpegPath=$ffmpegCommand.Source
-$sessionDir=Join-Path $PSScriptRoot 'demo\local'
+$sessionDir=Join-Path $PSScriptRoot 'Demo\Local'
 New-Item -ItemType Directory -Force -Path $sessionDir | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Profile) | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Output) | Out-Null
@@ -52,7 +52,7 @@ if($Mode -eq 'Encode') {
     return
 }
 if(-not ('DemoMouse' -as [type])) {
-    Add-Type -TypeDefinition (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'demo\MouseDemo.cs') -Raw)
+    Add-Type -TypeDefinition (Get-Content -LiteralPath (Join-Path $PSScriptRoot 'Demo\MouseDemo.cs') -Raw)
 }
 [DemoMouse]::Init()
 function Screen-Geometry {
