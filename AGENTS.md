@@ -1,20 +1,95 @@
-# DSN Windhawk Mods
+---
+project: "Windhawk"
+type: "Guide"
+summary: "Development, native Windows verification, and delivery of DSN Windhawk mods."
+updated: 2026-11-15
+incoming: false
+---
+# Windhawk
 
-Keep root READMEs to a short description and an index of mods, following DSN Tools. Keep versioning and publication conventions here.
+## Project
 
-Use impersonal wording in user-facing documentation and interface text. Use formal address in Russian where direct address is necessary.
+### Purpose
 
-Use `Mod/` for a mod's source and `Tests/` for its checks. Keep local builds under the ignored repository `Builds/<mod directory>/`, using the display name, version and build number in artifact names.
+Develop and maintain Windhawk mods, verify them in the native Windows shell,
+and prepare updates for the appropriate upstream repository or catalog.
 
-## Versioning
+### Structure
 
-- Each mod has an independent version and build number. The mod's `.wh.cpp` records the version in Windhawk's numeric `@version X.Y.Z` field and the positive integer build in a `// Build: N` comment immediately after the metadata block.
-- Increase `N` once per source revision of that mod. For a new capability increment `Y`; for a fix increment `Z`. The owner assigns `X`. Keep `N` increasing across version changes.
-- Documentation-only edits, repository reorganization without mod changes, and unchanged rebuilds keep the same version and build.
-- Use `X.Y.Z (N)` at the start of a commit message that changes the mod version.
+The project root is the Git root of `CTravkin/DSN_Windhawk_Mods`. The mod
+directories are [Explorer Item Pins](Explorer_Item_Pins/README.md),
+[Windows Border Switch](Windows_Border_Switch/README.md), and
+[Refined Quick Settings and Sound](Refined_Quick_Settings_and_Sound/README.md).
+Each mod owns its source under `Mod/`, checks under `Tests/`, and any shipped
+tools, assets, and documentation. Root READMEs describe the repository and index
+the mods. Mod-specific features and limitations belong in each mod's README and
+catalog description.
 
-## Publication
+## Files
 
-Maintain the sources in this repository. Submit original DSN mods and their updates to the Windhawk catalog through a pull request containing the standalone `mods/<mod-id>.wh.cpp` file.
+### Storage
 
-Refined Quick Settings and Sound is a GPL-3.0-only subtree with separate third-party notices. Keep the upstream title, ID and GitHub profile. Propose changes to HeyOkay in the upstream source repository. The upstream author handles any catalog update.
+Local materials use `Work/` for epics, `Dev/` for implementation and handoffs,
+`QA/` for verification, `Review/` for engineering reviews, `Ops/` for operations,
+and `Backups/` for recovery. Use their registers and the `Windhawk.base` view in
+the shared Projects Obsidian vault. Use `Local/` for private development state
+and `Builds/<mod directory>/` for ignored build output. Name artifacts with the
+display name, version, build number, and architecture where needed.
+
+### Git
+
+Use the existing `origin` for DSN sources. Preserve independent mod versioning.
+Keep local materials, install backups, and generated binaries outside commits.
+Before changing branches or publishing, verify the exact target and its head.
+Public source changes, catalog submissions, and changes proposed to a third-party
+upstream have distinct histories and release targets.
+
+## Work
+
+### Versioning
+
+- Record `@version X.Y.Z` in the Windhawk metadata block and `// Build: N`
+  immediately after it. Increase `N` once per source revision.
+- Increment `Y` for a capability and `Z` for a fix. The owner assigns `X`.
+  Documentation, moves, and rebuilding unchanged source keep the version and build.
+- Start version-changing commit messages with `X.Y.Z (N)`.
+- For Refined Quick Settings and Sound, edit the maintained inputs under
+  `Mod/Source/`, regenerate the standalone `.wh.cpp` with the mod's packaging
+  tool, and verify the export and GPL-3.0-only subtree notices.
+
+### Local environment
+
+- On Constantine's Windows machine, elevation is authorized for in-scope Windhawk
+  engine, registry, service, and affected system-process work. Request scoped
+  sandbox escalation when access is required. Use the native elevated Windows
+  context where Windows access checks require it. Keep operations scoped to the
+  affected mod and related host processes.
+- After successfully building a new usable mod version, install it in the system
+  Windhawk on this machine in the same task by default. Follow any explicit
+  instruction to skip installation or use an isolated environment. Build-only
+  harnesses and disposable diagnostics are not installable mod versions.
+- Identify the installed mod ID, version, architecture, and enabled state before
+  updating. Preserve the active settings, applicable persistent data, and a
+  recoverable copy of the previous source, DLL, and settings. Use the system
+  Windhawk editor or the established native installation path for that mod.
+- Verify the installed source and registered DLL match the intended build, then
+  check that the target process loads it and exercise the changed behavior where
+  possible. Record any unobserved architecture or shell surface. If the update
+  fails, recover the prior working installation and report the outcome.
+
+### Publication
+
+- Submit original DSN mods and their updates through a catalog PR containing
+  exactly one standalone `mods/<mod-id>.wh.cpp` file. See the
+  [catalog submission rules](https://github.com/ramensoftware/windhawk-mods#submitting-a-new-mod).
+- Preserve the upstream title, ID, GitHub profile, separate third-party notices,
+  and GPL-3.0-only terms for Refined Quick Settings and Sound. Propose changes in
+  HeyOkay's upstream source repository. The upstream author owns catalog updates.
+- Never name the AI model, add a generated-by signature, or include model metadata
+  in external comments, pull requests, issues, review replies, or commit text.
+  When an upstream requires model disclosure for AI-generated text, give
+  Constantine the technical findings for his own reply and leave submission to him.
+  Keep a project's required notices and existing authorship intact.
+- Use neutral wording in public documentation and UI. If Russian copy requires
+  direct address, use formal forms. Use `е` in external Russian text and omit the
+  final period in short standalone labels and hints.

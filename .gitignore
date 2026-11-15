@@ -1,1 +1,16 @@
 /Builds/
+
+# Local project material
+/Windhawk.base
+/Work/
+/Dev/
+/QA/
+/Review/
+/Ops/
+/Backups/
+/Docs/
+/Local/
+/Tools/
+/Output/
+/desktop.ini
+/AGENTS.override.md
