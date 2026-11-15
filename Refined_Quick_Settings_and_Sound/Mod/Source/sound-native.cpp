@@ -99,7 +99,6 @@ in this source file.
 ## Links
 
 - [Original mod by HeyOkay](https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound)
-- [Refined Quick Settings and Sound in DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Refined_Quick_Settings_and_Sound)
 - [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
