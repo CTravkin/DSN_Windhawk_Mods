@@ -27,64 +27,66 @@
 
 This "vanilla+" Windhawk mod reworks the Windows 11 "Quick Settings" and
 "Volume mixer" panels and makes them fit for daily use. It follows the
-Windows 11 design language, refining existing features and adding new ones:
-thin sliders, even row spacing at every display scale and a smooth frame
-transition to the Sound page.
+Windows 11 design language with thin sliders, even row spacing and a smooth
+frame transition to the Sound page.
 
-Everything runs inside the shell's own panels (ShellHost): no extra windows,
-the system Acrylic, fonts, themes, lists, bindings and animations are kept, and
-customizations are restored when the mod is unloaded.
+Everything runs inside the shell's own panels (ShellHost). The system Acrylic,
+fonts, themes, lists, bindings and animations are kept, and the original layout
+is restored when the mod is unloaded.
 
 ## Features
 
 **Quick Settings**
 
-- Display brightness defaults to Auto and can be disabled. Auto keeps the Windows slider or adds one for a display with a usable DDC/CI range.
-- The Settings row opens Windows Settings and can show up to five ordered shortcuts, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots, repeat choices and actions already visible in the brightness controls are skipped. Night light is available in the brightness row when it is shown.
-- Quick Settings can show one to four rows of tiles. Pages follow the number of available tiles. The row override is currently supported on Windows build 26300.9974.
+- **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
+- The DDC/CI brightness row has a shortcut to Display settings and a Night light button. The latter uses the native quick action when available and opens Night light settings otherwise.
+- Choose up to five **Additional shortcuts** to the right of **Settings**, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots and duplicate shortcuts are skipped. The Display shortcut is also skipped when the brightness row already has a Display button.
+- Set **Rows of tiles** to 1–4. Pages follow the number of available tiles. The override requires the ControlCenter build from Windows 26300.9974.
 
 **Sound**
 
 - The "Sound output" page is now simply "Sound".
 - Change the output and input devices and the spatial sound provider from
   dropdown lists.
-- Below them, a reworked Volume mixer for the apps. It is collapsible and
-  remembers its last state.
+- Below them is a reworked Volume mixer for the apps. It starts collapsed the first time Sound opens in each ShellHost process and remembers its state on subsequent openings.
 - Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
-- Hide apps from the mixer by name or executable, one app per row.
+- **Hide from the volume mixer** takes app names or executable names, one per row. Hidden apps keep playing audio.
 
 **Taskbar**
 
-- Enable Quick access to Sound to open Sound with a click on the taskbar volume icon.
-- Enable Middle-click to mute to toggle the sound without changing the volume level.
-- More sound settings in the volume icon menu opens the classic Sound Control Panel.
+- **Quick access to Sound** opens Sound with a click on the taskbar volume icon.
+- **Middle-click to mute** toggles sound from the volume icon and preserves the volume level. Off by default.
+- **More sound settings** in the volume icon menu opens the classic Sound Control Panel.
 - Device Manager is available in the network and battery icon menus.
-- The Alternative icons switches select the icon for each location.
+- **Alternative icons** includes the animated volume and wired network icons from the original mod. Each location has its own switch. Switching one off uses the Windows icon there.
 
-## Compatibility
+## Platforms
 
-- Windows 11 24H2 or later (Quick Settings hosted by ShellHost), x86-64
-  (ARM64 is untested).
-  Development testing: build 26300, primarily at 125% scale.
+- Windows 11 24H2 or later (Quick Settings hosted by ShellHost), x86-64.
+  The original mod was developed on build 26300, primarily at 125% scale.
 - Other Windows builds and display scales need validation. The mod depends on
   internal shell XAML elements and symbols which can change with Windows updates.
 - DDC/CI brightness requires a compatible monitor with DDC/CI enabled.
 - Added labels are available in English, Russian, Spanish, German, Brazilian Portuguese and Simplified Chinese.
-- The first Sound opening in each ShellHost process starts with the mixer
-  collapsed; subsequent openings remember its state.
 
-Control Center discovery uses COM-interface symbol hooks in ControlCenter.dll and the public XAML visual tree; it does not open a XAML Diagnostics connection. Compatibility with other mods that edit the same controls still requires live testing. If the panel was already open when enabling the mod, close and reopen it; restart ShellHost if it is not picked up.
+## Usage
 
-## Notes
+Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
 
-Disable other mods that change the Quick Settings, the Sound page or the
-taskbar volume icon before enabling this one. Errors are written to the
-Windhawk log.
+Disable other mods or styles that change the same controls. If the panels do not update after enabling the mod, close and reopen them. If needed, restart ShellHost and check the Windhawk log.
 
-## Credits and license
+## Updating from the Windhawk catalog version 0.1.154
 
-GPL-3.0-only. The UI-thread dispatch technique follows
+If **Hidden applications** was filled in before the update, move those entries before adding any new rows under **Hide from the volume mixer**.
+
+1. Open **Advanced** → **Mod settings**. In the **Load** menu, choose **Load formatted**.
+2. Replace the `hiddenApps` string with one indexed setting per entry. For example, `"hiddenApps": "iCloud; Example.exe"` becomes `"hiddenApplications[0]": "iCloud"` and `"hiddenApplications[1]": "Example.exe"`. If rows are already filled in, use the next free indices. Remove `hiddenApps` in the same edit and keep the other settings.
+3. Click **Save** and check that the entries appear under **Hide from the volume mixer** on the **Settings** tab.
+
+## Licenses
+
+[GPL-3.0-only](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Refined_Quick_Settings_and_Sound/LICENSE). The UI-thread dispatch technique follows
 [m417z's Notification Center Styler](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-11-notification-center-styler.wh.cpp)
 (GPL-3.0). ControlCenter.dll discovery uses the COM produce-interface pattern
 documented by [Per-monitor brightness](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/per-monitor-brightness.wh.cpp).
@@ -93,6 +95,12 @@ Sound Output Direct and Taller mod (GPL-3.0-only).
 The sliders-horizontal and ethernet-port icons are from
 [Lucide](https://lucide.dev/) (ISC); the license notice is included below
 in this source file.
+
+## Links
+
+- [Original mod by HeyOkay](https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound)
+- [Refined Quick Settings and Sound in DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Refined_Quick_Settings_and_Sound)
+- [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
 // ==WindhawkModSettings==
