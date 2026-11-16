@@ -10,8 +10,8 @@ autoscroll started by pressing the mouse wheel.
 The preview supports the native autoscroll cursors from Windows. The optional
 Office mode also recognizes the same pointer shapes in classic desktop Office
 apps, independent of Office cursor resource numbers. Resource matching has been
-checked with Excel from Office LTSC 2024 x64. Applications can also draw a
-separate stationary origin marker.
+checked with Excel from Office LTSC 2024 x64. Excel keeps its native starting
+marker, with the Windows scheme applied to recognized directional cursors.
 
 ## Features
 

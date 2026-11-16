@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.3.0
+// @version         0.3.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 3
+// Build: 4
 
 // ==WindhawkModReadme==
 /*
@@ -34,8 +34,8 @@ application. While scrolling, the scheme's Alternate select arrow points in the
 scroll direction.
 
 The Office option replaces recognized autoscroll cursors in the classic desktop
-Office applications. Diagonal smoothing is optional. An application can also
-draw a separate stationary origin marker.
+Office applications. Excel keeps its own starting marker. Diagonal smoothing
+is optional.
 */
 // ==/WindhawkModReadme==
 
@@ -98,8 +98,9 @@ struct ResourceMapping {
     WORD systemId;
 };
 
+constexpr PCWSTR kExcelProcess = L"excel.exe";
 constexpr std::array kOfficeProcesses = {
-    L"excel.exe", L"winword.exe", L"powerpnt.exe", L"outlook.exe",
+    kExcelProcess, L"winword.exe", L"powerpnt.exe", L"outlook.exe",
     L"onenote.exe", L"msaccess.exe", L"mspub.exe", L"visio.exe", L"winproj.exe",
 };
 
@@ -187,6 +188,7 @@ std::atomic<bool> g_replaceInOffice;
 bool g_smoothDiagonals;
 bool g_stopping;
 bool g_isOffice;
+bool g_isExcel;
 bool g_watchStarted;
 bool g_handlesReady;
 HKEY g_cursorsKey;
@@ -792,7 +794,11 @@ bool ReplacementEnabled() {
 
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
-        const size_t slot = ReplacementEnabled() ? IdentifyCursor(cursor) : kUnknownSlot;
+        size_t slot = ReplacementEnabled() ? IdentifyCursor(cursor) : kUnknownSlot;
+        // Excel draws its own origin marker underneath the neutral pointer.
+        if (g_isExcel && slot != kUnknownSlot && kMappings[slot].role == Role::Move) {
+            slot = kUnknownSlot;
+        }
         if (slot == kUnknownSlot && !g_needsCleanup.load()) {
             g_previousRole = Role::Count;
             return g_setCursorOriginal(cursor);
@@ -893,6 +899,7 @@ BOOL Wh_ModInit() {
         return FALSE;
     }
     const std::wstring_view path(processPath, pathLength);
+    g_isExcel = HasModuleName(path, kExcelProcess);
     g_isOffice = std::any_of(kOfficeProcesses.begin(), kOfficeProcesses.end(),
                            [&](PCWSTR name) { return HasModuleName(path, name); });
     g_needsRefresh.fill(true);
