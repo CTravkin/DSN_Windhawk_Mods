@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Apply the active Windows cursor scheme to recognized application pointers
 // @description:ru-RU Применяет активную схему Windows к распознанным указателям приложений
-// @version         0.7.0
+// @version         0.7.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -13,7 +13,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 11
+// Build: 12
 
 // ==WindhawkModReadme==
 /*
@@ -40,38 +40,52 @@ be smoothed in all eight directions.
   $name:ru-RU: Где подменять указатели
 - cursors:
     - autoscrollOrigin: true
-      $name: Autoscroll starting pointer
-      $name:ru-RU: Указатель в точке запуска автопрокрутки
-      $description: Shows the available scrolling axes
-      $description:ru-RU: Показывает доступные оси прокрутки
+      $name: Scroll origin
+      $name:ru-RU: Точка запуска
+      $description: Pointer shown at the starting point of autoscroll
+      $description:ru-RU: Указатель в точке запуска автопрокрутки
     - autoscrollArrows: true
-      $name: Autoscroll direction arrows
-      $name:ru-RU: Стрелки направления автопрокрутки
+      $name: Scroll arrows
+      $name:ru-RU: Стрелки прокрутки
+      $description: Arrows that indicate the autoscroll direction
+      $description:ru-RU: Стрелки направления автопрокрутки
     - link: true
-      $name: Link select
-      $name:ru-RU: Выбор ссылки
+      $name: Hand
+      $name:ru-RU: Рука
+      $description: Pointing hand over buttons, links, and other interactive elements
+      $description:ru-RU: Указательный палец над кнопками, ссылками и другими активными элементами
     - resize: true
-      $name: Resize panels, rows, and columns
-      $name:ru-RU: Изменение размеров панелей, строк и столбцов
+      $name: Resize
+      $name:ru-RU: Изменение размеров
+      $description: Resize panels, rows, and columns
+      $description:ru-RU: Изменение размеров панелей, строк и столбцов
     - marginSelection: true
-      $name: Text selection from the page margin
-      $name:ru-RU: Выделение текста с поля страницы
+      $name: Margin selection
+      $name:ru-RU: Выделение с поля
+      $description: Arrow for selecting text from the page margin
+      $description:ru-RU: Стрелка выделения текста со стороны поля страницы
     - downSelection: true
-      $name: Downward selection arrow
-      $name:ru-RU: Стрелка выделения вниз
+      $name: Down arrow
+      $name:ru-RU: Стрелка вниз
+      $description: Downward arrow used for selection
+      $description:ru-RU: Направленная вниз стрелка выделения
     - cell: true
-      $name: Cell selection
-      $name:ru-RU: Выделение ячеек
+      $name: Cell cross
+      $name:ru-RU: Крестик ячейки
+      $description: Cross-shaped pointer for selecting cells in web tables
+      $description:ru-RU: Указатель в виде крестика для выбора ячеек в веб-таблицах
     - verticalText: true
       $name: Vertical text
       $name:ru-RU: Вертикальный текст
+      $description: Horizontal text pointer for vertically written text
+      $description:ru-RU: Горизонтальный текстовый указатель для вертикального текста
   $name: Which pointers to replace
   $name:ru-RU: Какие указатели подменять
 - smoothDiagonals: true
-  $name: Smooth autoscroll arrows
-  $name:ru-RU: Сглаживание стрелок автопрокрутки
-  $description: Smooth arrow edges with partially transparent pixels in all eight directions
-  $description:ru-RU: Сглаживание краев стрелок полупрозрачными пикселями во всех восьми направлениях
+  $name: Smoothing
+  $name:ru-RU: Сглаживание
+  $description: Smooth the edges of autoscroll arrows in all eight directions
+  $description:ru-RU: Сглаживание краев стрелок автопрокрутки во всех восьми направлениях
 */
 // ==/WindhawkModSettings==
 
@@ -272,6 +286,27 @@ constexpr std::array kOfficeShapes = {
     std::pair{kVerticalResizeId, CursorShape{15, 17, {
         0x80, 0x1c0, 0x3e0, 0x7f0, 0x7f0, 0x1c0, 0x7fff, 0x7fff,
         0x0, 0x7fff, 0x7fff, 0x1c0, 0x7f0, 0x7f0, 0x3e0, 0x1c0, 0x80,
+    }}},
+    // Worksheet headers have variants with different separator thicknesses.
+    std::pair{kHorizontalResizeId, CursorShape{18, 18, {
+        0x780, 0x780, 0x780, 0x780, 0x780, 0x6798, 0xe79c, 0x1fffe,
+        0x3ffff, 0x3ffff, 0x1fffe, 0xe79c, 0x6798, 0x780, 0x780, 0x780,
+        0x780, 0x780,
+    }}},
+    std::pair{kVerticalResizeId, CursorShape{18, 18, {
+        0x300, 0x780, 0xfc0, 0x1fe0, 0x1fe0, 0x780, 0x780, 0x3ffff,
+        0x3ffff, 0x3ffff, 0x3ffff, 0x780, 0x780, 0x1fe0, 0x1fe0, 0xfc0,
+        0x780, 0x300,
+    }}},
+    std::pair{kHorizontalResizeId, CursorShape{18, 18, {
+        0xfc0, 0xfc0, 0xfc0, 0xfc0, 0xfc0, 0x6fd8, 0xefdc, 0x1fffe,
+        0x3ffff, 0x3ffff, 0x1fffe, 0xefdc, 0x6fd8, 0xfc0, 0xfc0, 0xfc0,
+        0xfc0, 0xfc0,
+    }}},
+    std::pair{kVerticalResizeId, CursorShape{18, 18, {
+        0x300, 0x780, 0xfc0, 0x1fe0, 0x1fe0, 0x780, 0x3ffff, 0x3ffff,
+        0x3ffff, 0x3ffff, 0x3ffff, 0x3ffff, 0x780, 0x1fe0, 0x1fe0, 0xfc0,
+        0x780, 0x300,
     }}},
 };
 

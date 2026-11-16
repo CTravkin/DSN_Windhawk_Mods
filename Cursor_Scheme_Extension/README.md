@@ -26,7 +26,7 @@ Windows scheme to the pointer at the start and during autoscroll.
   direction. Optional smoothing applies in all eight directions. Monochrome
   effects that invert the background keep their original pixel rendering.
 - Panel, row, and column dividers use the corresponding Resize roles.
-- In Office, the link pointer uses Link select, margin selection mirrors Normal
+- In Office, the pointing hand uses Link select, margin selection mirrors Normal
   select, and the downward selection arrow rotates Alternate select.
 - In Chromium and Electron, cell selection uses Precision select and the
   vertical text pointer rotates Text select. Transforms preserve the hotspot.
@@ -51,7 +51,7 @@ types under **Which pointers to replace**. Chromium and Electron and all pointer
 types are on by default. Classic Office is opt-in. Windows and Common Controls
 autoscroll follow the two autoscroll type switches.
 
-**Smooth autoscroll arrows** is on by default and applies to the eight
+**Smoothing** is on by default and applies to the eight autoscroll
 directional arrows. Change the cursor scheme and pointer roles in Windows.
 
 When upgrading from 0.6.x in the Windhawk editor, review the two application
