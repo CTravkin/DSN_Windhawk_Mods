@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.3.1
+// @version         0.4.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 4
+// Build: 5
 
 // ==WindhawkModReadme==
 /*
@@ -34,8 +34,8 @@ application. While scrolling, the scheme's Alternate select arrow points in the
 scroll direction.
 
 The Office option replaces recognized autoscroll cursors in the classic desktop
-Office applications. Excel keeps its own starting marker. Diagonal smoothing
-is optional.
+Office applications. Excel also uses the scheme's Move pointer for recognized
+starting markers. Diagonal smoothing is optional.
 */
 // ==/WindhawkModReadme==
 
@@ -195,8 +195,13 @@ HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
+using OfficeLoadBitmap = HBITMAP(WINAPI*)(HMODULE, WORD);
+OfficeLoadBitmap g_officeLoadBitmapOriginal;
+std::atomic<bool> g_excelBitmapHookPending;
+thread_local HCURSOR g_excelNeutralCursor;
+thread_local HCURSOR g_excelExitCursor;
 
-size_t SystemSlot(WORD id) {
+constexpr size_t SystemSlot(WORD id) {
     for (size_t i = 0; i < kMappings.size(); ++i) {
         if (kMappings[i].systemId == id) {
             return i;
@@ -792,12 +797,183 @@ bool ReplacementEnabled() {
     return !g_isOffice || g_replaceInOffice.load(std::memory_order_acquire);
 }
 
+bool IsExcelMarkerResource(HMODULE module, WORD id) {
+    // The Excel graphics DLL packs the same marker at three DPI sizes.
+    constexpr struct {
+        WORD id;
+        DWORD size;
+        uint64_t hash;
+    } markers[] = {
+        {365, 136, 0xb36b32c450eb710c},
+        {1989, 452, 0x2bc2f0d09d3303d1},
+        {1990, 737, 0xe85c7048c3735c62},
+    };
+    for (const auto& marker : markers) {
+        if (id != marker.id) {
+            continue;
+        }
+        HRSRC resource = FindResourceW(module, MAKEINTRESOURCEW(id),
+                                       MAKEINTRESOURCEW(998));
+        if (!resource || SizeofResource(module, resource) != marker.size) {
+            return false;
+        }
+        const auto* data = static_cast<const BYTE*>(LockResource(LoadResource(module, resource)));
+        if (!data) {
+            return false;
+        }
+        uint64_t hash = 0xcbf29ce484222325;
+        for (DWORD i = 0; i < marker.size; ++i) {
+            hash = (hash ^ data[i]) * 0x100000001b3;
+        }
+        return hash == marker.hash;
+    }
+    return false;
+}
+
+HBITMAP MakeExcelMarker(HBITMAP original) {
+    BITMAP bounds{};
+    if (!GetObjectW(original, sizeof(bounds), &bounds) ||
+        bounds.bmWidth < 2 || bounds.bmWidth > 64 ||
+        bounds.bmHeight < 2 || bounds.bmHeight > 64) {
+        return nullptr;
+    }
+    const auto image = ReadCursor(LoadCursorW(nullptr, IDC_SIZEALL), true);
+    if (!image || image->diagonalPixels.empty()) {
+        return nullptr;
+    }
+    const int width = bounds.bmWidth;
+    const int height = bounds.bmHeight;
+    const int centerX = width / 2;
+    const int centerY = height / 2;
+    // Excel centers the bitmap on the click and reads it back as a bottom-up DIB.
+    const double scale = (std::min)({1.0,
+        double(centerX) / (std::max)(image->hotX, image->width - image->hotX),
+        double(centerY) / (std::max)(image->hotY, image->height - image->hotY)});
+    auto info = ColorBitmapInfo(width, height);
+    info.bmiHeader.biHeight = height;
+    void* bits = nullptr;
+    HBITMAP bitmap = CreateDIBSection(nullptr, &info, DIB_RGB_COLORS, &bits, nullptr, 0);
+    if (!bitmap) {
+        return nullptr;
+    }
+    auto* pixels = static_cast<uint32_t*>(bits);
+    std::fill_n(pixels, size_t(width) * height, 0);
+    for (int y = 0; y < height; ++y) {
+        const int sy = image->hotY + static_cast<int>(std::lround((y - centerY) / scale));
+        if (sy < 0 || sy >= image->height) {
+            continue;
+        }
+        auto* row = pixels + size_t(height - 1 - y) * width;
+        for (int x = 0; x < width; ++x) {
+            const int sx = image->hotX + static_cast<int>(std::lround((x - centerX) / scale));
+            if (sx >= 0 && sx < image->width) {
+                row[x] = image->diagonalPixels[size_t(sy) * image->width + sx];
+            }
+        }
+    }
+    return bitmap;
+}
+
+HBITMAP WINAPI OfficeLoadBitmapHook(HMODULE module, WORD id) {
+    HBITMAP original = g_officeLoadBitmapOriginal(module, id);
+    if (!original || !ReplacementEnabled() || !IsExcelMarkerResource(module, id)) {
+        return original;
+    }
+    g_excelNeutralCursor = nullptr;
+    HMODULE excel = GetModuleHandleW(nullptr);
+    HCURSOR neutral = LoadCursorW(excel, MAKEINTRESOURCEW(256));
+    HCURSOR exit = LoadCursorW(excel, MAKEINTRESOURCEW(257));
+    if (!neutral || !exit) {
+        return original;
+    }
+    try {
+        if (HBITMAP replacement = MakeExcelMarker(original)) {
+            if (DeleteObject(original)) {
+                g_excelNeutralCursor = neutral;
+                g_excelExitCursor = exit;
+                return replacement;
+            }
+            DeleteObject(replacement);
+        }
+    } catch (...) {
+        // Excel still owns the original marker.
+    }
+    return original;
+}
+
+void TryHookExcelBitmapLoader(bool applyNow) {
+    constexpr PCWSTR moduleName = L"Mso30win32client.dll";
+#if defined(__x86_64__)
+    constexpr WORD ordinal = 35939;
+    constexpr BYTE prefix[] = {0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89, 0x74,
+                               0x24, 0x10, 0x57, 0x48, 0x83, 0xec, 0x40, 0x45,
+                               0x33, 0xc9, 0x45, 0x33, 0xc0, 0xe8};
+    constexpr size_t bodyOffset = 0x37;
+    constexpr BYTE body[] = {0x66, 0x44, 0x39, 0x43, 0x0e, 0x75, 0x40, 0x8b,
+                             0x53, 0x08, 0x45, 0x8b, 0xc8, 0x8b, 0x4b, 0x04};
+#elif defined(__i386__)
+    constexpr WORD ordinal = 61718;
+    constexpr BYTE prefix[] = {0x55, 0x8b, 0xec, 0x53, 0x56, 0x33, 0xdb, 0x53,
+                               0x53, 0xff, 0x75, 0x0c, 0xff, 0x75, 0x08, 0xe8};
+    constexpr size_t bodyOffset = 0x78;
+    constexpr BYTE body[] = {0x8b, 0xc3, 0x5f, 0x5e, 0x5b, 0x5d, 0xc2, 0x08, 0x00};
+#else
+    constexpr WORD ordinal = 0;
+    constexpr BYTE prefix[] = {0};
+    constexpr size_t bodyOffset = 0;
+    constexpr BYTE body[] = {0};
+#endif
+    if (!ordinal) {
+        g_excelBitmapHookPending.store(false, std::memory_order_relaxed);
+        return;
+    }
+    HMODULE module = GetModuleHandleW(moduleName);
+    if (!module || !g_excelBitmapHookPending.exchange(false)) {
+        return;
+    }
+    // Validate the private export before calling its trampoline with this ABI.
+    auto entry = GetProcAddress(module, MAKEINTRESOURCEA(ordinal));
+    std::array<BYTE, bodyOffset + sizeof(body)> bytes;
+    if (!entry || !ReadProcessMemory(GetCurrentProcess(), reinterpret_cast<const void*>(entry),
+                                     bytes.data(), bytes.size(), nullptr) ||
+        std::memcmp(bytes.data(), prefix, sizeof(prefix)) ||
+        std::memcmp(bytes.data() + bodyOffset, body, sizeof(body))) {
+        return;
+    }
+    if (WindhawkUtils::SetFunctionHook(reinterpret_cast<OfficeLoadBitmap>(entry),
+                                       OfficeLoadBitmapHook, &g_officeLoadBitmapOriginal) &&
+        applyNow) {
+        Wh_ApplyHookOperations();
+    }
+}
+
+HCURSOR MakeTransparentCursor() {
+    constexpr int size = 32;
+    std::array<BYTE, size * size / 8> andMask;
+    andMask.fill(0xff);
+    const std::array<BYTE, size * size / 8> xorMask{};
+    return CreateCursor(GetModuleHandleW(nullptr), 0, 0, size, size,
+                        andMask.data(), xorMask.data());
+}
+
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
-        size_t slot = ReplacementEnabled() ? IdentifyCursor(cursor) : kUnknownSlot;
-        // Excel draws its own origin marker underneath the neutral pointer.
-        if (g_isExcel && slot != kUnknownSlot && kMappings[slot].role == Role::Move) {
-            slot = kUnknownSlot;
+        const bool enabled = ReplacementEnabled();
+        if (enabled && g_excelBitmapHookPending.load(std::memory_order_relaxed)) {
+            TryHookExcelBitmapLoader(true);
+        }
+        if (g_excelNeutralCursor && cursor == g_excelExitCursor) {
+            g_excelNeutralCursor = nullptr;
+        }
+        const bool hideNeutral = enabled && cursor && cursor == g_excelNeutralCursor;
+        size_t slot = kUnknownSlot;
+        if (hideNeutral) {
+            slot = SystemSlot(32654);
+        } else if (enabled) {
+            slot = IdentifyCursor(cursor);
+            if (g_isExcel && slot != kUnknownSlot && kMappings[slot].role == Role::Move) {
+                slot = kUnknownSlot;
+            }
         }
         if (slot == kUnknownSlot && !g_needsCleanup.load()) {
             g_previousRole = Role::Count;
@@ -810,8 +986,10 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         if (slot != kUnknownSlot && !g_stopping && ReplacementEnabled()) {
             const auto& mapping = kMappings[slot];
             const size_t role = static_cast<size_t>(mapping.role);
-            CheckCursorSettings();
-            if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
+            if (!hideNeutral) {
+                CheckCursorSettings();
+            }
+            if (hideNeutral || (g_previousRole == mapping.role && !g_needsRefresh[role]) ||
                 RefreshSource(mapping.role)) {
                 auto& entry = g_replacements[slot];
                 if (entry.cursor && entry.original != cursor) {
@@ -819,10 +997,15 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
                     entry = {};
                 }
                 if (!entry.cursor) {
-                    const CursorImage& source = *g_sources[role];
-                    const HCURSOR replacement = mapping.eighthTurns
-                        ? MakeCursor(Rotate(source, mapping.eighthTurns))
-                        : MakeCursor(source);
+                    HCURSOR replacement;
+                    if (hideNeutral) {
+                        replacement = MakeTransparentCursor();
+                    } else {
+                        const CursorImage& source = *g_sources[role];
+                        replacement = mapping.eighthTurns
+                            ? MakeCursor(Rotate(source, mapping.eighthTurns))
+                            : MakeCursor(source);
+                    }
                     if (replacement) {
                         entry = {replacement, cursor};
                     }
@@ -900,6 +1083,7 @@ BOOL Wh_ModInit() {
     }
     const std::wstring_view path(processPath, pathLength);
     g_isExcel = HasModuleName(path, kExcelProcess);
+    g_excelBitmapHookPending.store(g_isExcel, std::memory_order_relaxed);
     g_isOffice = std::any_of(kOfficeProcesses.begin(), kOfficeProcesses.end(),
                            [&](PCWSTR name) { return HasModuleName(path, name); });
     g_needsRefresh.fill(true);
@@ -909,6 +1093,9 @@ BOOL Wh_ModInit() {
         CloseSettingsWatch();
         return FALSE;
     }
+    if (g_isExcel && ReplacementEnabled()) {
+        TryHookExcelBitmapLoader(false);
+    }
     return TRUE;
 }
 
@@ -917,6 +1104,7 @@ void Wh_ModSettingsChanged() {
 }
 
 void Wh_ModBeforeUninit() {
+    g_excelBitmapHookPending.store(false, std::memory_order_relaxed);
     try {
         std::vector<std::pair<DWORD, HWND>> windows;
         {
