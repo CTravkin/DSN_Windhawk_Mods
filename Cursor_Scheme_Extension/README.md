@@ -7,12 +7,14 @@ autoscroll started by pressing the mouse wheel.
 
 ## Status
 
-The preview supports the native autoscroll cursors from Windows. The optional
-Office mode also recognizes the same pointer shapes in classic desktop Office
-apps, independent of Office cursor resource numbers. Resource matching has been
-checked with Excel from Office LTSC 2024 x64. When the Excel bitmap loader and
-the marker resource are recognized, the starting marker uses the active
-scheme's Move pointer. Otherwise Excel displays its native marker.
+The preview supports the native autoscroll cursors from Windows, including the
+Common Controls Reader Mode. Chrome and Edge use a shared set of cursor images
+recognized independently of their resource numbers. The optional Office mode
+recognizes the Windows pointer shapes in classic desktop Office apps. Office
+resource matching has been checked with Excel from Office LTSC 2024 x64.
+
+Applications can draw a stationary starting marker themselves. Excel uses that
+marker with recognized directional cursors from the Windows scheme.
 
 ## Features
 
