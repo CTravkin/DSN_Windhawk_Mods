@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.4.1
+// @version         0.4.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 6
+// Build: 7
 
 // ==WindhawkModReadme==
 /*
@@ -175,6 +175,13 @@ struct CursorShape {
     bool operator==(const CursorShape&) const = default;
 };
 
+struct ExcelMarker {
+    HBITMAP bitmap = nullptr;
+    HCURSOR neutralCursor = nullptr;
+    HCURSOR exitCursor = nullptr;
+    bool painted = false;
+};
+
 std::array<HCURSOR, kMappings.size()> g_nativeCursors;
 std::array<CursorShape, kMappings.size()> g_referenceShapes;
 std::array<Replacement, kMappings.size()> g_replacements;
@@ -198,9 +205,9 @@ thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
 using OfficeLoadBitmap = HBITMAP(WINAPI*)(HMODULE, WORD);
 OfficeLoadBitmap g_officeLoadBitmapOriginal;
+decltype(&BitBlt) g_bitBltOriginal;
 std::atomic<bool> g_excelBitmapHookPending;
-thread_local HCURSOR g_excelNeutralCursor;
-thread_local HCURSOR g_excelExitCursor;
+thread_local ExcelMarker g_excelMarker;
 
 constexpr size_t SystemSlot(WORD id) {
     for (size_t i = 0; i < kMappings.size(); ++i) {
@@ -931,25 +938,50 @@ HBITMAP WINAPI OfficeLoadBitmapHook(HMODULE module, WORD id) {
         if (!IsExcelMarkerResource(module, id)) {
             return original;
         }
-        g_excelNeutralCursor = nullptr;
+        g_excelMarker = {};
         HMODULE excel = GetModuleHandleW(nullptr);
         HCURSOR neutral = LoadCursorW(excel, MAKEINTRESOURCEW(256));
         HCURSOR exit = LoadCursorW(excel, MAKEINTRESOURCEW(257));
-        if (!neutral || !exit) {
-            return original;
-        }
-        if (HBITMAP replacement = MakeExcelMarker(original)) {
-            if (DeleteObject(original)) {
-                g_excelNeutralCursor = neutral;
-                g_excelExitCursor = exit;
-                return replacement;
-            }
-            DeleteObject(replacement);
+        if (neutral && exit) {
+            g_excelMarker = {original, neutral, exit};
         }
     } catch (...) {
         // Excel still owns the original marker.
     }
     return original;
+}
+
+BOOL WINAPI BitBltHook(HDC destination, int x, int y, int width, int height,
+                       HDC source, int sourceX, int sourceY, DWORD operation) {
+    if (g_excelMarker.bitmap && operation == SRCCOPY && source && ReplacementEnabled() &&
+        width > 0 && width <= 64 && height > 0 && height <= 64 &&
+        GetCurrentObject(source, OBJ_BITMAP) == g_excelMarker.bitmap) {
+        g_excelMarker.painted = false;
+        try {
+            // Excel copies this bitmap without alpha. Blend the themed image on the same DC.
+            MemoryDc themed;
+            IconBitmaps bitmap;
+            bitmap.hbmColor = themed.value ? MakeExcelMarker(g_excelMarker.bitmap) : nullptr;
+            if (bitmap.hbmColor) {
+                HGDIOBJ previous = SelectObject(themed.value, bitmap.hbmColor);
+                if (previous && previous != HGDI_ERROR) {
+                    constexpr BLENDFUNCTION blend{AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+                    const bool drawn = GdiAlphaBlend(destination, x, y, width, height,
+                                                     themed.value, sourceX, sourceY,
+                                                     width, height, blend);
+                    SelectObject(themed.value, previous);
+                    if (drawn) {
+                        g_excelMarker.painted = true;
+                        return TRUE;
+                    }
+                }
+            }
+        } catch (...) {
+            // Excel can still draw its original bitmap.
+        }
+    }
+    return g_bitBltOriginal(destination, x, y, width, height, source, sourceX, sourceY,
+                            operation);
 }
 
 void TryHookExcelBitmapLoader(bool applyNow) {
@@ -1013,10 +1045,11 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         if (enabled && g_excelBitmapHookPending.load(std::memory_order_relaxed)) {
             TryHookExcelBitmapLoader(true);
         }
-        if (g_excelNeutralCursor && cursor == g_excelExitCursor) {
-            g_excelNeutralCursor = nullptr;
+        if (g_excelMarker.bitmap && cursor == g_excelMarker.exitCursor) {
+            g_excelMarker = {};
         }
-        const bool hideNeutral = enabled && cursor && cursor == g_excelNeutralCursor;
+        const bool hideNeutral = enabled && g_excelMarker.painted &&
+            cursor == g_excelMarker.neutralCursor;
         size_t slot = kUnknownSlot;
         if (hideNeutral) {
             slot = SystemSlot(32654);
@@ -1134,7 +1167,6 @@ BOOL Wh_ModInit() {
     }
     const std::wstring_view path(processPath, pathLength);
     g_isExcel = HasModuleName(path, kExcelProcess);
-    g_excelBitmapHookPending.store(g_isExcel, std::memory_order_relaxed);
     g_isOffice = std::any_of(kOfficeProcesses.begin(), kOfficeProcesses.end(),
                            [&](PCWSTR name) { return HasModuleName(path, name); });
     g_needsRefresh.fill(true);
@@ -1144,8 +1176,11 @@ BOOL Wh_ModInit() {
         CloseSettingsWatch();
         return FALSE;
     }
-    if (g_isExcel && ReplacementEnabled()) {
-        TryHookExcelBitmapLoader(false);
+    if (g_isExcel && WindhawkUtils::SetFunctionHook(BitBlt, BitBltHook, &g_bitBltOriginal)) {
+        g_excelBitmapHookPending.store(true, std::memory_order_relaxed);
+        if (ReplacementEnabled()) {
+            TryHookExcelBitmapLoader(false);
+        }
     }
     return TRUE;
 }
