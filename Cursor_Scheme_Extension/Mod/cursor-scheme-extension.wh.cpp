@@ -3,28 +3,17 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.5.0
+// @version         0.6.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
 // @license         MIT
-// @include         cursor-scheme-extension-preview.exe
-// @include         excel.exe
-// @include         winword.exe
-// @include         powerpnt.exe
-// @include         outlook.exe
-// @include         onenote.exe
-// @include         msaccess.exe
-// @include         mspub.exe
-// @include         visio.exe
-// @include         winproj.exe
-// @include         chrome.exe
-// @include         msedge.exe
+// @include         *
 // @architecture    x86
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 8
+// Build: 9
 
 // ==WindhawkModReadme==
 /*
@@ -35,10 +24,9 @@ the starting point, the pointer shows the scrolling axes indicated by the
 application. While scrolling, the scheme's Alternate select arrow points in the
 scroll direction.
 
-The mod also recognizes the native autoscroll pointer resources shared by
-Chrome and Edge. The Office option replaces recognized autoscroll cursors in
-classic desktop Office. Excel draws its starting marker. Diagonal smoothing is
-optional.
+The Chromium and Electron option recognizes shared autoscroll pointer images.
+The Office option also themes supported link and selection pointers in classic
+desktop Office. Arrow smoothing works in all eight scrolling directions.
 */
 // ==/WindhawkModReadme==
 
@@ -47,13 +35,18 @@ optional.
 - replaceInOffice: false
   $name: Replace cursors in Office
   $name:ru-RU: Замена указателей в Office
-  $description: Apply the Windows scheme to recognized autoscroll cursors in classic desktop Office apps
-  $description:ru-RU: Применение схемы Windows к распознанным указателям автопрокрутки в классических приложениях Office
+  $description: Apply the Windows scheme to recognized pointers in classic desktop Office
+  $description:ru-RU: Применение схемы Windows к распознанным указателям в классических приложениях Office
+- replaceInElectron: true
+  $name: Autoscroll in Chromium and Electron
+  $name:ru-RU: Автопрокрутка в Chromium и Electron
+  $description: Apply the Windows scheme to recognized pointers used for autoscroll
+  $description:ru-RU: Применение схемы Windows к распознанным указателям автопрокрутки
 - smoothDiagonals: true
-  $name: Smooth diagonal arrows
-  $name:ru-RU: Сглаживание диагональных стрелок
-  $description: Smooth edges with partially transparent pixels when rotating the arrow diagonally
-  $description:ru-RU: Сглаживание краев полупрозрачными пикселями при повороте стрелки по диагонали
+  $name: Smooth autoscroll arrows
+  $name:ru-RU: Сглаживание стрелок автопрокрутки
+  $description: Smooth arrow edges with partially transparent pixels in all eight directions
+  $description:ru-RU: Сглаживание краев стрелок полупрозрачными пикселями во всех восьми направлениях
 */
 // ==/WindhawkModSettings==
 
@@ -75,13 +68,19 @@ optional.
 
 namespace {
 
-enum class Role : size_t { Vertical, Horizontal, Move, Up, Count };
+enum class Role : size_t { Vertical, Horizontal, Move, Up, Arrow, Link, Count };
 
 struct CursorMapping {
     WORD systemId;
     Role role;
-    unsigned eighthTurns;
+    unsigned eighthTurns = 0;
+    bool mirror = false;
 };
+
+constexpr WORD kFirstAutoscrollId = 32652;
+constexpr WORD kLastAutoscrollId = 32662;
+constexpr WORD kArrowId = 32512;
+constexpr WORD kLinkId = 32649;
 
 constexpr std::array kMappings = {
     CursorMapping{32652, Role::Vertical, 0},
@@ -95,21 +94,14 @@ constexpr std::array kMappings = {
     CursorMapping{32660, Role::Up, 1},
     CursorMapping{32661, Role::Up, 5},
     CursorMapping{32662, Role::Up, 3},
+    CursorMapping{kArrowId, Role::Arrow, 0, true},
+    CursorMapping{kLinkId, Role::Link},
 };
 
 struct ResourceMapping {
     WORD id;
     WORD systemId;
 };
-
-constexpr PCWSTR kExcelProcess = L"excel.exe";
-constexpr std::array kOfficeProcesses = {
-    kExcelProcess, L"winword.exe", L"powerpnt.exe", L"outlook.exe",
-    L"onenote.exe", L"msaccess.exe", L"mspub.exe", L"visio.exe", L"winproj.exe",
-};
-
-constexpr std::array kChromiumProcesses = {L"chrome.exe", L"msedge.exe"};
-constexpr std::array kChromiumCursorModules = {L"chrome.dll", L"msedge.dll", L"msedge.exe"};
 
 constexpr std::array kCommonControlsResources = {
     ResourceMapping{109, 32652}, ResourceMapping{110, 32653},
@@ -125,7 +117,7 @@ struct CursorFingerprint {
     WORD systemId;
 };
 
-// Chrome and Edge package the same Windows cursor images under different IDs.
+// Chromium variants package the same Windows cursor images under different IDs.
 // Keep the color plane as well as the mask to distinguish the three idle states.
 constexpr std::array kChromiumCursors = {
     CursorFingerprint{0x357a05e1db72cda9, 32658},  // East
@@ -141,7 +133,9 @@ constexpr std::array kChromiumCursors = {
     CursorFingerprint{0x7ce71739ad53d0d5, 32657},  // West
 };
 
-const std::array kRoleIds = {IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW};
+const std::array kRoleIds = {
+    IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW, IDC_ARROW, IDC_HAND,
+};
 constexpr size_t kRoleCount = static_cast<size_t>(Role::Count);
 constexpr size_t kUnknownSlot = kMappings.size();
 constexpr int kMaxSourceSize = 512;
@@ -155,7 +149,7 @@ struct CursorImage {
     // A monochrome cursor keeps the XOR plane below its AND plane.
     std::vector<uint32_t> mask;
     std::vector<uint32_t> color;
-    std::vector<uint32_t> diagonalPixels;
+    std::vector<uint32_t> smoothPixels;
 
     bool operator==(const CursorImage&) const = default;
 };
@@ -202,8 +196,24 @@ struct CursorShape {
     bool operator==(const CursorShape&) const = default;
 };
 
-std::array<HCURSOR, kMappings.size()> g_nativeCursors;
-std::array<CursorShape, kMappings.size()> g_referenceShapes;
+// Cropped silhouettes of the shared Office selection and hyperlink pointers.
+constexpr CursorShape kOfficeSelectionShape{12, 20, {
+    0x0c00, 0x0e00, 0x0f00, 0x0f80, 0x0fc0, 0x0fe0, 0x0ff0, 0x0ff8,
+    0x0ffc, 0x0ffe, 0x0fff, 0x0ff0, 0x0ff0, 0x0e78, 0x0c78, 0x083c,
+    0x003c, 0x001e, 0x001e, 0x000c,
+}};
+constexpr CursorShape kOfficeLinkShape{17, 22, {
+    0x0060, 0x00f0, 0x00f0, 0x00f0, 0x00f0, 0x03f0, 0x1ff0, 0x7ff0,
+    0xfff0, 0x1fff7, 0x1ffff, 0x1ffff, 0x1fffe, 0x1fffc, 0x1fffc, 0x1fff8,
+    0xfff8, 0xfff0, 0xfff0, 0x7fe0, 0x7fe0, 0x7fe0,
+}};
+
+struct CursorMatch {
+    size_t slot = kUnknownSlot;
+    bool chromium = false;
+};
+
+std::array<CursorShape, kLastAutoscrollId - kFirstAutoscrollId + 1> g_referenceShapes;
 std::array<Replacement, kMappings.size()> g_replacements;
 std::array<std::optional<CursorImage>, kRoleCount> g_sources;
 std::array<bool, kRoleCount> g_needsRefresh;
@@ -213,13 +223,11 @@ std::mutex g_mutex;
 std::once_flag g_referenceShapesInit;
 std::atomic<bool> g_needsCleanup;
 std::atomic<bool> g_replaceInOffice;
-bool g_smoothDiagonals;
+std::atomic<bool> g_replaceInElectron;
+std::atomic<bool> g_isOffice;
+bool g_smoothArrows;
 bool g_stopping;
-bool g_isOffice;
-bool g_isExcel;
-bool g_isChromium;
 bool g_watchStarted;
-bool g_handlesReady;
 HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
@@ -255,18 +263,39 @@ bool HasModuleName(std::wstring_view path, std::wstring_view module) {
                                 TRUE) == CSTR_EQUAL;
 }
 
-bool IsChromiumBrowserProcess() {
+bool IsChromiumChildProcess() {
+    const auto commandLine = GetCommandLineW();
+    if (!std::wstring_view(commandLine).contains(L"--type=")) {
+        return false;
+    }
     int argumentCount = 0;
-    LPWSTR* arguments = CommandLineToArgvW(GetCommandLineW(), &argumentCount);
+    LPWSTR* arguments = CommandLineToArgvW(commandLine, &argumentCount);
     if (!arguments) {
         return false;
     }
-    const auto child = std::any_of(arguments + 1, arguments + argumentCount, [](PCWSTR arg) {
-        const std::wstring_view argument(arg);
-        return argument == L"--type" || argument.starts_with(L"--type=");
-    });
+    bool type = false;
+    bool chromiumHandle = false;
+    for (int i = 1; i < argumentCount; ++i) {
+        const std::wstring_view argument(arguments[i]);
+        type |= argument == L"--type=renderer" || argument == L"--type=gpu-process" ||
+                argument == L"--type=utility";
+        chromiumHandle |= argument.starts_with(L"--field-trial-handle=") ||
+                          argument.starts_with(L"--mojo-platform-channel-handle=");
+    }
     LocalFree(arguments);
-    return !child;
+    return type && chromiumHandle;
+}
+
+bool ObserveOffice() {
+    if (g_isOffice.load(std::memory_order_relaxed)) {
+        return true;
+    }
+    // The common Office runtime can be loaded after the mod starts.
+    if (GetModuleHandleW(L"mso20win32client.dll")) {
+        g_isOffice.store(true, std::memory_order_relaxed);
+        return true;
+    }
+    return false;
 }
 
 BITMAPINFO ColorBitmapInfo(int width, int height) {
@@ -319,8 +348,8 @@ std::vector<uint32_t> DrawAlphaCursor(HCURSOR cursor, HDC dc, int width, int hei
     return result;
 }
 
-std::vector<uint32_t> PrepareDiagonalPixels(HCURSOR cursor, HDC dc,
-                                            const CursorImage& image) {
+std::vector<uint32_t> PrepareSmoothPixels(HCURSOR cursor, HDC dc,
+                                        const CursorImage& image) {
     if (std::any_of(image.color.begin(), image.color.end(),
                     [](uint32_t pixel) { return pixel >> 24; })) {
         return DrawAlphaCursor(cursor, dc, image.width, image.height);
@@ -344,7 +373,7 @@ std::vector<uint32_t> PrepareDiagonalPixels(HCURSOR cursor, HDC dc,
 }
 
 std::optional<CursorImage> ReadCursorBitmaps(HCURSOR cursor, const ICONINFO& info,
-                                            bool prepareDiagonals, int maxSize) {
+                                            bool prepareSmoothing, int maxSize) {
     if (info.fIcon || !info.hbmMask) {
         return std::nullopt;
     }
@@ -382,19 +411,19 @@ std::optional<CursorImage> ReadCursorBitmaps(HCURSOR cursor, const ICONINFO& inf
         }
     }
 
-    if (prepareDiagonals) {
-        image.diagonalPixels = PrepareDiagonalPixels(cursor, dc.value, image);
+    if (prepareSmoothing) {
+        image.smoothPixels = PrepareSmoothPixels(cursor, dc.value, image);
     }
     return image;
 }
 
-std::optional<CursorImage> ReadCursor(HCURSOR cursor, bool prepareDiagonals,
+std::optional<CursorImage> ReadCursor(HCURSOR cursor, bool prepareSmoothing,
                                      int maxSize = kMaxSourceSize) {
     IconBitmaps info;
     if (!cursor || !GetIconInfo(cursor, &info)) {
         return std::nullopt;
     }
-    return ReadCursorBitmaps(cursor, info, prepareDiagonals, maxSize);
+    return ReadCursorBitmaps(cursor, info, prepareSmoothing, maxSize);
 }
 
 CursorShape MakeShape(const CursorImage& image) {
@@ -462,20 +491,26 @@ CursorShape LoadResourceShape(HMODULE module, PCWSTR name) {
     return image ? MakeShape(*image) : CursorShape{};
 }
 
-size_t FindShapeSlot(const CursorShape& shape) {
+size_t FindOfficeSlot(const CursorShape& shape) {
     if (!shape.width) {
         return kUnknownSlot;
     }
+    if (shape == kOfficeSelectionShape) {
+        return SystemSlot(kArrowId);
+    }
+    if (shape == kOfficeLinkShape) {
+        return SystemSlot(kLinkId);
+    }
     std::call_once(g_referenceShapesInit, [] {
-        for (size_t i = 0; i < kMappings.size(); ++i) {
-            g_referenceShapes[i] = LoadResourceShape(nullptr,
-                MAKEINTRESOURCEW(kMappings[i].systemId));
+        for (WORD id = kFirstAutoscrollId; id <= kLastAutoscrollId; ++id) {
+            g_referenceShapes[id - kFirstAutoscrollId] =
+                LoadResourceShape(nullptr, MAKEINTRESOURCEW(id));
         }
     });
 
     for (size_t i = 0; i < g_referenceShapes.size(); ++i) {
         if (g_referenceShapes[i] == shape) {
-            return i;
+            return SystemSlot(static_cast<WORD>(kFirstAutoscrollId + i));
         }
     }
     return kUnknownSlot;
@@ -501,10 +536,11 @@ size_t FindChromiumSlot(const CursorImage& image) {
     return kUnknownSlot;
 }
 
-size_t ReadResourceSlot(HCURSOR cursor) {
+CursorMatch ReadResourceSlot(HCURSOR cursor) {
+    const bool office = ObserveOffice();
     ICONINFOEXW info{sizeof(info)};
     if (!GetIconInfoExW(cursor, &info)) {
-        return kUnknownSlot;
+        return {};
     }
     IconBitmaps bitmaps;
     bitmaps.fIcon = info.fIcon;
@@ -514,29 +550,38 @@ size_t ReadResourceSlot(HCURSOR cursor) {
     bitmaps.hbmColor = info.hbmColor;
 
     if (info.fIcon) {
-        return kUnknownSlot;
+        return {};
     }
     if (HasModuleName(info.szModName, L"USER32") ||
         HasModuleName(info.szModName, L"user32.dll")) {
-        return SystemSlot(info.wResID);
+        return info.wResID >= kFirstAutoscrollId && info.wResID <= kLastAutoscrollId
+            ? CursorMatch{SystemSlot(info.wResID)} : CursorMatch{};
     }
     if (HasModuleName(info.szModName, L"comctl32.dll")) {
-        return ResourceSlot(info.wResID, kCommonControlsResources);
+        return {ResourceSlot(info.wResID, kCommonControlsResources)};
     }
-    const bool chromiumResource = g_isChromium &&
-        std::any_of(kChromiumCursorModules.begin(), kChromiumCursorModules.end(),
-                    [&](PCWSTR name) { return HasModuleName(info.szModName, name); });
-    if (!g_isOffice && !chromiumResource) {
-        return kUnknownSlot;
+    if (!office && (!*info.szModName || !bitmaps.hbmColor)) {
+        return {};
     }
 
-    const auto findSlot = [chromiumResource](const CursorImage& image) {
-        return chromiumResource ? FindChromiumSlot(image) : FindShapeSlot(MakeShape(image));
+    const auto findSlot = [&](const CursorImage& image) -> CursorMatch {
+        if (!office) {
+            return {FindChromiumSlot(image), true};
+        }
+        const size_t slot = FindOfficeSlot(MakeShape(image));
+        // This two-axis resource is paired with an independently drawn origin marker.
+        if (info.wResID == 256 && slot == SystemSlot(32654)) {
+            return {};
+        }
+        return {slot};
     };
     const auto image = ReadCursorBitmaps(cursor, bitmaps, false, kShapeSize * 2);
-    const size_t slot = image ? findSlot(*image) : kUnknownSlot;
-    if (slot != kUnknownSlot) {
-        return slot;
+    if (image) {
+        const auto match = findSlot(*image);
+        if (match.slot != kUnknownSlot ||
+            (!office && image->width == kShapeSize && image->height == kShapeSize)) {
+            return match;
+        }
     }
 
     // A DPI-specific copy can differ from the original resource's 32px raster.
@@ -544,7 +589,7 @@ size_t ReadResourceSlot(HCURSOR cursor) {
     HMODULE module = nullptr;
     if (!*info.szModName || (!info.wResID && !*name) ||
         !GetModuleHandleExW(0, info.szModName, &module)) {
-        return kUnknownSlot;
+        return {};
     }
 
     std::optional<CursorImage> resource;
@@ -555,22 +600,17 @@ size_t ReadResourceSlot(HCURSOR cursor) {
         throw;
     }
     FreeLibrary(module);
-    return resource ? findSlot(*resource) : kUnknownSlot;
+    return resource ? findSlot(*resource) : CursorMatch{};
 }
 
-size_t IdentifyCursor(HCURSOR cursor) {
+CursorMatch IdentifyCursor(HCURSOR cursor) {
     if (!cursor) {
-        return kUnknownSlot;
-    }
-    for (size_t i = 0; i < g_nativeCursors.size(); ++i) {
-        if (g_nativeCursors[i] == cursor) {
-            return i;
-        }
+        return {};
     }
 
     struct Lookup {
         HCURSOR cursor = nullptr;
-        size_t slot = kUnknownSlot;
+        CursorMatch match;
     };
     // Bounded per GUI thread. Normal mouse movement usually hits the same slot.
     thread_local std::array<Lookup, 32> entries;
@@ -579,37 +619,42 @@ size_t IdentifyCursor(HCURSOR cursor) {
     if (entry.cursor != cursor) {
         entry = {cursor, ReadResourceSlot(cursor)};
     }
-    return entry.slot;
+    return entry.match;
 }
 
-uint32_t SampleDiagonal(const CursorImage& source, double centerX, double centerY,
-                        double cosine, double sine) {
-    constexpr std::array offsets = {-0.375, -0.125, 0.125, 0.375};
-    constexpr unsigned count = offsets.size() * offsets.size();
+uint32_t SampleSmooth(const CursorImage& source, double centerX, double centerY,
+                      double cosine, double sine) {
+    // The outer taps reach adjacent pixels at exact right angles as well.
+    constexpr std::array offsets = {-0.5625, -0.1875, 0.1875, 0.5625};
+    constexpr std::array weights = {2u, 6u, 6u, 2u};
+    constexpr unsigned totalWeight = 16 * 16;
     std::array<unsigned, 4> channels{};
-    for (double x : offsets) {
-        for (double y : offsets) {
+    for (size_t j = 0; j < offsets.size(); ++j) {
+        const double y = offsets[j];
+        for (size_t k = 0; k < offsets.size(); ++k) {
+            const double x = offsets[k];
             const int sx = static_cast<int>(std::lround(centerX + x * cosine + y * sine));
             const int sy = static_cast<int>(std::lround(centerY - x * sine + y * cosine));
             if (sx < 0 || sx >= source.width || sy < 0 || sy >= source.height) {
                 continue;
             }
-            const uint32_t pixel = source.diagonalPixels[size_t(sy) * source.width + sx];
+            const uint32_t pixel = source.smoothPixels[size_t(sy) * source.width + sx];
+            const unsigned weight = weights[j] * weights[k];
             for (unsigned i = 0; i < channels.size(); ++i) {
-                channels[i] += (pixel >> (8 * i)) & 0xFF;
+                channels[i] += weight * ((pixel >> (8 * i)) & 0xFF);
             }
         }
     }
 
     uint32_t result = 0;
     for (unsigned i = 0; i < channels.size(); ++i) {
-        result |= ((channels[i] + count / 2) / count) << (8 * i);
+        result |= ((channels[i] + totalWeight / 2) / totalWeight) << (8 * i);
     }
     return result;
 }
 
 CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
-    const bool smooth = eighthTurns % 2 && !source.diagonalPixels.empty();
+    const bool smooth = !source.smoothPixels.empty();
     const bool monochrome = source.color.empty() && !smooth;
     const double angle = eighthTurns * (3.14159265358979323846 / 4.0);
     // Round the exact right angles so trigonometric error cannot add a row.
@@ -649,7 +694,7 @@ CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
             const int dy = y - result.hotY;
             const size_t to = size_t(y) * result.width + x;
             if (smooth) {
-                const uint32_t pixel = SampleDiagonal(source,
+                const uint32_t pixel = SampleSmooth(source,
                     dx * cosine + dy * sine + source.hotX,
                     -dx * sine + dy * cosine + source.hotY, cosine, sine);
                 result.color[to] = pixel;
@@ -678,6 +723,16 @@ CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
     }
 
     return result;
+}
+
+CursorImage Mirror(CursorImage image) {
+    image.hotX = image.width - 1 - image.hotX;
+    for (auto* plane : {&image.mask, &image.color}) {
+        for (size_t row = 0; row < plane->size(); row += image.width) {
+            std::reverse(plane->data() + row, plane->data() + row + image.width);
+        }
+    }
+    return image;
 }
 
 HCURSOR MakeCursor(const CursorImage& image) {
@@ -756,7 +811,7 @@ void CheckCursorSettings() {
 bool RefreshSource(Role role) {
     const size_t index = static_cast<size_t>(role);
     auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]),
-                            role == Role::Up && g_smoothDiagonals);
+                            role == Role::Up && g_smoothArrows);
     if (!image) {
         g_needsRefresh[index] = true;
         return false;
@@ -862,18 +917,20 @@ void FreeRetired() {
     });
 }
 
-bool ReplacementEnabled() {
-    return !g_isOffice || g_replaceInOffice.load(std::memory_order_acquire);
+bool ReplacementEnabled(CursorMatch match) {
+    if (match.slot == kUnknownSlot) {
+        return false;
+    }
+    if (g_isOffice.load(std::memory_order_relaxed)) {
+        return g_replaceInOffice.load(std::memory_order_acquire);
+    }
+    return !match.chromium || g_replaceInElectron.load(std::memory_order_acquire);
 }
 
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
-        size_t slot = ReplacementEnabled() ? IdentifyCursor(cursor) : kUnknownSlot;
-        // Excel draws its own origin marker underneath the neutral pointer.
-        if (g_isExcel && slot != kUnknownSlot && kMappings[slot].role == Role::Move) {
-            slot = kUnknownSlot;
-        }
-        if (slot == kUnknownSlot && !g_needsCleanup.load()) {
+        const auto match = IdentifyCursor(cursor);
+        if (!ReplacementEnabled(match) && !g_needsCleanup.load()) {
             g_previousRole = Role::Count;
             return g_setCursorOriginal(cursor);
         }
@@ -881,22 +938,27 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         std::lock_guard lock(g_mutex);
         ForgetInactiveThreads();
         HCURSOR display = cursor;
-        if (slot != kUnknownSlot && !g_stopping && ReplacementEnabled()) {
-            const auto& mapping = kMappings[slot];
+        if (!g_stopping && ReplacementEnabled(match)) {
+            const auto& mapping = kMappings[match.slot];
             const size_t role = static_cast<size_t>(mapping.role);
             CheckCursorSettings();
             if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
                 RefreshSource(mapping.role)) {
-                auto& entry = g_replacements[slot];
+                auto& entry = g_replacements[match.slot];
                 if (entry.cursor && entry.original != cursor) {
                     g_retired.push_back(entry);
                     entry = {};
                 }
                 if (!entry.cursor) {
                     const CursorImage& source = *g_sources[role];
-                    const HCURSOR replacement = mapping.eighthTurns
-                        ? MakeCursor(Rotate(source, mapping.eighthTurns))
-                        : MakeCursor(source);
+                    HCURSOR replacement;
+                    if (mapping.mirror) {
+                        replacement = MakeCursor(Mirror(source));
+                    } else if (mapping.eighthTurns || !source.smoothPixels.empty()) {
+                        replacement = MakeCursor(Rotate(source, mapping.eighthTurns));
+                    } else {
+                        replacement = MakeCursor(source);
+                    }
                     if (replacement) {
                         entry = {replacement, cursor};
                     }
@@ -944,43 +1006,25 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
 
 void UpdateSettings() {
     const bool replaceInOffice = Wh_GetIntSetting(L"replaceInOffice") != 0;
-    const bool smoothDiagonals = Wh_GetIntSetting(L"smoothDiagonals") != 0;
+    const bool replaceInElectron = Wh_GetIntSetting(L"replaceInElectron") != 0;
+    const bool smoothArrows = Wh_GetIntSetting(L"smoothDiagonals") != 0;
     std::lock_guard lock(g_mutex);
-    if (g_smoothDiagonals != smoothDiagonals) {
-        g_smoothDiagonals = smoothDiagonals;
+    if (g_smoothArrows != smoothArrows) {
+        g_smoothArrows = smoothArrows;
         g_needsRefresh[static_cast<size_t>(Role::Up)] = true;
     }
-    if ((!g_isOffice || replaceInOffice) && !g_handlesReady) {
-        for (size_t i = 0; i < kMappings.size(); ++i) {
-            g_nativeCursors[i] = LoadCursorW(nullptr,
-                                             MAKEINTRESOURCEW(kMappings[i].systemId));
-        }
-        g_handlesReady = true;
-    }
+    g_replaceInElectron.store(replaceInElectron, std::memory_order_release);
     g_replaceInOffice.store(replaceInOffice, std::memory_order_release);
 }
 
 }  // namespace
 
 BOOL Wh_ModInit() {
-    if (!GetModuleHandleW(L"user32.dll")) {
+    if (!GetModuleHandleW(L"user32.dll") || IsChromiumChildProcess()) {
         return FALSE;
     }
 
-    wchar_t processPath[MAX_PATH];
-    const DWORD pathLength = GetModuleFileNameW(nullptr, processPath, MAX_PATH);
-    if (!pathLength || pathLength >= MAX_PATH) {
-        return FALSE;
-    }
-    const std::wstring_view path(processPath, pathLength);
-    g_isExcel = HasModuleName(path, kExcelProcess);
-    g_isOffice = std::any_of(kOfficeProcesses.begin(), kOfficeProcesses.end(),
-                           [&](PCWSTR name) { return HasModuleName(path, name); });
-    g_isChromium = std::any_of(kChromiumProcesses.begin(), kChromiumProcesses.end(),
-                             [&](PCWSTR name) { return HasModuleName(path, name); });
-    if (g_isChromium && !IsChromiumBrowserProcess()) {
-        return FALSE;
-    }
+    ObserveOffice();
     g_needsRefresh.fill(true);
     UpdateSettings();
 

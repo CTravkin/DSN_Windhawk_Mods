@@ -7,11 +7,13 @@ autoscroll started by pressing the mouse wheel.
 
 ## Status
 
-The preview supports the native autoscroll cursors from Windows, including the
-Common Controls Reader Mode. Chrome and Edge use a shared set of cursor images
-recognized independently of their resource numbers. The optional Office mode
-recognizes the Windows pointer shapes in classic desktop Office apps. Office
-resource matching has been checked with Excel from Office LTSC 2024 x64.
+The mod recognizes native Windows autoscroll cursors, including Common Controls
+Reader Mode. It identifies the shared Chromium and Electron cursors by image.
+Classic desktop Office uses the same replacement mechanism for recognized
+autoscroll, link, and text margin selection cursors.
+
+Windhawk can load the mod in graphical desktop processes. Recognition is cached
+per GUI thread, and rotated arrows are built in memory when needed.
 
 Applications can draw a stationary starting marker themselves. Excel uses that
 marker with recognized directional cursors from the Windows scheme.
@@ -21,8 +23,10 @@ marker with recognized directional cursors from the Windows scheme.
 - At the starting point, the pointer uses the Vertical resize, Horizontal
   resize, or Move role, according to the axes indicated by the application.
 - During scrolling, the Alternate select (`Up`) arrow points in the active
-  direction. The mod rotates the arrow in memory, smooths diagonal edges, and
-  reads the current scheme when autoscroll starts.
+  direction. Optional smoothing applies in all eight directions. Monochrome
+  effects that invert the background keep their original pixel rendering.
+- In Office, recognized hyperlink cursors use Link select and recognized text
+  margin selection cursors mirror Normal select, including its hotspot.
 
 ## Platforms
 
@@ -45,8 +49,9 @@ as usual.
 
 | Windhawk setting | Default | Effect |
 | --- | --- | --- |
-| Replace cursors in Office | Off | Use the active Windows scheme for recognized autoscroll pointers in classic desktop Office apps |
-| Smooth diagonal arrows | On | Use partially transparent edge pixels when rotating diagonally. Turning this off uses the original pixels for the rotation |
+| Replace cursors in Office | Off | Use the active Windows scheme for recognized cursors in classic desktop Office |
+| Autoscroll in Chromium and Electron | On | Theme recognized Chromium and Electron autoscroll cursors |
+| Smooth autoscroll arrows | On | Smooth edges with partially transparent pixels in all eight directions |
 
 ### Manual preview
 
