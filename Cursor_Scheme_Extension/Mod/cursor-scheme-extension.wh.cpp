@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.6.0
+// @version         0.6.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -13,7 +13,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 9
+// Build: 10
 
 // ==WindhawkModReadme==
 /*
@@ -564,16 +564,11 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
         return {};
     }
 
-    const auto findSlot = [&](const CursorImage& image) -> CursorMatch {
+    const auto findSlot = [office](const CursorImage& image) -> CursorMatch {
         if (!office) {
             return {FindChromiumSlot(image), true};
         }
-        const size_t slot = FindOfficeSlot(MakeShape(image));
-        // This two-axis resource is paired with an independently drawn origin marker.
-        if (info.wResID == 256 && slot == SystemSlot(32654)) {
-            return {};
-        }
-        return {slot};
+        return {FindOfficeSlot(MakeShape(image))};
     };
     const auto image = ReadCursorBitmaps(cursor, bitmaps, false, kShapeSize * 2);
     if (image) {

@@ -15,8 +15,8 @@ autoscroll, link, and text margin selection cursors.
 Windhawk can load the mod in graphical desktop processes. Recognition is cached
 per GUI thread, and rotated arrows are built in memory when needed.
 
-Applications can draw a stationary starting marker themselves. Excel uses that
-marker with recognized directional cursors from the Windows scheme.
+Excel draws the stationary marker at the click position. The mod applies the
+Windows scheme to the pointer at the start and during autoscroll.
 
 ## Features
 
