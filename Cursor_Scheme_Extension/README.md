@@ -7,17 +7,17 @@ autoscroll started by pressing the mouse wheel.
 
 ## Status
 
-This prototype runs in the preview window, Excel, and Word. It targets the
-shared autoscroll cursors provided by Windows User32. An application can draw
-its own autoscroll pointer or stationary origin marker.
+This prototype runs in the preview window, Excel, and Word. It recognizes
+autoscroll cursor resources from Windows User32, Common Controls, and Excel.
+An application can also draw a separate stationary origin marker.
 
 ## Features
 
 - At the starting point, the pointer uses the Vertical resize, Horizontal
   resize, or Move role, according to the axes indicated by the application.
 - During scrolling, the Alternate select (`Up`) arrow points in the active
-  direction. The mod rotates the arrow in memory and reads the current scheme
-  when autoscroll starts.
+  direction. The mod rotates the arrow in memory, smooths diagonal edges, and
+  reads the current scheme when autoscroll starts.
 
 ## Platforms
 

@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.1.0
+// @version         0.2.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -14,7 +14,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 1
+// Build: 2
 
 // ==WindhawkModReadme==
 /*
@@ -25,9 +25,9 @@ the starting point, the pointer shows the scrolling axes indicated by the
 application. While scrolling, the scheme's Alternate select arrow points in the
 scroll direction.
 
-The prototype runs in the preview window, Excel, and Word. It recognizes the
-autoscroll cursors supplied by Windows User32. Applications with their own
-cursors or separately drawn origin markers supply those images themselves.
+The prototype runs in the preview window, Excel, and Word. It recognizes
+autoscroll cursor resources from Windows User32, Common Controls, and Excel.
+An application can also draw a separate stationary origin marker.
 */
 // ==/WindhawkModReadme==
 
@@ -42,6 +42,7 @@ cursors or separately drawn origin markers supply those images themselves.
 #include <cstring>
 #include <mutex>
 #include <optional>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -69,8 +70,35 @@ constexpr std::array kMappings = {
     CursorMapping{32662, Role::Up, 3},
 };
 
+struct ResourceMapping {
+    WORD id;
+    WORD systemId;
+};
+
+constexpr std::array kExcelResources = {
+    ResourceMapping{256, 32654},
+    ResourceMapping{293, 32655}, ResourceMapping{294, 32660},
+    ResourceMapping{295, 32658}, ResourceMapping{296, 32662},
+    ResourceMapping{297, 32656}, ResourceMapping{298, 32661},
+    ResourceMapping{299, 32657}, ResourceMapping{300, 32659},
+    ResourceMapping{353, 32655}, ResourceMapping{354, 32660},
+    ResourceMapping{355, 32658}, ResourceMapping{356, 32662},
+    ResourceMapping{357, 32656}, ResourceMapping{358, 32661},
+    ResourceMapping{359, 32657}, ResourceMapping{360, 32659},
+};
+
+constexpr std::array kCommonControlsResources = {
+    ResourceMapping{109, 32652}, ResourceMapping{110, 32653},
+    ResourceMapping{111, 32654}, ResourceMapping{112, 32655},
+    ResourceMapping{113, 32656}, ResourceMapping{114, 32658},
+    ResourceMapping{115, 32657}, ResourceMapping{116, 32660},
+    ResourceMapping{117, 32659}, ResourceMapping{118, 32662},
+    ResourceMapping{119, 32661},
+};
+
 const std::array kRoleIds = {IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW};
 constexpr size_t kRoleCount = static_cast<size_t>(Role::Count);
+constexpr size_t kUnknownSlot = kMappings.size();
 constexpr int kMaxSourceSize = 512;
 
 struct CursorImage {
@@ -81,6 +109,7 @@ struct CursorImage {
     // A monochrome cursor keeps the XOR plane below its AND plane.
     std::vector<uint32_t> mask;
     std::vector<uint32_t> color;
+    std::vector<uint32_t> diagonalPixels;
 
     bool operator==(const CursorImage&) const = default;
 };
@@ -120,6 +149,7 @@ struct ThreadSelection {
 };
 
 std::array<HCURSOR, kMappings.size()> g_nativeCursors;
+std::array<HCURSOR, kExcelResources.size()> g_excelCursors;
 std::array<Replacement, kMappings.size()> g_replacements;
 std::array<std::optional<CursorImage>, kRoleCount> g_sources;
 std::array<bool, kRoleCount> g_needsRefresh;
@@ -128,17 +158,99 @@ std::vector<ThreadSelection> g_selections;
 std::mutex g_mutex;
 std::atomic<bool> g_hasReplacements;
 bool g_stopping;
+bool g_isExcel;
 HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
 
-bool ReadBitmap(HDC dc,
-                HBITMAP bitmap,
-                int width,
-                int height,
-                std::vector<uint32_t>& pixels) {
-    pixels.resize(size_t(width) * height);
+size_t SystemSlot(WORD id) {
+    for (size_t i = 0; i < kMappings.size(); ++i) {
+        if (kMappings[i].systemId == id) {
+            return i;
+        }
+    }
+    return kUnknownSlot;
+}
+
+template <size_t N>
+size_t ResourceSlot(WORD id, const std::array<ResourceMapping, N>& resources) {
+    for (const auto& resource : resources) {
+        if (resource.id == id) {
+            return SystemSlot(resource.systemId);
+        }
+    }
+    return kUnknownSlot;
+}
+
+bool HasModuleName(std::wstring_view path, std::wstring_view module) {
+    const auto slash = path.find_last_of(L"\\/");
+    if (slash != path.npos) {
+        path.remove_prefix(slash + 1);
+    }
+    return path.size() == module.size() &&
+           CompareStringOrdinal(path.data(), static_cast<int>(path.size()),
+                                module.data(), static_cast<int>(module.size()),
+                                TRUE) == CSTR_EQUAL;
+}
+
+size_t ReadResourceSlot(HCURSOR cursor) {
+    ICONINFOEXW info{sizeof(info)};
+    if (!GetIconInfoExW(cursor, &info)) {
+        return kUnknownSlot;
+    }
+    if (info.hbmMask) {
+        DeleteObject(info.hbmMask);
+    }
+    if (info.hbmColor) {
+        DeleteObject(info.hbmColor);
+    }
+    if (info.fIcon || !info.wResID) {
+        return kUnknownSlot;
+    }
+
+    if (HasModuleName(info.szModName, L"USER32") ||
+        HasModuleName(info.szModName, L"user32.dll")) {
+        return SystemSlot(info.wResID);
+    }
+    if (g_isExcel && HasModuleName(info.szModName, L"excel.exe")) {
+        return ResourceSlot(info.wResID, kExcelResources);
+    }
+    if (HasModuleName(info.szModName, L"comctl32.dll")) {
+        return ResourceSlot(info.wResID, kCommonControlsResources);
+    }
+    return kUnknownSlot;
+}
+
+size_t IdentifyCursor(HCURSOR cursor) {
+    if (!cursor) {
+        return kUnknownSlot;
+    }
+    for (size_t i = 0; i < g_nativeCursors.size(); ++i) {
+        if (g_nativeCursors[i] == cursor) {
+            return i;
+        }
+    }
+    if (g_isExcel) {
+        for (size_t i = 0; i < g_excelCursors.size(); ++i) {
+            if (g_excelCursors[i] == cursor) {
+                return SystemSlot(kExcelResources[i].systemId);
+            }
+        }
+    }
+
+    // Applications repeatedly set the same cursor while the mouse moves.
+    // Cache only consecutive lookups to keep recycled handles out of a long-lived cache.
+    thread_local HCURSOR previous;
+    thread_local size_t previousSlot = kUnknownSlot;
+    if (cursor != previous) {
+        previousSlot = ReadResourceSlot(cursor);
+        previous = cursor;
+    }
+    return previousSlot;
+}
+
+BITMAPINFO ColorBitmapInfo(int width, int height) {
     BITMAPINFO info{};
     info.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info.bmiHeader.biWidth = width;
@@ -146,11 +258,73 @@ bool ReadBitmap(HDC dc,
     info.bmiHeader.biPlanes = 1;
     info.bmiHeader.biBitCount = 32;
     info.bmiHeader.biCompression = BI_RGB;
+    return info;
+}
+
+bool ReadBitmap(HDC dc,
+                HBITMAP bitmap,
+                int width,
+                int height,
+                std::vector<uint32_t>& pixels) {
+    pixels.resize(size_t(width) * height);
+    auto info = ColorBitmapInfo(width, height);
     return GetDIBits(dc, bitmap, 0, height, pixels.data(), &info,
                      DIB_RGB_COLORS) == height;
 }
 
-std::optional<CursorImage> ReadCursor(HCURSOR cursor) {
+std::vector<uint32_t> DrawAlphaCursor(HCURSOR cursor, HDC dc, int width, int height) {
+    auto info = ColorBitmapInfo(width, height);
+    void* pixels = nullptr;
+    IconBitmaps bitmap;
+    bitmap.hbmColor = CreateDIBSection(dc, &info, DIB_RGB_COLORS, &pixels, nullptr, 0);
+    if (!bitmap.hbmColor || !pixels) {
+        return {};
+    }
+
+    const size_t count = size_t(width) * height;
+    std::vector<uint32_t> result(count);
+    HGDIOBJ previous = SelectObject(dc, bitmap.hbmColor);
+    if (!previous || previous == HGDI_ERROR) {
+        return {};
+    }
+    std::memset(pixels, 0, count * sizeof(uint32_t));
+    const bool drawn = DrawIconEx(dc, 0, 0, cursor, width, height, 0,
+                                 nullptr, DI_NORMAL | DI_NOMIRROR);
+    GdiFlush();
+    SelectObject(dc, previous);
+    if (!drawn) {
+        return {};
+    }
+    // Drawing into a transparent surface gives premultiplied BGRA.
+    std::memcpy(result.data(), pixels, count * sizeof(uint32_t));
+    return result;
+}
+
+std::vector<uint32_t> PrepareDiagonalPixels(HCURSOR cursor, HDC dc,
+                                            const CursorImage& image) {
+    if (std::any_of(image.color.begin(), image.color.end(),
+                    [](uint32_t pixel) { return pixel >> 24; })) {
+        return DrawAlphaCursor(cursor, dc, image.width, image.height);
+    }
+
+    const size_t count = size_t(image.width) * image.height;
+    std::vector<uint32_t> result(count);
+    for (size_t i = 0; i < count; ++i) {
+        const uint32_t xorPixel = (image.color.empty() ? image.mask[count + i]
+                                                      : image.color[i]) & 0x00FFFFFF;
+        if (image.mask[i] & 0x00FFFFFF) {
+            if (xorPixel) {
+                // An inverted background cannot be represented with alpha blending.
+                return {};
+            }
+        } else {
+            result[i] = 0xFF000000 | xorPixel;
+        }
+    }
+    return result;
+}
+
+std::optional<CursorImage> ReadCursor(HCURSOR cursor, bool prepareDiagonals) {
     IconBitmaps info;
     if (!cursor || !GetIconInfo(cursor, &info) || info.fIcon || !info.hbmMask) {
         return std::nullopt;
@@ -189,11 +363,41 @@ std::optional<CursorImage> ReadCursor(HCURSOR cursor) {
         }
     }
 
+    if (prepareDiagonals) {
+        image.diagonalPixels = PrepareDiagonalPixels(cursor, dc.value, image);
+    }
     return image;
 }
 
+uint32_t SampleDiagonal(const CursorImage& source, double centerX, double centerY,
+                        double cosine, double sine) {
+    constexpr std::array offsets = {-0.375, -0.125, 0.125, 0.375};
+    constexpr unsigned count = offsets.size() * offsets.size();
+    std::array<unsigned, 4> channels{};
+    for (double x : offsets) {
+        for (double y : offsets) {
+            const int sx = static_cast<int>(std::lround(centerX + x * cosine + y * sine));
+            const int sy = static_cast<int>(std::lround(centerY - x * sine + y * cosine));
+            if (sx < 0 || sx >= source.width || sy < 0 || sy >= source.height) {
+                continue;
+            }
+            const uint32_t pixel = source.diagonalPixels[size_t(sy) * source.width + sx];
+            for (unsigned i = 0; i < channels.size(); ++i) {
+                channels[i] += (pixel >> (8 * i)) & 0xFF;
+            }
+        }
+    }
+
+    uint32_t result = 0;
+    for (unsigned i = 0; i < channels.size(); ++i) {
+        result |= ((channels[i] + count / 2) / count) << (8 * i);
+    }
+    return result;
+}
+
 CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
-    const bool monochrome = source.color.empty();
+    const bool smooth = eighthTurns % 2 && !source.diagonalPixels.empty();
+    const bool monochrome = source.color.empty() && !smooth;
     const double angle = eighthTurns * (3.14159265358979323846 / 4.0);
     // Round the exact right angles so trigonometric error cannot add a row.
     const double cosine = eighthTurns % 2 ? std::cos(angle) : std::round(std::cos(angle));
@@ -212,10 +416,11 @@ CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
     }
 
     CursorImage result;
-    result.hotX = -static_cast<int>(std::floor(minX));
-    result.hotY = -static_cast<int>(std::floor(minY));
-    result.width = result.hotX + static_cast<int>(std::ceil(maxX)) + 1;
-    result.height = result.hotY + static_cast<int>(std::ceil(maxY)) + 1;
+    const int margin = smooth ? 1 : 0;
+    result.hotX = margin - static_cast<int>(std::floor(minX));
+    result.hotY = margin - static_cast<int>(std::floor(minY));
+    result.width = result.hotX + static_cast<int>(std::ceil(maxX)) + 1 + margin;
+    result.height = result.hotY + static_cast<int>(std::ceil(maxY)) + 1 + margin;
     const size_t plane = size_t(result.width) * result.height;
     const size_t sourcePlane = size_t(source.width) * source.height;
     result.mask.assign(plane, 0x00FFFFFF);
@@ -229,6 +434,18 @@ CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
         for (int x = 0; x < result.width; ++x) {
             const int dx = x - result.hotX;
             const int dy = y - result.hotY;
+            const size_t to = size_t(y) * result.width + x;
+            if (smooth) {
+                const uint32_t pixel = SampleDiagonal(source,
+                    dx * cosine + dy * sine + source.hotX,
+                    -dx * sine + dy * cosine + source.hotY, cosine, sine);
+                result.color[to] = pixel;
+                if (pixel >> 24) {
+                    result.mask[to] = 0;
+                }
+                continue;
+            }
+
             const int sx = static_cast<int>(std::lround(dx * cosine + dy * sine)) +
                            source.hotX;
             const int sy = static_cast<int>(std::lround(-dx * sine + dy * cosine)) +
@@ -238,7 +455,6 @@ CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
             }
 
             const size_t from = size_t(sy) * source.width + sx;
-            const size_t to = size_t(y) * result.width + x;
             result.mask[to] = source.mask[from];
             if (monochrome) {
                 result.mask[plane + to] = source.mask[sourcePlane + from];
@@ -273,13 +489,7 @@ HCURSOR MakeCursor(const CursorImage& image) {
     }
 
     if (!image.color.empty()) {
-        BITMAPINFO dib{};
-        dib.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-        dib.bmiHeader.biWidth = image.width;
-        dib.bmiHeader.biHeight = -image.height;
-        dib.bmiHeader.biPlanes = 1;
-        dib.bmiHeader.biBitCount = 32;
-        dib.bmiHeader.biCompression = BI_RGB;
+        auto dib = ColorBitmapInfo(image.width, image.height);
         void* pixels = nullptr;
         info.hbmColor = CreateDIBSection(nullptr, &dib, DIB_RGB_COLORS, &pixels,
                                          nullptr, 0);
@@ -311,7 +521,7 @@ void CheckCursorSettings() {
 
 bool RefreshSource(Role role) {
     const size_t index = static_cast<size_t>(role);
-    auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]));
+    auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]), role == Role::Up);
     if (!image) {
         g_needsRefresh[index] = true;
         return false;
@@ -418,17 +628,9 @@ void FreeRetired() {
 }
 
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
-    size_t slot = kMappings.size();
-    if (cursor) {
-        for (size_t i = 0; i < kMappings.size(); ++i) {
-            if (g_nativeCursors[i] == cursor) {
-                slot = i;
-                break;
-            }
-        }
-    }
+    const size_t slot = IdentifyCursor(cursor);
 
-    if (slot == kMappings.size() && !g_hasReplacements.load()) {
+    if (slot == kUnknownSlot && !g_hasReplacements.load()) {
         g_previousRole = Role::Count;
         return g_setCursorOriginal(cursor);
     }
@@ -437,13 +639,17 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         std::lock_guard lock(g_mutex);
         ForgetInactiveThreads();
         HCURSOR display = cursor;
-        if (slot != kMappings.size() && !g_stopping) {
+        if (slot != kUnknownSlot && !g_stopping) {
             const auto& mapping = kMappings[slot];
             const size_t role = static_cast<size_t>(mapping.role);
             CheckCursorSettings();
             if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
                 RefreshSource(mapping.role)) {
                 auto& entry = g_replacements[slot];
+                if (entry.cursor && entry.original != cursor) {
+                    g_retired.push_back(entry);
+                    entry = {};
+                }
                 if (!entry.cursor) {
                     const CursorImage& source = *g_sources[role];
                     const HCURSOR replacement = mapping.eighthTurns
@@ -513,6 +719,16 @@ BOOL Wh_ModInit() {
 
     for (size_t i = 0; i < kMappings.size(); ++i) {
         g_nativeCursors[i] = LoadCursorW(nullptr, MAKEINTRESOURCEW(kMappings[i].systemId));
+    }
+    wchar_t processPath[MAX_PATH];
+    const DWORD pathLength = GetModuleFileNameW(nullptr, processPath, MAX_PATH);
+    g_isExcel = pathLength && pathLength < MAX_PATH &&
+                HasModuleName({processPath, pathLength}, L"excel.exe");
+    if (g_isExcel) {
+        HMODULE excel = GetModuleHandleW(nullptr);
+        for (size_t i = 0; i < kExcelResources.size(); ++i) {
+            g_excelCursors[i] = LoadCursorW(excel, MAKEINTRESOURCEW(kExcelResources[i].id));
+        }
     }
     g_needsRefresh.fill(true);
 
