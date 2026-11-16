@@ -3,7 +3,7 @@
 // @name            Cursor Scheme Extension
 // @description     Use the active Windows cursor scheme for native middle-button autoscroll
 // @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.4.0
+// @version         0.4.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -22,7 +22,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32
 // ==/WindhawkMod==
-// Build: 5
+// Build: 6
 
 // ==WindhawkModReadme==
 /*
@@ -55,6 +55,7 @@ starting markers. Diagonal smoothing is optional.
 // ==/WindhawkModSettings==
 
 #include <windows.h>
+#include <psapi.h>
 #include <windhawk_utils.h>
 
 #include <algorithm>
@@ -797,35 +798,82 @@ bool ReplacementEnabled() {
     return !g_isOffice || g_replaceInOffice.load(std::memory_order_acquire);
 }
 
+struct ExcelMarkerResource {
+    WORD id;
+    DWORD size;
+    uint64_t hash;
+};
+
+// Excel packs the same marker at three DPI sizes.
+constexpr std::array kExcelMarkerResources = {
+    ExcelMarkerResource{365, 136, 0xb36b32c450eb710c},
+    ExcelMarkerResource{1989, 452, 0x2bc2f0d09d3303d1},
+    ExcelMarkerResource{1990, 737, 0xe85c7048c3735c62},
+};
+
+HRSRC FindExcelBitmapResource(HMODULE module, WORD id) {
+    return FindResourceW(module, MAKEINTRESOURCEW(id), MAKEINTRESOURCEW(998));
+}
+
+bool ExcelMarkerMatches(HMODULE module, HRSRC resource, const ExcelMarkerResource& marker) {
+    if (!resource || SizeofResource(module, resource) != marker.size) {
+        return false;
+    }
+    const auto* data = static_cast<const BYTE*>(LockResource(LoadResource(module, resource)));
+    if (!data) {
+        return false;
+    }
+    uint64_t hash = 0xcbf29ce484222325;
+    for (DWORD i = 0; i < marker.size; ++i) {
+        hash = (hash ^ data[i]) * 0x100000001b3;
+    }
+    return hash == marker.hash;
+}
+
+auto ReadExcelCommonMarkers() {
+    std::array<bool, kExcelMarkerResources.size()> matches{};
+    constexpr wchar_t commonFile[] = L"XLINTL32.COMMON.DLL";
+    wchar_t path[MAX_PATH];
+    const DWORD length = GetModuleFileNameW(GetModuleHandleW(nullptr), path, MAX_PATH);
+    if (!length || length >= MAX_PATH) {
+        return matches;
+    }
+    const auto slash = std::wstring_view(path, length).find_last_of(L"\\/");
+    if (slash == std::wstring_view::npos || slash + 1 + std::size(commonFile) > MAX_PATH) {
+        return matches;
+    }
+    std::copy_n(commonFile, std::size(commonFile), path + slash + 1);
+    HMODULE common = LoadLibraryExW(path, nullptr, LOAD_LIBRARY_AS_DATAFILE);
+    if (!common) {
+        return matches;
+    }
+    for (size_t i = 0; i < matches.size(); ++i) {
+        const auto& marker = kExcelMarkerResources[i];
+        matches[i] = ExcelMarkerMatches(common, FindExcelBitmapResource(common, marker.id), marker);
+    }
+    FreeLibrary(common);
+    return matches;
+}
+
 bool IsExcelMarkerResource(HMODULE module, WORD id) {
-    // The Excel graphics DLL packs the same marker at three DPI sizes.
-    constexpr struct {
-        WORD id;
-        DWORD size;
-        uint64_t hash;
-    } markers[] = {
-        {365, 136, 0xb36b32c450eb710c},
-        {1989, 452, 0x2bc2f0d09d3303d1},
-        {1990, 737, 0xe85c7048c3735c62},
-    };
-    for (const auto& marker : markers) {
+    for (size_t i = 0; i < kExcelMarkerResources.size(); ++i) {
+        const auto& marker = kExcelMarkerResources[i];
         if (id != marker.id) {
             continue;
         }
-        HRSRC resource = FindResourceW(module, MAKEINTRESOURCEW(id),
-                                       MAKEINTRESOURCEW(998));
-        if (!resource || SizeofResource(module, resource) != marker.size) {
+        if (HRSRC resource = FindExcelBitmapResource(module, id)) {
+            return ExcelMarkerMatches(module, resource, marker);
+        }
+        // Office resolves a missing localized graphic against the common resource DLL.
+        wchar_t path[MAX_PATH];
+        const auto mapped = reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(module) & ~uintptr_t{3});
+        const DWORD length = K32GetMappedFileNameW(GetCurrentProcess(), mapped, path, MAX_PATH);
+        if (!length || length >= MAX_PATH ||
+            !HasModuleName(std::wstring_view(path, length), L"XLINTL32.DLL")) {
             return false;
         }
-        const auto* data = static_cast<const BYTE*>(LockResource(LoadResource(module, resource)));
-        if (!data) {
-            return false;
-        }
-        uint64_t hash = 0xcbf29ce484222325;
-        for (DWORD i = 0; i < marker.size; ++i) {
-            hash = (hash ^ data[i]) * 0x100000001b3;
-        }
-        return hash == marker.hash;
+        static const auto commonMarkers = ReadExcelCommonMarkers();
+        return commonMarkers[i];
     }
     return false;
 }
@@ -876,17 +924,20 @@ HBITMAP MakeExcelMarker(HBITMAP original) {
 
 HBITMAP WINAPI OfficeLoadBitmapHook(HMODULE module, WORD id) {
     HBITMAP original = g_officeLoadBitmapOriginal(module, id);
-    if (!original || !ReplacementEnabled() || !IsExcelMarkerResource(module, id)) {
-        return original;
-    }
-    g_excelNeutralCursor = nullptr;
-    HMODULE excel = GetModuleHandleW(nullptr);
-    HCURSOR neutral = LoadCursorW(excel, MAKEINTRESOURCEW(256));
-    HCURSOR exit = LoadCursorW(excel, MAKEINTRESOURCEW(257));
-    if (!neutral || !exit) {
+    if (!original || !ReplacementEnabled()) {
         return original;
     }
     try {
+        if (!IsExcelMarkerResource(module, id)) {
+            return original;
+        }
+        g_excelNeutralCursor = nullptr;
+        HMODULE excel = GetModuleHandleW(nullptr);
+        HCURSOR neutral = LoadCursorW(excel, MAKEINTRESOURCEW(256));
+        HCURSOR exit = LoadCursorW(excel, MAKEINTRESOURCEW(257));
+        if (!neutral || !exit) {
+            return original;
+        }
         if (HBITMAP replacement = MakeExcelMarker(original)) {
             if (DeleteObject(original)) {
                 g_excelNeutralCursor = neutral;
