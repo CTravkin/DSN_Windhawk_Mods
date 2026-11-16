@@ -2,15 +2,15 @@
 
 **English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
-Cursor Scheme Extension uses the active Windows cursor scheme for native
-autoscroll started by pressing the mouse wheel.
+Cursor Scheme Extension applies the active Windows cursor scheme to recognized
+application pointers.
 
 ## Status
 
 The mod recognizes native Windows autoscroll cursors, including Common Controls
 Reader Mode. It identifies the shared Chromium and Electron cursors by image.
-Classic desktop Office uses the same replacement mechanism for recognized
-autoscroll, link, and text margin selection cursors.
+Classic desktop Office uses the same replacement mechanism for its recognized
+pointers.
 
 Windhawk can load the mod in graphical desktop processes. Recognition is cached
 per GUI thread, and rotated arrows are built in memory when needed.
@@ -25,8 +25,11 @@ Windows scheme to the pointer at the start and during autoscroll.
 - During scrolling, the Alternate select (`Up`) arrow points in the active
   direction. Optional smoothing applies in all eight directions. Monochrome
   effects that invert the background keep their original pixel rendering.
-- In Office, recognized hyperlink cursors use Link select and recognized text
-  margin selection cursors mirror Normal select, including its hotspot.
+- Panel, row, and column dividers use the corresponding Resize roles.
+- In Office, the link pointer uses Link select, margin selection mirrors Normal
+  select, and the downward selection arrow rotates Alternate select.
+- In Chromium and Electron, cell selection uses Precision select and the
+  vertical text pointer rotates Text select. Transforms preserve the hotspot.
 
 ## Platforms
 
@@ -43,15 +46,16 @@ x64, and ARM64. Runtime checks use Windows 11 x64.
 
 ### Usage
 
-Press the mouse wheel inside a scrollable area in an application that uses native
-autoscroll. Change the cursor scheme or its individual pointer roles in Windows
-as usual.
+Choose application families under **Where to replace pointers** and individual
+types under **Which pointers to replace**. Chromium and Electron and all pointer
+types are on by default. Classic Office is opt-in. Windows and Common Controls
+autoscroll follow the two autoscroll type switches.
 
-| Windhawk setting | Default | Effect |
-| --- | --- | --- |
-| Replace cursors in Office | Off | Use the active Windows scheme for recognized cursors in classic desktop Office |
-| Autoscroll in Chromium and Electron | On | Theme recognized Chromium and Electron autoscroll cursors |
-| Smooth autoscroll arrows | On | Smooth edges with partially transparent pixels in all eight directions |
+**Smooth autoscroll arrows** is on by default and applies to the eight
+directional arrows. Change the cursor scheme and pointer roles in Windows.
+
+When upgrading from 0.6.x in the Windhawk editor, review the two application
+switches in their new group.
 
 ### Manual preview
 

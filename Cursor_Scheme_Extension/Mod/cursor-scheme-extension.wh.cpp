@@ -1,9 +1,9 @@
 // ==WindhawkMod==
 // @id              cursor-scheme-extension
 // @name            Cursor Scheme Extension
-// @description     Use the active Windows cursor scheme for native middle-button autoscroll
-// @description:ru-RU Применение активной схемы указателей Windows к штатной автопрокрутке
-// @version         0.6.1
+// @description     Apply the active Windows cursor scheme to recognized application pointers
+// @description:ru-RU Применяет активную схему Windows к распознанным указателям приложений
+// @version         0.7.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -13,35 +13,60 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 10
+// Build: 11
 
 // ==WindhawkModReadme==
 /*
 # Cursor Scheme Extension
 
-Uses the active Windows cursor scheme for native middle-button autoscroll. At
-the starting point, the pointer shows the scrolling axes indicated by the
-application. While scrolling, the scheme's Alternate select arrow points in the
-scroll direction.
-
-The Chromium and Electron option recognizes shared autoscroll pointer images.
-The Office option also themes supported link and selection pointers in classic
-desktop Office. Arrow smoothing works in all eight scrolling directions.
+Applies the active Windows cursor scheme to recognized application pointers.
+The mod covers middle-button autoscroll, panel and table dividers, link
+pointers, and several selection and text pointers. Choose the application
+families and pointer types independently in Settings. Autoscroll arrows can
+be smoothed in all eight directions.
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
-- replaceInOffice: false
-  $name: Replace cursors in Office
-  $name:ru-RU: Замена указателей в Office
-  $description: Apply the Windows scheme to recognized pointers in classic desktop Office
-  $description:ru-RU: Применение схемы Windows к распознанным указателям в классических приложениях Office
-- replaceInElectron: true
-  $name: Autoscroll in Chromium and Electron
-  $name:ru-RU: Автопрокрутка в Chromium и Electron
-  $description: Apply the Windows scheme to recognized pointers used for autoscroll
-  $description:ru-RU: Применение схемы Windows к распознанным указателям автопрокрутки
+- targets:
+    - chromium: true
+      $name: Chromium and Electron
+      $name:ru-RU: Chromium и Electron
+    - office: false
+      $name: Classic Office
+      $name:ru-RU: Классический Office
+  $name: Where to replace pointers
+  $name:ru-RU: Где подменять указатели
+- cursors:
+    - autoscrollOrigin: true
+      $name: Autoscroll starting pointer
+      $name:ru-RU: Указатель в точке запуска автопрокрутки
+      $description: Shows the available scrolling axes
+      $description:ru-RU: Показывает доступные оси прокрутки
+    - autoscrollArrows: true
+      $name: Autoscroll direction arrows
+      $name:ru-RU: Стрелки направления автопрокрутки
+    - link: true
+      $name: Link select
+      $name:ru-RU: Выбор ссылки
+    - resize: true
+      $name: Resize panels, rows, and columns
+      $name:ru-RU: Изменение размеров панелей, строк и столбцов
+    - marginSelection: true
+      $name: Text selection from the page margin
+      $name:ru-RU: Выделение текста с поля страницы
+    - downSelection: true
+      $name: Downward selection arrow
+      $name:ru-RU: Стрелка выделения вниз
+    - cell: true
+      $name: Cell selection
+      $name:ru-RU: Выделение ячеек
+    - verticalText: true
+      $name: Vertical text
+      $name:ru-RU: Вертикальный текст
+  $name: Which pointers to replace
+  $name:ru-RU: Какие указатели подменять
 - smoothDiagonals: true
   $name: Smooth autoscroll arrows
   $name:ru-RU: Сглаживание стрелок автопрокрутки
@@ -68,11 +93,23 @@ desktop Office. Arrow smoothing works in all eight scrolling directions.
 
 namespace {
 
-enum class Role : size_t { Vertical, Horizontal, Move, Up, Arrow, Link, Count };
+enum class Role : size_t { Vertical, Horizontal, Move, Up, Arrow, Link, Cross, Text, Count };
+
+enum class CursorType {
+    AutoscrollOrigin,
+    AutoscrollArrows,
+    Link,
+    Resize,
+    MarginSelection,
+    DownSelection,
+    Cell,
+    VerticalText,
+};
 
 struct CursorMapping {
     WORD systemId;
     Role role;
+    CursorType type;
     unsigned eighthTurns = 0;
     bool mirror = false;
 };
@@ -80,22 +117,33 @@ struct CursorMapping {
 constexpr WORD kFirstAutoscrollId = 32652;
 constexpr WORD kLastAutoscrollId = 32662;
 constexpr WORD kArrowId = 32512;
+constexpr WORD kTextId = 32513;
+constexpr WORD kCrossId = 32515;
+constexpr WORD kUpId = 32516;
+constexpr WORD kHorizontalResizeId = 32644;
+constexpr WORD kVerticalResizeId = 32645;
 constexpr WORD kLinkId = 32649;
+constexpr int kShapeSize = 32;
 
 constexpr std::array kMappings = {
-    CursorMapping{32652, Role::Vertical, 0},
-    CursorMapping{32653, Role::Horizontal, 0},
-    CursorMapping{32654, Role::Move, 0},
-    CursorMapping{32655, Role::Up, 0},
-    CursorMapping{32656, Role::Up, 4},
-    CursorMapping{32657, Role::Up, 6},
-    CursorMapping{32658, Role::Up, 2},
-    CursorMapping{32659, Role::Up, 7},
-    CursorMapping{32660, Role::Up, 1},
-    CursorMapping{32661, Role::Up, 5},
-    CursorMapping{32662, Role::Up, 3},
-    CursorMapping{kArrowId, Role::Arrow, 0, true},
-    CursorMapping{kLinkId, Role::Link},
+    CursorMapping{32652, Role::Vertical, CursorType::AutoscrollOrigin},
+    CursorMapping{32653, Role::Horizontal, CursorType::AutoscrollOrigin},
+    CursorMapping{32654, Role::Move, CursorType::AutoscrollOrigin},
+    CursorMapping{32655, Role::Up, CursorType::AutoscrollArrows},
+    CursorMapping{32656, Role::Up, CursorType::AutoscrollArrows, 4},
+    CursorMapping{32657, Role::Up, CursorType::AutoscrollArrows, 6},
+    CursorMapping{32658, Role::Up, CursorType::AutoscrollArrows, 2},
+    CursorMapping{32659, Role::Up, CursorType::AutoscrollArrows, 7},
+    CursorMapping{32660, Role::Up, CursorType::AutoscrollArrows, 1},
+    CursorMapping{32661, Role::Up, CursorType::AutoscrollArrows, 5},
+    CursorMapping{32662, Role::Up, CursorType::AutoscrollArrows, 3},
+    CursorMapping{kArrowId, Role::Arrow, CursorType::MarginSelection, 0, true},
+    CursorMapping{kLinkId, Role::Link, CursorType::Link},
+    CursorMapping{kHorizontalResizeId, Role::Horizontal, CursorType::Resize},
+    CursorMapping{kVerticalResizeId, Role::Vertical, CursorType::Resize},
+    CursorMapping{kUpId, Role::Up, CursorType::DownSelection, 4},
+    CursorMapping{kCrossId, Role::Cross, CursorType::Cell},
+    CursorMapping{kTextId, Role::Text, CursorType::VerticalText, 2},
 };
 
 struct ResourceMapping {
@@ -115,6 +163,8 @@ constexpr std::array kCommonControlsResources = {
 struct CursorFingerprint {
     uint64_t pixels;
     WORD systemId;
+    int hotX = kShapeSize / 2;
+    int hotY = kShapeSize / 2;
 };
 
 // Chromium variants package the same Windows cursor images under different IDs.
@@ -131,15 +181,18 @@ constexpr std::array kChromiumCursors = {
     CursorFingerprint{0xf438f4b2379ecc48, 32662},  // Southeast
     CursorFingerprint{0x10ea8f9d7a1c0876, 32661},  // Southwest
     CursorFingerprint{0x7ce71739ad53d0d5, 32657},  // West
+    CursorFingerprint{0x702794672c4a6ec5, kHorizontalResizeId, 10, 8},
+    CursorFingerprint{0x19747d1629ec5525, kVerticalResizeId, 9, 10},
+    CursorFingerprint{0x5d9bc833e83e07c8, kCrossId, 7, 7},
+    CursorFingerprint{0xae4a396c7f94f919, kTextId, 9, 3},
 };
 
 const std::array kRoleIds = {
-    IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW, IDC_ARROW, IDC_HAND,
+    IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW, IDC_ARROW, IDC_HAND, IDC_CROSS, IDC_IBEAM,
 };
 constexpr size_t kRoleCount = static_cast<size_t>(Role::Count);
 constexpr size_t kUnknownSlot = kMappings.size();
 constexpr int kMaxSourceSize = 512;
-constexpr int kShapeSize = 32;
 
 struct CursorImage {
     int width = 0;
@@ -196,17 +249,31 @@ struct CursorShape {
     bool operator==(const CursorShape&) const = default;
 };
 
-// Cropped silhouettes of the shared Office selection and hyperlink pointers.
-constexpr CursorShape kOfficeSelectionShape{12, 20, {
-    0x0c00, 0x0e00, 0x0f00, 0x0f80, 0x0fc0, 0x0fe0, 0x0ff0, 0x0ff8,
-    0x0ffc, 0x0ffe, 0x0fff, 0x0ff0, 0x0ff0, 0x0e78, 0x0c78, 0x083c,
-    0x003c, 0x001e, 0x001e, 0x000c,
-}};
-constexpr CursorShape kOfficeLinkShape{17, 22, {
-    0x0060, 0x00f0, 0x00f0, 0x00f0, 0x00f0, 0x03f0, 0x1ff0, 0x7ff0,
-    0xfff0, 0x1fff7, 0x1ffff, 0x1ffff, 0x1fffe, 0x1fffc, 0x1fffc, 0x1fff8,
-    0xfff8, 0xfff0, 0xfff0, 0x7fe0, 0x7fe0, 0x7fe0,
-}};
+// Cropped silhouettes of shared Office pointers, independent of resource IDs.
+constexpr std::array kOfficeShapes = {
+    std::pair{kArrowId, CursorShape{12, 20, {
+        0x0c00, 0x0e00, 0x0f00, 0x0f80, 0x0fc0, 0x0fe0, 0x0ff0, 0x0ff8,
+        0x0ffc, 0x0ffe, 0x0fff, 0x0ff0, 0x0ff0, 0x0e78, 0x0c78, 0x083c,
+        0x003c, 0x001e, 0x001e, 0x000c,
+    }}},
+    std::pair{kLinkId, CursorShape{17, 22, {
+        0x0060, 0x00f0, 0x00f0, 0x00f0, 0x00f0, 0x03f0, 0x1ff0, 0x7ff0,
+        0xfff0, 0x1fff7, 0x1ffff, 0x1ffff, 0x1fffe, 0x1fffc, 0x1fffc, 0x1fff8,
+        0xfff8, 0xfff0, 0xfff0, 0x7fe0, 0x7fe0, 0x7fe0,
+    }}},
+    std::pair{kUpId, CursorShape{9, 12, {
+        0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x1ff, 0x1ff,
+        0xfe, 0x7c, 0x38, 0x10,
+    }}},
+    std::pair{kHorizontalResizeId, CursorShape{17, 15, {
+        0x6c0, 0x6c0, 0x6c0, 0x6c0, 0x36d8, 0x76dc, 0xfefe, 0x1feff,
+        0xfefe, 0x76dc, 0x36d8, 0x6c0, 0x6c0, 0x6c0, 0x6c0,
+    }}},
+    std::pair{kVerticalResizeId, CursorShape{15, 17, {
+        0x80, 0x1c0, 0x3e0, 0x7f0, 0x7f0, 0x1c0, 0x7fff, 0x7fff,
+        0x0, 0x7fff, 0x7fff, 0x1c0, 0x7f0, 0x7f0, 0x3e0, 0x1c0, 0x80,
+    }}},
+};
 
 struct CursorMatch {
     size_t slot = kUnknownSlot;
@@ -224,6 +291,7 @@ std::once_flag g_referenceShapesInit;
 std::atomic<bool> g_needsCleanup;
 std::atomic<bool> g_replaceInOffice;
 std::atomic<bool> g_replaceInElectron;
+std::atomic<uint32_t> g_enabledTypes;
 std::atomic<bool> g_isOffice;
 bool g_smoothArrows;
 bool g_stopping;
@@ -495,11 +563,10 @@ size_t FindOfficeSlot(const CursorShape& shape) {
     if (!shape.width) {
         return kUnknownSlot;
     }
-    if (shape == kOfficeSelectionShape) {
-        return SystemSlot(kArrowId);
-    }
-    if (shape == kOfficeLinkShape) {
-        return SystemSlot(kLinkId);
+    for (const auto& [id, reference] : kOfficeShapes) {
+        if (reference == shape) {
+            return SystemSlot(id);
+        }
     }
     std::call_once(g_referenceShapesInit, [] {
         for (WORD id = kFirstAutoscrollId; id <= kLastAutoscrollId; ++id) {
@@ -517,9 +584,7 @@ size_t FindOfficeSlot(const CursorShape& shape) {
 }
 
 size_t FindChromiumSlot(const CursorImage& image) {
-    if (image.width != kShapeSize || image.height != kShapeSize ||
-        image.hotX != kShapeSize / 2 || image.hotY != kShapeSize / 2 ||
-        image.color.empty()) {
+    if (image.width != kShapeSize || image.height != kShapeSize) {
         return kUnknownSlot;
     }
     uint64_t hash = 0xcbf29ce484222325;
@@ -529,7 +594,7 @@ size_t FindChromiumSlot(const CursorImage& image) {
         }
     }
     for (const auto& known : kChromiumCursors) {
-        if (known.pixels == hash) {
+        if (known.pixels == hash && known.hotX == image.hotX && known.hotY == image.hotY) {
             return SystemSlot(known.systemId);
         }
     }
@@ -560,7 +625,7 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
     if (HasModuleName(info.szModName, L"comctl32.dll")) {
         return {ResourceSlot(info.wResID, kCommonControlsResources)};
     }
-    if (!office && (!*info.szModName || !bitmaps.hbmColor)) {
+    if (!office && !*info.szModName) {
         return {};
     }
 
@@ -648,8 +713,7 @@ uint32_t SampleSmooth(const CursorImage& source, double centerX, double centerY,
     return result;
 }
 
-CursorImage Rotate(const CursorImage& source, unsigned eighthTurns) {
-    const bool smooth = !source.smoothPixels.empty();
+CursorImage Rotate(const CursorImage& source, unsigned eighthTurns, bool smooth) {
     const bool monochrome = source.color.empty() && !smooth;
     const double angle = eighthTurns * (3.14159265358979323846 / 4.0);
     // Round the exact right angles so trigonometric error cannot add a row.
@@ -912,8 +976,13 @@ void FreeRetired() {
     });
 }
 
+constexpr uint32_t TypeBit(CursorType type) {
+    return uint32_t{1} << static_cast<unsigned>(type);
+}
+
 bool ReplacementEnabled(CursorMatch match) {
-    if (match.slot == kUnknownSlot) {
+    if (match.slot == kUnknownSlot ||
+        !(g_enabledTypes.load(std::memory_order_acquire) & TypeBit(kMappings[match.slot].type))) {
         return false;
     }
     if (g_isOffice.load(std::memory_order_relaxed)) {
@@ -946,11 +1015,13 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
                 }
                 if (!entry.cursor) {
                     const CursorImage& source = *g_sources[role];
+                    const bool smooth = mapping.type == CursorType::AutoscrollArrows &&
+                                        !source.smoothPixels.empty();
                     HCURSOR replacement;
                     if (mapping.mirror) {
                         replacement = MakeCursor(Mirror(source));
-                    } else if (mapping.eighthTurns || !source.smoothPixels.empty()) {
-                        replacement = MakeCursor(Rotate(source, mapping.eighthTurns));
+                    } else if (mapping.eighthTurns || smooth) {
+                        replacement = MakeCursor(Rotate(source, mapping.eighthTurns, smooth));
                     } else {
                         replacement = MakeCursor(source);
                     }
@@ -1000,9 +1071,25 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
 }
 
 void UpdateSettings() {
-    const bool replaceInOffice = Wh_GetIntSetting(L"replaceInOffice") != 0;
-    const bool replaceInElectron = Wh_GetIntSetting(L"replaceInElectron") != 0;
+    const bool replaceInOffice = Wh_GetIntSetting(L"targets.office") != 0;
+    const bool replaceInElectron = Wh_GetIntSetting(L"targets.chromium") != 0;
     const bool smoothArrows = Wh_GetIntSetting(L"smoothDiagonals") != 0;
+    constexpr std::array cursorSettings = {
+        std::pair{CursorType::AutoscrollOrigin, L"cursors.autoscrollOrigin"},
+        std::pair{CursorType::AutoscrollArrows, L"cursors.autoscrollArrows"},
+        std::pair{CursorType::Link, L"cursors.link"},
+        std::pair{CursorType::Resize, L"cursors.resize"},
+        std::pair{CursorType::MarginSelection, L"cursors.marginSelection"},
+        std::pair{CursorType::DownSelection, L"cursors.downSelection"},
+        std::pair{CursorType::Cell, L"cursors.cell"},
+        std::pair{CursorType::VerticalText, L"cursors.verticalText"},
+    };
+    uint32_t enabledTypes = 0;
+    for (const auto& [type, name] : cursorSettings) {
+        if (Wh_GetIntSetting(name)) {
+            enabledTypes |= TypeBit(type);
+        }
+    }
     std::lock_guard lock(g_mutex);
     if (g_smoothArrows != smoothArrows) {
         g_smoothArrows = smoothArrows;
@@ -1010,6 +1097,7 @@ void UpdateSettings() {
     }
     g_replaceInElectron.store(replaceInElectron, std::memory_order_release);
     g_replaceInOffice.store(replaceInOffice, std::memory_order_release);
+    g_enabledTypes.store(enabledTypes, std::memory_order_release);
 }
 
 }  // namespace
