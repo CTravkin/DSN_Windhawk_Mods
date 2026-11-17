@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.0
+// @version         0.10.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 15
+// Build: 16
 
 // ==WindhawkModReadme==
 /*
@@ -31,7 +31,8 @@ Controls and Windows Forms. Chromium includes Electron and compatible embedded
 runtimes. Gecko covers cell selection, resize pointers, and vertical text.
 Qt covers horizontal and vertical splitters. Classic Office can be enabled
 separately. Use an executable name or full path to exclude an application.
-Autoscroll arrows can be smoothed in all eight directions.
+Smoothing is available for the autoscroll starting pointer, all eight
+autoscroll arrows, and selection arrows.
 */
 // ==/WindhawkModReadme==
 
@@ -240,19 +241,34 @@ Autoscroll arrows can be smoothed in all eight directions.
   $name:de-DE: Welche Zeiger ersetzt werden
   $name:pt-BR: Quais ponteiros substituir
   $name:zh-CN: 要替换的指针
-- smoothDiagonals: true
+- smoothing:
+    - autoscrollOrigin: true
+      $name: Autoscroll starting pointer
+      $name:ru-RU: Точка запуска автопрокрутки
+      $name:es-ES: Inicio del desplazamiento automático
+      $name:de-DE: Startpunkt des automatischen Scrollens
+      $name:pt-BR: Início da rolagem automática
+      $name:zh-CN: 自动滚动起点
+    - autoscrollArrows: true
+      $name: Autoscroll arrows
+      $name:ru-RU: Стрелки автопрокрутки
+      $name:es-ES: Flechas de desplazamiento automático
+      $name:de-DE: Pfeile für automatisches Scrollen
+      $name:pt-BR: Setas de rolagem automática
+      $name:zh-CN: 自动滚动方向箭头
+    - selectionArrows: true
+      $name: Selection arrows
+      $name:ru-RU: Стрелки выделения
+      $name:es-ES: Flechas de selección
+      $name:de-DE: Auswahlpfeile
+      $name:pt-BR: Setas de seleção
+      $name:zh-CN: 选择箭头
   $name: Smoothing
   $name:ru-RU: Сглаживание
   $name:es-ES: Suavizado
   $name:de-DE: Kantenglättung
   $name:pt-BR: Suavização
   $name:zh-CN: 边缘平滑
-  $description: Smooth the edges of autoscroll arrows in all eight directions
-  $description:ru-RU: Сглаживание краев стрелок автопрокрутки во всех восьми направлениях
-  $description:es-ES: Suaviza los bordes de las flechas de desplazamiento automático en las ocho direcciones
-  $description:de-DE: Glättet die Kanten der Scrollpfeile in allen acht Richtungen
-  $description:pt-BR: Suaviza as bordas das setas de rolagem automática nas oito direções
-  $description:zh-CN: 平滑八个方向的自动滚动箭头边缘
 */
 // ==/WindhawkModSettings==
 
@@ -290,6 +306,10 @@ enum class CursorType {
     VerticalText,
     Move,
 };
+
+constexpr uint32_t TypeBit(CursorType type) {
+    return uint32_t{1} << static_cast<unsigned>(type);
+}
 
 struct CursorMapping {
     WORD systemId;  // Zero for selection arrow shapes without a system ID.
@@ -478,6 +498,7 @@ struct MemoryDc {
 struct Replacement {
     HCURSOR cursor = nullptr;
     HCURSOR original = nullptr;
+    bool smooth = false;
 };
 
 struct ThreadSelection {
@@ -608,7 +629,7 @@ std::atomic<uint32_t> g_enabledTypes;
 std::atomic<bool> g_isOffice;
 std::atomic<bool> g_processExcluded;
 std::vector<std::wstring> g_excludedApplications;
-bool g_smoothArrows;
+uint32_t g_smoothingTypes;
 bool g_stopping;
 bool g_watchStarted;
 HKEY g_cursorsKey;
@@ -1285,8 +1306,11 @@ void CheckCursorSettings() {
 
 bool RefreshSource(Role role) {
     const size_t index = static_cast<size_t>(role);
-    auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]),
-                            role == Role::Up && g_smoothArrows);
+    const bool prepareSmoothing = std::any_of(
+        kMappings.begin(), kMappings.end(), [role](const CursorMapping& mapping) {
+            return mapping.role == role && (g_smoothingTypes & TypeBit(mapping.type));
+        });
+    auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]), prepareSmoothing);
     if (!image) {
         g_needsRefresh[index] = true;
         return false;
@@ -1390,10 +1414,6 @@ void FreeRetired() {
         return entry.cursor != visible.hCursor && entry.cursor != threadCursor &&
                !IsAssigned(entry.cursor) && DestroyCursor(entry.cursor);
     });
-}
-
-constexpr uint32_t TypeBit(CursorType type) {
-    return uint32_t{1} << static_cast<unsigned>(type);
 }
 
 constexpr uint32_t TargetBit(Target target) {
@@ -1527,15 +1547,15 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
             CheckCursorSettings();
             if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
                 RefreshSource(mapping.role)) {
+                const CursorImage& source = *g_sources[role];
+                const bool smooth = (g_smoothingTypes & TypeBit(mapping.type)) &&
+                                    !source.smoothPixels.empty();
                 auto& entry = g_replacements[match.slot];
-                if (entry.cursor && entry.original != cursor) {
+                if (entry.cursor && (entry.original != cursor || entry.smooth != smooth)) {
                     g_retired.push_back(entry);
                     entry = {};
                 }
                 if (!entry.cursor) {
-                    const CursorImage& source = *g_sources[role];
-                    const bool smooth = mapping.type == CursorType::AutoscrollArrows &&
-                                        !source.smoothPixels.empty();
                     HCURSOR replacement;
                     if (mapping.mirror) {
                         replacement = MakeCursor(Mirror(source));
@@ -1545,7 +1565,7 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
                         replacement = MakeCursor(source);
                     }
                     if (replacement) {
-                        entry = {replacement, cursor};
+                        entry = {replacement, cursor, smooth};
                     }
                 }
                 if (entry.cursor) {
@@ -1590,7 +1610,17 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
 }
 
 void UpdateSettings() {
-    const bool smoothArrows = Wh_GetIntSetting(L"smoothDiagonals") != 0;
+    constexpr std::array smoothingSettings = {
+        std::pair{CursorType::AutoscrollOrigin, L"smoothing.autoscrollOrigin"},
+        std::pair{CursorType::AutoscrollArrows, L"smoothing.autoscrollArrows"},
+        std::pair{CursorType::SelectionArrows, L"smoothing.selectionArrows"},
+    };
+    uint32_t smoothingTypes = 0;
+    for (const auto& [type, name] : smoothingSettings) {
+        if (Wh_GetIntSetting(name)) {
+            smoothingTypes |= TypeBit(type);
+        }
+    }
     constexpr std::array targetSettings = {
         std::pair{Target::Windows, L"targets.windows"},
         std::pair{Target::Chromium, L"targets.chromium"},
@@ -1625,9 +1655,14 @@ void UpdateSettings() {
     const bool processExcluded = !exclusions.empty() &&
         IsExcluded(ProcessImagePath(GetCurrentProcess()), exclusions);
     std::lock_guard lock(g_mutex);
-    if (g_smoothArrows != smoothArrows) {
-        g_smoothArrows = smoothArrows;
-        g_needsRefresh[static_cast<size_t>(Role::Up)] = true;
+    const uint32_t changedSmoothing = g_smoothingTypes ^ smoothingTypes;
+    if (changedSmoothing) {
+        for (const auto& mapping : kMappings) {
+            if (changedSmoothing & TypeBit(mapping.type)) {
+                g_needsRefresh[static_cast<size_t>(mapping.role)] = true;
+            }
+        }
+        g_smoothingTypes = smoothingTypes;
     }
     g_excludedApplications = std::move(exclusions);
     g_processExcluded.store(processExcluded, std::memory_order_release);

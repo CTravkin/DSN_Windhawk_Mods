@@ -62,8 +62,9 @@ Add one executable name (for example, `example.exe`) or full path per row
 under **Excluded applications**. A name matches any location. A full path
 matches a specific installation.
 
-**Smoothing** is on by default and applies to the eight autoscroll
-directional arrows. Change the cursor scheme and pointer roles in Windows.
+**Smoothing** has separate switches for the autoscroll starting pointer,
+all eight autoscroll arrows, and selection arrows. All three are on by default.
+Change the cursor scheme and pointer roles in Windows.
 
 ### Manual preview
 
