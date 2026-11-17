@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.6
+// @version         0.10.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 21
+// Build: 22
 
 // ==WindhawkModReadme==
 /*
@@ -712,6 +712,10 @@ HMODULE ThisModule() {
 HWND EnsureRestoreWindow() {
     thread_local HWND window;
     thread_local uint64_t session;
+    thread_local bool unavailable;
+    if (unavailable) {
+        return nullptr;
+    }
     const auto currentSession = g_sessionId.load();
     if (session != currentSession || !IsWindow(window)) {
         const auto module = ThisModule();
@@ -748,7 +752,15 @@ HWND EnsureRestoreWindow() {
             if (lifetime) {
                 CloseHandle(lifetime);
             }
-            DestroyWindow(window);
+            if (!DestroyWindow(window)) {
+                // A CBT hook can veto destruction. This untracked orphan still
+                // calls our WndProc, so prevent both unloading and further orphans.
+                HMODULE pin = nullptr;
+                GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                                      GET_MODULE_HANDLE_EX_FLAG_PIN,
+                                  reinterpret_cast<PCWSTR>(RestoreWindowProc), &pin);
+                unavailable = true;
+            }
             window = nullptr;
         }
     }
@@ -2059,7 +2071,7 @@ void RestoreStoppedThread() {
                             continue;
                         }
                         if (owner.restoreWindow) {
-                            window = std::exchange(owner.restoreWindow, nullptr);
+                            window = owner.restoreWindow;
                         } else if (owner.callHook) {
                             hook = std::exchange(owner.callHook, nullptr);
                         } else if (owner.messageHook) {
@@ -2075,7 +2087,17 @@ void RestoreStoppedThread() {
                 }
             }
             if (window) {
-                DestroyWindow(window);
+                if (!DestroyWindow(window)) {
+                    std::lock_guard lock(g_mutex);
+                    for (const auto& session : g_restoreSessions) {
+                        for (auto& owner : session->owners) {
+                            if (owner.restoreWindow == window) {
+                                owner.deferredCode = true;
+                            }
+                        }
+                    }
+                    break;
+                }
             } else if (hook) {
                 UnhookWindowsHookEx(hook);
             } else {
@@ -2130,7 +2152,8 @@ bool ReleaseSession(const std::shared_ptr<RestoreSession>& session) {
         return false;
     }
     for (const auto& owner : session->owners) {
-        if (!owner.restored && WaitForSingleObject(owner.lifetime, 0) != WAIT_OBJECT_0) {
+        if ((!owner.restored || owner.restoreWindow) &&
+            WaitForSingleObject(owner.lifetime, 0) != WAIT_OBJECT_0) {
             return false;
         }
     }
@@ -2421,7 +2444,7 @@ void Wh_ModBeforeUninit() {
                     std::lock_guard lock(g_mutex);
                     for (auto& owner : session->owners) {
                         if (owner.id == thread) {
-                            owner.deferredCode = !delivered;
+                            owner.deferredCode |= !delivered;
                         }
                     }
                 }

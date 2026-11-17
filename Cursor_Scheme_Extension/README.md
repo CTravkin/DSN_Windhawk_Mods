@@ -17,8 +17,12 @@ per GUI thread, and rotated arrows are built in memory when needed.
 Published cursor handles remain valid until the mod restores the process's
 input queues. The cache holds up to 128 instances across active and stopped
 sessions. While full, further requests use the application's original cursor.
-An unresponsive input thread restores its cursor when it resumes. The callback
-code remains resident until that thread exits.
+An unresponsive input thread restores its cursor when it resumes. Callback code
+can remain resident until its owning thread exits, including when a removed
+hook is still returning. If Windows cannot enumerate input owners, their cursor
+handles remain valid until the process exits.
+If an untracked restore window cannot be destroyed, its callback code also
+remains resident until the process exits.
 
 Excel draws the stationary marker at the click position. The mod applies the
 Windows scheme to the pointer at the start and during autoscroll. Firefox

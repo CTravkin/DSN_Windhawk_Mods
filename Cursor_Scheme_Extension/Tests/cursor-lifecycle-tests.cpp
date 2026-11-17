@@ -5,6 +5,22 @@
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor);
 bool failSnapshot;
+bool failTracking;
+bool permanentPin;
+
+BOOL WINAPI TestDuplicateHandle(HANDLE sourceProcess, HANDLE source, HANDLE targetProcess,
+                               HANDLE* target, DWORD access, BOOL inherit, DWORD options) {
+    if (failTracking) {
+        SetLastError(ERROR_NOT_ENOUGH_MEMORY);
+        return FALSE;
+    }
+    return DuplicateHandle(sourceProcess, source, targetProcess, target, access, inherit, options);
+}
+
+BOOL WINAPI TestModuleHandle(DWORD flags, LPCWSTR address, HMODULE* module) {
+    permanentPin |= (flags & GET_MODULE_HANDLE_EX_FLAG_PIN) != 0;
+    return GetModuleHandleExW(flags, address, module);
+}
 
 HANDLE WINAPI TestSnapshot(DWORD flags, DWORD process) {
     if (failSnapshot) {
@@ -15,7 +31,11 @@ HANDLE WINAPI TestSnapshot(DWORD flags, DWORD process) {
 }
 
 #define CreateToolhelp32Snapshot TestSnapshot
+#define DuplicateHandle TestDuplicateHandle
+#define GetModuleHandleExW TestModuleHandle
 #include "../Mod/cursor-scheme-extension.wh.cpp"
+#undef GetModuleHandleExW
+#undef DuplicateHandle
 #undef CreateToolhelp32Snapshot
 
 namespace {
@@ -436,6 +456,51 @@ void ResponsiveForeignUnload() {
     }
     DestroyCursor(original);
 }
+
+HWND vetoedWindow;
+
+LRESULT CALLBACK VetoRestoreDestruction(int code, WPARAM wParam, LPARAM lParam) {
+    if (code == HCBT_DESTROYWND) {
+        WCHAR name[96]{};
+        GetClassNameW(reinterpret_cast<HWND>(wParam), name, 96);
+        if (wcscmp(name, kRestoreClass) == 0) {
+            vetoedWindow = reinterpret_cast<HWND>(wParam);
+            return 1;
+        }
+    }
+    return CallNextHookEx(nullptr, code, wParam, lParam);
+}
+
+void VetoedWindow(bool trackingFailure) {
+    HWND window = AppWindow();
+    HCURSOR original = Fixture(0xffabcdef);
+    HHOOK veto = SetWindowsHookExW(WH_CBT, VetoRestoreDestruction, nullptr, GetCurrentThreadId());
+    Check(veto != nullptr, "CBT hook registered");
+    failTracking = trackingFailure;
+    SetCursorHook(original);
+    failTracking = false;
+    Finish();
+    Check(vetoedWindow && IsWindow(vetoedWindow), "CBT veto leaves the private HWND alive");
+    Check(GetCursor() == original, "cursor restored despite CBT veto");
+    if (trackingFailure) {
+        Check(permanentPin && g_instances.empty(),
+              "untracked orphan pins callback code and avoids publishing a cursor");
+    } else {
+        Check(!g_restoreSessions.empty() && g_restoreSessions.front()->owners.front().deferredCode,
+              "tracked orphan retains its stopped session and code");
+    }
+    UnhookWindowsHookEx(veto);
+    if (IsWindow(vetoedWindow)) {
+        SendMessageW(vetoedWindow, kRestoreMessage, 0, 0);
+        if (IsWindow(vetoedWindow)) {
+            DestroyWindow(vetoedWindow);
+        }
+    }
+    Check(!IsWindow(vetoedWindow), "private window can be destroyed after veto removal");
+    SetCursor(nullptr);
+    DestroyCursor(original);
+    DestroyWindow(window);
+}
 }  // namespace
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor) {
@@ -464,6 +529,8 @@ int main(int argc, char** argv) {
     else if (test == "inherited") InheritedQueue();
     else if (test == "discovery-failure") FailedDiscovery();
     else if (test == "responsive") ResponsiveForeignUnload();
+    else if (test == "cbt") VetoedWindow(false);
+    else if (test == "orphan") VetoedWindow(true);
     else return 2;
     std::printf("%s: %s\n", argv[1], failures ? "FAIL" : "PASS");
     return failures ? 1 : 0;

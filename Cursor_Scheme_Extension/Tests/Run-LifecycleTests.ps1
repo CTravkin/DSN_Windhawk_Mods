@@ -25,7 +25,7 @@ foreach ($architecture in 'x86_64', 'i686') {
     }
 
     foreach ($scenario in 'reentrant', 'unload', 'shared', 'cache', 'slow', 'reload',
-                          'inherited', 'discovery-failure', 'responsive') {
+                          'inherited', 'discovery-failure', 'responsive', 'cbt', 'orphan') {
         $log = Join-Path $buildRoot "cursor-lifecycle-$architecture-$scenario.txt"
         $launch = @{
             FilePath = $executable
