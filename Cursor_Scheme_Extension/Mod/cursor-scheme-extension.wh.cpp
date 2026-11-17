@@ -7,7 +7,7 @@
 // @description:de-DE Ersetzt anwendungseigene Mauszeiger durch die Zeiger des ausgewählten Windows-Schemas
 // @description:pt-BR Substitui os ponteiros dos aplicativos pelos do esquema selecionado no Windows
 // @description:zh-CN 将应用内置的鼠标指针替换为所选 Windows 方案中的指针
-// @version         1.0.0
+// @version         1.0.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 23
+// Build: 24
 
 // ==WindhawkModReadme==
 /*
@@ -71,11 +71,9 @@ Select a pointer scheme in Windows, then open the mod's **Settings**. **Applicat
 | Gecko | Firefox and compatible apps: cell selection, resizing, and vertical text |
 | Qt | Panel splitters in applications with a Qt interface |
 
-Windows, Chromium, Gecko, Qt, and all pointer types are on by default. Office is off by default.
-
 Under **Application exclusions**, below the family switches, add one executable name or full path per row. A name matches any installation of that executable; a full path matches one location.
 
-**Smoothing** has separate switches for **Autoscroll activation**, **Autoscroll arrows**, and **Selection arrows**. All three are on by default, and all eight autoscroll directions are covered.
+**Smoothing** has separate switches for **Autoscroll activation**, **Autoscroll arrows**, and **Selection arrows**. Autoscroll smoothing covers all eight directions.
 
 ## Links
 
@@ -126,7 +124,7 @@ Under **Application exclusions**, below the family switches, add one executable 
       $description:de-DE: "Chrome, Edge, Electron-Apps und eingebettete Chromium-Browser"
       $description:pt-BR: "Chrome, Edge, aplicativos Electron e navegadores Chromium incorporados"
       $description:zh-CN: "Chrome、Edge、Electron 应用和嵌入式 Chromium 浏览器"
-    - gecko: true
+    - gecko: false
       $name: "Gecko"
       $name:ru-RU: "Gecko"
       $name:es-ES: "Gecko"
@@ -250,7 +248,7 @@ Under **Application exclusions**, below the family switches, add one executable 
       $description:de-DE: "Pfeile zur Auswahl von Zeilen, Spalten oder der gesamten Tabelle"
       $description:pt-BR: "Setas para selecionar linhas, colunas ou a tabela inteira"
       $description:zh-CN: "用于选择行、列或整个表格的箭头"
-    - cell: true
+    - cell: false
       $name: "Cell selection"
       $name:ru-RU: "Выбор ячейки"
       $name:es-ES: "Selección de celdas"

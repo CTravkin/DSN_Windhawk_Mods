@@ -60,11 +60,9 @@ Select a pointer scheme in Windows, then open the mod's **Settings** in Windhawk
 | Gecko | Firefox and compatible apps: cell selection, resizing, and vertical text |
 | Qt | Panel splitters in applications with a Qt interface |
 
-Windows, Chromium, Gecko, Qt, and all pointer types are on by default. Office is off by default.
-
 Under **Application exclusions**, below the family switches, add one executable name or full path per row. A name matches any installation of that executable; a full path matches one location.
 
-**Smoothing** has separate switches for **Autoscroll activation**, **Autoscroll arrows**, and **Selection arrows**. All three are on by default, and all eight autoscroll directions are covered.
+**Smoothing** has separate switches for **Autoscroll activation**, **Autoscroll arrows**, and **Selection arrows**. Autoscroll smoothing covers all eight directions.
 
 ### Verification
 
