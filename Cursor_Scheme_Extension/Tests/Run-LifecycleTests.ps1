@@ -24,7 +24,8 @@ foreach ($architecture in 'x86_64', 'i686') {
         throw "Lifecycle test compilation failed ($architecture)"
     }
 
-    foreach ($scenario in 'reentrant', 'unload', 'shared', 'cache', 'slow', 'reload', 'inherited') {
+    foreach ($scenario in 'reentrant', 'unload', 'shared', 'cache', 'slow', 'reload',
+                          'inherited', 'discovery-failure', 'responsive') {
         $log = Join-Path $buildRoot "cursor-lifecycle-$architecture-$scenario.txt"
         $launch = @{
             FilePath = $executable

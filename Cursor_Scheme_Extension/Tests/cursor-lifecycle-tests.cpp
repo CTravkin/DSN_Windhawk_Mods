@@ -1,10 +1,22 @@
 #include <windhawk_api.h>
+#include <tlhelp32.h>
 #include <atomic>
 #include <cstdio>
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor);
+bool failSnapshot;
 
+HANDLE WINAPI TestSnapshot(DWORD flags, DWORD process) {
+    if (failSnapshot) {
+        SetLastError(ERROR_ACCESS_DENIED);
+        return INVALID_HANDLE_VALUE;
+    }
+    return CreateToolhelp32Snapshot(flags, process);
+}
+
+#define CreateToolhelp32Snapshot TestSnapshot
 #include "../Mod/cursor-scheme-extension.wh.cpp"
+#undef CreateToolhelp32Snapshot
 
 namespace {
 int failures;
@@ -378,6 +390,52 @@ void InheritedQueue() {
     DestroyCursor(original);
     DestroyWindow(window);
 }
+
+void FailedDiscovery() {
+    HWND window = AppWindow();
+    HCURSOR original = Fixture(0xff89abcd);
+    SetCursorHook(original);
+    HCURSOR displayed = GetCursor();
+    Check(displayed && displayed != original, "failure-path fixture is themed");
+    failSnapshot = true;
+    Finish();
+    Check(GetCursor() == original, "known queue restored even when discovery fails");
+    Check(Readable(displayed) && !g_restoreSessions.empty(),
+          "incomplete discovery retains unknown owners' handles");
+    Start();
+    failSnapshot = false;
+    SetCursorHook(original);
+    Check(GetCursor() != original && GetCursorHook() == original,
+          "retained failure context does not disable later sessions");
+    SetCursorHook(nullptr);
+    Finish();
+    SetCursor(nullptr);
+    DestroyCursor(original);
+    DestroyWindow(window);
+}
+
+void ResponsiveForeignUnload() {
+    HCURSOR original = Fixture(0xff9abcde);
+    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, TRUE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
+    HANDLE owner = CreateThread(nullptr, 0, DelayedOwner, &test, 0, nullptr);
+    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0,
+          "responsive owner ready");
+    Finish();
+    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
+          "responsive owner restored from another thread");
+    Check(g_restoreSessions.empty() && !Readable(test.displayed),
+          "normal cross-thread unload leaves no deferred session or cursor");
+    SetEvent(test.exit);
+    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "responsive owner exited");
+    CloseHandle(owner);
+    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
+        CloseHandle(event);
+    }
+    DestroyCursor(original);
+}
 }  // namespace
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor) {
@@ -404,6 +462,8 @@ int main(int argc, char** argv) {
     else if (test == "slow") SlowUnload();
     else if (test == "reload") ReloadWithPendingQueue();
     else if (test == "inherited") InheritedQueue();
+    else if (test == "discovery-failure") FailedDiscovery();
+    else if (test == "responsive") ResponsiveForeignUnload();
     else return 2;
     std::printf("%s: %s\n", argv[1], failures ? "FAIL" : "PASS");
     return failures ? 1 : 0;

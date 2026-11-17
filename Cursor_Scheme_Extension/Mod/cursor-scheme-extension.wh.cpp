@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.5
+// @version         0.10.6
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 20
+// Build: 21
 
 // ==WindhawkModReadme==
 /*
@@ -535,6 +535,7 @@ struct RestoreSession {
     HMODULE module = nullptr;
     HANDLE changed = nullptr;
     std::atomic<bool> hooksRemoved{false};
+    bool discoveryComplete = true;
     std::vector<CursorInstance> instances;
     std::vector<ThreadSelection> owners;
 
@@ -2133,10 +2134,12 @@ bool ReleaseSession(const std::shared_ptr<RestoreSession>& session) {
             return false;
         }
     }
-    for (const auto& instance : session->instances) {
-        DestroyCursor(instance.cursor);
+    std::erase_if(session->instances, [](const CursorInstance& instance) {
+        return DestroyCursor(instance.cursor) != FALSE;
+    });
+    if (!session->instances.empty()) {
+        return false;
     }
-    session->instances.clear();
     for (const auto& owner : session->owners) {
         if (owner.callHook) {
             UnhookWindowsHookEx(owner.callHook);
@@ -2182,13 +2185,18 @@ DWORD WINAPI DeferredRestoreCleanup(void* parameter) {
     FreeLibraryAndExitThread(module, 0);
 }
 
-void DiscoverInputOwners(const std::shared_ptr<RestoreSession>& session) {
+bool DiscoverInputOwners(const std::shared_ptr<RestoreSession>& session) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
     if (snapshot == INVALID_HANDLE_VALUE) {
-        return;
+        return false;
     }
+    bool complete = true;
     THREADENTRY32 entry{sizeof(entry)};
-    for (BOOL found = Thread32First(snapshot, &entry); found; found = Thread32Next(snapshot, &entry)) {
+    BOOL found = Thread32First(snapshot, &entry);
+    if (!found) {
+        complete = GetLastError() == ERROR_NO_MORE_FILES;
+    }
+    for (; found; found = Thread32Next(snapshot, &entry)) {
         if (entry.th32OwnerProcessID != GetCurrentProcessId()) {
             continue;
         }
@@ -2198,6 +2206,7 @@ void DiscoverInputOwners(const std::shared_ptr<RestoreSession>& session) {
         }
         HANDLE lifetime = OpenThread(SYNCHRONIZE, FALSE, entry.th32ThreadID);
         if (!lifetime) {
+            complete &= GetLastError() == ERROR_INVALID_PARAMETER;
             continue;
         }
         const HWND window = FindCursorWindow(entry.th32ThreadID);
@@ -2219,7 +2228,9 @@ void DiscoverInputOwners(const std::shared_ptr<RestoreSession>& session) {
             CloseHandle(lifetime);
         }
     }
+    complete &= GetLastError() == ERROR_NO_MORE_FILES;
     CloseHandle(snapshot);
+    return complete;
 }
 
 void UpdateSettings() {
@@ -2341,7 +2352,10 @@ void Wh_ModBeforeUninit() {
             g_unloading = session;
         }
         // Input can be inherited by a queue which never called either cursor hook.
-        DiscoverInputOwners(session);
+        if (!session->instances.empty()) {
+            session->discoveryComplete = false;
+            session->discoveryComplete = DiscoverInputOwners(session);
+        }
         std::vector<DWORD> threads;
         {
             std::lock_guard lock(g_mutex);
@@ -2349,55 +2363,76 @@ void Wh_ModBeforeUninit() {
                 threads.push_back(owner.id);
             }
         }
+
         for (DWORD thread : threads) {
             if (thread == GetCurrentThreadId()) {
                 RestoreStoppedThread();
                 continue;
             }
-            const HHOOK call = SetWindowsHookExW(WH_CALLWNDPROC, RestoreCallHook, pin, thread);
-            const HHOOK message = SetWindowsHookExW(WH_GETMESSAGE, RestoreMessageHook, pin, thread);
             HWND window = nullptr;
             bool privateWindow = false;
-            bool alreadyRestored = false;
             {
                 std::lock_guard lock(g_mutex);
                 for (auto& owner : session->owners) {
                     if (owner.id == thread) {
-                        if (!owner.restored) {
-                            owner.callHook = call;
-                            owner.messageHook = message;
-                            privateWindow = owner.restoreWindow != nullptr;
-                            window = owner.restoreWindow ? owner.restoreWindow : owner.window;
-                        } else {
-                            alreadyRestored = true;
-                        }
+                        privateWindow = owner.restoreWindow != nullptr;
+                        window = privateWindow ? owner.restoreWindow : owner.window;
+                        // This is set before either hook can start on another thread.
+                        // UnhookWindowsHookEx does not wait for in-flight callbacks.
+                        owner.deferredCode = !privateWindow;
                         break;
                     }
                 }
             }
-            if (alreadyRestored) {
-                if (call) {
-                    UnhookWindowsHookEx(call);
-                }
-                if (message) {
-                    UnhookWindowsHookEx(message);
-                }
-                continue;
-            }
-            const bool delivered = window &&
-                SendMessageTimeoutW(window, privateWindow ? kRestoreMessage : WM_NULL, 0, 0,
-                                    SMTO_ABORTIFHUNG | SMTO_BLOCK | SMTO_ERRORONEXIT,
-                                    100, nullptr);
-            {
-                std::lock_guard lock(g_mutex);
-                for (auto& owner : session->owners) {
-                    if (owner.id == thread) {
-                        owner.deferredCode = !delivered;
+            if (!privateWindow) {
+                const HHOOK call = SetWindowsHookExW(WH_CALLWNDPROC, RestoreCallHook, pin, thread);
+                const HHOOK message = SetWindowsHookExW(WH_GETMESSAGE, RestoreMessageHook, pin, thread);
+                bool alreadyRestored = false;
+                {
+                    std::lock_guard lock(g_mutex);
+                    for (auto& owner : session->owners) {
+                        if (owner.id == thread) {
+                            alreadyRestored = owner.restored;
+                            if (!alreadyRestored) {
+                                owner.callHook = call;
+                                owner.messageHook = message;
+                            }
+                            break;
+                        }
                     }
                 }
+                if (alreadyRestored) {
+                    if (call) {
+                        UnhookWindowsHookEx(call);
+                    }
+                    if (message) {
+                        UnhookWindowsHookEx(message);
+                    }
+                    continue;
+                }
             }
-            // PostThreadMessage reaches message-only input queues as well.
-            PostThreadMessageW(thread, WM_NULL, 0, 0);
+            const UINT flags = SMTO_ABORTIFHUNG | SMTO_BLOCK |
+                (privateWindow ? 0u : SMTO_ERRORONEXIT);
+            const bool delivered = window &&
+                SendMessageTimeoutW(window, privateWindow ? kRestoreMessage : WM_NULL, 0, 0,
+                                    flags, 100, nullptr);
+            if (privateWindow) {
+                {
+                    std::lock_guard lock(g_mutex);
+                    for (auto& owner : session->owners) {
+                        if (owner.id == thread) {
+                            owner.deferredCode = !delivered;
+                        }
+                    }
+                }
+                if (!delivered) {
+                    PostMessageW(window, kRestoreMessage, 0, 0);
+                }
+            } else {
+                // Only the owner's exit proves that a removed hook has returned.
+                // The module pin is retained even after a synchronous acknowledgement.
+                PostThreadMessageW(thread, WM_NULL, 0, 0);
+            }
         }
     } catch (...) {
         // A successful module pin must survive any unserviced restore callback.
@@ -2428,6 +2463,11 @@ void Wh_ModUninit() {
         return;
     }
     session->hooksRemoved.store(true, std::memory_order_release);
+    if (!session->discoveryComplete) {
+        // Unknown input owners can still hold an alias. Keep its identity and
+        // native handle until process exit rather than invalidate a live queue.
+        return;
+    }
     const bool pendingCode = std::any_of(session->owners.begin(), session->owners.end(),
         [](const ThreadSelection& owner) { return owner.deferredCode; });
     if (!pendingCode && ReleaseSession(session)) {
