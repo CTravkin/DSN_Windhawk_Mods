@@ -98,7 +98,7 @@ BOOL CALLBACK OfficeResource(HMODULE module, PCWSTR, PWSTR name, LONG_PTR) {
 
 int wmain(int argc, wchar_t** argv) {
     try {
-        // output, Windows cursor directory, Bibata directory, W11 directory, Office executable
+        // output, Windows cursor directory, W11 directory, Vision directory, Office executable
         if (argc != 6) return 2;
         output = argv[1];
         std::filesystem::create_directories(output);
@@ -130,8 +130,8 @@ int wmain(int argc, wchar_t** argv) {
         struct Theme {const wchar_t* name; const wchar_t* folder; const wchar_t* prefix;};
         const std::array themes = {
             Theme{L"aero", argv[2], L"aero_"},
-            Theme{L"bibata", argv[3], L""},
-            Theme{L"w11", argv[4], L""}};
+            Theme{L"w11", argv[3], L""},
+            Theme{L"vision", argv[4], L""}};
         for (size_t i = 0; i < themes.size(); ++i) {
             const auto& theme = themes[i];
             auto role = [&](const wchar_t* file) {

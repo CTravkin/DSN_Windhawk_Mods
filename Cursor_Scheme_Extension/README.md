@@ -6,9 +6,9 @@ Cursor Scheme Extension replaces built-in application pointers with pointers fro
 
 The mod uses the scheme already selected in Windows and picks up changes to it automatically. Transformed pointers are created and cached in memory.
 
-![Selected application pointers without and with Cursor Scheme Extension, using Windows Aero, Bibata Original Ice, and W11 Concept Light Classic](Assets/Previews/Comparison.en.png)
+![Three pairs of application pointers without and with Cursor Scheme Extension: Windows Aero, W11 Concept, and Vision](Assets/Previews/Comparison.en.png)
 
-Cursor artwork: Windows and Office by Microsoft, [Bibata Original](https://github.com/ful1e5/Bibata_Cursor) by ful1e5, [W11 Concept](https://www.deviantart.com/jepricreations/art/Windows-11-Cursors-Concept-HD-v2-890672103) by jepriCreations. [Image sources and rendering](Assets/Previews/CREDITS.md).
+Cursor artwork: Windows and Office by Microsoft, [W11 Concept](https://www.deviantart.com/jepricreations/art/Windows-11-Cursors-Concept-HD-v2-890672103) by jepriCreations, [Vision](https://www.deviantart.com/idarques/art/Vision-Cursor-911891424) by IDarques.
 
 ## Features
 

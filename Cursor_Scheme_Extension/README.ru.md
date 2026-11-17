@@ -6,9 +6,9 @@ Cursor Scheme Extension заменяет встроенные курсоры п�
 
 Мод использует уже выбранную в Windows схему и автоматически подхватывает ее изменения. Преобразованные указатели создаются и кешируются в памяти.
 
-![Сравнение курсоров приложений без мода и с Cursor Scheme Extension для Windows Aero, Bibata Original Ice и W11 Concept Light Classic](Assets/Previews/Comparison.ru.png)
+![Три пары курсоров приложений без мода и с Cursor Scheme Extension: Windows Aero, W11 Concept и Vision](Assets/Previews/Comparison.en.png)
 
-Авторы курсоров: Windows и Office — Microsoft, [Bibata Original](https://github.com/ful1e5/Bibata_Cursor) — ful1e5, [W11 Concept](https://www.deviantart.com/jepricreations/art/Windows-11-Cursors-Concept-HD-v2-890672103) — jepriCreations. [Источники и способ отрисовки](Assets/Previews/CREDITS.md).
+Авторы курсоров: Windows и Office — Microsoft, [W11 Concept](https://www.deviantart.com/jepricreations/art/Windows-11-Cursors-Concept-HD-v2-890672103) — jepriCreations, [Vision](https://www.deviantart.com/idarques/art/Vision-Cursor-911891424) — IDarques.
 
 ## Функции
 
