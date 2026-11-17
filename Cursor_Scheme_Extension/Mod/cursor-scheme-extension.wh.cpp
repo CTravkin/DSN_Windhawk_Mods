@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.1
+// @version         0.10.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 16
+// Build: 17
 
 // ==WindhawkModReadme==
 /*
@@ -32,7 +32,8 @@ runtimes. Gecko covers cell selection, resize pointers, and vertical text.
 Qt covers horizontal and vertical splitters. Classic Office can be enabled
 separately. Use an executable name or full path to exclude an application.
 Smoothing is available for the autoscroll starting pointer, all eight
-autoscroll arrows, and selection arrows.
+autoscroll arrows, and selection arrows. Animated scheme roles keep their
+frame order and timing.
 */
 // ==/WindhawkModReadme==
 
@@ -241,34 +242,27 @@ autoscroll arrows, and selection arrows.
   $name:de-DE: Welche Zeiger ersetzt werden
   $name:pt-BR: Quais ponteiros substituir
   $name:zh-CN: 要替换的指针
-- smoothing:
-    - autoscrollOrigin: true
-      $name: Autoscroll starting pointer
-      $name:ru-RU: Точка запуска автопрокрутки
-      $name:es-ES: Inicio del desplazamiento automático
-      $name:de-DE: Startpunkt des automatischen Scrollens
-      $name:pt-BR: Início da rolagem automática
-      $name:zh-CN: 自动滚动起点
-    - autoscrollArrows: true
-      $name: Autoscroll arrows
-      $name:ru-RU: Стрелки автопрокрутки
-      $name:es-ES: Flechas de desplazamiento automático
-      $name:de-DE: Pfeile für automatisches Scrollen
-      $name:pt-BR: Setas de rolagem automática
-      $name:zh-CN: 自动滚动方向箭头
-    - selectionArrows: true
-      $name: Selection arrows
-      $name:ru-RU: Стрелки выделения
-      $name:es-ES: Flechas de selección
-      $name:de-DE: Auswahlpfeile
-      $name:pt-BR: Setas de seleção
-      $name:zh-CN: 选择箭头
-  $name: Smoothing
-  $name:ru-RU: Сглаживание
-  $name:es-ES: Suavizado
-  $name:de-DE: Kantenglättung
-  $name:pt-BR: Suavização
-  $name:zh-CN: 边缘平滑
+- smoothAutoscrollOrigin: true
+  $name: Smooth autoscroll starting pointer
+  $name:ru-RU: Сглаживание точки запуска автопрокрутки
+  $name:es-ES: Suavizar el inicio del desplazamiento automático
+  $name:de-DE: Startpunkt des automatischen Scrollens glätten
+  $name:pt-BR: Suavizar o início da rolagem automática
+  $name:zh-CN: 平滑自动滚动起点
+- smoothDiagonals: true
+  $name: Smooth autoscroll arrows
+  $name:ru-RU: Сглаживание стрелок автопрокрутки
+  $name:es-ES: Suavizar las flechas de desplazamiento automático
+  $name:de-DE: Pfeile für automatisches Scrollen glätten
+  $name:pt-BR: Suavizar as setas de rolagem automática
+  $name:zh-CN: 平滑自动滚动方向箭头
+- smoothSelectionArrows: true
+  $name: Smooth selection arrows
+  $name:ru-RU: Сглаживание стрелок выделения
+  $name:es-ES: Suavizar las flechas de selección
+  $name:de-DE: Auswahlpfeile glätten
+  $name:pt-BR: Suavizar as setas de seleção
+  $name:zh-CN: 平滑选择箭头
 */
 // ==/WindhawkModSettings==
 
@@ -473,6 +467,20 @@ struct CursorImage {
     bool operator==(const CursorImage&) const = default;
 };
 
+struct CursorFrame {
+    CursorImage image;
+    DWORD duration;
+
+    bool operator==(const CursorFrame&) const = default;
+};
+
+struct CursorSource {
+    std::vector<CursorFrame> frames;
+    HCURSOR firstAnimationFrame = nullptr;
+
+    bool operator==(const CursorSource&) const = default;
+};
+
 struct IconBitmaps : ICONINFO {
     IconBitmaps() : ICONINFO{} {}
     ~IconBitmaps() {
@@ -497,7 +505,6 @@ struct MemoryDc {
 
 struct Replacement {
     HCURSOR cursor = nullptr;
-    HCURSOR original = nullptr;
     bool smooth = false;
 };
 
@@ -506,6 +513,7 @@ struct ThreadSelection {
     HANDLE lifetime;
     HWND window = nullptr;
     HCURSOR cursor = nullptr;
+    HCURSOR original = nullptr;
 };
 
 struct CursorShape {
@@ -616,10 +624,10 @@ struct CursorMatch {
 };
 
 std::array<CursorShape, kLastAutoscrollId - kFirstAutoscrollId + 1> g_referenceShapes;
-std::array<Replacement, kMappings.size()> g_replacements;
-std::array<std::optional<CursorImage>, kRoleCount> g_sources;
+std::array<std::optional<Replacement>, kMappings.size()> g_replacements;
+std::array<std::optional<CursorSource>, kRoleCount> g_sources;
 std::array<bool, kRoleCount> g_needsRefresh;
-std::vector<Replacement> g_retired;
+std::vector<HCURSOR> g_retired;
 std::vector<ThreadSelection> g_selections;
 std::mutex g_mutex;
 std::once_flag g_referenceShapesInit;
@@ -628,6 +636,7 @@ std::atomic<uint32_t> g_enabledTargets;
 std::atomic<uint32_t> g_enabledTypes;
 std::atomic<bool> g_isOffice;
 std::atomic<bool> g_processExcluded;
+std::atomic<bool> g_hasExclusions;
 std::vector<std::wstring> g_excludedApplications;
 uint32_t g_smoothingTypes;
 bool g_stopping;
@@ -636,6 +645,7 @@ HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
+decltype(&GetCursor) g_getCursorOriginal;
 
 template <size_t N>
 size_t ResourceSlot(WORD id, const std::array<ResourceMapping, N>& resources) {
@@ -685,6 +695,12 @@ bool ObserveOffice() {
     if (g_isOffice.load(std::memory_order_relaxed)) {
         return true;
     }
+    thread_local ULONGLONG nextProbe;
+    const auto now = GetTickCount64();
+    if (now < nextProbe) {
+        return false;
+    }
+    nextProbe = now + 250;
     // The common Office runtime can be loaded after the mod starts.
     if (GetModuleHandleW(L"mso20win32client.dll")) {
         g_isOffice.store(true, std::memory_order_relaxed);
@@ -1003,8 +1019,7 @@ bool HasChromiumPanningResources(PCWSTR name) {
     return matches;
 }
 
-CursorMatch ReadResourceSlot(HCURSOR cursor) {
-    const bool office = ObserveOffice();
+CursorMatch ReadResourceSlot(HCURSOR cursor, bool office) {
     ICONINFOEXW info{sizeof(info)};
     if (!GetIconInfoExW(cursor, &info)) {
         return {};
@@ -1108,13 +1123,15 @@ CursorMatch IdentifyCursor(HCURSOR cursor) {
     struct Lookup {
         HCURSOR cursor = nullptr;
         CursorMatch match;
+        bool office = false;
     };
     // Bounded per GUI thread. Normal mouse movement usually hits the same slot.
     thread_local std::array<Lookup, 32> entries;
     const uintptr_t key = reinterpret_cast<uintptr_t>(cursor);
     auto& entry = entries[(key ^ (key >> 16)) % entries.size()];
-    if (entry.cursor != cursor) {
-        entry = {cursor, ReadResourceSlot(cursor)};
+    const bool office = ObserveOffice();
+    if (entry.cursor != cursor || entry.office != office) {
+        entry = {cursor, ReadResourceSlot(cursor, office), office};
     }
     return entry.match;
 }
@@ -1266,6 +1283,140 @@ HCURSOR MakeCursor(const CursorImage& image) {
     return CreateIconIndirect(&info);
 }
 
+// User32 exposes the source step count, frame handles, and durations in jiffies.
+// Resolve it dynamically so static cursors keep working if the export is absent.
+using GetCursorFrameInfoFn = HCURSOR(WINAPI*)(HCURSOR, DWORD, DWORD, DWORD*, DWORD*);
+
+GetCursorFrameInfoFn CursorFrameInfo() {
+    static const auto frameInfo = reinterpret_cast<GetCursorFrameInfoFn>(
+        GetProcAddress(GetModuleHandleW(L"user32.dll"), "GetCursorFrameInfo"));
+    return frameInfo;
+}
+
+CursorImage TransformCursor(const CursorImage& image, const CursorMapping& mapping,
+                            bool smooth) {
+    smooth = smooth && !image.smoothPixels.empty();
+    if (mapping.mirror) {
+        return Mirror(image);
+    }
+    return mapping.eighthTurns || smooth ? Rotate(image, mapping.eighthTurns, smooth) : image;
+}
+
+class RiffBuffer {
+public:
+    void WriteWord(WORD value) {
+        bytes.push_back(static_cast<BYTE>(value));
+        bytes.push_back(static_cast<BYTE>(value >> 8));
+    }
+
+    void WriteDword(DWORD value) {
+        WriteWord(LOWORD(value));
+        WriteWord(HIWORD(value));
+    }
+
+    size_t BeginChunk(const char (&id)[5]) {
+        bytes.insert(bytes.end(), id, id + 4);
+        const size_t sizeField = bytes.size();
+        WriteDword(0);
+        return sizeField;
+    }
+
+    void EndChunk(size_t sizeField) {
+        const size_t size = bytes.size() - sizeField - sizeof(DWORD);
+        for (size_t i = 0; i < sizeof(DWORD); ++i) {
+            bytes[sizeField + i] = static_cast<BYTE>(size >> (8 * i));
+        }
+        if (size % 2) {
+            bytes.push_back(0);
+        }
+    }
+
+    std::vector<BYTE> bytes;
+};
+
+void AppendCursorFrame(RiffBuffer& riff, const CursorImage& image) {
+    const auto chunk = riff.BeginChunk("icon");
+    const size_t area = size_t(image.width) * image.height;
+    const size_t maskStride = (size_t(image.width) + 31) / 32 * 4;
+    const size_t bitmapSize = area * sizeof(DWORD) + maskStride * image.height;
+
+    // A complete single-image CUR file inside the ANI frame chunk.
+    riff.WriteWord(0);
+    riff.WriteWord(2);
+    riff.WriteWord(1);
+    riff.bytes.push_back(static_cast<BYTE>(image.width));
+    riff.bytes.push_back(static_cast<BYTE>(image.height));
+    riff.WriteWord(0);
+    riff.WriteWord(static_cast<WORD>(image.hotX));
+    riff.WriteWord(static_cast<WORD>(image.hotY));
+    riff.WriteDword(static_cast<DWORD>(sizeof(BITMAPINFOHEADER) + bitmapSize));
+    riff.WriteDword(22);
+    riff.WriteDword(sizeof(BITMAPINFOHEADER));
+    riff.WriteDword(image.width);
+    riff.WriteDword(image.height * 2);
+    riff.WriteWord(1);
+    riff.WriteWord(32);
+    for (DWORD value : {DWORD{BI_RGB}, static_cast<DWORD>(bitmapSize), 0ul, 0ul, 0ul, 0ul}) {
+        riff.WriteDword(value);
+    }
+
+    for (int y = image.height - 1; y >= 0; --y) {
+        for (int x = 0; x < image.width; ++x) {
+            const size_t i = size_t(y) * image.width + x;
+            riff.WriteDword(image.color.empty() ? image.mask[area + i] & 0x00FFFFFF
+                                               : image.color[i]);
+        }
+    }
+    for (int y = image.height - 1; y >= 0; --y) {
+        const size_t start = riff.bytes.size();
+        riff.bytes.resize(start + maskStride);
+        for (int x = 0; x < image.width; ++x) {
+            if (image.mask[size_t(y) * image.width + x] & 0x00FFFFFF) {
+                riff.bytes[start + x / 8] |= BYTE(0x80 >> (x % 8));
+            }
+        }
+    }
+    riff.EndChunk(chunk);
+}
+
+HCURSOR MakeReplacement(const CursorSource& source, const CursorMapping& mapping, bool smooth) {
+    if (source.frames.empty()) {
+        return nullptr;
+    }
+    if (source.frames.size() == 1) {
+        return MakeCursor(TransformCursor(source.frames.front().image, mapping, smooth));
+    }
+    // RIFF ACON holds one transformed CUR per source step and the original rates.
+    RiffBuffer riff;
+    const auto container = riff.BeginChunk("RIFF");
+    riff.bytes.insert(riff.bytes.end(), {'A', 'C', 'O', 'N'});
+    const auto header = riff.BeginChunk("anih");
+    const auto count = static_cast<DWORD>(source.frames.size());
+    for (DWORD value : {36ul, count, count, 0ul, 0ul, 0ul, 0ul,
+                        source.frames.front().duration, 1ul}) {
+        riff.WriteDword(value);
+    }
+    riff.EndChunk(header);
+    const auto rates = riff.BeginChunk("rate");
+    for (const auto& frame : source.frames) {
+        riff.WriteDword(frame.duration);
+    }
+    riff.EndChunk(rates);
+    const auto frames = riff.BeginChunk("LIST");
+    riff.bytes.insert(riff.bytes.end(), {'f', 'r', 'a', 'm'});
+    for (const auto& frame : source.frames) {
+        const auto image = TransformCursor(frame.image, mapping, smooth);
+        if (image.width > 256 || image.height > 256) {
+            return nullptr;
+        }
+        AppendCursorFrame(riff, image);
+    }
+    riff.EndChunk(frames);
+    riff.EndChunk(container);
+    return CreateIconFromResourceEx(riff.bytes.data(), static_cast<DWORD>(riff.bytes.size()),
+                                    FALSE, 0x00030000, 0, 0, 0);
+}
+
 bool WatchCursorSettings() {
     return RegNotifyChangeKeyValue(g_cursorsKey, FALSE,
                                    REG_NOTIFY_CHANGE_LAST_SET |
@@ -1310,40 +1461,63 @@ bool RefreshSource(Role role) {
         kMappings.begin(), kMappings.end(), [role](const CursorMapping& mapping) {
             return mapping.role == role && (g_smoothingTypes & TypeBit(mapping.type));
         });
-    auto image = ReadCursor(LoadCursorW(nullptr, kRoleIds[index]), prepareSmoothing);
-    if (!image) {
+    const HCURSOR cursor = LoadCursorW(nullptr, kRoleIds[index]);
+    if (!cursor) {
         g_needsRefresh[index] = true;
         return false;
     }
+    const auto frameInfo = CursorFrameInfo();
+    DWORD steps = 1;
+    DWORD duration = 0;
+    HCURSOR firstFrame = frameInfo ? frameInfo(cursor, 0, 0, &duration, &steps) : cursor;
+    const bool animated = firstFrame && steps > 1;
+    auto& previous = g_sources[index];
+    if (!g_needsRefresh[index] && animated && previous &&
+        previous->firstAnimationFrame == firstFrame) {
+        return true;
+    }
+    CursorSource source;
+    if (animated) {
+        constexpr DWORD maxSteps = 256;
+        constexpr size_t maxPixels = 512 * 1024;
+        size_t pixels = 0;
+        source.firstAnimationFrame = firstFrame;
+        for (DWORD step = 0; step < steps && steps <= maxSteps; ++step) {
+            DWORD stepCount = 0;
+            DWORD rate = 0;
+            const HCURSOR frame = frameInfo(cursor, 0, step, &rate, &stepCount);
+            auto image = ReadCursor(frame, prepareSmoothing, 256);
+            if (!image || stepCount != steps) {
+                break;
+            }
+            pixels += size_t(image->width) * image->height;
+            if (pixels > maxPixels) {
+                break;
+            }
+            source.frames.push_back({std::move(*image), rate});
+        }
+        if (source.frames.size() != steps) {
+            source.frames.clear();
+        }
+    } else if (auto image = ReadCursor(cursor, prepareSmoothing)) {
+        source.frames.push_back({std::move(*image), 0});
+    }
 
-    if (!g_sources[index] || image != g_sources[index]) {
+    if (!previous || source != *previous) {
         for (size_t i = 0; i < kMappings.size(); ++i) {
-            if (kMappings[i].role == role && g_replacements[i].cursor) {
-                g_retired.push_back(g_replacements[i]);
-                g_replacements[i] = {};
+            auto& entry = g_replacements[i];
+            if (kMappings[i].role == role && entry) {
+                if (entry->cursor) {
+                    g_retired.push_back(entry->cursor);
+                }
+                entry.reset();
             }
         }
-        g_sources[index] = std::move(image);
+        previous = std::move(source);
     }
 
     g_needsRefresh[index] = false;
     return true;
-}
-
-HCURSOR ResolvePrevious(HCURSOR previous) {
-    if (previous) {
-        for (const auto& entry : g_replacements) {
-            if (entry.cursor == previous) {
-                return entry.original;
-            }
-        }
-        for (const auto& entry : g_retired) {
-            if (entry.cursor == previous) {
-                return entry.original;
-            }
-        }
-    }
-    return previous;
 }
 
 ThreadSelection* FindCurrentSelection() {
@@ -1356,7 +1530,7 @@ ThreadSelection* FindCurrentSelection() {
     return nullptr;
 }
 
-ThreadSelection* TrackCurrentSelection() {
+ThreadSelection* TrackCurrentSelection(HWND window) {
     HANDLE lifetime = nullptr;
     if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(),
                          &lifetime, SYNCHRONIZE, FALSE, 0)) {
@@ -1364,7 +1538,7 @@ ThreadSelection* TrackCurrentSelection() {
     }
 
     try {
-        g_selections.push_back({GetCurrentThreadId(), lifetime});
+        g_selections.push_back({GetCurrentThreadId(), lifetime, window});
     } catch (...) {
         CloseHandle(lifetime);
         throw;
@@ -1372,14 +1546,25 @@ ThreadSelection* TrackCurrentSelection() {
     return &g_selections.back();
 }
 
-HWND FindCursorWindow(DWORD threadId) {
-    // These queries do not send messages into a window while the lock is held.
-    for (HWND window : {GetCapture(), GetFocus(), GetActiveWindow()}) {
+BOOL CALLBACK FindThreadWindow(HWND window, LPARAM data) {
+    *reinterpret_cast<HWND*>(data) = window;
+    return FALSE;
+}
+
+HWND FindCursorWindow(DWORD threadId, bool includeInactive = true) {
+    // A window can set its cursor under the mouse without gaining focus.
+    GUITHREADINFO info{sizeof(info)};
+    GetGUIThreadInfo(threadId, &info);
+    for (HWND window : {info.hwndCapture, info.hwndFocus, info.hwndActive}) {
         if (window && GetWindowThreadProcessId(window, nullptr) == threadId) {
             return window;
         }
     }
-    return nullptr;
+    HWND window = nullptr;
+    if (includeInactive) {
+        EnumThreadWindows(threadId, FindThreadWindow, reinterpret_cast<LPARAM>(&window));
+    }
+    return window;
 }
 
 void ForgetInactiveThreads() {
@@ -1409,10 +1594,10 @@ void FreeRetired() {
         return;
     }
 
-    const HCURSOR threadCursor = GetCursor();
-    std::erase_if(g_retired, [&](const Replacement& entry) {
-        return entry.cursor != visible.hCursor && entry.cursor != threadCursor &&
-               !IsAssigned(entry.cursor) && DestroyCursor(entry.cursor);
+    const HCURSOR threadCursor = g_getCursorOriginal();
+    std::erase_if(g_retired, [&](HCURSOR cursor) {
+        return cursor != visible.hCursor && cursor != threadCursor &&
+               !IsAssigned(cursor) && DestroyCursor(cursor);
     });
 }
 
@@ -1502,11 +1687,7 @@ bool IsExcludedHostWindow(HWND window) {
     return IsExcluded(host.path, g_excludedApplications);
 }
 
-bool IsExcludedHost() {
-    if (g_excludedApplications.empty()) {
-        return false;
-    }
-
+HWND FindEmbeddedWindow() {
     // A Chromium child HWND can be embedded in a different process.
     const DWORD thread = GetCurrentThreadId();
     HWND window = GetCapture();
@@ -1517,9 +1698,9 @@ bool IsExcludedHost() {
         }
     }
     if (!window || GetWindowThreadProcessId(window, nullptr) != thread) {
-        window = FindCursorWindow(thread);
+        window = FindCursorWindow(thread, false);
     }
-    return IsExcludedHostWindow(window);
+    return window;
 }
 
 bool ReplacementEnabled(CursorMatch match) {
@@ -1528,48 +1709,73 @@ bool ReplacementEnabled(CursorMatch match) {
            (g_enabledTypes.load(std::memory_order_acquire) & TypeBit(kMappings[match.slot].type));
 }
 
+HCURSOR WINAPI GetCursorHook() {
+    if (!g_needsCleanup.load()) {
+        return g_getCursorOriginal();
+    }
+    std::lock_guard lock(g_mutex);
+    const HCURSOR current = g_getCursorOriginal();
+    const auto* selection = FindCurrentSelection();
+    return selection && selection->cursor && current == selection->cursor
+        ? selection->original : current;
+}
+
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
         const auto match = g_processExcluded.load(std::memory_order_acquire)
             ? CursorMatch{} : IdentifyCursor(cursor);
-        if (!ReplacementEnabled(match) && !g_needsCleanup.load()) {
+        const bool enabled = ReplacementEnabled(match);
+        if (!enabled && !g_needsCleanup.load()) {
             g_previousRole = Role::Count;
             return g_setCursorOriginal(cursor);
         }
 
+        // WindowFromPoint can run the window's hit-test handler synchronously.
+        HWND embeddedWindow = nullptr;
+        thread_local bool findingEmbeddedWindow = false;
+        if (enabled && match.target == Target::Chromium && g_hasExclusions.load() &&
+            !findingEmbeddedWindow) {
+            findingEmbeddedWindow = true;
+            embeddedWindow = FindEmbeddedWindow();
+            findingEmbeddedWindow = false;
+        }
         std::lock_guard lock(g_mutex);
         ForgetInactiveThreads();
+        auto* selection = FindCurrentSelection();
         HCURSOR display = cursor;
-        if (!g_stopping && ReplacementEnabled(match) &&
-            (match.target != Target::Chromium || !IsExcludedHost())) {
+        const bool replace = !g_stopping && ReplacementEnabled(match) &&
+            (!embeddedWindow || g_excludedApplications.empty() ||
+             !IsExcludedHostWindow(embeddedWindow));
+        if (replace && (!selection ||
+            GetWindowThreadProcessId(selection->window, nullptr) != selection->id)) {
+            const HWND window = FindCursorWindow(GetCurrentThreadId());
+            if (selection) {
+                selection->window = window;
+            } else if (window) {
+                selection = TrackCurrentSelection(window);
+            }
+        }
+        if (replace && selection && selection->window) {
             const auto& mapping = kMappings[match.slot];
             const size_t role = static_cast<size_t>(mapping.role);
             CheckCursorSettings();
             if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
                 RefreshSource(mapping.role)) {
-                const CursorImage& source = *g_sources[role];
-                const bool smooth = (g_smoothingTypes & TypeBit(mapping.type)) &&
-                                    !source.smoothPixels.empty();
+                const auto& source = *g_sources[role];
+                const bool smooth = (g_smoothingTypes & TypeBit(mapping.type)) != 0;
                 auto& entry = g_replacements[match.slot];
-                if (entry.cursor && (entry.original != cursor || entry.smooth != smooth)) {
-                    g_retired.push_back(entry);
-                    entry = {};
-                }
-                if (!entry.cursor) {
-                    HCURSOR replacement;
-                    if (mapping.mirror) {
-                        replacement = MakeCursor(Mirror(source));
-                    } else if (mapping.eighthTurns || smooth) {
-                        replacement = MakeCursor(Rotate(source, mapping.eighthTurns, smooth));
-                    } else {
-                        replacement = MakeCursor(source);
+                if (entry && entry->smooth != smooth) {
+                    if (entry->cursor) {
+                        g_retired.push_back(entry->cursor);
                     }
-                    if (replacement) {
-                        entry = {replacement, cursor, smooth};
-                    }
+                    entry.reset();
                 }
-                if (entry.cursor) {
-                    display = entry.cursor;
+                if (!entry) {
+                    // Cache unsupported images too, so mouse movement does not retry encoding.
+                    entry = Replacement{MakeReplacement(source, mapping, smooth), smooth};
+                }
+                if (entry->cursor) {
+                    display = entry->cursor;
                 }
             }
             g_previousRole = mapping.role;
@@ -1577,24 +1783,22 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
             g_previousRole = Role::Count;
         }
 
-        auto* selection = FindCurrentSelection();
         if (display != cursor) {
-            if (!selection) {
-                selection = TrackCurrentSelection();
-            }
-            if (selection) {
-                selection->window = FindCursorWindow(selection->id);
-                g_needsCleanup.store(true);
-            } else {
-                display = cursor;
-            }
+            g_needsCleanup.store(true);
         }
 
-        HCURSOR previous = ResolvePrevious(g_setCursorOriginal(display));
+        HCURSOR previous = g_setCursorOriginal(display);
         if (selection) {
-            const HCURSOR current = GetCursor();
+            if (previous == selection->cursor && selection->cursor) {
+                previous = selection->original;
+            }
+            const HCURSOR current = g_getCursorOriginal();
             if (display != cursor && current == display) {
                 selection->cursor = display;
+                selection->original = cursor;
+            } else if (current == cursor && g_stopping && current == selection->cursor) {
+                g_setCursorOriginal(selection->original);
+                selection->cursor = nullptr;
             } else if (current != selection->cursor) {
                 selection->cursor = nullptr;
             }
@@ -1610,10 +1814,11 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
 }
 
 void UpdateSettings() {
+    // Keep the key used before smoothing expanded past the autoscroll arrows.
     constexpr std::array smoothingSettings = {
-        std::pair{CursorType::AutoscrollOrigin, L"smoothing.autoscrollOrigin"},
-        std::pair{CursorType::AutoscrollArrows, L"smoothing.autoscrollArrows"},
-        std::pair{CursorType::SelectionArrows, L"smoothing.selectionArrows"},
+        std::pair{CursorType::AutoscrollOrigin, L"smoothAutoscrollOrigin"},
+        std::pair{CursorType::AutoscrollArrows, L"smoothDiagonals"},
+        std::pair{CursorType::SelectionArrows, L"smoothSelectionArrows"},
     };
     uint32_t smoothingTypes = 0;
     for (const auto& [type, name] : smoothingSettings) {
@@ -1665,6 +1870,7 @@ void UpdateSettings() {
         g_smoothingTypes = smoothingTypes;
     }
     g_excludedApplications = std::move(exclusions);
+    g_hasExclusions.store(!g_excludedApplications.empty());
     g_processExcluded.store(processExcluded, std::memory_order_release);
     g_enabledTargets.store(enabledTargets, std::memory_order_release);
     g_enabledTypes.store(enabledTypes, std::memory_order_release);
@@ -1681,7 +1887,8 @@ BOOL Wh_ModInit() {
     g_needsRefresh.fill(true);
     UpdateSettings();
 
-    if (!WindhawkUtils::SetFunctionHook(SetCursor, SetCursorHook, &g_setCursorOriginal)) {
+    if (!WindhawkUtils::SetFunctionHook(GetCursor, GetCursorHook, &g_getCursorOriginal) ||
+        !WindhawkUtils::SetFunctionHook(SetCursor, SetCursorHook, &g_setCursorOriginal)) {
         CloseSettingsWatch();
         return FALSE;
     }
@@ -1700,7 +1907,11 @@ void Wh_ModBeforeUninit() {
             g_stopping = true;
             ForgetInactiveThreads();
             for (const auto& selection : g_selections) {
-                windows.emplace_back(selection.id, selection.window);
+                HWND window = selection.window;
+                if (!window || GetWindowThreadProcessId(window, nullptr) != selection.id) {
+                    window = FindCursorWindow(selection.id);
+                }
+                windows.emplace_back(selection.id, window);
             }
         }
 
@@ -1728,17 +1939,18 @@ void Wh_ModUninit() {
     ForgetInactiveThreads();
     CURSORINFO visible{sizeof(visible)};
     const bool haveVisible = GetCursorInfo(&visible);
-    const auto freeIfUnused = [&](const Replacement& entry) {
-        if (haveVisible && entry.cursor && entry.cursor != visible.hCursor &&
-            !IsAssigned(entry.cursor)) {
-            DestroyCursor(entry.cursor);
+    const auto freeIfUnused = [&](HCURSOR cursor) {
+        if (haveVisible && cursor && cursor != visible.hCursor && !IsAssigned(cursor)) {
+            DestroyCursor(cursor);
         }
     };
     for (const auto& entry : g_replacements) {
-        freeIfUnused(entry);
+        if (entry) {
+            freeIfUnused(entry->cursor);
+        }
     }
-    for (const auto& entry : g_retired) {
-        freeIfUnused(entry);
+    for (HCURSOR cursor : g_retired) {
+        freeIfUnused(cursor);
     }
     for (const auto& selection : g_selections) {
         CloseHandle(selection.lifetime);

@@ -26,6 +26,7 @@ the current coverage.
 - During scrolling, the Alternate select (`Up`) arrow points in the active
   direction. Optional smoothing applies in all eight directions. Monochrome
   effects that invert the background keep their original pixel rendering.
+  Animated scheme cursors retain their frame order and timing.
 - Recognized drag pointers for cells, ranges, and objects use Move. Dividers
   and corner handles use the horizontal, vertical, or diagonal Resize roles.
   Windows and Chromium already use the active scheme for standard Move and
@@ -62,7 +63,7 @@ Add one executable name (for example, `example.exe`) or full path per row
 under **Excluded applications**. A name matches any location. A full path
 matches a specific installation.
 
-**Smoothing** has separate switches for the autoscroll starting pointer,
+Separate smoothing switches cover the autoscroll starting pointer,
 all eight autoscroll arrows, and selection arrows. All three are on by default.
 Change the cursor scheme and pointer roles in Windows.
 
