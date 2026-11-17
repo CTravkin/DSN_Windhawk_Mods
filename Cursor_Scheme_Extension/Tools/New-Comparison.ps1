@@ -53,7 +53,7 @@ if ($cursorProcess.ExitCode -ne 0) {
     throw "Comparison renderer exited $($cursorProcess.ExitCode)"
 }
 
-$cursorOutput = Join-Path $OutputDirectory 'Comparison.en.png'
+$cursorOutput = Join-Path $OutputDirectory 'Comparison.png'
 $cursorScale = 2
 $cursorWidth = 852
 $cursorHeight = 620
@@ -117,7 +117,6 @@ for ($cursorRow = 0; $cursorRow -lt 6; $cursorRow++) {
             } finally { $cursorImage.Dispose() }
         }
     }
-    if ($cursorRow -lt 5) { $cursorGraphics.DrawLine($cursorLine, 24, $cursorY + 82, 828, $cursorY + 82) }
 }
 $cursorGraphics.Dispose()
 $cursorBitmap.Save($cursorOutput, [System.Drawing.Imaging.ImageFormat]::Png)
