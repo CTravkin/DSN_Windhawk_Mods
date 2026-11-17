@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.9.0
+// @version         0.10.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 14
+// Build: 15
 
 // ==WindhawkModReadme==
 /*
@@ -26,21 +26,70 @@
 Applies the active Windows cursor scheme to recognized application pointers.
 The mod covers middle-button autoscroll, move and resize pointers, link
 pointers, and several selection and text pointers. Choose the application
-families and pointer types independently in Settings. Autoscroll arrows can
-be smoothed in all eight directions.
+families and pointer types independently in Settings. Windows includes Common
+Controls and Windows Forms. Chromium includes Electron and compatible embedded
+runtimes. Gecko covers cell selection, resize pointers, and vertical text.
+Qt covers horizontal and vertical splitters. Classic Office can be enabled
+separately. Use an executable name or full path to exclude an application.
+Autoscroll arrows can be smoothed in all eight directions.
 */
 // ==/WindhawkModReadme==
 
 // ==WindhawkModSettings==
 /*
 - targets:
+    - windows: true
+      $name: Windows
+      $name:ru-RU: Windows
+      $name:es-ES: Windows
+      $name:de-DE: Windows
+      $name:pt-BR: Windows
+      $name:zh-CN: Windows
+      $description: Win32, Common Controls, and Windows Forms
+      $description:ru-RU: Win32, Common Controls и Windows Forms
+      $description:es-ES: Win32, Common Controls y Windows Forms
+      $description:de-DE: Win32, Common Controls und Windows Forms
+      $description:pt-BR: Win32, Common Controls e Windows Forms
+      $description:zh-CN: Win32、通用控件和 Windows Forms
     - chromium: true
-      $name: Chromium and Electron
-      $name:ru-RU: Chromium и Electron
-      $name:es-ES: Chromium y Electron
-      $name:de-DE: Chromium und Electron
-      $name:pt-BR: Chromium e Electron
-      $name:zh-CN: Chromium 和 Electron
+      $name: Chromium
+      $name:ru-RU: Chromium
+      $name:es-ES: Chromium
+      $name:de-DE: Chromium
+      $name:pt-BR: Chromium
+      $name:zh-CN: Chromium
+      $description: Chrome, Edge, Electron, and compatible embedded Chromium runtimes
+      $description:ru-RU: Chrome, Edge, Electron и совместимые встроенные движки Chromium
+      $description:es-ES: Chrome, Edge, Electron y motores Chromium integrados compatibles
+      $description:de-DE: Chrome, Edge, Electron und kompatible eingebettete Chromium-Laufzeiten
+      $description:pt-BR: Chrome, Edge, Electron e mecanismos Chromium incorporados compatíveis
+      $description:zh-CN: Chrome、Edge、Electron 和兼容的嵌入式 Chromium 运行时
+    - gecko: true
+      $name: Gecko
+      $name:ru-RU: Gecko
+      $name:es-ES: Gecko
+      $name:de-DE: Gecko
+      $name:pt-BR: Gecko
+      $name:zh-CN: Gecko
+      $description: Firefox and applications with compatible Gecko pointers
+      $description:ru-RU: Firefox и приложения с совместимыми указателями Gecko
+      $description:es-ES: Firefox y aplicaciones con punteros Gecko compatibles
+      $description:de-DE: Firefox und Anwendungen mit kompatiblen Gecko-Zeigern
+      $description:pt-BR: Firefox e aplicativos com ponteiros Gecko compatíveis
+      $description:zh-CN: Firefox 和使用兼容 Gecko 指针的应用
+    - qt: true
+      $name: Qt
+      $name:ru-RU: Qt
+      $name:es-ES: Qt
+      $name:de-DE: Qt
+      $name:pt-BR: Qt
+      $name:zh-CN: Qt
+      $description: Native Qt interface splitters
+      $description:ru-RU: Разделители панелей в интерфейсе Qt
+      $description:es-ES: Divisores de paneles de la interfaz nativa de Qt
+      $description:de-DE: Bereichstrenner der nativen Qt-Oberfläche
+      $description:pt-BR: Divisores de painéis da interface nativa do Qt
+      $description:zh-CN: Qt 原生界面的面板分隔条
     - office: false
       $name: Classic Office
       $name:ru-RU: Классический Office
@@ -54,6 +103,19 @@ be smoothed in all eight directions.
   $name:de-DE: Wo Zeiger ersetzt werden
   $name:pt-BR: Onde substituir os ponteiros
   $name:zh-CN: 替换指针的应用
+- excludedApplications: [""]
+  $name: Application exclusions
+  $name:ru-RU: Исключения приложений
+  $name:es-ES: Exclusiones de aplicaciones
+  $name:de-DE: Anwendungsausnahmen
+  $name:pt-BR: Exclusões de aplicativos
+  $name:zh-CN: 应用排除列表
+  $description: One executable name or full path per row
+  $description:ru-RU: Одно имя исполняемого файла или полный путь на строку
+  $description:es-ES: Un nombre de ejecutable o una ruta completa por fila
+  $description:de-DE: Ein Dateiname oder vollständiger Pfad pro Zeile
+  $description:pt-BR: Um nome de executável ou caminho completo por linha
+  $description:zh-CN: 每行填写一个可执行文件名或完整路径
 - cursors:
     - autoscrollOrigin: true
       $name: Scroll origin
@@ -206,6 +268,7 @@ be smoothed in all eight directions.
 #include <cstring>
 #include <mutex>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -316,6 +379,27 @@ constexpr std::array kChromiumCursors = {
     CursorFingerprint{0x19747d1629ec5525, kVerticalResizeId, 9, 10},
     CursorFingerprint{0x5d9bc833e83e07c8, kCrossId, 7, 7},
     CursorFingerprint{0xae4a396c7f94f919, kTextId, 9, 3},
+};
+
+constexpr std::array kGeckoResources = {
+    ResourceMapping{4103, kCrossId}, ResourceMapping{4108, kHorizontalResizeId},
+    ResourceMapping{4109, kVerticalResizeId}, ResourceMapping{4110, kTextId},
+};
+
+constexpr std::array kWinFormsCursors = {
+    CursorFingerprint{0x3d2b81e973cf56e9, 32658, 10, 14},
+    CursorFingerprint{0xd93d0fd3350a3d65, kVerticalResizeId, 15, 15},
+    CursorFingerprint{0x71eb275f9ab04048, 32660, 12, 18},
+    CursorFingerprint{0xaf7c0cde3dde97f9, 32654, 16, 15},
+    CursorFingerprint{0x7d323e4f02f00091, 32653, 16, 15},
+    CursorFingerprint{0x13f5d35db6fc2c31, 32652, 16, 15},
+    CursorFingerprint{0xadbd3ff7cbab4a91, 32655, 15, 20},
+    CursorFingerprint{0x0f8885c50070a3a2, 32659, 20, 18},
+    CursorFingerprint{0x32816356d17c25b8, 32662, 12, 11},
+    CursorFingerprint{0xa968ca07a7fce9e9, 32656, 16, 8},
+    CursorFingerprint{0x6d15dc3f672c03c8, 32661, 19, 10},
+    CursorFingerprint{0x0c50ddb1fa40c055, kHorizontalResizeId, 15, 15},
+    CursorFingerprint{0x46ea5b501abd3e51, 32657, 21, 14},
 };
 
 // Some Office sizing handles share an outline, with the direction in the XOR plane.
@@ -503,9 +587,11 @@ constexpr std::array kOfficeShapes = {
     }}},
 };
 
+enum class Target { Windows, Chromium, Gecko, Qt, Office };
+
 struct CursorMatch {
     size_t slot = kUnknownSlot;
-    bool chromium = false;
+    Target target = Target::Windows;
 };
 
 std::array<CursorShape, kLastAutoscrollId - kFirstAutoscrollId + 1> g_referenceShapes;
@@ -517,10 +603,11 @@ std::vector<ThreadSelection> g_selections;
 std::mutex g_mutex;
 std::once_flag g_referenceShapesInit;
 std::atomic<bool> g_needsCleanup;
-std::atomic<bool> g_replaceInOffice;
-std::atomic<bool> g_replaceInElectron;
+std::atomic<uint32_t> g_enabledTargets;
 std::atomic<uint32_t> g_enabledTypes;
 std::atomic<bool> g_isOffice;
+std::atomic<bool> g_processExcluded;
+std::vector<std::wstring> g_excludedApplications;
 bool g_smoothArrows;
 bool g_stopping;
 bool g_watchStarted;
@@ -828,6 +915,73 @@ size_t FindFingerprintSlot(const CursorImage& image,
     return kUnknownSlot;
 }
 
+size_t FindQtSplitterSlot(const CursorImage& image) {
+    struct Splitter {
+        int size;
+        int hotX;
+        int hotY;
+        uint64_t mask;
+        WORD systemId;
+    };
+    // Qt creates these handles from PNGs, so GetIconInfoEx has no resource ID.
+    constexpr std::array splitters = {
+        Splitter{32, 11, 11, 0xce3de8a32fb52cae, kVerticalResizeId},
+        Splitter{48, 16, 17, 0xb08f48e137820f25, kVerticalResizeId},
+        Splitter{64, 22, 22, 0x43f54dc870c43aa9, kVerticalResizeId},
+        Splitter{32, 11, 11, 0x5ca6f5b51c206092, kHorizontalResizeId},
+        Splitter{48, 16, 17, 0xf0c2ba92e0955965, kHorizontalResizeId},
+        Splitter{64, 22, 22, 0x55eb77441590bd35, kHorizontalResizeId},
+    };
+    if (image.color.empty() || image.width != image.height) {
+        return kUnknownSlot;
+    }
+    uint64_t mask = 0xcbf29ce484222325;
+    for (uint32_t pixel : image.color) {
+        mask = (mask ^ ((pixel >> 24) >= 128)) * 0x100000001b3;
+    }
+    for (const auto& splitter : splitters) {
+        if (splitter.size == image.width && splitter.hotX == image.hotX &&
+            splitter.hotY == image.hotY && splitter.mask == mask) {
+            return SystemSlot(splitter.systemId);
+        }
+    }
+    return kUnknownSlot;
+}
+
+BOOL CALLBACK FindChromiumPanningResource(HMODULE module, LPCWSTR, LPWSTR name, LONG_PTR data) {
+    auto& found = *reinterpret_cast<bool*>(data);
+    try {
+        const auto image = LoadResourceImage(module, name);
+        if (image) {
+            const auto slot = FindFingerprintSlot(*image, kChromiumCursors);
+            if (slot != kUnknownSlot && kMappings[slot].systemId >= kFirstAutoscrollId) {
+                found = true;
+                return FALSE;
+            }
+        }
+        return TRUE;
+    } catch (...) {
+        return FALSE;
+    }
+}
+
+bool HasChromiumPanningResources(PCWSTR name) {
+    // Resolve an ambiguous image in a mixed Office/Chromium process once per source.
+    thread_local std::wstring moduleName;
+    thread_local bool matches;
+    if (moduleName != name) {
+        moduleName = name;
+        matches = false;
+        HMODULE module = nullptr;
+        if (*name && GetModuleHandleExW(0, name, &module)) {
+            EnumResourceNamesW(module, MAKEINTRESOURCEW(12), FindChromiumPanningResource,
+                               reinterpret_cast<LONG_PTR>(&matches));
+            FreeLibrary(module);
+        }
+    }
+    return matches;
+}
+
 CursorMatch ReadResourceSlot(HCURSOR cursor) {
     const bool office = ObserveOffice();
     ICONINFOEXW info{sizeof(info)};
@@ -848,21 +1002,54 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
         HasModuleName(info.szModName, L"user32.dll")) {
         // Native move and resize handles already use the active Windows scheme.
         return info.wResID >= kFirstAutoscrollId && info.wResID <= kLastAutoscrollId
-            ? CursorMatch{SystemSlot(info.wResID)} : CursorMatch{};
+            ? CursorMatch{SystemSlot(info.wResID), office ? Target::Office : Target::Windows}
+            : CursorMatch{};
     }
     if (HasModuleName(info.szModName, L"comctl32.dll")) {
-        return {ResourceSlot(info.wResID, kCommonControlsResources)};
+        return {ResourceSlot(info.wResID, kCommonControlsResources),
+                office ? Target::Office : Target::Windows};
     }
-    if (!office && !*info.szModName) {
+    const bool named = *info.szModName;
+    const bool gecko = HasModuleName(info.szModName, L"xul.dll");
+    const size_t geckoSlot = gecko ? ResourceSlot(info.wResID, kGeckoResources) : kUnknownSlot;
+    if (gecko && geckoSlot == kUnknownSlot) {
+        return {};
+    }
+    const bool qtCandidate = !named && bitmaps.hbmColor &&
+        (info.xHotspot == 11 || info.xHotspot == 16 || info.xHotspot == 22);
+    const bool winForms = !named &&
+        (GetModuleHandleW(L"clr.dll") || GetModuleHandleW(L"coreclr.dll"));
+    if (!named && !office && !qtCandidate && !winForms) {
         return {};
     }
 
-    const auto findSlot = [office](const CursorImage& image) -> CursorMatch {
-        if (!office) {
-            return {FindFingerprintSlot(image, kChromiumCursors), true};
+    const auto findSlot = [&](const CursorImage& image) -> CursorMatch {
+        const auto chromiumSlot = named ? FindFingerprintSlot(image, kChromiumCursors)
+                                        : kUnknownSlot;
+        if (gecko) {
+            return {chromiumSlot == geckoSlot ? geckoSlot : kUnknownSlot, Target::Gecko};
         }
-        const auto slot = FindFingerprintSlot(image, kOfficeResizeCursors);
-        return {slot != kUnknownSlot ? slot : FindOfficeSlot(MakeShape(image))};
+        if (qtCandidate) {
+            const auto qtSlot = FindQtSplitterSlot(image);
+            if (qtSlot != kUnknownSlot) {
+                return {qtSlot, Target::Qt};
+            }
+        }
+        if (winForms) {
+            const auto formsSlot = FindFingerprintSlot(image, kWinFormsCursors);
+            if (formsSlot != kUnknownSlot) {
+                return {formsSlot, Target::Windows};
+            }
+        }
+        if (chromiumSlot != kUnknownSlot &&
+            (!office || HasChromiumPanningResources(info.szModName))) {
+            return {chromiumSlot, Target::Chromium};
+        }
+        if (office) {
+            const auto slot = FindFingerprintSlot(image, kOfficeResizeCursors);
+            return {slot != kUnknownSlot ? slot : FindOfficeSlot(MakeShape(image)), Target::Office};
+        }
+        return {};
     };
     const auto image = ReadCursorBitmaps(cursor, bitmaps, false, kShapeSize * 2);
     if (image) {
@@ -876,7 +1063,7 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
     // A DPI-specific copy can differ from the original resource's 32px raster.
     PCWSTR name = info.wResID ? MAKEINTRESOURCEW(info.wResID) : info.szResName;
     HMODULE module = nullptr;
-    if (!*info.szModName || (!info.wResID && !*name) ||
+    if (!named || (!info.wResID && !*name) ||
         !GetModuleHandleExW(0, info.szModName, &module)) {
         return {};
     }
@@ -1209,20 +1396,122 @@ constexpr uint32_t TypeBit(CursorType type) {
     return uint32_t{1} << static_cast<unsigned>(type);
 }
 
-bool ReplacementEnabled(CursorMatch match) {
-    if (match.slot == kUnknownSlot ||
-        !(g_enabledTypes.load(std::memory_order_acquire) & TypeBit(kMappings[match.slot].type))) {
+constexpr uint32_t TargetBit(Target target) {
+    return uint32_t{1} << static_cast<unsigned>(target);
+}
+
+std::wstring ProcessImagePath(HANDLE process) {
+    std::wstring path(MAX_PATH, L'\0');
+    for (;;) {
+        DWORD length = static_cast<DWORD>(path.size());
+        if (QueryFullProcessImageNameW(process, 0, path.data(), &length)) {
+            path.resize(length);
+            return path;
+        }
+        if (GetLastError() != ERROR_INSUFFICIENT_BUFFER || path.size() >= 32768) {
+            return {};
+        }
+        path.resize((std::min)(path.size() * 2, size_t{32768}));
+    }
+}
+
+bool IsExcluded(std::wstring_view path, const std::vector<std::wstring>& exclusions) {
+    if (path.empty()) {
         return false;
     }
-    if (g_isOffice.load(std::memory_order_relaxed)) {
-        return g_replaceInOffice.load(std::memory_order_acquire);
+    for (const auto& entry : exclusions) {
+        if (entry.find_first_of(L"\\:") == std::wstring::npos) {
+            if (HasModuleName(path, entry)) {
+                return true;
+            }
+        } else if (path.size() == entry.size() &&
+                   CompareStringOrdinal(path.data(), static_cast<int>(path.size()),
+                                        entry.data(), static_cast<int>(entry.size()),
+                                        TRUE) == CSTR_EQUAL) {
+            return true;
+        }
     }
-    return !match.chromium || g_replaceInElectron.load(std::memory_order_acquire);
+    return false;
+}
+
+std::vector<std::wstring> ReadExcludedApplications() {
+    std::vector<std::wstring> entries;
+    // The settings API exposes indexed values without an array length.
+    for (int i = 0, empty = 0; empty < 32; ++i) {
+        auto value = WindhawkUtils::StringSetting::make(L"excludedApplications[%d]", i);
+        const std::wstring_view text(value.get());
+        const auto first = text.find_first_not_of(L" \t\r\n");
+        if (first == std::wstring_view::npos) {
+            ++empty;
+            continue;
+        }
+        empty = 0;
+        auto& entry = entries.emplace_back(text.substr(
+            first, text.find_last_not_of(L" \t\r\n") - first + 1));
+        std::replace(entry.begin(), entry.end(), L'/', L'\\');
+    }
+    return entries;
+}
+
+bool IsExcludedHostWindow(HWND window) {
+    const HWND root = window ? GetAncestor(window, GA_ROOT) : nullptr;
+    DWORD processId = 0;
+    if (!root || !GetWindowThreadProcessId(root, &processId) ||
+        processId == GetCurrentProcessId()) {
+        return false;
+    }
+
+    struct Host {
+        HWND root;
+        DWORD processId;
+        std::wstring path;
+    };
+    thread_local Host host{};
+    if (host.root != root || host.processId != processId) {
+        host = {root, processId, {}};
+        if (HANDLE process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId)) {
+            try {
+                host.path = ProcessImagePath(process);
+            } catch (...) {
+                CloseHandle(process);
+                throw;
+            }
+            CloseHandle(process);
+        }
+    }
+    return IsExcluded(host.path, g_excludedApplications);
+}
+
+bool IsExcludedHost() {
+    if (g_excludedApplications.empty()) {
+        return false;
+    }
+
+    // A Chromium child HWND can be embedded in a different process.
+    const DWORD thread = GetCurrentThreadId();
+    HWND window = GetCapture();
+    if (!window) {
+        POINT point{};
+        if (GetCursorPos(&point)) {
+            window = WindowFromPoint(point);
+        }
+    }
+    if (!window || GetWindowThreadProcessId(window, nullptr) != thread) {
+        window = FindCursorWindow(thread);
+    }
+    return IsExcludedHostWindow(window);
+}
+
+bool ReplacementEnabled(CursorMatch match) {
+    return match.slot != kUnknownSlot && !g_processExcluded.load(std::memory_order_acquire) &&
+           (g_enabledTargets.load(std::memory_order_acquire) & TargetBit(match.target)) &&
+           (g_enabledTypes.load(std::memory_order_acquire) & TypeBit(kMappings[match.slot].type));
 }
 
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
-        const auto match = IdentifyCursor(cursor);
+        const auto match = g_processExcluded.load(std::memory_order_acquire)
+            ? CursorMatch{} : IdentifyCursor(cursor);
         if (!ReplacementEnabled(match) && !g_needsCleanup.load()) {
             g_previousRole = Role::Count;
             return g_setCursorOriginal(cursor);
@@ -1231,7 +1520,8 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         std::lock_guard lock(g_mutex);
         ForgetInactiveThreads();
         HCURSOR display = cursor;
-        if (!g_stopping && ReplacementEnabled(match)) {
+        if (!g_stopping && ReplacementEnabled(match) &&
+            (match.target != Target::Chromium || !IsExcludedHost())) {
             const auto& mapping = kMappings[match.slot];
             const size_t role = static_cast<size_t>(mapping.role);
             CheckCursorSettings();
@@ -1300,9 +1590,14 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
 }
 
 void UpdateSettings() {
-    const bool replaceInOffice = Wh_GetIntSetting(L"targets.office") != 0;
-    const bool replaceInElectron = Wh_GetIntSetting(L"targets.chromium") != 0;
     const bool smoothArrows = Wh_GetIntSetting(L"smoothDiagonals") != 0;
+    constexpr std::array targetSettings = {
+        std::pair{Target::Windows, L"targets.windows"},
+        std::pair{Target::Chromium, L"targets.chromium"},
+        std::pair{Target::Gecko, L"targets.gecko"},
+        std::pair{Target::Qt, L"targets.qt"},
+        std::pair{Target::Office, L"targets.office"},
+    };
     constexpr std::array cursorSettings = {
         std::pair{CursorType::AutoscrollOrigin, L"cursors.autoscrollOrigin"},
         std::pair{CursorType::AutoscrollArrows, L"cursors.autoscrollArrows"},
@@ -1320,13 +1615,23 @@ void UpdateSettings() {
             enabledTypes |= TypeBit(type);
         }
     }
+    uint32_t enabledTargets = 0;
+    for (const auto& [target, name] : targetSettings) {
+        if (Wh_GetIntSetting(name)) {
+            enabledTargets |= TargetBit(target);
+        }
+    }
+    auto exclusions = ReadExcludedApplications();
+    const bool processExcluded = !exclusions.empty() &&
+        IsExcluded(ProcessImagePath(GetCurrentProcess()), exclusions);
     std::lock_guard lock(g_mutex);
     if (g_smoothArrows != smoothArrows) {
         g_smoothArrows = smoothArrows;
         g_needsRefresh[static_cast<size_t>(Role::Up)] = true;
     }
-    g_replaceInElectron.store(replaceInElectron, std::memory_order_release);
-    g_replaceInOffice.store(replaceInOffice, std::memory_order_release);
+    g_excludedApplications = std::move(exclusions);
+    g_processExcluded.store(processExcluded, std::memory_order_release);
+    g_enabledTargets.store(enabledTargets, std::memory_order_release);
     g_enabledTypes.store(enabledTypes, std::memory_order_release);
 }
 

@@ -7,16 +7,17 @@ application pointers.
 
 ## Status
 
-The mod recognizes native Windows autoscroll cursors, including Common Controls
-Reader Mode. It identifies the shared Chromium and Electron cursors by image.
-Classic desktop Office uses the same replacement mechanism for its recognized
-pointers.
+The mod recognizes native Windows and Common Controls autoscroll cursors,
+Windows Forms pointers, and shared Chromium assets in Electron and compatible
+embedded runtimes. Gecko, Qt, and classic desktop Office have separate controls.
 
 Windhawk can load the mod in graphical desktop processes. Recognition is cached
 per GUI thread, and rotated arrows are built in memory when needed.
 
 Excel draws the stationary marker at the click position. The mod applies the
-Windows scheme to the pointer at the start and during autoscroll.
+Windows scheme to the pointer at the start and during autoscroll. Firefox
+draws its autoscroll marker separately from the pointer. That marker is outside
+the current coverage.
 
 ## Features
 
@@ -32,8 +33,11 @@ Windows scheme to the pointer at the start and during autoscroll.
 - In Office, the pointing hand uses Link select and margin selection mirrors
   Normal select. Arrows for selecting rows, columns, or an entire table rotate
   Alternate select in the direction of the original arrow.
-- Cell selection in Excel, Chromium, and Electron uses Precision select.
+- Cell selection in Excel, Chromium, and Gecko uses Precision select.
   The vertical text pointer rotates Text select. Transforms preserve the hotspot.
+- Gecko column and row dividers, Qt splitters, and Windows Forms splitters
+  use the corresponding Resize roles. Windows Forms autoscroll follows the
+  Windows option.
 
 ## Platforms
 
@@ -51,15 +55,15 @@ x64, and ARM64. Runtime checks use Windows 11 x64.
 ### Usage
 
 Choose application families under **Where to replace pointers** and individual
-types under **Which pointers to replace**. Chromium and Electron and all pointer
-types are on by default. Classic Office is opt-in. Windows and Common Controls
-autoscroll follow the two autoscroll type switches.
+types under **Which pointers to replace**. Windows, Chromium, Gecko, Qt, and all
+pointer types are on by default. Classic Office is opt-in.
+
+Add one executable name (for example, `example.exe`) or full path per row
+under **Excluded applications**. A name matches any location. A full path
+matches a specific installation.
 
 **Smoothing** is on by default and applies to the eight autoscroll
 directional arrows. Change the cursor scheme and pointer roles in Windows.
-
-When upgrading from 0.6.x in the Windhawk editor, review the two application
-switches in their new group.
 
 ### Manual preview
 
