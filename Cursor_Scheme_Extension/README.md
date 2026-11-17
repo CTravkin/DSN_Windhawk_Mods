@@ -53,7 +53,9 @@ the current coverage.
 ## Platforms
 
 Windows 11 with [Windhawk](https://windhawk.net/). Builds are available for x86,
-x64, and ARM64. Runtime checks use Windows 11 x64.
+x64, and ARM64. Runtime checks cover x86 and x64 on Windows 11 x64. ARM64 has
+been compiled without a runtime check. Microsoft 365 and Qt WebEngine have
+not been verified.
 
 ## Operations
 
