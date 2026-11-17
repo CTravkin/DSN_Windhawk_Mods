@@ -14,6 +14,12 @@ embedded runtimes. Gecko, Qt, and classic desktop Office have separate controls.
 Windhawk can load the mod in graphical desktop processes. Recognition is cached
 per GUI thread, and rotated arrows are built in memory when needed.
 
+Published cursor handles remain valid until the mod restores the process's
+input queues. The cache holds up to 128 instances across active and stopped
+sessions. While full, further requests use the application's original cursor.
+An unresponsive input thread restores its cursor when it resumes. The callback
+code remains resident until that thread exits.
+
 Excel draws the stationary marker at the click position. The mod applies the
 Windows scheme to the pointer at the start and during autoscroll. Firefox
 draws its autoscroll marker separately from the pointer. That marker is outside

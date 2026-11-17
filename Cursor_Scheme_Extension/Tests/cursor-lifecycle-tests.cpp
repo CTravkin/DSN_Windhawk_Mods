@@ -50,6 +50,7 @@ HWND AppWindow() {
 }
 
 void Start() {
+    BeginCursorSession();
     g_setCursorOriginal = ObservedSetCursor;
     g_getCursorOriginal = GetCursor;
     g_enabledTypes = UINT32_MAX;
@@ -116,6 +117,7 @@ struct SharedTest {
     HCURSOR previous = nullptr;
     HCURSOR saved = nullptr;
     bool recovered = false;
+    HANDLE exit = nullptr;
 };
 
 DWORD WINAPI SharedReader(void* argument) {
@@ -140,6 +142,7 @@ DWORD WINAPI SharedReader(void* argument) {
         }
         SetEvent(test.done);
     }
+    WaitForSingleObject(test.exit, 5000);
     if (window) DestroyWindow(window);
     return 0;
 }
@@ -150,31 +153,41 @@ void SharedQueues() {
     SharedTest test{CreateEventW(nullptr, FALSE, FALSE, nullptr),
                     CreateEventW(nullptr, FALSE, FALSE, nullptr),
                     CreateEventW(nullptr, FALSE, FALSE, nullptr), a, b};
+    test.exit = CreateEventW(nullptr, TRUE, FALSE, nullptr);
     DWORD id = 0;
     HANDLE reader = CreateThread(nullptr, 0, SharedReader, &test, 0, &id);
     Check(reader && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "reader ready");
     Check(AttachThreadInput(GetCurrentThreadId(), id, TRUE), "queues joined");
     SetCursorHook(a);
+    const HCURSOR firstDisplay = GetCursor();
     SetEvent(test.next);
     Check(WaitForSingleObject(test.done, 5000) == WAIT_OBJECT_0, "reader completed");
     Check(test.read == a && test.previous == a && test.saved == b,
           "attached thread reads and returns exact source");
     Check(GetCursorHook() == b, "origin thread observes second source");
+    const HCURSOR sharedDisplay = GetCursor();
     {
         std::lock_guard lock(g_mutex);
         g_smoothingTypes = 0;
         g_needsRefresh.fill(true);
     }
-    SetCursorHook(b);
     Check(AttachThreadInput(GetCurrentThreadId(), id, FALSE), "queues detached");
     SetEvent(test.next);
     Check(WaitForSingleObject(test.done, 5000) == WAIT_OBJECT_0 && test.recovered,
           "saved logical cursor survives generation change and detach");
+    const HCURSOR actualDisplay = GetCursor();
+    const HCURSOR expectedQuiet = actualDisplay == firstDisplay ? a
+        : actualDisplay == sharedDisplay ? b : actualDisplay;
+    Check(Readable(sharedDisplay) && Readable(actualDisplay) &&
+              GetCursorHook() == expectedQuiet,
+          "detached quiet queue keeps its current instance and logical identity");
+    SetEvent(test.exit);
     Check(WaitForSingleObject(reader, 5000) == WAIT_OBJECT_0, "reader exited");
     CloseHandle(reader);
     CloseHandle(test.ready);
     CloseHandle(test.next);
     CloseHandle(test.done);
+    CloseHandle(test.exit);
     SetCursorHook(nullptr);
     Finish();
     DestroyCursor(a);
@@ -255,12 +268,16 @@ void SlowUnload() {
     Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "slow owner ready");
     const auto before = GetTickCount64();
     Finish();
-    Check(GetTickCount64() - before < 1500 && g_deferredCleanup,
+    Check(GetTickCount64() - before < 1500 && !g_restoreSessions.empty(),
           "unresponsive queue does not block unload");
     Check(Readable(test.displayed), "unresponsive queue keeps live handle");
     SetEvent(test.resume);
     Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
           "resumed queue executes deferred restoration");
+    const auto deadline = GetTickCount64() + 1000;
+    while (Readable(test.displayed) && GetTickCount64() < deadline) {
+        Sleep(5);
+    }
     Check(!Readable(test.displayed), "resumed queue releases former handle");
     SetEvent(test.exit);
     Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "slow owner exited");
@@ -269,6 +286,97 @@ void SlowUnload() {
         CloseHandle(event);
     }
     DestroyCursor(original);
+}
+
+void ReloadWithPendingQueue() {
+    HCURSOR original = Fixture(0xff56789a);
+    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
+    HANDLE owner = CreateThread(nullptr, 0, DelayedOwner, &test, 0, nullptr);
+    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "reload owner ready");
+    Finish();
+    Check(!g_restoreSessions.empty(), "old session remains available");
+    Start();
+    HWND window = AppWindow();
+    HCURSOR next = Fixture(0xff6789ab);
+    SetCursorHook(next);
+    HCURSOR displayed = GetCursor();
+    Check(displayed && displayed != next && GetCursorHook() == next,
+          "new session is enabled while old cleanup remains");
+    SetEvent(test.resume);
+    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
+          "old queue restores without replacing a new session pointer");
+    SetEvent(test.exit);
+    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "old owner exited after reload");
+    Sleep(50);
+    Check(Readable(displayed) && GetCursorHook() == next,
+          "old cleanup preserves the new session and handle");
+    SetCursorHook(nullptr);
+    Finish();
+    CloseHandle(owner);
+    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
+        CloseHandle(event);
+    }
+    DestroyCursor(original);
+    DestroyCursor(next);
+    DestroyWindow(window);
+}
+
+DWORD WINAPI QuietOwner(void* argument) {
+    auto& test = *static_cast<SlowThread*>(argument);
+    HWND window = AppWindow();
+    SetEvent(test.ready);
+    WaitForSingleObject(test.resume, 5000);
+    MSG msg{};
+    const auto end = GetTickCount64() + 2000;
+    while (GetTickCount64() < end) {
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            DispatchMessageW(&msg);
+        }
+        if (GetCursor() != test.displayed) {
+            test.restored = true;
+            break;
+        }
+        Sleep(5);
+    }
+    SetEvent(test.checked);
+    WaitForSingleObject(test.exit, 5000);
+    SetCursor(nullptr);
+    DestroyWindow(window);
+    return 0;
+}
+
+void InheritedQueue() {
+    HWND window = AppWindow();
+    HCURSOR original = Fixture(0xff789abc);
+    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
+                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
+    DWORD thread = 0;
+    HANDLE owner = CreateThread(nullptr, 0, QuietOwner, &test, 0, &thread);
+    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "quiet owner ready");
+    Check(AttachThreadInput(GetCurrentThreadId(), thread, TRUE), "quiet queue attached");
+    SetCursorHook(original);
+    const HCURSOR displayed = GetCursor();
+    test.displayed = displayed;
+    Check(displayed != original, "quiet queue receives a published alias");
+    Check(AttachThreadInput(GetCurrentThreadId(), thread, FALSE), "quiet queue detached");
+    SetCursorHook(nullptr);
+    Finish();
+    SetEvent(test.resume);
+    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
+          "untracked input owner restores without calling either hook");
+    SetEvent(test.exit);
+    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "quiet owner exited");
+    CloseHandle(owner);
+    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
+        CloseHandle(event);
+    }
+    DestroyCursor(original);
+    DestroyWindow(window);
 }
 }  // namespace
 
@@ -294,6 +402,8 @@ int main(int argc, char** argv) {
     else if (test == "shared") SharedQueues();
     else if (test == "cache") Alternating();
     else if (test == "slow") SlowUnload();
+    else if (test == "reload") ReloadWithPendingQueue();
+    else if (test == "inherited") InheritedQueue();
     else return 2;
     std::printf("%s: %s\n", argv[1], failures ? "FAIL" : "PASS");
     return failures ? 1 : 0;
