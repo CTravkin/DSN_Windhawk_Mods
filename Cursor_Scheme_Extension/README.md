@@ -33,8 +33,12 @@ The interface is available in English, Russian, Spanish, German, Brazilian Portu
 - Replacement applies to recognized pointers displayed through Windows cursor APIs. The application controls whether autoscroll is available, its speed, and its direction.
 - Excel and Firefox draw their stationary autoscroll markers separately. These markers keep their original appearance.
 - Monochrome pointers that invert the background retain their original pixel rendering without smoothing.
-- The cache holds up to 128 replacement instances, including those still in use from stopped sessions. When full, further requests use the original pointer.
-- Disabling the mod restores application pointers. Unresponsive UI threads finish restoring when they resume. Cursor handles and callback code can remain allocated until the owning thread exits. If Windows cannot identify input owners or destroy a helper window, affected resources remain until the process exits.
+- Each mod load creates at most 128 replacement instances per process. When full, further requests use the application's original pointer.
+- After disabling, the application restores its pointer at its next cursor update, usually the next mouse move. Replacement cursor handles remain allocated until the process exits so that pointers still used by Windows stay valid.
+
+### Compatibility
+
+This mod extends the active Windows scheme across application families, including autoscroll and transformed selection arrows. Some replacements overlap with [Chromium Cursor Remap](https://windhawk.net/mods/chromium-cursor-remap) and [Cursor Override](https://windhawk.net/mods/cursor-override). Avoid enabling overlapping replacements in the same applications; separate their targets with Windhawk's process exclusion lists.
 
 ## Platforms
 
@@ -76,7 +80,7 @@ Run the lifecycle tests from this mod directory on Windows with PowerShell and t
 pwsh -NoProfile -File .\Tests\Run-LifecycleTests.ps1
 ```
 
-The tests cover reentrant callbacks, shared input queues, handle reuse, and restoration on x86 and x64. They use isolated processes and preserve the installed settings.
+The tests cover reentrant callbacks, shared input queues, handle reuse, and safe unloading on x86 and x64. A separate probe loads and unloads a real DLL three times while its GUI owner thread stays alive, checking that the cursor remains valid. They use isolated processes and preserve the installed settings.
 
 The [Win32 preview source](Tests/cursor-scheme-extension-preview.cpp) displays all eleven system autoscroll states. Build it as `cursor-scheme-extension-preview.exe` and open it with the mod enabled. Wheel-click **Vertical**, **Horizontal**, or **Both axes**, then move away from the starting point and back. Try the four diagonals in **Both axes**. Press **F2** for the Windows Reader Mode path.
 
