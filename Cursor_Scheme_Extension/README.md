@@ -25,7 +25,10 @@ Windows scheme to the pointer at the start and during autoscroll.
 - During scrolling, the Alternate select (`Up`) arrow points in the active
   direction. Optional smoothing applies in all eight directions. Monochrome
   effects that invert the background keep their original pixel rendering.
-- Panel, row, and column dividers use the corresponding Resize roles.
+- Recognized drag pointers for cells, ranges, and objects use Move. Dividers
+  and corner handles use the horizontal, vertical, or diagonal Resize roles.
+  Windows and Chromium already use the active scheme for standard Move and
+  Resize pointers.
 - In Office, the pointing hand uses Link select and margin selection mirrors
   Normal select. Arrows for selecting rows, columns, or an entire table rotate
   Alternate select in the direction of the original arrow.

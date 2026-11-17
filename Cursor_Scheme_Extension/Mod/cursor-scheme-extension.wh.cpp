@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.8.0
+// @version         0.9.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,14 +17,14 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 13
+// Build: 14
 
 // ==WindhawkModReadme==
 /*
 # Cursor Scheme Extension
 
 Applies the active Windows cursor scheme to recognized application pointers.
-The mod covers middle-button autoscroll, panel and table dividers, link
+The mod covers middle-button autoscroll, move and resize pointers, link
 pointers, and several selection and text pointers. Choose the application
 families and pointer types independently in Settings. Autoscroll arrows can
 be smoothed in all eight directions.
@@ -94,6 +94,19 @@ be smoothed in all eight directions.
       $description:de-DE: Handzeiger über Schaltflächen, Links und anderen interaktiven Elementen
       $description:pt-BR: Mão sobre botões, links e outros elementos interativos
       $description:zh-CN: 按钮、链接和其他交互元素上的手形指针
+    - move: true
+      $name: Move
+      $name:ru-RU: Перемещение
+      $name:es-ES: Mover
+      $name:de-DE: Verschieben
+      $name:pt-BR: Mover
+      $name:zh-CN: 移动
+      $description: Drag cells, ranges, and objects
+      $description:ru-RU: Перетаскивание ячеек, диапазонов и объектов
+      $description:es-ES: Arrastrar celdas, rangos y objetos
+      $description:de-DE: Zellen, Bereiche und Objekte ziehen
+      $description:pt-BR: Arrastar células, intervalos e objetos
+      $description:zh-CN: 拖动单元格、区域和对象
     - resize: true
       $name: Resize
       $name:ru-RU: Изменение размеров
@@ -101,12 +114,12 @@ be smoothed in all eight directions.
       $name:de-DE: Größe ändern
       $name:pt-BR: Redimensionar
       $name:zh-CN: 调整大小
-      $description: Resize panels, rows, and columns
-      $description:ru-RU: Изменение размеров панелей, строк и столбцов
-      $description:es-ES: Cambiar el tamaño de paneles, filas y columnas
-      $description:de-DE: Größe von Bereichen, Zeilen und Spalten ändern
-      $description:pt-BR: Redimensionamento de painéis, linhas e colunas
-      $description:zh-CN: 调整面板、行和列的大小
+      $description: Resize panels, rows, columns, and objects
+      $description:ru-RU: Изменение размеров панелей, строк, столбцов и объектов
+      $description:es-ES: Cambiar el tamaño de paneles, filas, columnas y objetos
+      $description:de-DE: Größe von Bereichen, Zeilen, Spalten und Objekten ändern
+      $description:pt-BR: Redimensionamento de painéis, linhas, colunas e objetos
+      $description:zh-CN: 调整面板、行、列和对象的大小
     - marginSelection: true
       $name: Margin selection
       $name:ru-RU: Выделение с поля
@@ -199,7 +212,9 @@ be smoothed in all eight directions.
 
 namespace {
 
-enum class Role : size_t { Vertical, Horizontal, Move, Up, Arrow, Link, Cross, Text, Count };
+enum class Role : size_t {
+    Vertical, Horizontal, Move, Up, Arrow, Link, Cross, Text, ResizeNwse, ResizeNesw, Count,
+};
 
 enum class CursorType {
     AutoscrollOrigin,
@@ -210,6 +225,7 @@ enum class CursorType {
     SelectionArrows,
     Cell,
     VerticalText,
+    Move,
 };
 
 struct CursorMapping {
@@ -225,8 +241,11 @@ constexpr WORD kLastAutoscrollId = 32662;
 constexpr WORD kArrowId = 32512;
 constexpr WORD kTextId = 32513;
 constexpr WORD kCrossId = 32515;
+constexpr WORD kNwseResizeId = 32642;
+constexpr WORD kNeswResizeId = 32643;
 constexpr WORD kHorizontalResizeId = 32644;
 constexpr WORD kVerticalResizeId = 32645;
+constexpr WORD kMoveId = 32646;
 constexpr WORD kLinkId = 32649;
 constexpr int kShapeSize = 32;
 
@@ -246,6 +265,9 @@ constexpr std::array kMappings = {
     CursorMapping{kLinkId, Role::Link, CursorType::Link},
     CursorMapping{kHorizontalResizeId, Role::Horizontal, CursorType::Resize},
     CursorMapping{kVerticalResizeId, Role::Vertical, CursorType::Resize},
+    CursorMapping{kNwseResizeId, Role::ResizeNwse, CursorType::Resize},
+    CursorMapping{kNeswResizeId, Role::ResizeNesw, CursorType::Resize},
+    CursorMapping{kMoveId, Role::Move, CursorType::Move},
     CursorMapping{0, Role::Up, CursorType::SelectionArrows, 4},
     CursorMapping{0, Role::Up, CursorType::SelectionArrows, 2},
     CursorMapping{0, Role::Up, CursorType::SelectionArrows, 6},
@@ -296,8 +318,17 @@ constexpr std::array kChromiumCursors = {
     CursorFingerprint{0xae4a396c7f94f919, kTextId, 9, 3},
 };
 
+// Some Office sizing handles share an outline, with the direction in the XOR plane.
+constexpr std::array kOfficeResizeCursors = {
+    CursorFingerprint{0x2689c39224fa1451, kNeswResizeId, 10, 10},
+    CursorFingerprint{0xb2b90ccbfdaee413, kNeswResizeId, 9, 9},
+    CursorFingerprint{0xe80141f08ed56999, kNwseResizeId, 9, 9},
+    CursorFingerprint{0x15fc4d693e6441d7, kNwseResizeId, 9, 9},
+};
+
 const std::array kRoleIds = {
     IDC_SIZENS, IDC_SIZEWE, IDC_SIZEALL, IDC_UPARROW, IDC_ARROW, IDC_HAND, IDC_CROSS, IDC_IBEAM,
+    IDC_SIZENWSE, IDC_SIZENESW,
 };
 constexpr size_t kRoleCount = static_cast<size_t>(Role::Count);
 constexpr size_t kUnknownSlot = kMappings.size();
@@ -412,6 +443,34 @@ constexpr std::array kOfficeShapes = {
     std::pair{SystemSlot(kCrossId), CursorShape{15, 15, {
         0x3f0, 0x7f0, 0x7f0, 0x7f0, 0x3fff, 0x7fff, 0x7fff, 0x7fff,
         0x7fff, 0x7fff, 0x7ffe, 0x7f0, 0x7f0, 0x7f0, 0x7e0,
+    }}},
+    std::pair{SystemSlot(kMoveId), CursorShape{17, 15, {
+        0x100, 0x380, 0x7c0, 0xfe0, 0x27c8, 0x739c, 0xfffe, 0x1ffff,
+        0xfffe, 0x739c, 0x27c8, 0xfe0, 0x7c0, 0x380, 0x100,
+    }}},
+    std::pair{SystemSlot(kMoveId), CursorShape{18, 18, {
+        0x300, 0x780, 0xfc0, 0x1fe0, 0x1fe0, 0x6798, 0xe79c, 0x1fffe,
+        0x3ffff, 0x3ffff, 0x1fffe, 0xe79c, 0x6798, 0x1fe0, 0x1fe0, 0xfc0,
+        0x780, 0x300,
+    }}},
+    std::pair{SystemSlot(kMoveId), CursorShape{19, 19, {
+        0x200, 0x700, 0xf80, 0x1fc0, 0x1fc0, 0x700, 0xc718, 0x1c71c,
+        0x3fafe, 0x7ffff, 0x3fafe, 0x1c71c, 0xc718, 0x700, 0x1fc0, 0x1fc0,
+        0xf80, 0x700, 0x200,
+    }}},
+    std::pair{SystemSlot(kMoveId), CursorShape{20, 28, {
+        0x200, 0x700, 0xf80, 0x1fc0, 0x1fc0, 0x700, 0xc718, 0x1c71c,
+        0x3f8fe, 0x7faff, 0x3fefe, 0x1ce1c, 0xde18, 0x3e00, 0x7fc0, 0xffc0,
+        0x1ff80, 0x3ff00, 0x7fe00, 0xffe00, 0xfe00, 0x1ee00, 0x1e600, 0x3c200,
+        0x3c000, 0x78000, 0x78000, 0x70000,
+    }}},
+    std::pair{SystemSlot(kNwseResizeId), CursorShape{13, 13, {
+        0x7f, 0x7f, 0x3f, 0x1f, 0x3f, 0x77, 0x18e3, 0x1dc0,
+        0x1f80, 0x1f00, 0x1f80, 0x1fc0, 0x1fc0,
+    }}},
+    std::pair{SystemSlot(kNeswResizeId), CursorShape{13, 13, {
+        0x1fc0, 0x1fc0, 0x1f80, 0x1f00, 0x1f80, 0x1dc0, 0x18e3, 0x77,
+        0x3f, 0x1f, 0x3f, 0x7f, 0x7f,
     }}},
     std::pair{SystemSlot(kHorizontalResizeId), CursorShape{17, 15, {
         0x6c0, 0x6c0, 0x6c0, 0x6c0, 0x36d8, 0x76dc, 0xfefe, 0x1feff,
@@ -743,8 +802,16 @@ size_t FindOfficeSlot(const CursorShape& shape) {
     return kUnknownSlot;
 }
 
-size_t FindChromiumSlot(const CursorImage& image) {
+template <size_t N>
+size_t FindFingerprintSlot(const CursorImage& image,
+                           const std::array<CursorFingerprint, N>& fingerprints) {
     if (image.width != kShapeSize || image.height != kShapeSize) {
+        return kUnknownSlot;
+    }
+    const auto matchesHotspot = [&](const CursorFingerprint& known) {
+        return known.hotX == image.hotX && known.hotY == image.hotY;
+    };
+    if (std::none_of(fingerprints.begin(), fingerprints.end(), matchesHotspot)) {
         return kUnknownSlot;
     }
     uint64_t hash = 0xcbf29ce484222325;
@@ -753,8 +820,8 @@ size_t FindChromiumSlot(const CursorImage& image) {
             hash = (hash ^ pixel) * 0x100000001b3;
         }
     }
-    for (const auto& known : kChromiumCursors) {
-        if (known.pixels == hash && known.hotX == image.hotX && known.hotY == image.hotY) {
+    for (const auto& known : fingerprints) {
+        if (known.pixels == hash && matchesHotspot(known)) {
             return SystemSlot(known.systemId);
         }
     }
@@ -779,6 +846,7 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
     }
     if (HasModuleName(info.szModName, L"USER32") ||
         HasModuleName(info.szModName, L"user32.dll")) {
+        // Native move and resize handles already use the active Windows scheme.
         return info.wResID >= kFirstAutoscrollId && info.wResID <= kLastAutoscrollId
             ? CursorMatch{SystemSlot(info.wResID)} : CursorMatch{};
     }
@@ -791,9 +859,10 @@ CursorMatch ReadResourceSlot(HCURSOR cursor) {
 
     const auto findSlot = [office](const CursorImage& image) -> CursorMatch {
         if (!office) {
-            return {FindChromiumSlot(image), true};
+            return {FindFingerprintSlot(image, kChromiumCursors), true};
         }
-        return {FindOfficeSlot(MakeShape(image))};
+        const auto slot = FindFingerprintSlot(image, kOfficeResizeCursors);
+        return {slot != kUnknownSlot ? slot : FindOfficeSlot(MakeShape(image))};
     };
     const auto image = ReadCursorBitmaps(cursor, bitmaps, false, kShapeSize * 2);
     if (image) {
@@ -1238,6 +1307,7 @@ void UpdateSettings() {
         std::pair{CursorType::AutoscrollOrigin, L"cursors.autoscrollOrigin"},
         std::pair{CursorType::AutoscrollArrows, L"cursors.autoscrollArrows"},
         std::pair{CursorType::Link, L"cursors.link"},
+        std::pair{CursorType::Move, L"cursors.move"},
         std::pair{CursorType::Resize, L"cursors.resize"},
         std::pair{CursorType::MarginSelection, L"cursors.marginSelection"},
         std::pair{CursorType::SelectionArrows, L"cursors.downSelection"},
