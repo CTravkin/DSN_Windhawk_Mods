@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.2
+// @version         0.10.3
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 17
+// Build: 18
 
 // ==WindhawkModReadme==
 /*
@@ -1551,20 +1551,48 @@ BOOL CALLBACK FindThreadWindow(HWND window, LPARAM data) {
     return FALSE;
 }
 
-HWND FindCursorWindow(DWORD threadId, bool includeInactive = true) {
+struct ChildWindowSearch {
+    DWORD threadId;
+    HWND window = nullptr;
+};
+
+BOOL CALLBACK FindOwnedChild(HWND window, LPARAM data) {
+    auto& search = *reinterpret_cast<ChildWindowSearch*>(data);
+    if (GetWindowThreadProcessId(window, nullptr) == search.threadId) {
+        search.window = window;
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL CALLBACK FindChildInHost(HWND host, LPARAM data) {
+    EnumChildWindows(host, FindOwnedChild, data);
+    return !reinterpret_cast<ChildWindowSearch*>(data)->window;
+}
+
+HWND CursorWindowAtPointer() {
+    POINT point{};
+    return GetCursorPos(&point) ? WindowFromPoint(point) : nullptr;
+}
+
+HWND FindCursorWindow(DWORD threadId, HWND atPointer = nullptr, HWND previous = nullptr) {
     // A window can set its cursor under the mouse without gaining focus.
     GUITHREADINFO info{sizeof(info)};
     GetGUIThreadInfo(threadId, &info);
-    for (HWND window : {info.hwndCapture, info.hwndFocus, info.hwndActive}) {
+    for (HWND window : {info.hwndCapture, atPointer, previous, info.hwndFocus, info.hwndActive}) {
         if (window && GetWindowThreadProcessId(window, nullptr) == threadId) {
             return window;
         }
     }
     HWND window = nullptr;
-    if (includeInactive) {
-        EnumThreadWindows(threadId, FindThreadWindow, reinterpret_cast<LPARAM>(&window));
+    EnumThreadWindows(threadId, FindThreadWindow, reinterpret_cast<LPARAM>(&window));
+    if (window) {
+        return window;
     }
-    return window;
+    // An embedded engine might only own a child of another process's window.
+    ChildWindowSearch search{threadId};
+    EnumWindows(FindChildInHost, reinterpret_cast<LPARAM>(&search));
+    return search.window;
 }
 
 void ForgetInactiveThreads() {
@@ -1687,22 +1715,6 @@ bool IsExcludedHostWindow(HWND window) {
     return IsExcluded(host.path, g_excludedApplications);
 }
 
-HWND FindEmbeddedWindow() {
-    // A Chromium child HWND can be embedded in a different process.
-    const DWORD thread = GetCurrentThreadId();
-    HWND window = GetCapture();
-    if (!window) {
-        POINT point{};
-        if (GetCursorPos(&point)) {
-            window = WindowFromPoint(point);
-        }
-    }
-    if (!window || GetWindowThreadProcessId(window, nullptr) != thread) {
-        window = FindCursorWindow(thread, false);
-    }
-    return window;
-}
-
 bool ReplacementEnabled(CursorMatch match) {
     return match.slot != kUnknownSlot && !g_processExcluded.load(std::memory_order_acquire) &&
            (g_enabledTargets.load(std::memory_order_acquire) & TargetBit(match.target)) &&
@@ -1731,31 +1743,52 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
         }
 
         // WindowFromPoint can run the window's hit-test handler synchronously.
-        HWND embeddedWindow = nullptr;
-        thread_local bool findingEmbeddedWindow = false;
-        if (enabled && match.target == Target::Chromium && g_hasExclusions.load() &&
-            !findingEmbeddedWindow) {
-            findingEmbeddedWindow = true;
-            embeddedWindow = FindEmbeddedWindow();
-            findingEmbeddedWindow = false;
+        HWND atPointer = nullptr;
+        thread_local ULONGLONG nextWindowProbe;
+        thread_local bool findingPointerWindow;
+        const bool checkHost = enabled && match.target == Target::Chromium && g_hasExclusions.load();
+        const auto now = enabled ? GetTickCount64() : 0;
+        if (enabled && !findingPointerWindow &&
+            (checkHost || (g_previousRole == Role::Count && now >= nextWindowProbe))) {
+            findingPointerWindow = true;
+            atPointer = GetCapture();
+            if (!atPointer) {
+                atPointer = CursorWindowAtPointer();
+            }
+            findingPointerWindow = false;
         }
         std::lock_guard lock(g_mutex);
         ForgetInactiveThreads();
         auto* selection = FindCurrentSelection();
         HCURSOR display = cursor;
-        const bool replace = !g_stopping && ReplacementEnabled(match) &&
-            (!embeddedWindow || g_excludedApplications.empty() ||
-             !IsExcludedHostWindow(embeddedWindow));
-        if (replace && (!selection ||
-            GetWindowThreadProcessId(selection->window, nullptr) != selection->id)) {
-            const HWND window = FindCursorWindow(GetCurrentThreadId());
-            if (selection) {
-                selection->window = window;
-            } else if (window) {
-                selection = TrackCurrentSelection(window);
+        HWND window = nullptr;
+        if (!g_stopping && ReplacementEnabled(match)) {
+            const DWORD threadId = GetCurrentThreadId();
+            if (atPointer && GetWindowThreadProcessId(atPointer, nullptr) == threadId) {
+                window = atPointer;
+            } else if (selection &&
+                       GetWindowThreadProcessId(selection->window, nullptr) == threadId) {
+                window = selection->window;
+            } else if (now >= nextWindowProbe) {
+                window = FindCursorWindow(threadId, atPointer);
+                if (!window) {
+                    // No desktop window can display this thread's cursor yet.
+                    nextWindowProbe = now + 250;
+                }
+            }
+            if (window && match.target == Target::Chromium && !g_excludedApplications.empty() &&
+                IsExcludedHostWindow(window)) {
+                window = nullptr;
+            }
+            if (window) {
+                if (selection) {
+                    selection->window = window;
+                } else {
+                    selection = TrackCurrentSelection(window);
+                }
             }
         }
-        if (replace && selection && selection->window) {
+        if (window && selection) {
             const auto& mapping = kMappings[match.slot];
             const size_t role = static_cast<size_t>(mapping.role);
             CheckCursorSettings();
@@ -1901,16 +1934,14 @@ void Wh_ModSettingsChanged() {
 
 void Wh_ModBeforeUninit() {
     try {
+        const HWND atPointer = CursorWindowAtPointer();
         std::vector<std::pair<DWORD, HWND>> windows;
         {
             std::lock_guard lock(g_mutex);
             g_stopping = true;
             ForgetInactiveThreads();
             for (const auto& selection : g_selections) {
-                HWND window = selection.window;
-                if (!window || GetWindowThreadProcessId(window, nullptr) != selection.id) {
-                    window = FindCursorWindow(selection.id);
-                }
+                const HWND window = FindCursorWindow(selection.id, atPointer, selection.window);
                 windows.emplace_back(selection.id, window);
             }
         }
