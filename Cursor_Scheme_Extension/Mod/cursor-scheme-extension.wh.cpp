@@ -1,13 +1,13 @@
 // ==WindhawkMod==
 // @id              cursor-scheme-extension
 // @name            Cursor Scheme Extension
-// @description     Apply the active Windows cursor scheme to recognized application pointers
-// @description:ru-RU Применяет активную схему Windows к распознанным указателям приложений
-// @description:es-ES Aplica el esquema de punteros activo de Windows a los punteros reconocidos de las aplicaciones
-// @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
-// @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
-// @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.7
+// @description     Replaces built-in application pointers with pointers from the selected Windows scheme
+// @description:ru-RU Заменяет встроенные курсоры приложений курсорами из выбранной схемы Windows
+// @description:es-ES Sustituye los punteros propios de las aplicaciones por los del esquema seleccionado en Windows
+// @description:de-DE Ersetzt anwendungseigene Mauszeiger durch die Zeiger des ausgewählten Windows-Schemas
+// @description:pt-BR Substitui os ponteiros dos aplicativos pelos do esquema selecionado no Windows
+// @description:zh-CN 将应用内置的鼠标指针替换为所选 Windows 方案中的指针
+// @version         1.0.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,23 +17,33 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 22
+// Build: 23
 
 // ==WindhawkModReadme==
 /*
 # Cursor Scheme Extension
 
-Applies the active Windows cursor scheme to recognized application pointers.
-The mod covers middle-button autoscroll, move and resize pointers, link
-pointers, and several selection and text pointers. Choose the application
-families and pointer types independently in Settings. Windows includes Common
-Controls and Windows Forms. Chromium includes Electron and compatible embedded
-runtimes. Gecko covers cell selection, resize pointers, and vertical text.
-Qt covers horizontal and vertical splitters. Classic Office can be enabled
-separately. Use an executable name or full path to exclude an application.
-Smoothing is available for the autoscroll starting pointer, all eight
-autoscroll arrows, and selection arrows. Animated scheme roles keep their
-frame order and timing.
+Replaces built-in application pointers with pointers from the selected Windows
+scheme, including autoscroll, moving and resizing, and text and table selection.
+
+Choose application families under **Applications and processes** and pointer
+shapes under **Pointer types**. Windows includes standard controls and Windows
+Forms. Chromium includes Electron and compatible embedded browsers. Office
+covers desktop Word, Excel, PowerPoint, and classic Outlook and is off by default.
+Gecko and Qt have separate switches. Add executable names or full paths to
+**Application exclusions**, one per line.
+
+The **Smoothing** group has separate switches for autoscroll activation,
+autoscroll arrows in all eight directions, and selection arrows. All three
+are on by default. Animated pointers retain their frames and timing.
+
+Excel and Firefox draw stationary autoscroll markers separately from the mouse
+pointer. Those markers are outside the mod's coverage.
+
+The replacement cache holds up to 128 instances. When full, further requests
+use the original pointer. During unloading, cursor handles and callback code
+can remain resident until the owning thread or process exits when safe release
+cannot be confirmed.
 */
 // ==/WindhawkModReadme==
 
@@ -41,228 +51,253 @@ frame order and timing.
 /*
 - targets:
     - windows: true
-      $name: Windows
-      $name:ru-RU: Windows
-      $name:es-ES: Windows
-      $name:de-DE: Windows
-      $name:pt-BR: Windows
-      $name:zh-CN: Windows
-      $description: Win32, Common Controls, and Windows Forms
-      $description:ru-RU: Win32, Common Controls и Windows Forms
-      $description:es-ES: Win32, Common Controls y Windows Forms
-      $description:de-DE: Win32, Common Controls und Windows Forms
-      $description:pt-BR: Win32, Common Controls e Windows Forms
-      $description:zh-CN: Win32、通用控件和 Windows Forms
-    - chromium: true
-      $name: Chromium
-      $name:ru-RU: Chromium
-      $name:es-ES: Chromium
-      $name:de-DE: Chromium
-      $name:pt-BR: Chromium
-      $name:zh-CN: Chromium
-      $description: Chrome, Edge, Electron, and compatible embedded Chromium runtimes
-      $description:ru-RU: Chrome, Edge, Electron и совместимые встроенные движки Chromium
-      $description:es-ES: Chrome, Edge, Electron y motores Chromium integrados compatibles
-      $description:de-DE: Chrome, Edge, Electron und kompatible eingebettete Chromium-Laufzeiten
-      $description:pt-BR: Chrome, Edge, Electron e mecanismos Chromium incorporados compatíveis
-      $description:zh-CN: Chrome、Edge、Electron 和兼容的嵌入式 Chromium 运行时
-    - gecko: true
-      $name: Gecko
-      $name:ru-RU: Gecko
-      $name:es-ES: Gecko
-      $name:de-DE: Gecko
-      $name:pt-BR: Gecko
-      $name:zh-CN: Gecko
-      $description: Firefox and applications with compatible Gecko pointers
-      $description:ru-RU: Firefox и приложения с совместимыми указателями Gecko
-      $description:es-ES: Firefox y aplicaciones con punteros Gecko compatibles
-      $description:de-DE: Firefox und Anwendungen mit kompatiblen Gecko-Zeigern
-      $description:pt-BR: Firefox e aplicativos com ponteiros Gecko compatíveis
-      $description:zh-CN: Firefox 和使用兼容 Gecko 指针的应用
-    - qt: true
-      $name: Qt
-      $name:ru-RU: Qt
-      $name:es-ES: Qt
-      $name:de-DE: Qt
-      $name:pt-BR: Qt
-      $name:zh-CN: Qt
-      $description: Native Qt interface splitters
-      $description:ru-RU: Разделители панелей в интерфейсе Qt
-      $description:es-ES: Divisores de paneles de la interfaz nativa de Qt
-      $description:de-DE: Bereichstrenner der nativen Qt-Oberfläche
-      $description:pt-BR: Divisores de painéis da interface nativa do Qt
-      $description:zh-CN: Qt 原生界面的面板分隔条
+      $name: "Windows"
+      $name:ru-RU: "Windows"
+      $name:es-ES: "Windows"
+      $name:de-DE: "Windows"
+      $name:pt-BR: "Windows"
+      $name:zh-CN: "Windows"
+      $description: "System pointers in Windows and standard interface controls"
+      $description:ru-RU: "Системные указатели Windows и стандартных элементов интерфейса"
+      $description:es-ES: "Punteros del sistema en Windows y en los controles de interfaz estándar"
+      $description:de-DE: "Systemzeiger von Windows und Standard-Bedienelementen"
+      $description:pt-BR: "Ponteiros do sistema no Windows e nos controles de interface padrão"
+      $description:zh-CN: "Windows 及标准界面控件中的系统指针"
     - office: false
-      $name: Classic Office
-      $name:ru-RU: Классический Office
-      $name:es-ES: Office clásico
-      $name:de-DE: Klassisches Office
-      $name:pt-BR: Office clássico
-      $name:zh-CN: 经典版 Office
-  $name: Where to replace pointers
-  $name:ru-RU: Где подменять указатели
-  $name:es-ES: Dónde sustituir los punteros
-  $name:de-DE: Wo Zeiger ersetzt werden
-  $name:pt-BR: Onde substituir os ponteiros
-  $name:zh-CN: 替换指针的应用
-- excludedApplications: [""]
-  $name: Application exclusions
-  $name:ru-RU: Исключения приложений
-  $name:es-ES: Exclusiones de aplicaciones
-  $name:de-DE: Anwendungsausnahmen
-  $name:pt-BR: Exclusões de aplicativos
-  $name:zh-CN: 应用排除列表
-  $description: One executable name or full path per row
-  $description:ru-RU: Одно имя исполняемого файла или полный путь на строку
-  $description:es-ES: Un nombre de ejecutable o una ruta completa por fila
-  $description:de-DE: Ein Dateiname oder vollständiger Pfad pro Zeile
-  $description:pt-BR: Um nome de executável ou caminho completo por linha
-  $description:zh-CN: 每行填写一个可执行文件名或完整路径
+      $name: "Office"
+      $name:ru-RU: "Office"
+      $name:es-ES: "Office"
+      $name:de-DE: "Office"
+      $name:pt-BR: "Office"
+      $name:zh-CN: "Office"
+      $description: "Desktop Word, Excel, PowerPoint, and classic Outlook"
+      $description:ru-RU: "Настольные Word, Excel, PowerPoint и классический Outlook"
+      $description:es-ES: "Versiones de escritorio de Word, Excel, PowerPoint y Outlook clásico"
+      $description:de-DE: "Desktopversionen von Word, Excel, PowerPoint und das klassische Outlook"
+      $description:pt-BR: "Versões para desktop do Word, Excel, PowerPoint e Outlook clássico"
+      $description:zh-CN: "桌面版 Word、Excel、PowerPoint 和经典 Outlook"
+    - chromium: true
+      $name: "Chromium"
+      $name:ru-RU: "Chromium"
+      $name:es-ES: "Chromium"
+      $name:de-DE: "Chromium"
+      $name:pt-BR: "Chromium"
+      $name:zh-CN: "Chromium"
+      $description: "Chrome, Edge, Electron apps, and embedded Chromium browsers"
+      $description:ru-RU: "Chrome, Edge, приложения на Electron и встроенные браузеры на Chromium"
+      $description:es-ES: "Chrome, Edge, aplicaciones Electron y navegadores Chromium integrados"
+      $description:de-DE: "Chrome, Edge, Electron-Apps und eingebettete Chromium-Browser"
+      $description:pt-BR: "Chrome, Edge, aplicativos Electron e navegadores Chromium incorporados"
+      $description:zh-CN: "Chrome、Edge、Electron 应用和嵌入式 Chromium 浏览器"
+    - gecko: true
+      $name: "Gecko"
+      $name:ru-RU: "Gecko"
+      $name:es-ES: "Gecko"
+      $name:de-DE: "Gecko"
+      $name:pt-BR: "Gecko"
+      $name:zh-CN: "Gecko"
+      $description: "Firefox and other applications based on Gecko"
+      $description:ru-RU: "Firefox и другие приложения на движке Gecko"
+      $description:es-ES: "Firefox y otras aplicaciones basadas en Gecko"
+      $description:de-DE: "Firefox und andere Anwendungen auf Gecko-Basis"
+      $description:pt-BR: "Firefox e outros aplicativos baseados no Gecko"
+      $description:zh-CN: "Firefox 和其他基于 Gecko 的应用"
+    - qt: true
+      $name: "Qt"
+      $name:ru-RU: "Qt"
+      $name:es-ES: "Qt"
+      $name:de-DE: "Qt"
+      $name:pt-BR: "Qt"
+      $name:zh-CN: "Qt"
+      $description: "Applications with a Qt interface, such as VLC and VirtualBox"
+      $description:ru-RU: "Приложения с интерфейсом на Qt, например VLC и VirtualBox"
+      $description:es-ES: "Aplicaciones con interfaz Qt, como VLC y VirtualBox"
+      $description:de-DE: "Anwendungen mit Qt-Oberfläche, etwa VLC und VirtualBox"
+      $description:pt-BR: "Aplicativos com interface Qt, como VLC e VirtualBox"
+      $description:zh-CN: "使用 Qt 界面的应用，例如 VLC 和 VirtualBox"
+    - excludedApplications: [""]
+      $name: "Application exclusions"
+      $name:ru-RU: "Исключение приложений"
+      $name:es-ES: "Exclusiones de aplicaciones"
+      $name:de-DE: "Anwendungsausnahmen"
+      $name:pt-BR: "Exclusões de aplicativos"
+      $name:zh-CN: "应用排除列表"
+      $description: "Executable name or full path, one per line"
+      $description:ru-RU: "Имя файла запуска или полный путь, по одному на строку"
+      $description:es-ES: "Nombre del ejecutable o ruta completa, uno por línea"
+      $description:de-DE: "Name der ausführbaren Datei oder vollständiger Pfad, ein Eintrag pro Zeile"
+      $description:pt-BR: "Nome do executável ou caminho completo, um por linha"
+      $description:zh-CN: "每行填写一个可执行文件名或完整路径"
+  $name: "Applications and processes"
+  $name:ru-RU: "Приложения и процессы"
+  $name:es-ES: "Aplicaciones y procesos"
+  $name:de-DE: "Anwendungen und Prozesse"
+  $name:pt-BR: "Aplicativos e processos"
+  $name:zh-CN: "应用和进程"
 - cursors:
-    - autoscrollOrigin: true
-      $name: Scroll origin
-      $name:ru-RU: Точка запуска
-      $name:es-ES: Punto de inicio
-      $name:de-DE: Scrollstart
-      $name:pt-BR: Ponto inicial
-      $name:zh-CN: 滚动起点
-      $description: Pointer shown at the starting point of autoscroll
-      $description:ru-RU: Указатель в точке запуска автопрокрутки
-      $description:es-ES: Puntero en el punto de inicio del desplazamiento automático
-      $description:de-DE: Zeiger am Startpunkt des automatischen Scrollens
-      $description:pt-BR: Ponteiro no ponto inicial da rolagem automática
-      $description:zh-CN: 自动滚动起点处的指针
-    - autoscrollArrows: true
-      $name: Scroll arrows
-      $name:ru-RU: Стрелки прокрутки
-      $name:es-ES: Flechas de desplazamiento
-      $name:de-DE: Scrollpfeile
-      $name:pt-BR: Setas de rolagem
-      $name:zh-CN: 滚动箭头
-      $description: Arrows that indicate the autoscroll direction
-      $description:ru-RU: Стрелки направления автопрокрутки
-      $description:es-ES: Flechas que indican la dirección del desplazamiento automático
-      $description:de-DE: Pfeile für die Richtung des automatischen Scrollens
-      $description:pt-BR: Setas que indicam a direção da rolagem automática
-      $description:zh-CN: 指示自动滚动方向的箭头
     - link: true
-      $name: Hand
-      $name:ru-RU: Рука
-      $name:es-ES: Mano
-      $name:de-DE: Hand
-      $name:pt-BR: Mão
-      $name:zh-CN: 手形指针
-      $description: Pointing hand over buttons, links, and other interactive elements
-      $description:ru-RU: Указательный палец над кнопками, ссылками и другими активными элементами
-      $description:es-ES: Mano sobre botones, enlaces y otros elementos interactivos
-      $description:de-DE: Handzeiger über Schaltflächen, Links und anderen interaktiven Elementen
-      $description:pt-BR: Mão sobre botões, links e outros elementos interativos
-      $description:zh-CN: 按钮、链接和其他交互元素上的手形指针
-    - move: true
-      $name: Move
-      $name:ru-RU: Перемещение
-      $name:es-ES: Mover
-      $name:de-DE: Verschieben
-      $name:pt-BR: Mover
-      $name:zh-CN: 移动
-      $description: Drag cells, ranges, and objects
-      $description:ru-RU: Перетаскивание ячеек, диапазонов и объектов
-      $description:es-ES: Arrastrar celdas, rangos y objetos
-      $description:de-DE: Zellen, Bereiche und Objekte ziehen
-      $description:pt-BR: Arrastar células, intervalos e objetos
-      $description:zh-CN: 拖动单元格、区域和对象
+      $name: "Hand"
+      $name:ru-RU: "Рука"
+      $name:es-ES: "Mano"
+      $name:de-DE: "Hand"
+      $name:pt-BR: "Mão"
+      $name:zh-CN: "手形"
+      $description: "Pointing hand over buttons, links, and other interactive elements"
+      $description:ru-RU: "Указательный палец над кнопками, ссылками и другими активными элементами"
+      $description:es-ES: "Mano sobre botones, enlaces y otros elementos interactivos"
+      $description:de-DE: "Handzeiger über Schaltflächen, Links und anderen interaktiven Elementen"
+      $description:pt-BR: "Mão sobre botões, links e outros elementos interativos"
+      $description:zh-CN: "按钮、链接和其他交互元素上的手形指针"
     - resize: true
-      $name: Resize
-      $name:ru-RU: Изменение размеров
-      $name:es-ES: Cambiar tamaño
-      $name:de-DE: Größe ändern
-      $name:pt-BR: Redimensionar
-      $name:zh-CN: 调整大小
-      $description: Resize panels, rows, columns, and objects
-      $description:ru-RU: Изменение размеров панелей, строк, столбцов и объектов
-      $description:es-ES: Cambiar el tamaño de paneles, filas, columnas y objetos
-      $description:de-DE: Größe von Bereichen, Zeilen, Spalten und Objekten ändern
-      $description:pt-BR: Redimensionamento de painéis, linhas, colunas e objetos
-      $description:zh-CN: 调整面板、行、列和对象的大小
-    - marginSelection: true
-      $name: Margin selection
-      $name:ru-RU: Выделение с поля
-      $name:es-ES: Selección desde el margen
-      $name:de-DE: Auswahl am Seitenrand
-      $name:pt-BR: Seleção pela margem
-      $name:zh-CN: 页边距选取
-      $description: Arrow for selecting text from the page margin
-      $description:ru-RU: Стрелка выделения текста со стороны поля страницы
-      $description:es-ES: Flecha para seleccionar texto desde el margen de la página
-      $description:de-DE: Pfeil zur Textauswahl vom Seitenrand aus
-      $description:pt-BR: Seta para selecionar texto pela margem da página
-      $description:zh-CN: 从页边距选取文本时显示的箭头
+      $name: "Resize"
+      $name:ru-RU: "Изменение размеров"
+      $name:es-ES: "Cambiar tamaño"
+      $name:de-DE: "Größe ändern"
+      $name:pt-BR: "Redimensionar"
+      $name:zh-CN: "调整大小"
+      $description: "Resize panels, rows, columns, and objects"
+      $description:ru-RU: "Изменение размеров панелей, строк, столбцов и объектов"
+      $description:es-ES: "Cambiar el tamaño de paneles, filas, columnas y objetos"
+      $description:de-DE: "Größe von Bereichen, Zeilen, Spalten und Objekten ändern"
+      $description:pt-BR: "Redimensionamento de painéis, linhas, colunas e objetos"
+      $description:zh-CN: "调整面板、行、列和对象的大小"
+    - move: true
+      $name: "Move"
+      $name:ru-RU: "Перемещение"
+      $name:es-ES: "Mover"
+      $name:de-DE: "Verschieben"
+      $name:pt-BR: "Mover"
+      $name:zh-CN: "移动"
+      $description: "Pointer for dragging cells, ranges, and objects"
+      $description:ru-RU: "Указатель при перетаскивании ячеек, диапазонов и объектов"
+      $description:es-ES: "Puntero para arrastrar celdas, rangos y objetos"
+      $description:de-DE: "Zeiger beim Ziehen von Zellen, Bereichen und Objekten"
+      $description:pt-BR: "Ponteiro ao arrastar células, intervalos e objetos"
+      $description:zh-CN: "拖动单元格、区域和对象时的指针"
+    - autoscrollOrigin: true
+      $name: "Autoscroll activation"
+      $name:ru-RU: "Включение автопрокрутки"
+      $name:es-ES: "Inicio del desplazamiento automático"
+      $name:de-DE: "Start des automatischen Scrollens"
+      $name:pt-BR: "Início da rolagem automática"
+      $name:zh-CN: "启动自动滚动"
+      $description: "Pointer after pressing the mouse wheel, before choosing a scroll direction"
+      $description:ru-RU: "Указатель после нажатия на колесико, до выбора направления прокрутки"
+      $description:es-ES: "Puntero al pulsar la rueda del mouse, antes de elegir la dirección de desplazamiento"
+      $description:de-DE: "Zeiger nach dem Drücken des Mausrads, vor der Wahl der Scrollrichtung"
+      $description:pt-BR: "Ponteiro após pressionar a roda do mouse, antes de escolher a direção da rolagem"
+      $description:zh-CN: "按下鼠标滚轮后、选择滚动方向前的指针"
+    - autoscrollArrows: true
+      $name: "Autoscroll arrows"
+      $name:ru-RU: "Стрелки автопрокрутки"
+      $name:es-ES: "Flechas de desplazamiento automático"
+      $name:de-DE: "Pfeile für automatisches Scrollen"
+      $name:pt-BR: "Setas de rolagem automática"
+      $name:zh-CN: "自动滚动箭头"
+      $description: "Arrows showing the autoscroll direction as the mouse moves away from the starting point"
+      $description:ru-RU: "Стрелки направления автопрокрутки при отведении мыши"
+      $description:es-ES: "Flechas que indican la dirección del desplazamiento automático al alejar el mouse del punto inicial"
+      $description:de-DE: "Pfeile für die automatische Scrollrichtung beim Bewegen der Maus vom Startpunkt weg"
+      $description:pt-BR: "Setas que indicam a direção da rolagem automática ao afastar o mouse do ponto inicial"
+      $description:zh-CN: "鼠标移离起点时指示自动滚动方向的箭头"
     - downSelection: true
-      $name: Selection arrows
-      $name:ru-RU: Стрелки выделения
-      $name:es-ES: Flechas de selección
-      $name:de-DE: Auswahlpfeile
-      $name:pt-BR: Setas de seleção
-      $name:zh-CN: 选择箭头
-      $description: Arrows for selecting rows, columns, or the entire table
-      $description:ru-RU: Стрелки для выделения строк, столбцов или всей таблицы
-      $description:es-ES: Flechas para seleccionar filas, columnas o toda la tabla
-      $description:de-DE: Pfeile zur Auswahl von Zeilen, Spalten oder der gesamten Tabelle
-      $description:pt-BR: Setas para selecionar linhas, colunas ou a tabela inteira
-      $description:zh-CN: 用于选择行、列或整个表格的箭头
+      $name: "Selection arrows"
+      $name:ru-RU: "Стрелки выделения"
+      $name:es-ES: "Flechas de selección"
+      $name:de-DE: "Auswahlpfeile"
+      $name:pt-BR: "Setas de seleção"
+      $name:zh-CN: "选择箭头"
+      $description: "Arrows for selecting rows, columns, or the entire table"
+      $description:ru-RU: "Стрелки для выделения строк, столбцов или всей таблицы"
+      $description:es-ES: "Flechas para seleccionar filas, columnas o toda la tabla"
+      $description:de-DE: "Pfeile zur Auswahl von Zeilen, Spalten oder der gesamten Tabelle"
+      $description:pt-BR: "Setas para selecionar linhas, colunas ou a tabela inteira"
+      $description:zh-CN: "用于选择行、列或整个表格的箭头"
     - cell: true
-      $name: Cell cross
-      $name:ru-RU: Крестик ячейки
-      $name:es-ES: Cruz de celda
-      $name:de-DE: Zellkreuz
-      $name:pt-BR: Cruz de célula
-      $name:zh-CN: 单元格十字指针
-      $description: Cross-shaped pointer for selecting cells in tables
-      $description:ru-RU: Указатель в виде крестика для выбора ячеек в таблицах
-      $description:es-ES: Puntero en forma de cruz para seleccionar celdas de una tabla
-      $description:de-DE: Kreuzförmiger Zeiger zur Auswahl von Tabellenzellen
-      $description:pt-BR: Ponteiro em forma de cruz para selecionar células em tabelas
-      $description:zh-CN: 用于选择表格单元格的十字指针
+      $name: "Cell selection"
+      $name:ru-RU: "Выбор ячейки"
+      $name:es-ES: "Selección de celdas"
+      $name:de-DE: "Zellauswahl"
+      $name:pt-BR: "Seleção de células"
+      $name:zh-CN: "单元格选择"
+      $description: "Cross-shaped pointer over cells and when selecting ranges"
+      $description:ru-RU: "Крестик при наведении на ячейки и выделении диапазонов"
+      $description:es-ES: "Puntero en forma de cruz sobre las celdas y al seleccionar rangos"
+      $description:de-DE: "Kreuzzeiger über Zellen und beim Auswählen von Bereichen"
+      $description:pt-BR: "Ponteiro em forma de cruz sobre células e ao selecionar intervalos"
+      $description:zh-CN: "悬停在单元格上或选择区域时的十字指针"
+    - marginSelection: true
+      $name: "Margin selection"
+      $name:ru-RU: "Выделение снаружи"
+      $name:es-ES: "Selección desde el margen"
+      $name:de-DE: "Auswahl vom Seitenrand"
+      $name:pt-BR: "Seleção pela margem"
+      $name:zh-CN: "从页边距选择"
+      $description: "Arrow for selecting text from the left page margin"
+      $description:ru-RU: "Стрелка для выделения текста при наведении на левое поле страницы"
+      $description:es-ES: "Flecha para seleccionar texto desde el margen izquierdo de la página"
+      $description:de-DE: "Pfeil zur Textauswahl vom linken Seitenrand"
+      $description:pt-BR: "Seta para selecionar texto pela margem esquerda da página"
+      $description:zh-CN: "从页面左侧边距选择文本时的箭头"
     - verticalText: true
-      $name: Vertical text
-      $name:ru-RU: Вертикальный текст
-      $name:es-ES: Texto vertical
-      $name:de-DE: Vertikaler Text
-      $name:pt-BR: Texto vertical
-      $name:zh-CN: 竖排文本
-      $description: Horizontal text pointer for vertically written text
-      $description:ru-RU: Горизонтальный текстовый указатель для вертикального текста
-      $description:es-ES: Puntero de texto horizontal para texto escrito en vertical
-      $description:de-DE: Waagerechter Textzeiger für senkrecht geschriebenen Text
-      $description:pt-BR: Ponteiro de texto horizontal para texto escrito na vertical
-      $description:zh-CN: 用于竖排文本的水平文本指针
-  $name: Which pointers to replace
-  $name:ru-RU: Какие указатели подменять
-  $name:es-ES: Qué punteros sustituir
-  $name:de-DE: Welche Zeiger ersetzt werden
-  $name:pt-BR: Quais ponteiros substituir
-  $name:zh-CN: 要替换的指针
-- smoothAutoscrollOrigin: true
-  $name: Smooth autoscroll starting pointer
-  $name:ru-RU: Сглаживание точки запуска автопрокрутки
-  $name:es-ES: Suavizar el inicio del desplazamiento automático
-  $name:de-DE: Startpunkt des automatischen Scrollens glätten
-  $name:pt-BR: Suavizar o início da rolagem automática
-  $name:zh-CN: 平滑自动滚动起点
-- smoothDiagonals: true
-  $name: Smooth autoscroll arrows
-  $name:ru-RU: Сглаживание стрелок автопрокрутки
-  $name:es-ES: Suavizar las flechas de desplazamiento automático
-  $name:de-DE: Pfeile für automatisches Scrollen glätten
-  $name:pt-BR: Suavizar as setas de rolagem automática
-  $name:zh-CN: 平滑自动滚动方向箭头
-- smoothSelectionArrows: true
-  $name: Smooth selection arrows
-  $name:ru-RU: Сглаживание стрелок выделения
-  $name:es-ES: Suavizar las flechas de selección
-  $name:de-DE: Auswahlpfeile glätten
-  $name:pt-BR: Suavizar as setas de seleção
-  $name:zh-CN: 平滑选择箭头
+      $name: "Vertical text input"
+      $name:ru-RU: "Вертикальный ввод"
+      $name:es-ES: "Entrada de texto vertical"
+      $name:de-DE: "Vertikale Texteingabe"
+      $name:pt-BR: "Entrada de texto vertical"
+      $name:zh-CN: "竖排文本输入"
+      $description: "Horizontal mouse pointer in areas with vertical text"
+      $description:ru-RU: "Горизонтальный курсор мыши в областях с вертикальным текстом"
+      $description:es-ES: "Puntero horizontal del mouse en áreas con texto vertical"
+      $description:de-DE: "Waagerechter Mauszeiger in Bereichen mit vertikalem Text"
+      $description:pt-BR: "Ponteiro horizontal do mouse em áreas com texto vertical"
+      $description:zh-CN: "竖排文本区域中的水平鼠标指针"
+  $name: "Pointer types"
+  $name:ru-RU: "Виды курсоров"
+  $name:es-ES: "Tipos de puntero"
+  $name:de-DE: "Zeigertypen"
+  $name:pt-BR: "Tipos de ponteiro"
+  $name:zh-CN: "指针类型"
+  $description: "Replace selected pointer types with pointers from the current Windows scheme"
+  $description:ru-RU: "Подмена выбранных видов курсоров на курсоры текущей схемы Windows"
+  $description:es-ES: "Sustituir los tipos de puntero seleccionados por los del esquema actual de Windows"
+  $description:de-DE: "Ausgewählte Zeigertypen durch Zeiger des aktuellen Windows-Schemas ersetzen"
+  $description:pt-BR: "Substituição dos tipos de ponteiro selecionados pelos do esquema atual do Windows"
+  $description:zh-CN: "将选定类型的指针替换为当前 Windows 方案中的指针"
+- smoothing:
+    - autoscrollOrigin: true
+      $name: "Autoscroll activation"
+      $name:ru-RU: "Включение автопрокрутки"
+      $name:es-ES: "Inicio del desplazamiento automático"
+      $name:de-DE: "Start des automatischen Scrollens"
+      $name:pt-BR: "Início da rolagem automática"
+      $name:zh-CN: "启动自动滚动"
+    - autoscrollArrows: true
+      $name: "Autoscroll arrows"
+      $name:ru-RU: "Стрелки автопрокрутки"
+      $name:es-ES: "Flechas de desplazamiento automático"
+      $name:de-DE: "Pfeile für automatisches Scrollen"
+      $name:pt-BR: "Setas de rolagem automática"
+      $name:zh-CN: "自动滚动箭头"
+    - selectionArrows: true
+      $name: "Selection arrows"
+      $name:ru-RU: "Стрелки выделения"
+      $name:es-ES: "Flechas de selección"
+      $name:de-DE: "Auswahlpfeile"
+      $name:pt-BR: "Setas de seleção"
+      $name:zh-CN: "选择箭头"
+  $name: "Smoothing"
+  $name:ru-RU: "Сглаживание"
+  $name:es-ES: "Suavizado"
+  $name:de-DE: "Kantenglättung"
+  $name:pt-BR: "Suavização"
+  $name:zh-CN: "抗锯齿"
+  $description: "Smooth the edges of replacement pointers"
+  $description:ru-RU: "Сглаживание границ заменяемых курсоров"
+  $description:es-ES: "Suavizado de los bordes de los punteros de sustitución"
+  $description:de-DE: "Glättet die Ränder der ersetzten Mauszeiger"
+  $description:pt-BR: "Suavização das bordas dos ponteiros substitutos"
+  $description:zh-CN: "平滑替换后指针的边缘"
 */
 // ==/WindhawkModSettings==
 
@@ -1762,7 +1797,7 @@ std::vector<std::wstring> ReadExcludedApplications() {
     std::vector<std::wstring> entries;
     // The settings API exposes indexed values without an array length.
     for (int i = 0, empty = 0; empty < 32; ++i) {
-        auto value = WindhawkUtils::StringSetting::make(L"excludedApplications[%d]", i);
+        auto value = WindhawkUtils::StringSetting::make(L"targets.excludedApplications[%d]", i);
         const std::wstring_view text(value.get());
         const auto first = text.find_first_not_of(L" \t\r\n");
         if (first == std::wstring_view::npos) {
@@ -2257,11 +2292,10 @@ bool DiscoverInputOwners(const std::shared_ptr<RestoreSession>& session) {
 }
 
 void UpdateSettings() {
-    // Keep the key used before smoothing expanded past the autoscroll arrows.
     constexpr std::array smoothingSettings = {
-        std::pair{CursorType::AutoscrollOrigin, L"smoothAutoscrollOrigin"},
-        std::pair{CursorType::AutoscrollArrows, L"smoothDiagonals"},
-        std::pair{CursorType::SelectionArrows, L"smoothSelectionArrows"},
+        std::pair{CursorType::AutoscrollOrigin, L"smoothing.autoscrollOrigin"},
+        std::pair{CursorType::AutoscrollArrows, L"smoothing.autoscrollArrows"},
+        std::pair{CursorType::SelectionArrows, L"smoothing.selectionArrows"},
     };
     uint32_t smoothingTypes = 0;
     for (const auto& [type, name] : smoothingSettings) {

@@ -2,8 +2,8 @@
 
 **English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
-Cursor Scheme Extension applies the active Windows cursor scheme to recognized
-application pointers.
+Cursor Scheme Extension replaces built-in application pointers with pointers
+from the selected Windows scheme.
 
 ## Status
 
@@ -67,17 +67,17 @@ not been verified.
 
 ### Usage
 
-Choose application families under **Where to replace pointers** and individual
-types under **Which pointers to replace**. Windows, Chromium, Gecko, Qt, and all
-pointer types are on by default. Classic Office is opt-in.
+Choose application families under **Applications and processes** and individual
+shapes under **Pointer types**. Windows, Chromium, Gecko, Qt, and all pointer
+types are on by default. Office covers desktop applications and is opt-in.
 
-Add one executable name (for example, `example.exe`) or full path per row
-under **Application exclusions**. A name matches any location. A full path
-matches a specific installation.
+Add one executable name or full path per row under **Application exclusions**,
+below the family switches. A name matches any location. A full path matches a
+specific installation.
 
-Separate smoothing switches cover the autoscroll starting pointer,
+The **Smoothing** group has separate switches for autoscroll activation,
 all eight autoscroll arrows, and selection arrows. All three are on by default.
-Change the cursor scheme and pointer roles in Windows.
+Change the pointer scheme and individual roles in Windows.
 
 ### Manual preview
 
