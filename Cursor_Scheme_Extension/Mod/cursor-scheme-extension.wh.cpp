@@ -7,7 +7,7 @@
 // @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
 // @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
 // @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
-// @version         0.10.3
+// @version         0.10.4
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -17,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 18
+// Build: 19
 
 // ==WindhawkModReadme==
 /*
@@ -506,6 +506,14 @@ struct MemoryDc {
 struct Replacement {
     HCURSOR cursor = nullptr;
     bool smooth = false;
+    uint64_t generation = 0;
+};
+
+struct CursorInstance {
+    HCURSOR cursor;
+    HCURSOR original;
+    uint64_t generation;
+    bool retired = false;
 };
 
 struct ThreadSelection {
@@ -514,6 +522,7 @@ struct ThreadSelection {
     HWND window = nullptr;
     HCURSOR cursor = nullptr;
     HCURSOR original = nullptr;
+    HWND restoreWindow = nullptr;
 };
 
 struct CursorShape {
@@ -628,6 +637,7 @@ std::array<std::optional<Replacement>, kMappings.size()> g_replacements;
 std::array<std::optional<CursorSource>, kRoleCount> g_sources;
 std::array<bool, kRoleCount> g_needsRefresh;
 std::vector<HCURSOR> g_retired;
+std::vector<CursorInstance> g_instances;
 std::vector<ThreadSelection> g_selections;
 std::mutex g_mutex;
 std::once_flag g_referenceShapesInit;
@@ -641,11 +651,80 @@ std::vector<std::wstring> g_excludedApplications;
 uint32_t g_smoothingTypes;
 bool g_stopping;
 bool g_watchStarted;
+unsigned g_activeCalls;
+uint64_t g_nextGeneration;
+std::atomic<bool> g_hooksRemoved;
+bool g_deferredCleanup;
 HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
 decltype(&GetCursor) g_getCursorOriginal;
+thread_local bool g_readNativeCursor;
+
+HCURSOR NativeCursor() {
+    const bool previous = std::exchange(g_readNativeCursor, true);
+    const HCURSOR cursor = GetCursor();
+    g_readNativeCursor = previous;
+    return cursor;
+}
+
+void RestoreCurrentQueue();
+LRESULT CALLBACK RestoreWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+
+constexpr UINT kRestoreMessage = WM_APP + 0x495;
+constexpr PCWSTR kRestoreClass = L"CursorSchemeExtension.Restore";
+
+HMODULE ThisModule() {
+    HMODULE module = nullptr;
+    GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                          GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                      reinterpret_cast<PCWSTR>(RestoreWindowProc), &module);
+    return module;
+}
+
+HWND EnsureRestoreWindow() {
+    thread_local HWND window;
+    if (!IsWindow(window)) {
+        const auto module = ThisModule();
+        WNDCLASSW windowClass{};
+        windowClass.lpfnWndProc = RestoreWindowProc;
+        windowClass.hInstance = module;
+        windowClass.lpszClassName = kRestoreClass;
+        if (!RegisterClassW(&windowClass) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) {
+            return nullptr;
+        }
+        // A private window lets the mod restore the queue without invoking app code.
+        window = CreateWindowExW(0, kRestoreClass, L"", 0, 0, 0, 0, 0,
+                                 HWND_MESSAGE, nullptr, module, nullptr);
+        if (!window) {
+            return nullptr;
+        }
+        HANDLE lifetime = nullptr;
+        bool tracked = false;
+        if (DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(),
+                            &lifetime, SYNCHRONIZE, FALSE, 0)) {
+            try {
+                std::lock_guard lock(g_mutex);
+                if (!g_stopping) {
+                    g_selections.push_back({GetCurrentThreadId(), lifetime, nullptr,
+                                            nullptr, nullptr, window});
+                    tracked = true;
+                }
+            } catch (...) {
+                // The window must never outlive its owning mod without being tracked.
+            }
+        }
+        if (!tracked) {
+            if (lifetime) {
+                CloseHandle(lifetime);
+            }
+            DestroyWindow(window);
+            window = nullptr;
+        }
+    }
+    return window;
+}
 
 template <size_t N>
 size_t ResourceSlot(WORD id, const std::array<ResourceMapping, N>& resources) {
@@ -1510,6 +1589,9 @@ bool RefreshSource(Role role) {
                 if (entry->cursor) {
                     g_retired.push_back(entry->cursor);
                 }
+                for (auto& instance : g_instances) {
+                    instance.retired |= instance.generation == entry->generation;
+                }
                 entry.reset();
             }
         }
@@ -1528,22 +1610,6 @@ ThreadSelection* FindCurrentSelection() {
         }
     }
     return nullptr;
-}
-
-ThreadSelection* TrackCurrentSelection(HWND window) {
-    HANDLE lifetime = nullptr;
-    if (!DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(),
-                         &lifetime, SYNCHRONIZE, FALSE, 0)) {
-        return nullptr;
-    }
-
-    try {
-        g_selections.push_back({GetCurrentThreadId(), lifetime, window});
-    } catch (...) {
-        CloseHandle(lifetime);
-        throw;
-    }
-    return &g_selections.back();
 }
 
 BOOL CALLBACK FindThreadWindow(HWND window, LPARAM data) {
@@ -1597,7 +1663,7 @@ HWND FindCursorWindow(DWORD threadId, HWND atPointer = nullptr, HWND previous = 
 
 void ForgetInactiveThreads() {
     std::erase_if(g_selections, [](const ThreadSelection& selection) {
-        if (!selection.cursor || WaitForSingleObject(selection.lifetime, 0) == WAIT_OBJECT_0) {
+        if (WaitForSingleObject(selection.lifetime, 0) == WAIT_OBJECT_0) {
             CloseHandle(selection.lifetime);
             return true;
         }
@@ -1613,7 +1679,7 @@ bool IsAssigned(HCURSOR cursor) {
 }
 
 void FreeRetired() {
-    if (g_retired.empty()) {
+    if (g_activeCalls || (g_retired.empty() && g_instances.empty())) {
         return;
     }
 
@@ -1622,7 +1688,12 @@ void FreeRetired() {
         return;
     }
 
-    const HCURSOR threadCursor = g_getCursorOriginal();
+    const HCURSOR threadCursor = NativeCursor();
+    std::erase_if(g_instances, [&](const CursorInstance& instance) {
+        return instance.retired && instance.cursor != visible.hCursor &&
+               instance.cursor != threadCursor && !IsAssigned(instance.cursor) &&
+               DestroyCursor(instance.cursor);
+    });
     std::erase_if(g_retired, [&](HCURSOR cursor) {
         return cursor != visible.hCursor && cursor != threadCursor &&
                !IsAssigned(cursor) && DestroyCursor(cursor);
@@ -1721,19 +1792,73 @@ bool ReplacementEnabled(CursorMatch match) {
            (g_enabledTypes.load(std::memory_order_acquire) & TypeBit(kMappings[match.slot].type));
 }
 
+
+HCURSOR LogicalCursor(HCURSOR cursor) {
+    for (const auto& instance : g_instances) {
+        if (instance.cursor == cursor) {
+            return instance.original;
+        }
+    }
+    return cursor;
+}
+
+HCURSOR InstanceFor(Replacement& image, HCURSOR original,
+                    const CursorSource& source, const CursorMapping& mapping) {
+    for (const auto& instance : g_instances) {
+        if (instance.generation == image.generation && instance.original == original) {
+            return instance.cursor;
+        }
+    }
+    // Keep a pathological application from accumulating unlimited native handles.
+    constexpr size_t maxInstances = 128;
+    if (g_instances.size() >= maxInstances) {
+        return nullptr;
+    }
+    // CopyImage flattens ANI, so animations must be instantiated from their frames.
+    const bool animated = source.frames.size() > 1;
+    const HCURSOR cursor = animated ? MakeReplacement(source, mapping, image.smooth)
+        : static_cast<HCURSOR>(CopyImage(image.cursor, IMAGE_CURSOR, 0, 0, 0));
+    if (cursor) {
+        try {
+            g_instances.push_back({cursor, original, image.generation});
+        } catch (...) {
+            DestroyCursor(cursor);
+            throw;
+        }
+    }
+    return cursor;
+}
+
+class ActiveCursorCall {
+public:
+    // Called while g_mutex is held, before publishing a handle to Win32.
+    ActiveCursorCall() {
+        ++g_activeCalls;
+    }
+
+    ~ActiveCursorCall() {
+        std::lock_guard lock(g_mutex);
+        --g_activeCalls;
+        FreeRetired();
+        g_needsCleanup.store(!g_instances.empty());
+    }
+};
+
 HCURSOR WINAPI GetCursorHook() {
-    if (!g_needsCleanup.load()) {
+    if (g_readNativeCursor || !g_needsCleanup.load()) {
         return g_getCursorOriginal();
     }
     std::lock_guard lock(g_mutex);
-    const HCURSOR current = g_getCursorOriginal();
-    const auto* selection = FindCurrentSelection();
-    return selection && selection->cursor && current == selection->cursor
-        ? selection->original : current;
+    return LogicalCursor(g_getCursorOriginal());
 }
 
 HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
     try {
+        // This also accepts handles obtained through a visual snapshot API.
+        if (g_needsCleanup.load()) {
+            std::lock_guard lock(g_mutex);
+            cursor = LogicalCursor(cursor);
+        }
         const auto match = g_processExcluded.load(std::memory_order_acquire)
             ? CursorMatch{} : IdentifyCursor(cursor);
         const bool enabled = ReplacementEnabled(match);
@@ -1742,27 +1867,31 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
             return g_setCursorOriginal(cursor);
         }
 
-        // WindowFromPoint can run the window's hit-test handler synchronously.
+        // User32 can synchronously call app code from these window queries.
         HWND atPointer = nullptr;
+        HWND restoreWindow = nullptr;
         thread_local ULONGLONG nextWindowProbe;
         thread_local bool findingPointerWindow;
         const bool checkHost = enabled && match.target == Target::Chromium && g_hasExclusions.load();
         const auto now = enabled ? GetTickCount64() : 0;
-        if (enabled && !findingPointerWindow &&
-            (checkHost || (g_previousRole == Role::Count && now >= nextWindowProbe))) {
+        if (enabled && !findingPointerWindow) {
             findingPointerWindow = true;
-            atPointer = GetCapture();
-            if (!atPointer) {
-                atPointer = CursorWindowAtPointer();
+            restoreWindow = EnsureRestoreWindow();
+            if (checkHost || (g_previousRole == Role::Count && now >= nextWindowProbe)) {
+                atPointer = GetCapture();
+                if (!atPointer) {
+                    atPointer = CursorWindowAtPointer();
+                }
             }
             findingPointerWindow = false;
         }
-        std::lock_guard lock(g_mutex);
+
+        std::unique_lock lock(g_mutex);
         ForgetInactiveThreads();
         auto* selection = FindCurrentSelection();
         HCURSOR display = cursor;
         HWND window = nullptr;
-        if (!g_stopping && ReplacementEnabled(match)) {
+        if (!g_stopping && ReplacementEnabled(match) && restoreWindow) {
             const DWORD threadId = GetCurrentThreadId();
             if (atPointer && GetWindowThreadProcessId(atPointer, nullptr) == threadId) {
                 window = atPointer;
@@ -1772,78 +1901,167 @@ HCURSOR WINAPI SetCursorHook(HCURSOR cursor) {
             } else if (now >= nextWindowProbe) {
                 window = FindCursorWindow(threadId, atPointer);
                 if (!window) {
-                    // No desktop window can display this thread's cursor yet.
                     nextWindowProbe = now + 250;
                 }
             }
-            if (window && match.target == Target::Chromium && !g_excludedApplications.empty() &&
-                IsExcludedHostWindow(window)) {
-                window = nullptr;
-            }
-            if (window) {
+            const bool excludedHost = window && match.target == Target::Chromium &&
+                !g_excludedApplications.empty() && IsExcludedHostWindow(window);
+            if (!excludedHost) {
                 if (selection) {
                     selection->window = window;
-                } else {
-                    selection = TrackCurrentSelection(window);
+                    selection->restoreWindow = restoreWindow;
                 }
-            }
-        }
-        if (window && selection) {
-            const auto& mapping = kMappings[match.slot];
-            const size_t role = static_cast<size_t>(mapping.role);
-            CheckCursorSettings();
-            if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
-                RefreshSource(mapping.role)) {
-                const auto& source = *g_sources[role];
-                const bool smooth = (g_smoothingTypes & TypeBit(mapping.type)) != 0;
-                auto& entry = g_replacements[match.slot];
-                if (entry && entry->smooth != smooth) {
-                    if (entry->cursor) {
-                        g_retired.push_back(entry->cursor);
+                if (selection) {
+                    const auto& mapping = kMappings[match.slot];
+                    const size_t role = static_cast<size_t>(mapping.role);
+                    CheckCursorSettings();
+                    if ((g_previousRole == mapping.role && !g_needsRefresh[role]) ||
+                        RefreshSource(mapping.role)) {
+                        const auto& source = *g_sources[role];
+                        const bool smooth = (g_smoothingTypes & TypeBit(mapping.type)) != 0;
+                        auto& image = g_replacements[match.slot];
+                        if (image && image->smooth != smooth) {
+                            if (image->cursor) {
+                                g_retired.push_back(image->cursor);
+                            }
+                            for (auto& instance : g_instances) {
+                                instance.retired |= instance.generation == image->generation;
+                            }
+                            image.reset();
+                        }
+                        if (!image) {
+                            image = Replacement{MakeReplacement(source, mapping, smooth),
+                                                smooth, ++g_nextGeneration};
+                        }
+                        if (image->cursor) {
+                            if (HCURSOR instance = InstanceFor(*image, cursor, source, mapping)) {
+                                display = instance;
+                                g_needsCleanup.store(true);
+                            }
+                        }
                     }
-                    entry.reset();
+                    g_previousRole = mapping.role;
                 }
-                if (!entry) {
-                    // Cache unsupported images too, so mouse movement does not retry encoding.
-                    entry = Replacement{MakeReplacement(source, mapping, smooth), smooth};
-                }
-                if (entry->cursor) {
-                    display = entry->cursor;
-                }
+            } else {
+                g_previousRole = Role::Count;
             }
-            g_previousRole = mapping.role;
         } else {
             g_previousRole = Role::Count;
         }
 
-        if (display != cursor) {
-            g_needsCleanup.store(true);
-        }
-
-        HCURSOR previous = g_setCursorOriginal(display);
+        ActiveCursorCall active;
+        lock.unlock();
+        // SetCursor emits synchronous WinEvents. No shared-state lock may span it.
+        const HCURSOR previous = g_setCursorOriginal(display);
+        const HCURSOR current = NativeCursor();
+        lock.lock();
+        // A nested call may have moved the vector or changed the cursor again.
+        selection = FindCurrentSelection();
         if (selection) {
-            if (previous == selection->cursor && selection->cursor) {
-                previous = selection->original;
-            }
-            const HCURSOR current = g_getCursorOriginal();
-            if (display != cursor && current == display) {
-                selection->cursor = display;
-                selection->original = cursor;
-            } else if (current == cursor && g_stopping && current == selection->cursor) {
-                g_setCursorOriginal(selection->original);
-                selection->cursor = nullptr;
-            } else if (current != selection->cursor) {
-                selection->cursor = nullptr;
-            }
+            const HCURSOR logical = LogicalCursor(current);
+            selection->cursor = current != logical ? current : nullptr;
+            selection->original = logical;
         }
-        ForgetInactiveThreads();
-        FreeRetired();
-        g_needsCleanup.store(!g_selections.empty() || !g_retired.empty());
-        return previous;
+        const HCURSOR logicalPrevious = LogicalCursor(previous);
+        lock.unlock();
+        return logicalPrevious;
     } catch (...) {
         g_previousRole = Role::Count;
         return g_setCursorOriginal(cursor);
     }
+}
+
+
+void RestoreCurrentQueue() {
+    const HCURSOR current = NativeCursor();
+    std::unique_lock lock(g_mutex);
+    const HCURSOR original = LogicalCursor(current);
+    ActiveCursorCall active;
+    lock.unlock();
+    if (current != original) {
+        // Call the API entry point, which remains valid after Windhawk removes hooks.
+        SetCursor(original);
+    }
+    const HCURSOR restored = NativeCursor();
+    lock.lock();
+    if (auto* selection = FindCurrentSelection()) {
+        selection->cursor = LogicalCursor(restored) != restored ? restored : nullptr;
+        selection->original = LogicalCursor(restored);
+    }
+    lock.unlock();
+}
+
+LRESULT CALLBACK RestoreWindowProc(HWND window, UINT message, WPARAM wParam, LPARAM lParam) {
+    if (message == kRestoreMessage) {
+        RestoreCurrentQueue();
+        DestroyWindow(window);
+        return 0;
+    }
+    if (message == WM_NCDESTROY) {
+        std::lock_guard lock(g_mutex);
+        if (auto* selection = FindCurrentSelection()) {
+            if (selection->restoreWindow == window) {
+                selection->restoreWindow = nullptr;
+            }
+        }
+    }
+    return DefWindowProcW(window, message, wParam, lParam);
+}
+
+void ReleaseUnusedCursors() {
+    std::lock_guard lock(g_mutex);
+    ForgetInactiveThreads();
+    CURSORINFO visible{sizeof(visible)};
+    const bool haveVisible = GetCursorInfo(&visible);
+    const auto unused = [&](HCURSOR cursor) {
+        return haveVisible && !g_activeCalls && cursor != visible.hCursor && !IsAssigned(cursor);
+    };
+    std::erase_if(g_instances, [&](const CursorInstance& instance) {
+        return unused(instance.cursor) && DestroyCursor(instance.cursor);
+    });
+    for (auto& image : g_replacements) {
+        if (image && image->cursor && DestroyCursor(image->cursor)) {
+            image.reset();
+        }
+    }
+    std::erase_if(g_retired, [](HCURSOR cursor) {
+        return DestroyCursor(cursor) != FALSE;
+    });
+}
+
+struct DeferredRestore {
+    HMODULE module;
+    std::vector<HANDLE> threads;
+
+    ~DeferredRestore() {
+        for (HANDLE thread : threads) {
+            CloseHandle(thread);
+        }
+    }
+};
+
+DWORD WINAPI DeferredRestoreCleanup(void* parameter) {
+    auto* cleanup = static_cast<DeferredRestore*>(parameter);
+    // The module stays resident for any unresponsive GUI thread which still owns
+    // a restore window. Its queued restore runs whenever the thread resumes.
+    for (HANDLE thread : cleanup->threads) {
+        WaitForSingleObject(thread, INFINITE);
+    }
+    while (!g_hooksRemoved.load(std::memory_order_acquire)) {
+        Sleep(10);
+    }
+    ReleaseUnusedCursors();
+    {
+        std::lock_guard lock(g_mutex);
+        for (const auto& selection : g_selections) {
+            CloseHandle(selection.lifetime);
+        }
+        g_selections.clear();
+    }
+    UnregisterClassW(kRestoreClass, cleanup->module);
+    const HMODULE module = cleanup->module;
+    delete cleanup;
+    FreeLibraryAndExitThread(module, 0);
 }
 
 void UpdateSettings() {
@@ -1932,58 +2150,99 @@ void Wh_ModSettingsChanged() {
     UpdateSettings();
 }
 
+
 void Wh_ModBeforeUninit() {
+    HMODULE pin = nullptr;
+    DeferredRestore* deferred = nullptr;
     try {
-        const HWND atPointer = CursorWindowAtPointer();
-        std::vector<std::pair<DWORD, HWND>> windows;
+        if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                               reinterpret_cast<PCWSTR>(RestoreWindowProc), &pin)) {
+            return;
+        }
+        std::vector<HWND> windows;
         {
             std::lock_guard lock(g_mutex);
             g_stopping = true;
+            for (auto& instance : g_instances) {
+                instance.retired = true;
+            }
             ForgetInactiveThreads();
             for (const auto& selection : g_selections) {
-                const HWND window = FindCursorWindow(selection.id, atPointer, selection.window);
-                windows.emplace_back(selection.id, window);
+                if (selection.restoreWindow) {
+                    windows.push_back(selection.restoreWindow);
+                }
             }
         }
-
-        // The owning GUI thread must restore its cursor. Avoid blocking while
-        // holding the lock because the window can call SetCursor from here.
-        for (auto [id, window] : windows) {
-            DWORD process = 0;
-            if (window && GetWindowThreadProcessId(window, &process) == id &&
-                process == GetCurrentProcessId()) {
-                SendMessageTimeoutW(window, WM_SETCURSOR,
-                                    reinterpret_cast<WPARAM>(window),
-                                    MAKELPARAM(HTCLIENT, WM_MOUSEMOVE),
+        if (windows.empty()) {
+            FreeLibrary(pin);
+            return;
+        }
+        for (HWND window : windows) {
+            if (GetWindowThreadProcessId(window, nullptr) == GetCurrentThreadId()) {
+                SendMessageW(window, kRestoreMessage, 0, 0);
+            } else {
+                SendMessageTimeoutW(window, kRestoreMessage, 0, 0,
                                     SMTO_ABORTIFHUNG | SMTO_BLOCK | SMTO_ERRORONEXIT,
                                     100, nullptr);
             }
+            if (IsWindow(window)) {
+                PostMessageW(window, kRestoreMessage, 0, 0);
+            }
         }
+
+        deferred = new DeferredRestore{pin, {}};
+        {
+            std::lock_guard lock(g_mutex);
+            for (const auto& selection : g_selections) {
+                if (!selection.restoreWindow && !selection.cursor) {
+                    continue;
+                }
+                HANDLE thread = nullptr;
+                if (DuplicateHandle(GetCurrentProcess(), selection.lifetime, GetCurrentProcess(),
+                                    &thread, SYNCHRONIZE, FALSE, 0)) {
+                    try {
+                        deferred->threads.push_back(thread);
+                    } catch (...) {
+                        CloseHandle(thread);
+                        throw;
+                    }
+                } else {
+                    // Retain code safely if Windows cannot confirm the owner's lifetime.
+                    g_deferredCleanup = true;
+                    delete deferred;
+                    return;
+                }
+            }
+            g_deferredCleanup = !deferred->threads.empty();
+        }
+        if (g_deferredCleanup) {
+            HANDLE worker = CreateThread(nullptr, 0, DeferredRestoreCleanup, deferred, 0, nullptr);
+            if (worker) {
+                CloseHandle(worker);
+            } else {
+                // Keep the module reference if a suspended queue cannot be serviced yet.
+                delete deferred;
+            }
+            return;
+        }
+        delete deferred;
+        deferred = nullptr;
+        FreeLibrary(pin);
     } catch (...) {
-        // A cursor still assigned to a live thread must survive unloading.
+        delete deferred;
+        // A surviving restore window retains its code. Do not drop a successful pin.
     }
 }
 
 void Wh_ModUninit() {
-    std::lock_guard lock(g_mutex);
+    g_hooksRemoved.store(true, std::memory_order_release);
     CloseSettingsWatch();
-    ForgetInactiveThreads();
-    CURSORINFO visible{sizeof(visible)};
-    const bool haveVisible = GetCursorInfo(&visible);
-    const auto freeIfUnused = [&](HCURSOR cursor) {
-        if (haveVisible && cursor && cursor != visible.hCursor && !IsAssigned(cursor)) {
-            DestroyCursor(cursor);
+    ReleaseUnusedCursors();
+    if (!g_deferredCleanup) {
+        for (const auto& selection : g_selections) {
+            CloseHandle(selection.lifetime);
         }
-    };
-    for (const auto& entry : g_replacements) {
-        if (entry) {
-            freeIfUnused(entry->cursor);
-        }
-    }
-    for (HCURSOR cursor : g_retired) {
-        freeIfUnused(cursor);
-    }
-    for (const auto& selection : g_selections) {
-        CloseHandle(selection.lifetime);
+        g_selections.clear();
+        UnregisterClassW(kRestoreClass, ThisModule());
     }
 }

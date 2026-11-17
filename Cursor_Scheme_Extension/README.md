@@ -60,7 +60,7 @@ types under **Which pointers to replace**. Windows, Chromium, Gecko, Qt, and all
 pointer types are on by default. Classic Office is opt-in.
 
 Add one executable name (for example, `example.exe`) or full path per row
-under **Excluded applications**. A name matches any location. A full path
+under **Application exclusions**. A name matches any location. A full path
 matches a specific installation.
 
 Separate smoothing switches cover the autoscroll starting pointer,
@@ -74,3 +74,9 @@ eleven system cursor states. Build it as `cursor-scheme-extension-preview.exe`
 and open it with the mod enabled. Wheel-click **Vertical**, **Horizontal**, or
 **Both axes**. Move away from the starting point and back. In **Both axes**,
 try the four diagonals too. Press **F2** to try the Windows Reader Mode path.
+
+### Lifecycle tests
+
+Run [Run-LifecycleTests.ps1](Tests/Run-LifecycleTests.ps1) in PowerShell to check
+reentrant callbacks, shared input queues, handle reuse, and restoration on x86
+and x64. The tests use isolated processes and preserve the installed settings.
