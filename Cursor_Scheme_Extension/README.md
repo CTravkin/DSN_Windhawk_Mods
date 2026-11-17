@@ -26,10 +26,11 @@ Windows scheme to the pointer at the start and during autoscroll.
   direction. Optional smoothing applies in all eight directions. Monochrome
   effects that invert the background keep their original pixel rendering.
 - Panel, row, and column dividers use the corresponding Resize roles.
-- In Office, the pointing hand uses Link select, margin selection mirrors Normal
-  select, and the downward selection arrow rotates Alternate select.
-- In Chromium and Electron, cell selection uses Precision select and the
-  vertical text pointer rotates Text select. Transforms preserve the hotspot.
+- In Office, the pointing hand uses Link select and margin selection mirrors
+  Normal select. Arrows for selecting rows, columns, or an entire table rotate
+  Alternate select in the direction of the original arrow.
+- Cell selection in Excel, Chromium, and Electron uses Precision select.
+  The vertical text pointer rotates Text select. Transforms preserve the hotspot.
 
 ## Platforms
 

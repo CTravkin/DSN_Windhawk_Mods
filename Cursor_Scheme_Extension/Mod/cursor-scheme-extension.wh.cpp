@@ -3,7 +3,11 @@
 // @name            Cursor Scheme Extension
 // @description     Apply the active Windows cursor scheme to recognized application pointers
 // @description:ru-RU Применяет активную схему Windows к распознанным указателям приложений
-// @version         0.7.1
+// @description:es-ES Aplica el esquema de punteros activo de Windows a los punteros reconocidos de las aplicaciones
+// @description:de-DE Wendet das aktive Windows-Zeigerschema auf erkannte Anwendungszeiger an
+// @description:pt-BR Aplica o esquema de ponteiros ativo do Windows aos ponteiros reconhecidos dos aplicativos
+// @description:zh-CN 将当前 Windows 指针方案应用于已识别的应用指针
+// @version         0.8.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -13,7 +17,7 @@
 // @architecture    x86-64
 // @compilerOptions -lgdi32 -ladvapi32 -lshell32
 // ==/WindhawkMod==
-// Build: 12
+// Build: 13
 
 // ==WindhawkModReadme==
 /*
@@ -33,59 +37,147 @@ be smoothed in all eight directions.
     - chromium: true
       $name: Chromium and Electron
       $name:ru-RU: Chromium и Electron
+      $name:es-ES: Chromium y Electron
+      $name:de-DE: Chromium und Electron
+      $name:pt-BR: Chromium e Electron
+      $name:zh-CN: Chromium 和 Electron
     - office: false
       $name: Classic Office
       $name:ru-RU: Классический Office
+      $name:es-ES: Office clásico
+      $name:de-DE: Klassisches Office
+      $name:pt-BR: Office clássico
+      $name:zh-CN: 经典版 Office
   $name: Where to replace pointers
   $name:ru-RU: Где подменять указатели
+  $name:es-ES: Dónde sustituir los punteros
+  $name:de-DE: Wo Zeiger ersetzt werden
+  $name:pt-BR: Onde substituir os ponteiros
+  $name:zh-CN: 替换指针的应用
 - cursors:
     - autoscrollOrigin: true
       $name: Scroll origin
       $name:ru-RU: Точка запуска
+      $name:es-ES: Punto de inicio
+      $name:de-DE: Scrollstart
+      $name:pt-BR: Ponto inicial
+      $name:zh-CN: 滚动起点
       $description: Pointer shown at the starting point of autoscroll
       $description:ru-RU: Указатель в точке запуска автопрокрутки
+      $description:es-ES: Puntero en el punto de inicio del desplazamiento automático
+      $description:de-DE: Zeiger am Startpunkt des automatischen Scrollens
+      $description:pt-BR: Ponteiro no ponto inicial da rolagem automática
+      $description:zh-CN: 自动滚动起点处的指针
     - autoscrollArrows: true
       $name: Scroll arrows
       $name:ru-RU: Стрелки прокрутки
+      $name:es-ES: Flechas de desplazamiento
+      $name:de-DE: Scrollpfeile
+      $name:pt-BR: Setas de rolagem
+      $name:zh-CN: 滚动箭头
       $description: Arrows that indicate the autoscroll direction
       $description:ru-RU: Стрелки направления автопрокрутки
+      $description:es-ES: Flechas que indican la dirección del desplazamiento automático
+      $description:de-DE: Pfeile für die Richtung des automatischen Scrollens
+      $description:pt-BR: Setas que indicam a direção da rolagem automática
+      $description:zh-CN: 指示自动滚动方向的箭头
     - link: true
       $name: Hand
       $name:ru-RU: Рука
+      $name:es-ES: Mano
+      $name:de-DE: Hand
+      $name:pt-BR: Mão
+      $name:zh-CN: 手形指针
       $description: Pointing hand over buttons, links, and other interactive elements
       $description:ru-RU: Указательный палец над кнопками, ссылками и другими активными элементами
+      $description:es-ES: Mano sobre botones, enlaces y otros elementos interactivos
+      $description:de-DE: Handzeiger über Schaltflächen, Links und anderen interaktiven Elementen
+      $description:pt-BR: Mão sobre botões, links e outros elementos interativos
+      $description:zh-CN: 按钮、链接和其他交互元素上的手形指针
     - resize: true
       $name: Resize
       $name:ru-RU: Изменение размеров
+      $name:es-ES: Cambiar tamaño
+      $name:de-DE: Größe ändern
+      $name:pt-BR: Redimensionar
+      $name:zh-CN: 调整大小
       $description: Resize panels, rows, and columns
       $description:ru-RU: Изменение размеров панелей, строк и столбцов
+      $description:es-ES: Cambiar el tamaño de paneles, filas y columnas
+      $description:de-DE: Größe von Bereichen, Zeilen und Spalten ändern
+      $description:pt-BR: Redimensionamento de painéis, linhas e colunas
+      $description:zh-CN: 调整面板、行和列的大小
     - marginSelection: true
       $name: Margin selection
       $name:ru-RU: Выделение с поля
+      $name:es-ES: Selección desde el margen
+      $name:de-DE: Auswahl am Seitenrand
+      $name:pt-BR: Seleção pela margem
+      $name:zh-CN: 页边距选取
       $description: Arrow for selecting text from the page margin
       $description:ru-RU: Стрелка выделения текста со стороны поля страницы
+      $description:es-ES: Flecha para seleccionar texto desde el margen de la página
+      $description:de-DE: Pfeil zur Textauswahl vom Seitenrand aus
+      $description:pt-BR: Seta para selecionar texto pela margem da página
+      $description:zh-CN: 从页边距选取文本时显示的箭头
     - downSelection: true
-      $name: Down arrow
-      $name:ru-RU: Стрелка вниз
-      $description: Downward arrow used for selection
-      $description:ru-RU: Направленная вниз стрелка выделения
+      $name: Selection arrows
+      $name:ru-RU: Стрелки выделения
+      $name:es-ES: Flechas de selección
+      $name:de-DE: Auswahlpfeile
+      $name:pt-BR: Setas de seleção
+      $name:zh-CN: 选择箭头
+      $description: Arrows for selecting rows, columns, or the entire table
+      $description:ru-RU: Стрелки для выделения строк, столбцов или всей таблицы
+      $description:es-ES: Flechas para seleccionar filas, columnas o toda la tabla
+      $description:de-DE: Pfeile zur Auswahl von Zeilen, Spalten oder der gesamten Tabelle
+      $description:pt-BR: Setas para selecionar linhas, colunas ou a tabela inteira
+      $description:zh-CN: 用于选择行、列或整个表格的箭头
     - cell: true
       $name: Cell cross
       $name:ru-RU: Крестик ячейки
-      $description: Cross-shaped pointer for selecting cells in web tables
-      $description:ru-RU: Указатель в виде крестика для выбора ячеек в веб-таблицах
+      $name:es-ES: Cruz de celda
+      $name:de-DE: Zellkreuz
+      $name:pt-BR: Cruz de célula
+      $name:zh-CN: 单元格十字指针
+      $description: Cross-shaped pointer for selecting cells in tables
+      $description:ru-RU: Указатель в виде крестика для выбора ячеек в таблицах
+      $description:es-ES: Puntero en forma de cruz para seleccionar celdas de una tabla
+      $description:de-DE: Kreuzförmiger Zeiger zur Auswahl von Tabellenzellen
+      $description:pt-BR: Ponteiro em forma de cruz para selecionar células em tabelas
+      $description:zh-CN: 用于选择表格单元格的十字指针
     - verticalText: true
       $name: Vertical text
       $name:ru-RU: Вертикальный текст
+      $name:es-ES: Texto vertical
+      $name:de-DE: Vertikaler Text
+      $name:pt-BR: Texto vertical
+      $name:zh-CN: 竖排文本
       $description: Horizontal text pointer for vertically written text
       $description:ru-RU: Горизонтальный текстовый указатель для вертикального текста
+      $description:es-ES: Puntero de texto horizontal para texto escrito en vertical
+      $description:de-DE: Waagerechter Textzeiger für senkrecht geschriebenen Text
+      $description:pt-BR: Ponteiro de texto horizontal para texto escrito na vertical
+      $description:zh-CN: 用于竖排文本的水平文本指针
   $name: Which pointers to replace
   $name:ru-RU: Какие указатели подменять
+  $name:es-ES: Qué punteros sustituir
+  $name:de-DE: Welche Zeiger ersetzt werden
+  $name:pt-BR: Quais ponteiros substituir
+  $name:zh-CN: 要替换的指针
 - smoothDiagonals: true
   $name: Smoothing
   $name:ru-RU: Сглаживание
+  $name:es-ES: Suavizado
+  $name:de-DE: Kantenglättung
+  $name:pt-BR: Suavização
+  $name:zh-CN: 边缘平滑
   $description: Smooth the edges of autoscroll arrows in all eight directions
   $description:ru-RU: Сглаживание краев стрелок автопрокрутки во всех восьми направлениях
+  $description:es-ES: Suaviza los bordes de las flechas de desplazamiento automático en las ocho direcciones
+  $description:de-DE: Glättet die Kanten der Scrollpfeile in allen acht Richtungen
+  $description:pt-BR: Suaviza as bordas das setas de rolagem automática nas oito direções
+  $description:zh-CN: 平滑八个方向的自动滚动箭头边缘
 */
 // ==/WindhawkModSettings==
 
@@ -115,13 +207,13 @@ enum class CursorType {
     Link,
     Resize,
     MarginSelection,
-    DownSelection,
+    SelectionArrows,
     Cell,
     VerticalText,
 };
 
 struct CursorMapping {
-    WORD systemId;
+    WORD systemId;  // Zero for selection arrow shapes without a system ID.
     Role role;
     CursorType type;
     unsigned eighthTurns = 0;
@@ -133,7 +225,6 @@ constexpr WORD kLastAutoscrollId = 32662;
 constexpr WORD kArrowId = 32512;
 constexpr WORD kTextId = 32513;
 constexpr WORD kCrossId = 32515;
-constexpr WORD kUpId = 32516;
 constexpr WORD kHorizontalResizeId = 32644;
 constexpr WORD kVerticalResizeId = 32645;
 constexpr WORD kLinkId = 32649;
@@ -155,7 +246,11 @@ constexpr std::array kMappings = {
     CursorMapping{kLinkId, Role::Link, CursorType::Link},
     CursorMapping{kHorizontalResizeId, Role::Horizontal, CursorType::Resize},
     CursorMapping{kVerticalResizeId, Role::Vertical, CursorType::Resize},
-    CursorMapping{kUpId, Role::Up, CursorType::DownSelection, 4},
+    CursorMapping{0, Role::Up, CursorType::SelectionArrows, 4},
+    CursorMapping{0, Role::Up, CursorType::SelectionArrows, 2},
+    CursorMapping{0, Role::Up, CursorType::SelectionArrows, 6},
+    CursorMapping{0, Role::Up, CursorType::SelectionArrows, 3},
+    CursorMapping{0, Role::Up, CursorType::SelectionArrows, 5},
     CursorMapping{kCrossId, Role::Cross, CursorType::Cell},
     CursorMapping{kTextId, Role::Text, CursorType::VerticalText, 2},
 };
@@ -207,6 +302,28 @@ const std::array kRoleIds = {
 constexpr size_t kRoleCount = static_cast<size_t>(Role::Count);
 constexpr size_t kUnknownSlot = kMappings.size();
 constexpr int kMaxSourceSize = 512;
+
+constexpr size_t SystemSlot(WORD id) {
+    if (!id) {
+        return kUnknownSlot;
+    }
+    for (size_t i = 0; i < kMappings.size(); ++i) {
+        if (kMappings[i].systemId == id) {
+            return i;
+        }
+    }
+    return kUnknownSlot;
+}
+
+constexpr size_t SelectionSlot(unsigned eighthTurns) {
+    for (size_t i = 0; i < kMappings.size(); ++i) {
+        const auto& mapping = kMappings[i];
+        if (mapping.type == CursorType::SelectionArrows && mapping.eighthTurns == eighthTurns) {
+            return i;
+        }
+    }
+    return kUnknownSlot;
+}
 
 struct CursorImage {
     int width = 0;
@@ -265,45 +382,62 @@ struct CursorShape {
 
 // Cropped silhouettes of shared Office pointers, independent of resource IDs.
 constexpr std::array kOfficeShapes = {
-    std::pair{kArrowId, CursorShape{12, 20, {
+    std::pair{SystemSlot(kArrowId), CursorShape{12, 20, {
         0x0c00, 0x0e00, 0x0f00, 0x0f80, 0x0fc0, 0x0fe0, 0x0ff0, 0x0ff8,
         0x0ffc, 0x0ffe, 0x0fff, 0x0ff0, 0x0ff0, 0x0e78, 0x0c78, 0x083c,
         0x003c, 0x001e, 0x001e, 0x000c,
     }}},
-    std::pair{kLinkId, CursorShape{17, 22, {
+    std::pair{SystemSlot(kLinkId), CursorShape{17, 22, {
         0x0060, 0x00f0, 0x00f0, 0x00f0, 0x00f0, 0x03f0, 0x1ff0, 0x7ff0,
         0xfff0, 0x1fff7, 0x1ffff, 0x1ffff, 0x1fffe, 0x1fffc, 0x1fffc, 0x1fff8,
         0xfff8, 0xfff0, 0xfff0, 0x7fe0, 0x7fe0, 0x7fe0,
     }}},
-    std::pair{kUpId, CursorShape{9, 12, {
+    std::pair{SelectionSlot(4), CursorShape{9, 12, {
         0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x7c, 0x1ff, 0x1ff,
         0xfe, 0x7c, 0x38, 0x10,
     }}},
-    std::pair{kHorizontalResizeId, CursorShape{17, 15, {
+    std::pair{SelectionSlot(2), CursorShape{12, 9, {
+        0xc0, 0x1c0, 0x3ff, 0x7ff, 0xfff, 0x7ff, 0x3ff, 0x1c0, 0xc0,
+    }}},
+    std::pair{SelectionSlot(6), CursorShape{12, 9, {
+        0x30, 0x38, 0xffc, 0xffe, 0xfff, 0xffe, 0xffc, 0x38, 0x30,
+    }}},
+    std::pair{SelectionSlot(3), CursorShape{13, 13, {
+        0x8, 0x1c, 0x3e, 0x7f, 0xfe, 0x19fc, 0x1ff8, 0x1ff0,
+        0x1fe0, 0x1fc0, 0x1fc0, 0x1fe0, 0x1fe0,
+    }}},
+    std::pair{SelectionSlot(5), CursorShape{10, 10, {
+        0x80, 0x1c0, 0x3e0, 0x1f3, 0xff, 0x7f, 0x3f, 0x3f, 0x7f, 0x7f,
+    }}},
+    std::pair{SystemSlot(kCrossId), CursorShape{15, 15, {
+        0x3f0, 0x7f0, 0x7f0, 0x7f0, 0x3fff, 0x7fff, 0x7fff, 0x7fff,
+        0x7fff, 0x7fff, 0x7ffe, 0x7f0, 0x7f0, 0x7f0, 0x7e0,
+    }}},
+    std::pair{SystemSlot(kHorizontalResizeId), CursorShape{17, 15, {
         0x6c0, 0x6c0, 0x6c0, 0x6c0, 0x36d8, 0x76dc, 0xfefe, 0x1feff,
         0xfefe, 0x76dc, 0x36d8, 0x6c0, 0x6c0, 0x6c0, 0x6c0,
     }}},
-    std::pair{kVerticalResizeId, CursorShape{15, 17, {
+    std::pair{SystemSlot(kVerticalResizeId), CursorShape{15, 17, {
         0x80, 0x1c0, 0x3e0, 0x7f0, 0x7f0, 0x1c0, 0x7fff, 0x7fff,
         0x0, 0x7fff, 0x7fff, 0x1c0, 0x7f0, 0x7f0, 0x3e0, 0x1c0, 0x80,
     }}},
     // Worksheet headers have variants with different separator thicknesses.
-    std::pair{kHorizontalResizeId, CursorShape{18, 18, {
+    std::pair{SystemSlot(kHorizontalResizeId), CursorShape{18, 18, {
         0x780, 0x780, 0x780, 0x780, 0x780, 0x6798, 0xe79c, 0x1fffe,
         0x3ffff, 0x3ffff, 0x1fffe, 0xe79c, 0x6798, 0x780, 0x780, 0x780,
         0x780, 0x780,
     }}},
-    std::pair{kVerticalResizeId, CursorShape{18, 18, {
+    std::pair{SystemSlot(kVerticalResizeId), CursorShape{18, 18, {
         0x300, 0x780, 0xfc0, 0x1fe0, 0x1fe0, 0x780, 0x780, 0x3ffff,
         0x3ffff, 0x3ffff, 0x3ffff, 0x780, 0x780, 0x1fe0, 0x1fe0, 0xfc0,
         0x780, 0x300,
     }}},
-    std::pair{kHorizontalResizeId, CursorShape{18, 18, {
+    std::pair{SystemSlot(kHorizontalResizeId), CursorShape{18, 18, {
         0xfc0, 0xfc0, 0xfc0, 0xfc0, 0xfc0, 0x6fd8, 0xefdc, 0x1fffe,
         0x3ffff, 0x3ffff, 0x1fffe, 0xefdc, 0x6fd8, 0xfc0, 0xfc0, 0xfc0,
         0xfc0, 0xfc0,
     }}},
-    std::pair{kVerticalResizeId, CursorShape{18, 18, {
+    std::pair{SystemSlot(kVerticalResizeId), CursorShape{18, 18, {
         0x300, 0x780, 0xfc0, 0x1fe0, 0x1fe0, 0x780, 0x3ffff, 0x3ffff,
         0x3ffff, 0x3ffff, 0x3ffff, 0x3ffff, 0x780, 0x1fe0, 0x1fe0, 0xfc0,
         0x780, 0x300,
@@ -335,15 +469,6 @@ HKEY g_cursorsKey;
 HANDLE g_changeEvent;
 thread_local Role g_previousRole = Role::Count;
 decltype(&SetCursor) g_setCursorOriginal;
-
-size_t SystemSlot(WORD id) {
-    for (size_t i = 0; i < kMappings.size(); ++i) {
-        if (kMappings[i].systemId == id) {
-            return i;
-        }
-    }
-    return kUnknownSlot;
-}
 
 template <size_t N>
 size_t ResourceSlot(WORD id, const std::array<ResourceMapping, N>& resources) {
@@ -598,9 +723,9 @@ size_t FindOfficeSlot(const CursorShape& shape) {
     if (!shape.width) {
         return kUnknownSlot;
     }
-    for (const auto& [id, reference] : kOfficeShapes) {
+    for (const auto& [slot, reference] : kOfficeShapes) {
         if (reference == shape) {
-            return SystemSlot(id);
+            return slot;
         }
     }
     std::call_once(g_referenceShapesInit, [] {
@@ -1115,7 +1240,7 @@ void UpdateSettings() {
         std::pair{CursorType::Link, L"cursors.link"},
         std::pair{CursorType::Resize, L"cursors.resize"},
         std::pair{CursorType::MarginSelection, L"cursors.marginSelection"},
-        std::pair{CursorType::DownSelection, L"cursors.downSelection"},
+        std::pair{CursorType::SelectionArrows, L"cursors.downSelection"},
         std::pair{CursorType::Cell, L"cursors.cell"},
         std::pair{CursorType::VerticalText, L"cursors.verticalText"},
     };
