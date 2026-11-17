@@ -23,27 +23,64 @@
 /*
 # Cursor Scheme Extension
 
-Replaces built-in application pointers with pointers from the selected Windows
-scheme, including autoscroll, moving and resizing, and text and table selection.
+**English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Cursor_Scheme_Extension/README.ru.md)
 
-Choose application families under **Applications and processes** and pointer
-shapes under **Pointer types**. Windows includes standard controls and Windows
-Forms. Chromium includes Electron and compatible embedded browsers. Office
-covers desktop Word, Excel, PowerPoint, and classic Outlook and is off by default.
-Gecko and Qt have separate switches. Add executable names or full paths to
-**Application exclusions**, one per line.
+Cursor Scheme Extension replaces built-in application pointers with pointers from the selected Windows scheme. This includes middle-button autoscroll, the pointing hand, resizing, and text and table selection.
 
-The **Smoothing** group has separate switches for autoscroll activation,
-autoscroll arrows in all eight directions, and selection arrows. All three
-are on by default. Animated pointers retain their frames and timing.
+The mod uses the scheme already selected in Windows and picks up changes to it automatically. Transformed pointers are created and cached in memory.
 
-Excel and Firefox draw stationary autoscroll markers separately from the mouse
-pointer. Those markers are outside the mod's coverage.
+## Features
 
-The replacement cache holds up to 128 instances. When full, further requests
-use the original pointer. During unloading, cursor handles and callback code
-can remain resident until the owning thread or process exits when safe release
-cannot be confirmed.
+| Setting | Controls |
+| --- | --- |
+| Hand | Pointing hand over buttons, links, and other interactive elements |
+| Resize | Resizing panels, rows, columns, and objects |
+| Move | Dragging cells, ranges, and objects |
+| Autoscroll activation | The pointer after a wheel-click, before choosing a scroll direction |
+| Autoscroll arrows | All eight scrolling directions |
+| Selection arrows | Selecting rows, columns, or an entire table |
+| Cell selection | The cross over cells and when selecting ranges |
+| Margin selection | Selecting text from the left page margin |
+| Vertical text input | The horizontal mouse pointer in areas with vertical text |
+
+At the start of autoscroll, the pointer indicates vertical, horizontal, or both axes. Direction arrows use **Alternate select** (`Up`) from the Windows scheme, rotated to match the scrolling direction. Selection arrows use the same role. Transforms account for the pointer hotspot, and animated pointers retain their frame order and timing.
+
+The interface is available in English, Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
+
+### Limitations
+
+- Replacement applies to recognized pointers displayed through Windows cursor APIs. The application controls whether autoscroll is available, its speed, and its direction.
+- Excel and Firefox draw their stationary autoscroll markers separately. These markers keep their original appearance.
+- Monochrome pointers that invert the background retain their original pixel rendering without smoothing.
+- The cache holds up to 128 replacement instances, including those still in use from stopped sessions. When full, further requests use the original pointer.
+- Disabling the mod restores application pointers. Unresponsive UI threads finish restoring when they resume. Cursor handles and callback code can remain allocated until the owning thread exits. If Windows cannot identify input owners or destroy a helper window, affected resources remain until the process exits.
+
+## Platforms
+
+Requires Windows 11. Runtime checks cover x86 and x64 processes on Windows 11 x64 with Windhawk 1.7.3. ARM64 has been compiled without a runtime check. Microsoft 365 and Qt WebEngine have not been verified.
+
+## Usage
+
+Select a pointer scheme in Windows, then open the mod's **Settings**. **Applications and processes** selects the application families, and **Pointer types** selects the shapes to replace. Both must be enabled for a replacement to apply.
+
+| Family | Coverage |
+| --- | --- |
+| Windows | Native Windows pointers, standard controls, and Windows Forms |
+| Office | Desktop Word, Excel, PowerPoint, and classic Outlook |
+| Chromium | Chrome, Edge, Electron, and compatible embedded browsers |
+| Gecko | Firefox and compatible apps: cell selection, resizing, and vertical text |
+| Qt | Panel splitters in applications with a Qt interface |
+
+Windows, Chromium, Gecko, Qt, and all pointer types are on by default. Office is off by default.
+
+Under **Application exclusions**, below the family switches, add one executable name or full path per row. A name matches any installation of that executable; a full path matches one location.
+
+**Smoothing** has separate switches for **Autoscroll activation**, **Autoscroll arrows**, and **Selection arrows**. All three are on by default, and all eight autoscroll directions are covered.
+
+## Links
+
+- [Cursor Scheme Extension on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Cursor_Scheme_Extension)
+- [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
 
