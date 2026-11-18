@@ -1,42 +1,98 @@
 #include <windhawk_api.h>
-#include <tlhelp32.h>
 #include <atomic>
 #include <cstdio>
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor);
-bool failSnapshot;
-bool failTracking;
-bool permanentPin;
+HWND HostLookupReentry();
+unsigned ownModuleReferences;
+unsigned threadHookRegistrations;
+unsigned backgroundThreadStarts;
+unsigned helperWindowCreates;
+bool simulateHostLookup;
+bool reenterHostLookup;
+unsigned fullWindowScans;
+ULONGLONG simulatedTime = 1000;
+HWND simulatedWindowAtPointer;
+HWND observedHostRoot;
 
-BOOL WINAPI TestDuplicateHandle(HANDLE sourceProcess, HANDLE source, HANDLE targetProcess,
-                               HANDLE* target, DWORD access, BOOL inherit, DWORD options) {
-    if (failTracking) {
-        SetLastError(ERROR_NOT_ENOUGH_MEMORY);
-        return FALSE;
-    }
-    return DuplicateHandle(sourceProcess, source, targetProcess, target, access, inherit, options);
+HWND WINAPI TestGetAncestor(HWND window, UINT flags) {
+    if (simulateHostLookup) observedHostRoot = window;
+    return GetAncestor(window, flags);
+}
+
+HWND WINAPI TestWindowFromPoint(POINT point) {
+    return simulateHostLookup ? HostLookupReentry() : WindowFromPoint(point);
+}
+
+BOOL WINAPI TestGuiThreadInfo(DWORD thread, PGUITHREADINFO info) {
+    if (!simulateHostLookup) return GetGUIThreadInfo(thread, info);
+    *info = {sizeof(*info)};
+    return TRUE;
+}
+
+BOOL WINAPI TestEnumThreadWindows(DWORD thread, WNDENUMPROC callback, LPARAM parameter) {
+    return simulateHostLookup ? TRUE : EnumThreadWindows(thread, callback, parameter);
+}
+
+BOOL WINAPI TestEnumWindows(WNDENUMPROC callback, LPARAM parameter) {
+    if (!simulateHostLookup) return EnumWindows(callback, parameter);
+    ++fullWindowScans;
+    return TRUE;
+}
+
+ULONGLONG WINAPI TestTickCount() {
+    return simulateHostLookup ? simulatedTime : GetTickCount64();
 }
 
 BOOL WINAPI TestModuleHandle(DWORD flags, LPCWSTR address, HMODULE* module) {
-    permanentPin |= (flags & GET_MODULE_HANDLE_EX_FLAG_PIN) != 0;
+    if ((flags & GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS) &&
+        !(flags & GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT)) {
+        ++ownModuleReferences;
+    }
     return GetModuleHandleExW(flags, address, module);
 }
 
-HANDLE WINAPI TestSnapshot(DWORD flags, DWORD process) {
-    if (failSnapshot) {
-        SetLastError(ERROR_ACCESS_DENIED);
-        return INVALID_HANDLE_VALUE;
-    }
-    return CreateToolhelp32Snapshot(flags, process);
+HHOOK WINAPI TestWindowsHook(int type, HOOKPROC procedure, HINSTANCE module, DWORD thread) {
+    ++threadHookRegistrations;
+    return SetWindowsHookExW(type, procedure, module, thread);
 }
 
-#define CreateToolhelp32Snapshot TestSnapshot
-#define DuplicateHandle TestDuplicateHandle
+HANDLE WINAPI TestCreateThread(LPSECURITY_ATTRIBUTES attributes, SIZE_T stackSize,
+                               LPTHREAD_START_ROUTINE procedure, LPVOID parameter,
+                               DWORD flags, LPDWORD thread) {
+    ++backgroundThreadStarts;
+    return CreateThread(attributes, stackSize, procedure, parameter, flags, thread);
+}
+
+HWND WINAPI TestCreateWindow(DWORD extended, LPCWSTR className, LPCWSTR title, DWORD style,
+                             int x, int y, int width, int height, HWND parent, HMENU menu,
+                             HINSTANCE module, LPVOID parameter) {
+    ++helperWindowCreates;
+    return CreateWindowExW(extended, className, title, style, x, y, width, height,
+                           parent, menu, module, parameter);
+}
+
 #define GetModuleHandleExW TestModuleHandle
+#define SetWindowsHookExW TestWindowsHook
+#define CreateThread TestCreateThread
+#define CreateWindowExW TestCreateWindow
+#define WindowFromPoint TestWindowFromPoint
+#define GetGUIThreadInfo TestGuiThreadInfo
+#define EnumThreadWindows TestEnumThreadWindows
+#define EnumWindows TestEnumWindows
+#define GetTickCount64 TestTickCount
+#define GetAncestor TestGetAncestor
 #include "../Mod/cursor-scheme-extension.wh.cpp"
+#undef GetAncestor
+#undef GetTickCount64
+#undef EnumWindows
+#undef EnumThreadWindows
+#undef GetGUIThreadInfo
+#undef WindowFromPoint
+#undef CreateWindowExW
+#undef CreateThread
+#undef SetWindowsHookExW
 #undef GetModuleHandleExW
-#undef DuplicateHandle
-#undef CreateToolhelp32Snapshot
 
 namespace {
 int failures;
@@ -46,6 +102,9 @@ HCURSOR nestedPrevious;
 bool observing;
 bool insideObserver;
 unsigned nativeCreates;
+HCURSOR hostNestedSource;
+HCURSOR hostNestedPrevious;
+HCURSOR hostNestedDisplayed;
 
 void Check(bool value, const char* name) {
     if (!value) {
@@ -103,6 +162,27 @@ bool Readable(HCURSOR cursor) {
     return cursor && GetIconInfo(cursor, &bitmap);
 }
 
+void UnloadContract() {
+    HWND window = AppWindow();
+    HCURSOR original = Fixture(0xff456789);
+    SetCursorHook(original);
+    HCURSOR displayed = GetCursor();
+    Check(window && displayed && displayed != original, "themed unload fixture");
+    Finish();
+    Check(ownModuleReferences == 0,
+          "unload never retains the mod image");
+    Check(threadHookRegistrations == 0, "no thread hooks survive mod removal");
+    Check(backgroundThreadStarts == 0, "unload starts no background callback");
+    Check(helperWindowCreates == 0, "no mod-owned window procedure survives removal");
+    Check(Readable(displayed), "published Win32 handle survives module cleanup");
+    SetCursor(original);
+    Check(GetCursor() == original, "next native SetCursor restores application pointer");
+    SetCursor(nullptr);
+    if (Readable(displayed)) DestroyCursor(displayed);
+    DestroyCursor(original);
+    DestroyWindow(window);
+}
+
 void Reentrant() {
     HWND window = AppWindow();
     HCURSOR a = Fixture(0xff234567), b = Fixture(0xff345678);
@@ -121,21 +201,6 @@ void Reentrant() {
     Finish();
     DestroyCursor(a);
     DestroyCursor(b);
-    DestroyWindow(window);
-}
-
-void NonCooperative() {
-    // STATIC with its default procedure never handles the private restore message.
-    HWND window = AppWindow();
-    HCURSOR original = Fixture(0xff456789);
-    SetCursorHook(original);
-    HCURSOR displayed = GetCursor();
-    Check(window && displayed && displayed != original, "themed before unload");
-    Finish();
-    Check(GetCursor() == original, "unload restores without app SetCursor");
-    Check(!Readable(displayed), "private handle reclaimed");
-    SetCursor(nullptr);
-    DestroyCursor(original);
     DestroyWindow(window);
 }
 
@@ -254,35 +319,41 @@ void Alternating() {
     DestroyWindow(window);
 }
 
-struct SlowThread {
-    HANDLE ready;
-    HANDLE resume;
-    HANDLE checked;
-    HANDLE exit;
+struct QuietThread {
+    HANDLE ready = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    HANDLE resume = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    HANDLE checked = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    HANDLE exit = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     HCURSOR original;
     HCURSOR displayed = nullptr;
+    bool inherited = false;
+    bool survived = false;
     bool restored = false;
+
+    ~QuietThread() {
+        for (HANDLE event : {ready, resume, checked, exit}) CloseHandle(event);
+    }
 };
 
-DWORD WINAPI DelayedOwner(void* argument) {
-    auto& test = *static_cast<SlowThread*>(argument);
+DWORD WINAPI QuietOwner(void* argument) {
+    auto& test = *static_cast<QuietThread*>(argument);
     HWND window = AppWindow();
-    SetCursorHook(test.original);
-    test.displayed = GetCursor();
+    if (!test.inherited) {
+        SetCursorHook(test.original);
+        test.displayed = GetCursor();
+    }
     SetEvent(test.ready);
     WaitForSingleObject(test.resume, 5000);
-    MSG msg{};
-    const auto end = GetTickCount64() + 2000;
-    while (GetTickCount64() < end) {
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            DispatchMessageW(&msg);
-        }
-        if (GetCursor() == test.original) {
-            test.restored = true;
-            break;
-        }
-        Sleep(5);
+    const bool readable = Readable(test.displayed);
+    if (test.inherited && readable) {
+        // Detaching input queues can select a different cursor. A borrowed
+        // native handle must still be safe for the application to reuse later.
+        SetCursor(test.displayed);
     }
+    test.survived = readable && GetCursor() == test.displayed;
+    // The application, rather than any retained mod callback, selects its pointer.
+    SetCursor(test.original);
+    test.restored = GetCursor() == test.original;
     SetEvent(test.checked);
     WaitForSingleObject(test.exit, 5000);
     SetCursor(nullptr);
@@ -290,218 +361,135 @@ DWORD WINAPI DelayedOwner(void* argument) {
     return 0;
 }
 
-void SlowUnload() {
+void QuietUnload(bool inherited, bool reload) {
     HCURSOR original = Fixture(0xff456789);
-    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
-    HANDLE owner = CreateThread(nullptr, 0, DelayedOwner, &test, 0, nullptr);
-    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "slow owner ready");
+    QuietThread test;
+    test.original = original;
+    test.inherited = inherited;
+    DWORD threadId = 0;
+    HANDLE owner = CreateThread(nullptr, 0, QuietOwner, &test, 0, &threadId);
+    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "quiet owner ready");
+    HWND window = AppWindow();
+    if (inherited) {
+        Check(AttachThreadInput(GetCurrentThreadId(), threadId, TRUE), "queues joined");
+        SetCursorHook(original);
+        test.displayed = GetCursor();
+        Check(test.displayed != original, "quiet queue inherits themed handle");
+        Check(AttachThreadInput(GetCurrentThreadId(), threadId, FALSE), "queues detached");
+        SetCursorHook(nullptr);
+    }
     const auto before = GetTickCount64();
     Finish();
-    Check(GetTickCount64() - before < 1500 && !g_restoreSessions.empty(),
-          "unresponsive queue does not block unload");
-    Check(Readable(test.displayed), "unresponsive queue keeps live handle");
-    SetEvent(test.resume);
-    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
-          "resumed queue executes deferred restoration");
-    const auto deadline = GetTickCount64() + 1000;
-    while (Readable(test.displayed) && GetTickCount64() < deadline) {
-        Sleep(5);
-    }
-    Check(!Readable(test.displayed), "resumed queue releases former handle");
-    SetEvent(test.exit);
-    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "slow owner exited");
-    CloseHandle(owner);
-    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
-        CloseHandle(event);
-    }
-    DestroyCursor(original);
-}
+    Check(GetTickCount64() - before < 1000, "unload does not wait for another GUI thread");
+    Check(Readable(test.displayed), "unresponsive queue retains valid native cursor");
 
-void ReloadWithPendingQueue() {
-    HCURSOR original = Fixture(0xff56789a);
-    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
-    HANDLE owner = CreateThread(nullptr, 0, DelayedOwner, &test, 0, nullptr);
-    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "reload owner ready");
-    Finish();
-    Check(!g_restoreSessions.empty(), "old session remains available");
-    Start();
-    HWND window = AppWindow();
-    HCURSOR next = Fixture(0xff6789ab);
-    SetCursorHook(next);
-    HCURSOR displayed = GetCursor();
-    Check(displayed && displayed != next && GetCursorHook() == next,
-          "new session is enabled while old cleanup remains");
-    SetEvent(test.resume);
-    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
-          "old queue restores without replacing a new session pointer");
-    SetEvent(test.exit);
-    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "old owner exited after reload");
-    Sleep(50);
-    Check(Readable(displayed) && GetCursorHook() == next,
-          "old cleanup preserves the new session and handle");
-    SetCursorHook(nullptr);
-    Finish();
-    CloseHandle(owner);
-    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
-        CloseHandle(event);
+    HCURSOR next = nullptr, displayed = nullptr;
+    if (reload) {
+        Start();
+        next = Fixture(0xff56789a);
+        SetCursorHook(next);
+        displayed = GetCursor();
+        Check(displayed != next && GetCursorHook() == next, "new load replaces its own cursor");
     }
-    DestroyCursor(original);
-    DestroyCursor(next);
-    DestroyWindow(window);
-}
-
-DWORD WINAPI QuietOwner(void* argument) {
-    auto& test = *static_cast<SlowThread*>(argument);
-    HWND window = AppWindow();
-    SetEvent(test.ready);
-    WaitForSingleObject(test.resume, 5000);
-    MSG msg{};
-    const auto end = GetTickCount64() + 2000;
-    while (GetTickCount64() < end) {
-        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
-            DispatchMessageW(&msg);
-        }
-        if (GetCursor() != test.displayed) {
-            test.restored = true;
-            break;
-        }
-        Sleep(5);
-    }
-    SetEvent(test.checked);
-    WaitForSingleObject(test.exit, 5000);
-    SetCursor(nullptr);
-    DestroyWindow(window);
-    return 0;
-}
-
-void InheritedQueue() {
-    HWND window = AppWindow();
-    HCURSOR original = Fixture(0xff789abc);
-    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
-    DWORD thread = 0;
-    HANDLE owner = CreateThread(nullptr, 0, QuietOwner, &test, 0, &thread);
-    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0, "quiet owner ready");
-    Check(AttachThreadInput(GetCurrentThreadId(), thread, TRUE), "quiet queue attached");
-    SetCursorHook(original);
-    const HCURSOR displayed = GetCursor();
-    test.displayed = displayed;
-    Check(displayed != original, "quiet queue receives a published alias");
-    Check(AttachThreadInput(GetCurrentThreadId(), thread, FALSE), "quiet queue detached");
-    SetCursorHook(nullptr);
-    Finish();
     SetEvent(test.resume);
-    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
-          "untracked input owner restores without calling either hook");
+    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 &&
+              test.survived && test.restored,
+          "old queue survives unload and resumes with native SetCursor");
+    if (reload) {
+        Check(Readable(displayed) && GetCursorHook() == next, "old queue does not affect new load");
+        SetCursorHook(nullptr);
+        Finish();
+    }
     SetEvent(test.exit);
     Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "quiet owner exited");
     CloseHandle(owner);
-    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
-        CloseHandle(event);
-    }
+    SetCursor(nullptr);
     DestroyCursor(original);
+    if (next) DestroyCursor(next);
     DestroyWindow(window);
 }
 
-void FailedDiscovery() {
-    HWND window = AppWindow();
-    HCURSOR original = Fixture(0xff89abcd);
+void StoppingPassthrough() {
+    HCURSOR original = Fixture(0xff6789ab);
     SetCursorHook(original);
-    HCURSOR displayed = GetCursor();
-    Check(displayed && displayed != original, "failure-path fixture is themed");
-    failSnapshot = true;
-    Finish();
-    Check(GetCursor() == original, "known queue restored even when discovery fails");
-    Check(Readable(displayed) && !g_restoreSessions.empty(),
-          "incomplete discovery retains unknown owners' handles");
-    Start();
-    failSnapshot = false;
-    SetCursorHook(original);
-    Check(GetCursor() != original && GetCursorHook() == original,
-          "retained failure context does not disable later sessions");
+    const HCURSOR displayed = GetCursor();
+    const size_t instances = g_instances.size();
+    Wh_ModBeforeUninit();
+    Check(SetCursorHook(original) == original && GetCursor() == original,
+          "stopping hook returns logical previous cursor and passes native source");
+    Check(g_instances.size() == instances, "stopping creates no replacement");
+    Wh_ModUninit();
+    Check(Readable(displayed), "native published handle survives stopped hook");
+    SetCursor(nullptr);
+    DestroyCursor(original);
+}
+
+void InstanceLimit() {
+    std::vector<HCURSOR> originals;
+    for (unsigned i = 0; i < 129; ++i) {
+        HCURSOR original = Fixture(0xff000001 + i);
+        Check(original != nullptr, "instance-limit fixture");
+        originals.push_back(original);
+        SetCursorHook(original);
+        Check(GetCursorHook() == original, "instance-limit logical identity");
+        if (i == 128) {
+            Check(GetCursor() == original, "instance cap falls back to application cursor");
+        }
+    }
+    Check(g_instances.size() == 128, "instance cap bounds native handles per load");
     SetCursorHook(nullptr);
     Finish();
-    SetCursor(nullptr);
-    DestroyCursor(original);
-    DestroyWindow(window);
+    for (HCURSOR original : originals) DestroyCursor(original);
 }
 
-void ResponsiveForeignUnload() {
-    HCURSOR original = Fixture(0xff9abcde);
-    SlowThread test{CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, TRUE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr),
-                    CreateEventW(nullptr, TRUE, FALSE, nullptr), original};
-    HANDLE owner = CreateThread(nullptr, 0, DelayedOwner, &test, 0, nullptr);
-    Check(owner && WaitForSingleObject(test.ready, 5000) == WAIT_OBJECT_0,
-          "responsive owner ready");
-    Finish();
-    Check(WaitForSingleObject(test.checked, 5000) == WAIT_OBJECT_0 && test.restored,
-          "responsive owner restored from another thread");
-    Check(g_restoreSessions.empty() && !Readable(test.displayed),
-          "normal cross-thread unload leaves no deferred session or cursor");
-    SetEvent(test.exit);
-    Check(WaitForSingleObject(owner, 5000) == WAIT_OBJECT_0, "responsive owner exited");
-    CloseHandle(owner);
-    for (HANDLE event : {test.ready, test.resume, test.checked, test.exit}) {
-        CloseHandle(event);
-    }
-    DestroyCursor(original);
-}
-
-HWND vetoedWindow;
-
-LRESULT CALLBACK VetoRestoreDestruction(int code, WPARAM wParam, LPARAM lParam) {
-    if (code == HCBT_DESTROYWND) {
-        WCHAR name[96]{};
-        GetClassNameW(reinterpret_cast<HWND>(wParam), name, 96);
-        if (wcscmp(name, kRestoreClass) == 0) {
-            vetoedWindow = reinterpret_cast<HWND>(wParam);
-            return 1;
-        }
-    }
-    return CallNextHookEx(nullptr, code, wParam, lParam);
-}
-
-void VetoedWindow(bool trackingFailure) {
-    HWND window = AppWindow();
-    HCURSOR original = Fixture(0xffabcdef);
-    HHOOK veto = SetWindowsHookExW(WH_CBT, VetoRestoreDestruction, nullptr, GetCurrentThreadId());
-    Check(veto != nullptr, "CBT hook registered");
-    failTracking = trackingFailure;
+void HostLookup(bool reentrant) {
+    HCURSOR original = Fixture(0xff123456);
+    HCURSOR nested = Fixture(0xff234567);
     SetCursorHook(original);
-    failTracking = false;
-    Finish();
-    Check(vetoedWindow && IsWindow(vetoedWindow), "CBT veto leaves the private HWND alive");
-    Check(GetCursor() == original, "cursor restored despite CBT veto");
-    if (trackingFailure) {
-        Check(permanentPin && g_instances.empty(),
-              "untracked orphan pins callback code and avoids publishing a cursor");
+    g_excludedApplications = {L"excluded-host.exe"};
+    g_hasExclusions = true;
+    simulateHostLookup = true;
+    reenterHostLookup = reentrant;
+    hostNestedSource = nested;
+    const CursorMatch chromium{SelectionSlot(4), Target::Chromium};
+    SetCursorForMatch(original, chromium);
+    if (reentrant) {
+        Check(hostNestedDisplayed == nested,
+              "nested cursor passes through while host exclusion is unresolved");
+        Check(hostNestedPrevious == original, "nested host lookup returns logical prior cursor");
     } else {
-        Check(!g_restoreSessions.empty() && g_restoreSessions.front()->owners.front().deferredCode,
-              "tracked orphan retains its stopped session and code");
+        for (unsigned i = 0; i < 1000; ++i) SetCursorForMatch(original, chromium);
+        Check(fullWindowScans == 1, "negative host lookup scans desktop once within 250 ms");
+        simulatedWindowAtPointer = AppWindow();
+        observedHostRoot = nullptr;
+        SetCursorForMatch(original, chromium);
+        Check(simulatedWindowAtPointer && observedHostRoot == simulatedWindowAtPointer &&
+                  fullWindowScans == 1,
+              "new pointer window is checked immediately during throttle interval");
+        DestroyWindow(simulatedWindowAtPointer);
+        simulatedWindowAtPointer = nullptr;
+        simulatedTime += 250;
+        const unsigned before = fullWindowScans;
+        SetCursorForMatch(original, chromium);
+        Check(fullWindowScans == before + 1, "host lookup retries after the throttle interval");
     }
-    UnhookWindowsHookEx(veto);
-    if (IsWindow(vetoedWindow)) {
-        SendMessageW(vetoedWindow, kRestoreMessage, 0, 0);
-        if (IsWindow(vetoedWindow)) {
-            DestroyWindow(vetoedWindow);
-        }
-    }
-    Check(!IsWindow(vetoedWindow), "private window can be destroyed after veto removal");
-    SetCursor(nullptr);
+    simulateHostLookup = false;
+    SetCursorHook(nullptr);
+    Finish();
     DestroyCursor(original);
-    DestroyWindow(window);
+    DestroyCursor(nested);
 }
 }  // namespace
+
+HWND HostLookupReentry() {
+    if (reenterHostLookup) {
+        reenterHostLookup = false;
+        hostNestedPrevious = SetCursorForMatch(
+            hostNestedSource, {SelectionSlot(4), Target::Chromium});
+        hostNestedDisplayed = GetCursor();
+    }
+    return simulatedWindowAtPointer;
+}
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor) {
     HCURSOR previous = SetCursor(cursor);
@@ -520,17 +508,17 @@ int main(int argc, char** argv) {
     if (argc != 2) return 2;
     Start();
     std::string_view test = argv[1];
-    if (test == "reentrant") Reentrant();
-    else if (test == "unload") NonCooperative();
+    if (test == "unload-contract") UnloadContract();
+    else if (test == "reentrant") Reentrant();
     else if (test == "shared") SharedQueues();
     else if (test == "cache") Alternating();
-    else if (test == "slow") SlowUnload();
-    else if (test == "reload") ReloadWithPendingQueue();
-    else if (test == "inherited") InheritedQueue();
-    else if (test == "discovery-failure") FailedDiscovery();
-    else if (test == "responsive") ResponsiveForeignUnload();
-    else if (test == "cbt") VetoedWindow(false);
-    else if (test == "orphan") VetoedWindow(true);
+    else if (test == "slow") QuietUnload(false, false);
+    else if (test == "reload") QuietUnload(false, true);
+    else if (test == "inherited") QuietUnload(true, false);
+    else if (test == "stopping") StoppingPassthrough();
+    else if (test == "limit") InstanceLimit();
+    else if (test == "host-reentrant") HostLookup(true);
+    else if (test == "host-throttle") HostLookup(false);
     else return 2;
     std::printf("%s: %s\n", argv[1], failures ? "FAIL" : "PASS");
     return failures ? 1 : 0;
