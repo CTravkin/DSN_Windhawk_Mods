@@ -2,7 +2,7 @@
 #include "../Mod/cursor-scheme-extension.wh.cpp"
 
 extern "C" __declspec(dllexport) void FixtureStart() {
-    BeginCursorSession();
+    g_needsRefresh.fill(true);
     g_setCursorOriginal = SetCursor;
     g_getCursorOriginal = GetCursor;
     g_enabledTypes = UINT32_MAX;

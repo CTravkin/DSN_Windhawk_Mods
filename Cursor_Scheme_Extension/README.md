@@ -33,7 +33,7 @@ The interface is available in English, Russian, Spanish, German, Brazilian Portu
 - Replacement applies to recognized pointers displayed through Windows cursor APIs. The application controls whether autoscroll is available, its speed, and its direction.
 - Excel and Firefox draw their stationary autoscroll markers separately. These markers keep their original appearance.
 - Monochrome pointers that invert the background retain their original pixel rendering without smoothing.
-- Each mod load creates at most 128 replacement instances per process. When full, further requests use the application's original pointer.
+- Each mod load creates at most 128 replacement instances per process. Returning to a previously used scheme or smoothing setting reuses matching instances. When full, requests that need a new instance use the application's original pointer.
 - After disabling, the application restores its pointer at its next cursor update, usually the next mouse move. Replacement cursor handles remain allocated until the process exits so that pointers still used by Windows stay valid.
 
 ## Platforms
@@ -58,6 +58,8 @@ Do not use multiple mods to replace the same cursors in the same application: th
 3. Select **Compile Mod**, exit the editor, and check that **Cursor Scheme Extension** is enabled on the Windhawk home page.
 
 To update a local installation, open its editor, replace the source, and compile it again.
+
+When updating from 1.0.2 or earlier, run [Migrate-Settings.ps1](Tools/Migrate-Settings.ps1) with a new `-BackupPath` before compiling to preserve the **Selection arrows** preference. See the [tool instructions](Tools/TOOLS.md).
 
 [Windhawk editing mode guide](https://github.com/ramensoftware/windhawk/wiki/Editing-mode-guidelines)
 
@@ -86,6 +88,10 @@ pwsh -NoProfile -File .\Tests\Run-LifecycleTests.ps1
 ```
 
 The tests cover reentrant callbacks, shared input queues, handle reuse, and safe unloading on x86 and x64. A separate probe loads and unloads a real DLL three times while its GUI owner thread stays alive, checking that the cursor remains valid. They use isolated processes and preserve the installed settings.
+
+They also cover instance reuse, bounded scheme reads, notification-free updates, Chromium arguments, and the renamed selection setting. `Tests/Test-SettingsMigration.ps1` checks preference migration in disposable registry keys.
+
+With Node.js and the installed Windhawk extension, `node Tests/Test-Settings.cjs` validates the metadata, settings schema, and translations in all six languages using Windhawk's parser.
 
 The [Win32 preview source](Tests/cursor-scheme-extension-preview.cpp) displays all eleven system autoscroll states. Build it as `cursor-scheme-extension-preview.exe` and open it with the mod enabled. Wheel-click **Vertical**, **Horizontal**, or **Both axes**, then move away from the starting point and back. Try the four diagonals in **Both axes**. Press **F2** for the Windows Reader Mode path.
 

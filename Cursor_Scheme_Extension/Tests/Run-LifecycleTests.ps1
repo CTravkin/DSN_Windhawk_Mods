@@ -17,7 +17,7 @@ foreach ($architecture in 'x86_64', 'i686') {
         '-DUNICODE', '-D_UNICODE', '-D_WIN32_WINNT=0x0A00', '-DWINVER=0x0A00',
         '-DWH_MOD', '-DWH_EDITING',
         '-I', (Join-Path $CompilerRoot 'include'),
-        $source, '-lgdi32', '-ladvapi32', '-lshell32', '-o', $executable
+        $source, '-lgdi32', '-ladvapi32', '-o', $executable
     )
     & $compiler @arguments
     if ($LASTEXITCODE -ne 0) {
@@ -25,7 +25,7 @@ foreach ($architecture in 'x86_64', 'i686') {
     }
 
     foreach ($scenario in 'host-reentrant', 'host-throttle', 'unload-contract', 'reentrant', 'shared', 'cache', 'slow', 'reload',
-                          'inherited', 'stopping', 'limit') {
+                          'inherited', 'stopping', 'limit', 'reuse', 'refresh', 'command-line', 'selection-setting') {
         $log = Join-Path $buildRoot "cursor-lifecycle-$architecture-$scenario.txt"
         $launch = @{
             FilePath = $executable
@@ -52,7 +52,7 @@ foreach ($architecture in 'x86_64', 'i686') {
     & $compiler @common '-shared' '-DWH_MOD' '-DWH_EDITING' `
         '-I' (Join-Path $CompilerRoot 'include') `
         (Join-Path $PSScriptRoot 'cursor-unload-fixture.cpp') `
-        '-lgdi32' '-ladvapi32' '-lshell32' '-o' $fixture
+        '-lgdi32' '-ladvapi32' '-o' $fixture
     if ($LASTEXITCODE -ne 0) { throw "Unload fixture compilation failed ($architecture)" }
     & $compiler @common '-municode' (Join-Path $PSScriptRoot 'cursor-unload-dll-tests.cpp') `
         '-lgdi32' '-o' $unloadTest

@@ -1,6 +1,7 @@
 #include <windhawk_api.h>
 #include <atomic>
 #include <cstdio>
+#include <string>
 
 HCURSOR WINAPI ObservedSetCursor(HCURSOR cursor);
 HWND HostLookupReentry();
@@ -14,6 +15,32 @@ unsigned fullWindowScans;
 ULONGLONG simulatedTime = 1000;
 HWND simulatedWindowAtPointer;
 HWND observedHostRoot;
+bool simulateScheme;
+HCURSOR schemeCursor;
+unsigned schemeBitmapReads;
+PCWSTR simulatedCommandLine;
+int selectionArrowsSetting = 1;
+
+LPWSTR WINAPI TestCommandLine() {
+    return simulatedCommandLine ? const_cast<LPWSTR>(simulatedCommandLine) : GetCommandLineW();
+}
+
+HCURSOR WINAPI TestLoadCursor(HINSTANCE module, LPCWSTR name) {
+    if (simulateScheme && !module && name == IDC_UPARROW) return schemeCursor;
+    return LoadCursorW(module, name);
+}
+
+BOOL WINAPI TestIconInfo(HICON cursor, PICONINFO info) {
+    if (simulateScheme && cursor == schemeCursor) ++schemeBitmapReads;
+    return GetIconInfo(cursor, info);
+}
+
+int TestIntSetting(PCWSTR name, ...) {
+    return wcscmp(name, L"cursors.selectionArrows") == 0 ? selectionArrowsSetting : 1;
+}
+
+PCWSTR TestStringSetting(PCWSTR, ...) { return L""; }
+void TestFreeStringSetting(PCWSTR) {}
 
 HWND WINAPI TestGetAncestor(HWND window, UINT flags) {
     if (simulateHostLookup) observedHostRoot = window;
@@ -41,7 +68,7 @@ BOOL WINAPI TestEnumWindows(WNDENUMPROC callback, LPARAM parameter) {
 }
 
 ULONGLONG WINAPI TestTickCount() {
-    return simulateHostLookup ? simulatedTime : GetTickCount64();
+    return simulateHostLookup || simulateScheme ? simulatedTime : GetTickCount64();
 }
 
 BOOL WINAPI TestModuleHandle(DWORD flags, LPCWSTR address, HMODULE* module) {
@@ -82,7 +109,19 @@ HWND WINAPI TestCreateWindow(DWORD extended, LPCWSTR className, LPCWSTR title, D
 #define EnumWindows TestEnumWindows
 #define GetTickCount64 TestTickCount
 #define GetAncestor TestGetAncestor
+#define GetCommandLineW TestCommandLine
+#define LoadCursorW TestLoadCursor
+#define GetIconInfo TestIconInfo
+#define Wh_GetIntSetting TestIntSetting
+#define Wh_GetStringSetting TestStringSetting
+#define Wh_FreeStringSetting TestFreeStringSetting
 #include "../Mod/cursor-scheme-extension.wh.cpp"
+#undef Wh_FreeStringSetting
+#undef Wh_GetStringSetting
+#undef Wh_GetIntSetting
+#undef GetIconInfo
+#undef LoadCursorW
+#undef GetCommandLineW
 #undef GetAncestor
 #undef GetTickCount64
 #undef EnumWindows
@@ -141,7 +180,8 @@ HWND AppWindow() {
 }
 
 void Start() {
-    BeginCursorSession();
+    g_stopping = false;
+    g_watchStarted = false;
     g_setCursorOriginal = ObservedSetCursor;
     g_getCursorOriginal = GetCursor;
     g_enabledTypes = UINT32_MAX;
@@ -149,6 +189,7 @@ void Start() {
     g_isOffice = true;
     g_smoothingTypes = TypeBit(CursorType::SelectionArrows);
     g_needsRefresh.fill(true);
+    g_nextSourceProbe.fill(0);
 }
 
 void Finish() {
@@ -442,6 +483,97 @@ void InstanceLimit() {
     for (HCURSOR original : originals) DestroyCursor(original);
 }
 
+void ReuseInstances() {
+    HCURSOR original = Fixture(0xff234567);
+    SetCursorHook(original);
+    const HCURSOR smooth = GetCursor();
+    g_smoothingTypes = 0;
+    g_needsRefresh.fill(true);
+    SetCursorHook(original);
+    const HCURSOR sharp = GetCursor();
+    Check(smooth != original && sharp != original && smooth != sharp,
+          "both smoothing variants have native instances");
+    for (unsigned i = 0; i < 150; ++i) {
+        g_smoothingTypes = i % 2 ? 0 : TypeBit(CursorType::SelectionArrows);
+        g_needsRefresh.fill(true);
+        SetCursorHook(original);
+        Check(GetCursor() == (i % 2 ? sharp : smooth),
+              "returning to a prior appearance reuses its published instance");
+        Check(GetCursorHook() == original, "reused instance keeps logical identity");
+    }
+    Check(g_instances.size() == 2, "smoothing cycles do not consume the instance budget");
+    Check(Readable(smooth) && Readable(sharp), "both published variants remain valid");
+    SetCursorHook(nullptr);
+    Finish();
+    DestroyCursor(original);
+}
+
+void SourceRefresh() {
+    simulateScheme = true;
+    g_watchStarted = true;  // Exercise the fallback with no registry subscription.
+    HCURSOR original = Fixture(0xff123456);
+    HCURSOR firstSource = Fixture(0xff456789);
+    HCURSOR secondSource = Fixture(0xff789abc);
+    schemeCursor = firstSource;
+    SetCursorHook(original);
+    const HCURSOR first = GetCursor();
+    const unsigned initialReads = schemeBitmapReads;
+    for (unsigned i = 0; i < 1000; ++i) {
+        SetCursorHook(LoadCursorW(nullptr, IDC_ARROW));
+        SetCursorHook(original);
+    }
+    Check(schemeBitmapReads == initialReads,
+          "ordinary cursor transitions do not reread scheme bitmaps");
+    schemeCursor = secondSource;
+    simulatedTime += 1001;
+    SetCursorHook(original);
+    Check(GetCursor() != first && GetCursor() != original,
+          "unnotified scheme change is discovered while the same role stays active");
+    g_changeEvent = CreateEventW(nullptr, FALSE, TRUE, nullptr);
+    schemeCursor = firstSource;
+    SetCursorHook(original);
+    Check(GetCursor() == first, "registry notification refreshes immediately and reuses old scheme");
+    SetCursorHook(nullptr);
+    Finish();
+    simulateScheme = false;
+    DestroyCursor(original);
+    DestroyCursor(firstSource);
+    DestroyCursor(secondSource);
+}
+
+void ChromiumCommandLines() {
+    const std::pair<PCWSTR, bool> cases[] = {
+        {L"app.exe --type=renderer --field-trial-handle=123", true},
+        {L"\"C:\\Program Files\\app.exe\"\t\"--type=gpu-process\" --mojo-platform-channel-handle=456", true},
+        {L"app.exe --type=utility --field-trial-handle=123", true},
+        {L"app.exe --type=renderer", false},
+        {L"app.exe --type=browser --field-trial-handle=123", false},
+        {L"app.exe \"document --type=renderer --field-trial-handle=123\"", false},
+        {L"app.exe --type=renderer-extra --field-trial-handle=123", false},
+        {L"app.exe --type=renderer --other=--field-trial-handle=123", false},
+        {L"app.exe --type=renderer \"--field-trial-handle=123\"", true},
+        {L"app.exe --type=ren\"derer\" --field-trial-handle=123", true},
+    };
+    for (const auto& [line, expected] : cases) {
+        simulatedCommandLine = line;
+        Check(IsChromiumChildProcess() == expected, "Chromium switches respect argument boundaries and quotes");
+    }
+    simulatedCommandLine = nullptr;
+    Finish();
+}
+
+void SelectionSetting() {
+    selectionArrowsSetting = 0;
+    UpdateSettings();
+    Check(!(g_enabledTypes & TypeBit(CursorType::SelectionArrows)),
+          "renamed selection setting preserves disabled value");
+    selectionArrowsSetting = 1;
+    UpdateSettings();
+    Check((g_enabledTypes & TypeBit(CursorType::SelectionArrows)) != 0,
+          "renamed selection setting enables selection arrows");
+    Finish();
+}
+
 void HostLookup(bool reentrant) {
     HCURSOR original = Fixture(0xff123456);
     HCURSOR nested = Fixture(0xff234567);
@@ -517,6 +649,10 @@ int main(int argc, char** argv) {
     else if (test == "inherited") QuietUnload(true, false);
     else if (test == "stopping") StoppingPassthrough();
     else if (test == "limit") InstanceLimit();
+    else if (test == "reuse") ReuseInstances();
+    else if (test == "refresh") SourceRefresh();
+    else if (test == "command-line") ChromiumCommandLines();
+    else if (test == "selection-setting") SelectionSetting();
     else if (test == "host-reentrant") HostLookup(true);
     else if (test == "host-throttle") HostLookup(false);
     else return 2;
