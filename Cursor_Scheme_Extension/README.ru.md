@@ -40,6 +40,15 @@ Cursor Scheme Extension заменяет встроенные курсоры п�
 
 Нужны Windows 11 и [Windhawk](https://windhawk.net/). Выполнение x86 и x64 проверено на Windows 11 x64 с Windhawk 1.7.3. Для ARM64 проверена компиляция без запуска. Microsoft 365 и Qt WebEngine не проверены.
 
+### Совместимость
+
+Часть функций мода может пересекаться с возможностями следующих модов:
+
+- [Chromium Cursor Remap](https://windhawk.net/mods/chromium-cursor-remap) — подмена дополнительных курсоров Chromium и Electron.
+- [Cursor Override](https://windhawk.net/mods/cursor-override) — подмена дополнительных курсоров файлами `.cur` и `.ani`.
+
+Не следует одновременно подменять одинаковые курсоры несколькими модами в одном приложении: итоговый вид курсора может зависеть от порядка применения подмен.
+
 ## Эксплуатация
 
 ### Установка

@@ -40,6 +40,15 @@ The interface is available in English, Russian, Spanish, German, Brazilian Portu
 
 Requires Windows 11 and [Windhawk](https://windhawk.net/). Runtime checks cover x86 and x64 processes on Windows 11 x64 with Windhawk 1.7.3. ARM64 has been compiled without a runtime check. Microsoft 365 and Qt WebEngine have not been verified.
 
+### Compatibility
+
+Some of this mod's features may overlap with the following mods:
+
+- [Chromium Cursor Remap](https://windhawk.net/mods/chromium-cursor-remap) — additional cursor replacement in Chromium and Electron.
+- [Cursor Override](https://windhawk.net/mods/cursor-override) — additional cursor replacement using `.cur` and `.ani` files.
+
+Do not use multiple mods to replace the same cursors in the same application: the final cursor appearance may depend on the order in which replacements are applied.
+
 ## Operations
 
 ### Installation
