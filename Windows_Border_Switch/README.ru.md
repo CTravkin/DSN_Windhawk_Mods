@@ -49,7 +49,7 @@ Windows Border Switch скрывает системные рамки окон и
 - [Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler) — оформление панели задач, включая ее кромку ([руководство по настройке](https://github.com/ramensoftware/windows-11-taskbar-styling-guide)).
 - [Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler) — оформление уведомлений, календаря, быстрых настроек и панели управления воспроизведением ([руководство по настройке](https://github.com/ramensoftware/windows-11-notification-center-styling-guide)).
 
-Если тема или правило управляет той же рамкой, соответствующий параметр Windows Border Switch следует перевести в режим **Определено Windows** либо убрать пересекающиеся правила Styler. Совместимость зависит от выбранной темы и правил; совместная работа этих модов не проверялась.
+Если тема или правило управляет той же рамкой, соответствующий параметр Windows Border Switch следует перевести в режим **Определено Windows** либо убрать пересекающиеся правила Styler.
 
 ## Эксплуатация
 

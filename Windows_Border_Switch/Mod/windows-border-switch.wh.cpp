@@ -77,7 +77,7 @@ The following Styler mods customize shell panels. Their themes and custom rules 
 - [Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler) — styles the taskbar, including its edge ([styling guide](https://github.com/ramensoftware/windows-11-taskbar-styling-guide)).
 - [Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler) — styles notifications, the calendar, Quick Settings, and media controls ([styling guide](https://github.com/ramensoftware/windows-11-notification-center-styling-guide)).
 
-If a theme or rule controls the same border, set the corresponding Windows Border Switch option to **Windows-defined**, or remove the overlapping Styler rules. Compatibility depends on the selected theme and rules; these combinations have not been tested together.
+If a theme or rule controls the same border, set the corresponding Windows Border Switch option to **Windows-defined**, or remove the overlapping Styler rules.
 
 ## Usage
 
