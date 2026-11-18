@@ -29,11 +29,27 @@ Windows Border Switch скрывает системные рамки окон и
 
 - Поддержка рамок панелей зависит от сборки Windows и пакета Windows Web Experience Pack. После включения или обновления мода может потребоваться перезапуск Проводника либо выход из системы и повторный вход.
 - Окна приложений, запущенных от имени администратора, могут сохранить рамки. Это относится и к окну Windhawk. Приложения, которые рисуют рамки сами, управляют их видом.
-- Моды, меняющие ту же рамку или заголовок, могут перезаписывать изменения друг друга. Это касается и Windows 11 Accent Window Border.
 
 ## Платформы
 
 Нужны Windows 11 x64 или ARM64 и [Windhawk](https://windhawk.net/).
+
+### Совместимость
+
+Следующие моды пересекаются с Windows Border Switch в управлении рамками окон приложений:
+
+- [Invisible Window Borders](https://windhawk.net/mods/invisible-borders) — также скрывает системные рамки окон.
+- [Windows 11 Accent Window Border](https://windhawk.net/mods/win11-accent-border) — задает цвета рамок окон, что может конфликтовать с их скрытием.
+
+Не следует управлять одной рамкой или заголовком окна несколькими модами: они могут переопределять настройки и исключения друг друга. Если рамками окон управляет один из этих модов, а Windows Border Switch используется только для системных панелей, его параметры **Активное окно**, **Неактивные окна** и **Диалоговые окна** следует перевести в режим **Определено Windows**.
+
+Следующие Styler-моды меняют оформление системных панелей. Их темы и отдельные правила также могут затрагивать рамки:
+
+- [Windows 11 Start Menu Styler](https://windhawk.net/mods/windows-11-start-menu-styler) — оформление меню «Пуск» и панели поиска ([руководство по настройке](https://github.com/ramensoftware/windows-11-start-menu-styling-guide)).
+- [Windows 11 Taskbar Styler](https://windhawk.net/mods/windows-11-taskbar-styler) — оформление панели задач, включая ее кромку ([руководство по настройке](https://github.com/ramensoftware/windows-11-taskbar-styling-guide)).
+- [Windows 11 Notification Center Styler](https://windhawk.net/mods/windows-11-notification-center-styler) — оформление уведомлений, календаря, быстрых настроек и панели управления воспроизведением ([руководство по настройке](https://github.com/ramensoftware/windows-11-notification-center-styling-guide)).
+
+Если тема или правило управляет той же рамкой, соответствующий параметр Windows Border Switch следует перевести в режим **Определено Windows** либо убрать пересекающиеся правила Styler. Совместимость зависит от выбранной темы и правил; совместная работа этих модов не проверялась.
 
 ## Эксплуатация
 
@@ -54,11 +70,3 @@ Windows Border Switch скрывает системные рамки окон и
 В разделе **Исключения** указывается имя исполняемого файла, например `steam.exe`, и в поле **Не скрывать рамку** выбираются окна, для которых действует исключение.
 
 Режим **Определено Windows** восстанавливает системный цвет DWM. Приложения с собственным цветом DWM могут восстановить его при повторном открытии окна.
-
-## Ссылки
-
-- [Invisible Window Borders](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/invisible-borders.wh.cpp)
-- [Windows 11 Accent Window Border](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/win11-accent-border.wh.cpp)
-- [Windows 11 Start Menu Styler и руководство по настройке](https://github.com/ramensoftware/windows-11-start-menu-styling-guide)
-- [Windows 11 Taskbar Styler и руководство по настройке](https://github.com/ramensoftware/windows-11-taskbar-styling-guide)
-- [Windows 11 Notification Center Styler и руководство по настройке](https://github.com/ramensoftware/windows-11-notification-center-styling-guide)
