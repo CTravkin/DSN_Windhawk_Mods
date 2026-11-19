@@ -90,6 +90,8 @@ inline void HookQuickRows(HMODULE dll) {
 class QuickPage {
   X::FrameworkElement view_{nullptr};
   Journal journal_;
+  Journal tileShapeJournal_;
+  bool shapingTiles_ = false;
   std::vector<std::function<void()>> revoke_;
   std::set<void *> thinSliders_;
   std::set<std::pair<void *, int>> done_;
@@ -109,6 +111,15 @@ class QuickPage {
   C::StackPanel header_{nullptr};
   C::Grid brightRow_{nullptr};
   Journal unavailableBrightness_;
+  // The Windows and DDC controls stay separate: only the native control moves.
+  C::Slider nativeBright_{nullptr};
+  winrt::weak_ref<X::FrameworkElement> nativeBrightRow_;
+  winrt::weak_ref<C::Panel> nativeBrightParent_;
+  Journal nativeBrightnessJournal_;
+  std::vector<std::function<void()>> nativeBrightnessRevoke_;
+  std::set<void *> nativeBrightnessSeen_;
+  bool placingBrightness_ = false;
+  int ddcBrightness_ = -1;
   winrt::weak_ref<X::FrameworkElement> hiddenBrightnessRow_;
   winrt::weak_ref<X::FrameworkElement> missingBrightnessSlider_;
   ULONGLONG missingBrightnessSince_ = 0;
@@ -283,9 +294,10 @@ class QuickPage {
       grid_.Margin(m);
       changed = true;
     }
-    if (bright_ && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible &&
-        bright_.ActualHeight() > 0) {
-      double b = centre(bright_);
+    auto brightness = nativeBright_ ? nativeBright_ : bright_;
+    if (brightness && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible &&
+        brightness.ActualHeight() > 0) {
+      double b = centre(brightness);
       if (std::abs(vol - b - step) >= 1) {
         rowHeight_ = std::clamp(rowHeight_ + (step - (vol - b)) / s, 39.2 - 6, 39.2 + 6);
         brightRow_.Height(rowHeight_);
@@ -357,6 +369,8 @@ class QuickPage {
     Keep(title_.Click(winrt::auto_revoke, [this](auto &&, auto &&) { OpenSettings(); }));
     shortcuts_ = C::StackPanel();
     shortcuts_.Orientation(C::Orientation::Horizontal);
+    // 9 physical pixels at the 125% design scale, between 32-DIP plates.
+    shortcuts_.Spacing(7.2);
     C::Grid::SetColumn(shortcuts_, 2);
     row.Children().Append(shortcuts_);
     display_ = ShortcutButton(sound::QuickShortcut::Display);
@@ -462,7 +476,7 @@ class QuickPage {
     }
     auto button = IconButton(name);
     button.Margin({4, 0, 4, 0});
-    button.Content(SymbolGlyph(view_, glyph));
+    button.Content(SymbolGlyph(view_, glyph, 13.6));
     Keep(button.Click(winrt::auto_revoke, [uri](auto &&, auto &&) {
       ShellExecuteW(nullptr, L"open", uri, nullptr, nullptr, SW_SHOWNORMAL);
     }));
@@ -781,20 +795,114 @@ class QuickPage {
         return parent;
     return nullptr;
   }
-  static C::Slider NativeBrightnessSlider(X::FrameworkElement const &row) {
-    return Find(row, [](auto const &element) { return !!element.template try_as<C::Slider>(); })
-        .try_as<C::Slider>();
+  C::Slider NativeBrightnessSlider(X::FrameworkElement const &row) {
+    auto current = Find(row, [](auto const &element) {
+      return !!element.template try_as<C::Slider>();
+    }).try_as<C::Slider>();
+    if (current)
+      return current;
+    return row && row == nativeBrightRow_.get() ? nativeBright_ : nullptr;
   }
-  bool NativeBrightnessUsable(C::Slider const &slider) {
-    if (!slider || !slider.IsEnabled() || slider.Maximum() <= slider.Minimum())
+  bool NativeBrightnessUsable(X::FrameworkElement const &row, C::Slider const &slider) {
+    if (!row || !slider || !slider.IsEnabled() || slider.Maximum() <= slider.Minimum() ||
+        slider.Visibility() != X::Visibility::Visible)
       return false;
-    for (auto element = slider.as<X::FrameworkElement>(); element; element = Parent(element)) {
+    // The source branch decides availability. Hiding L1 while showing Sound
+    // must not detach/rebind the control; neither may our zero-height wrapper.
+    auto parent = slider == nativeBright_ ? nativeBrightParent_.get() : Parent(slider);
+    for (auto element = parent; element; element = Parent(element)) {
       if (element.Visibility() != X::Visibility::Visible)
         return false;
-      if (element == view_)
+      if (auto control = element.try_as<C::Control>(); control && !control.IsEnabled())
+        return false;
+      if (element == row)
         return true;
     }
     return false;
+  }
+  void RestoreNativeBrightness() {
+    for (auto &revoke : nativeBrightnessRevoke_)
+      try {
+        revoke();
+      } catch (...) {
+        Wh_Log(L"Native brightness handler cleanup: %08X", winrt::to_hresult());
+      }
+    nativeBrightnessRevoke_.clear();
+    nativeBrightnessJournal_.Restore();
+    nativeBrightnessSeen_.clear();
+    nativeBright_ = nullptr;
+    nativeBrightRow_ = nullptr;
+    nativeBrightParent_ = nullptr;
+    alignPasses_ = 0;
+  }
+  bool MoveNativeBrightness(X::FrameworkElement const &row, C::Slider const &slider) {
+    if (nativeBright_ == slider && nativeBrightRow_.get() == row && Parent(slider) == brightRow_)
+      return true;
+    RestoreNativeBrightness();
+    auto parent = Parent(slider).try_as<C::Panel>();
+    uint32_t index = 0;
+    if (!brightRow_ || !parent || parent.IsItemsHost() ||
+        !parent.Children().IndexOf(slider, index))
+      return false;
+    auto binding = slider.GetBindingExpression(P::RangeBase::ValueProperty());
+    auto model = VolumeModel(slider);
+    try {
+      auto set = [&](auto const &property, auto const &value) {
+        nativeBrightnessJournal_.Save(slider, property);
+        slider.SetValue(property, winrt::box_value(value));
+      };
+      // Keep inherited DataContext live, including future replacements in the
+      // source template. Value/Min/Max/IsEnabled bindings and handlers stay native.
+      if (slider.ReadLocalValue(X::FrameworkElement::DataContextProperty()) ==
+          X::DependencyProperty::UnsetValue()) {
+        nativeBrightnessJournal_.Save(slider, X::FrameworkElement::DataContextProperty());
+        D::Binding context;
+        context.Source(parent);
+        context.Path(X::PropertyPath(L"DataContext"));
+        context.Mode(D::BindingMode::OneWay);
+        slider.SetBinding(X::FrameworkElement::DataContextProperty(), context);
+      }
+      set(C::Grid::ColumnProperty(), 1);
+      set(C::Grid::RowProperty(), 0);
+      set(C::Grid::ColumnSpanProperty(), 1);
+      set(C::Grid::RowSpanProperty(), 1);
+      set(X::FrameworkElement::WidthProperty(), static_cast<double>(NAN));
+      set(X::FrameworkElement::MinWidthProperty(), 0.);
+      set(X::FrameworkElement::MaxWidthProperty(), static_cast<double>(INFINITY));
+      set(X::FrameworkElement::MarginProperty(), X::Thickness{});
+      set(X::FrameworkElement::HorizontalAlignmentProperty(), X::HorizontalAlignment::Stretch);
+      auto source = winrt::make_weak(parent);
+      auto destination = winrt::make_weak(brightRow_);
+      nativeBrightnessJournal_.undo.push_back([source, destination, slider, index] {
+        if (auto dest = destination.get()) {
+          uint32_t current;
+          if (dest.Children().IndexOf(slider, current))
+            dest.Children().RemoveAt(current);
+        }
+        // Do not take the control back if Windows has already reparented it.
+        if (auto original = source.get(); original && !Parent(slider)) {
+          uint32_t current;
+          if (!original.Children().IndexOf(slider, current))
+            original.Children().InsertAt(std::min(index, original.Children().Size()), slider);
+        }
+      });
+      nativeBright_ = slider;
+      nativeBrightRow_ = winrt::make_weak(row);
+      nativeBrightParent_ = source;
+      parent.Children().RemoveAt(index);
+      brightRow_.Children().Append(slider);
+      // An unexpected ElementName/RelativeSource binding must fall back to the
+      // untouched Windows row rather than silently control a different model.
+      if (slider.GetBindingExpression(P::RangeBase::ValueProperty()) != binding ||
+          VolumeModel(slider) != model)
+        throw winrt::hresult_error(E_FAIL, L"Native brightness binding source changed");
+      Wh_Log(L"Native brightness slider moved into the custom row; binding preserved");
+      return true;
+    } catch (...) {
+      Wh_Log(L"Native brightness move: %08X", winrt::to_hresult());
+      RestoreNativeBrightness();
+      return false;
+    }
   }
   void HideUnavailableBrightness(X::FrameworkElement const &row, bool hide) {
     auto hidden = hiddenBrightnessRow_.get();
@@ -809,9 +917,13 @@ class QuickPage {
     unavailableBrightness_.Save(row, X::FrameworkElement::MinHeightProperty());
     unavailableBrightness_.Save(row, X::FrameworkElement::MaxHeightProperty());
     unavailableBrightness_.Save(row, X::UIElement::IsHitTestVisibleProperty());
+    unavailableBrightness_.Save(row, X::FrameworkElement::MarginProperty());
+    unavailableBrightness_.Save(row, X::UIElement::OpacityProperty());
     hiddenBrightnessRow_ = winrt::make_weak(row);
     row.MinHeight(0);
     row.MaxHeight(0);
+    row.Margin({0, 0, 0, 0});
+    row.Opacity(0);
     row.IsHitTestVisible(false);
   }
   bool BrightnessTemplateMissing(X::FrameworkElement const &row, C::Slider const &slider) {
@@ -835,40 +947,56 @@ class QuickPage {
     return now - missingBrightnessSince_ >= 250;
   }
   void PlaceDisplayActions() {
-    if (!settingsRow_ || !night_ || !display_)
+    if (!settingsRow_ || !night_ || !display_ || std::exchange(placingBrightness_, true))
       return;
+    struct Reset {
+      bool &flag;
+      ~Reset() { flag = false; }
+    } reset{placingBrightness_};
     auto nativeRow = NativeBrightnessRow();
     if (!settings_.brightnessEnabled && nativeRow && First(nativeRow, 76))
       Set(nativeRow, X::UIElement::VisibilityProperty(), winrt::box_value(X::Visibility::Collapsed));
     auto nativeSlider = NativeBrightnessSlider(nativeRow);
-    bool nativeVisible = settings_.brightnessEnabled && NativeBrightnessUsable(nativeSlider);
+    bool nativeVisible = settings_.brightnessEnabled && NativeBrightnessUsable(nativeRow, nativeSlider);
+    if (nativeBright_ && (!nativeVisible || nativeBright_ != nativeSlider ||
+                         nativeBrightRow_.get() != nativeRow))
+      RestoreNativeBrightness();
+    bool moved = nativeVisible && MoveNativeBrightness(nativeRow, nativeSlider);
     bool missingSlider = settings_.brightnessEnabled &&
                          BrightnessTemplateMissing(nativeRow, nativeSlider);
     HideUnavailableBrightness(nativeRow, settings_.brightnessEnabled && nativeRow &&
                                             nativeRow.Visibility() == X::Visibility::Visible &&
-                                            !nativeVisible && (nativeSlider || missingSlider));
-    if (nativeVisible && brightRow_ && brightRow_.Visibility() == X::Visibility::Visible) {
-      brightRow_.Visibility(X::Visibility::Collapsed);
-      alignPasses_ = 0;
+                                            (moved || (!nativeVisible && (nativeSlider || missingSlider))));
+    bool show = settings_.brightnessEnabled && (moved || (!nativeVisible && ddcBrightness_ >= 0));
+    if (brightRow_) {
+      auto visibility = show ? X::Visibility::Visible : X::Visibility::Collapsed;
+      if (brightRow_.Visibility() != visibility) {
+        brightRow_.Visibility(visibility);
+        alignPasses_ = 0;
+      }
+      bright_.Visibility(moved ? X::Visibility::Collapsed : X::Visibility::Visible);
     }
-    bool nativeDisplay = nativeVisible && Find(nativeRow, [](auto const &e) {
+    // A native row kept in place can already provide its own Display button.
+    bool nativeDisplay = !moved && nativeVisible && Find(nativeRow, [](auto const &e) {
       auto button = e.template try_as<C::Button>();
       return button && button.Visibility() == X::Visibility::Visible &&
              String(button.CommandParameter()) == L"ms-settings:display";
     });
-    bool ddcVisible = brightRow_ && brightRow_.Visibility() == X::Visibility::Visible;
-    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, nativeDisplay || ddcVisible);
+    auto shortcuts = sound::QuickShortcuts(settings_.quickShortcuts, show || nativeDisplay);
     bool changed = shortcuts != visibleShortcuts_;
-    if (changed)
+    if (changed) {
       shortcuts_.Children().Clear();
+      shortcuts_.Margin(shortcuts.empty() ? X::Thickness{} : X::Thickness{4, 0, 4, 0});
+    }
     if (brightRow_) {
       auto place = [&](C::Button const &button, int column) {
         uint32_t index = 0;
         bool attached = brightRow_.Children().IndexOf(button, index);
-        if (ddcVisible && !attached) {
+        if (show && !attached) {
+          button.Margin({4, 0, 4, 0});
           C::Grid::SetColumn(button, column);
           brightRow_.Children().Append(button);
-        } else if (!ddcVisible && attached) {
+        } else if (!show && attached) {
           brightRow_.Children().RemoveAt(index);
         }
       };
@@ -880,44 +1008,39 @@ class QuickPage {
         auto it = shortcutButtons_.find(action);
         if (it == shortcutButtons_.end())
           it = shortcutButtons_.emplace(action, ShortcutButton(action)).first;
-        if (it->second)
+        if (it->second) {
+          it->second.Margin({0, 0, 0, 0});
           shortcuts_.Children().Append(it->second);
+        }
       }
       visibleShortcuts_ = std::move(shortcuts);
     }
-    if (brightnessGlyph_) {
-      auto visibility = ddcVisible ? X::Visibility::Collapsed : X::Visibility::Visible;
-      if (brightnessGlyph_.Visibility() != visibility)
-        brightnessGlyph_.Visibility(visibility);
-    }
+    if (brightnessGlyph_)
+      brightnessGlyph_.Visibility(show ? X::Visibility::Collapsed : X::Visibility::Visible);
   }
   bool PanelVisible() { return WindowShown(host_); }
   void ApplyBright(int value, bool nativeAvailable) {
-    if (!brightRow_)
+    ddcBrightness_ = value;
+    if (!bright_)
       return;
-    bool show = value >= 0 && !nativeAvailable;
-    auto want = show ? X::Visibility::Visible : X::Visibility::Collapsed;
-    if (brightRow_.Visibility() != want) {
-      brightRow_.Visibility(want);
-      alignPasses_ = 0;
-      PlaceDisplayActions();
-    }
     if (value >= 0 && std::lround(bright_.Value()) != value) {
       sync_ = true;
       bright_.Value(value);
       sync_ = false;
     }
-    if (show)
+    PlaceDisplayActions();
+    if (value >= 0 && !nativeAvailable)
       ShowBrightness(value);
   }
   // Panel monitor: cached value at once, a DDC/CI read on opening and every 3 s
   // while open (not while the user is changing it).
   void Brightness(bool opening) {
-    if (!brightRow_ || !ddc_)
+    if (!brightRow_ || !settings_.brightnessEnabled)
       return;
     auto now = GetTickCount64();
     auto monitor = MonitorFromWindow(host_, MONITOR_DEFAULTTONEAREST);
-    bool nativeAvailable = NativeBrightnessUsable(NativeBrightnessSlider(NativeBrightnessRow()));
+    auto nativeRow = NativeBrightnessRow();
+    bool nativeAvailable = NativeBrightnessUsable(nativeRow, NativeBrightnessSlider(nativeRow));
     bool availabilityChanged = nativeBrightnessAvailable_ != nativeAvailable;
     nativeBrightnessAvailable_ = nativeAvailable;
     if (monitor != monitor_ || availabilityChanged) {
@@ -926,6 +1049,8 @@ class QuickPage {
       auto cached = brightCache.find(monitor);
       ApplyBright(cached != brightCache.end() ? cached->second : -1, nativeAvailable);
     }
+    if (!ddc_)
+      return;
     if (!nativeAvailable && (opening || now - lastRead_ > 3000) && now - lastUser_ > 1500 &&
         (opening || visible_)) {
       lastRead_ = now;
@@ -943,6 +1068,11 @@ class QuickPage {
     }
   }
 
+  double BatteryTrailingMargin() const {
+    // Native plate inset (2) + this margin (1.2) + shortcut inset (4)
+    // gives a 7.2-DIP gap: 9 physical pixels at 125%.
+    return visibleShortcuts_.empty() ? 6. : 1.2;
+  }
   // Move the shell's actual footer ItemsControl, not a copy of its battery icon.
   // Keep its item templates, commands, bindings and future collection changes.
   bool MoveBatteryFooter(X::FrameworkElement const &left, X::FrameworkElement const &footer) {
@@ -993,7 +1123,8 @@ class QuickPage {
     Set(element, X::FrameworkElement::WidthProperty(), winrt::box_value(static_cast<double>(NAN)));
     Set(element, X::FrameworkElement::MinWidthProperty(), winrt::box_value(0.));
     Set(element, X::FrameworkElement::MinHeightProperty(), winrt::box_value(0.));
-    Set(element, X::FrameworkElement::MarginProperty(), winrt::box_value(X::Thickness{0, 0, 6, 0}));
+    Set(element, X::FrameworkElement::MarginProperty(),
+        winrt::box_value(X::Thickness{0, 0, BatteryTrailingMargin(), 0}));
     Set(element, X::FrameworkElement::HorizontalAlignmentProperty(),
         winrt::box_value(X::HorizontalAlignment::Right));
     Set(element, X::FrameworkElement::VerticalAlignmentProperty(),
@@ -1019,6 +1150,34 @@ class QuickPage {
            Class(element).c_str(), Class(parent).c_str());
     return true;
   }
+  void PositionBattery(X::FrameworkElement const &left) {
+    if (!settingsRow_ || !left || !left.IsLoaded() ||
+        settingsRow_.ColumnDefinitions().Size() != 3)
+      return;
+    auto slot = left;
+    for (auto parent = Parent(slot); parent && parent != settingsRow_; parent = Parent(slot))
+      slot = parent;
+    if (Parent(slot) != settingsRow_)
+      return;
+    double wanted = 0;
+    Find(left, [&](auto const &node) {
+      if (auto button = node.template try_as<C::Button>(); button && button.IsLoaded())
+        wanted = std::max(wanted, double(button.DesiredSize().Width));
+      return false;
+    });
+    if (wanted <= 0)
+      return;
+    auto root = settingsRow_.XamlRoot();
+    double scale = root ? root.RasterizationScale() : 1.;
+    double available = std::round(settingsRow_.ColumnDefinitions().GetAt(1).ActualWidth() * scale) -
+                       std::round(BatteryTrailingMargin() * scale);
+    // Enlarge the battery's layout slot into the free space on its left.
+    // The native content, symmetric padding and Settings geometry stay intact.
+    double shift = std::max(0., std::ceil(wanted * scale - 1e-6) - available) / scale;
+    X::Thickness margin{-shift, 0, BatteryTrailingMargin(), 0};
+    if (slot.Margin() != margin)
+      Set(slot, X::FrameworkElement::MarginProperty(), winrt::box_value(margin));
+  }
   void CompactBattery(X::FrameworkElement const &left) {
     // Match the gear: 36-DIP button, with a 2-DIP template inset on every
     // side, giving both native hover plates the same 32-DIP height.
@@ -1028,6 +1187,8 @@ class QuickPage {
           Set(button, X::FrameworkElement::HeightProperty(), winrt::box_value(36.));
           Set(button, X::FrameworkElement::MinHeightProperty(), winrt::box_value(0.));
           Set(button, X::FrameworkElement::MinWidthProperty(), winrt::box_value(0.));
+          Set(button, X::FrameworkElement::WidthProperty(), winrt::box_value(static_cast<double>(NAN)));
+          Set(button, X::FrameworkElement::MaxWidthProperty(), winrt::box_value(static_cast<double>(INFINITY)));
           Set(button, X::FrameworkElement::MarginProperty(), winrt::box_value(X::Thickness{}));
           Set(button, C::Control::PaddingProperty(), winrt::box_value(X::Thickness{8, 0, 8, 0}));
           Set(button, C::Control::HorizontalContentAlignmentProperty(),
@@ -1037,18 +1198,24 @@ class QuickPage {
           Set(button, X::FrameworkElement::VerticalAlignmentProperty(),
               winrt::box_value(X::VerticalAlignment::Center));
         }
-        // Remove the asymmetric 4,3,2,3 footer ItemsControl margin and any
-        // enclosing slot insets. The plate, not the percentage, ends at the
-        // slider rail: 6 DIP outside the button + 2 DIP inside its template.
-        for (auto slot = Parent(button); slot && slot != settingsRow_; slot = Parent(slot))
+        // Normalize native footer slots; measure the gap from the hover
+        // plate, including its 2-DIP inset, to the next button plate.
+        for (auto slot = Parent(button); slot && slot != settingsRow_; slot = Parent(slot)) {
+          bool outer = Parent(slot) == settingsRow_;
           if (First(slot, 75)) {
-            bool outer = Parent(slot) == settingsRow_;
             Set(slot, X::FrameworkElement::MarginProperty(),
-                winrt::box_value(X::Thickness{0, 0, outer ? 6. : 0., 0}));
+                winrt::box_value(X::Thickness{0, 0, outer ? BatteryTrailingMargin() : 0., 0}));
             Set(slot, X::FrameworkElement::MinHeightProperty(), winrt::box_value(0.));
+            Set(slot, X::FrameworkElement::WidthProperty(), winrt::box_value(static_cast<double>(NAN)));
+            Set(slot, X::FrameworkElement::MinWidthProperty(), winrt::box_value(0.));
+            Set(slot, X::FrameworkElement::MaxWidthProperty(), winrt::box_value(static_cast<double>(INFINITY)));
             Set(slot, X::FrameworkElement::VerticalAlignmentProperty(),
                 winrt::box_value(X::VerticalAlignment::Center));
           }
+          if (outer && std::abs(slot.Margin().Right - BatteryTrailingMargin()) > .001)
+            Set(slot, X::FrameworkElement::MarginProperty(),
+                winrt::box_value(X::Thickness{0, 0, BatteryTrailingMargin(), 0}));
+        }
         if (auto presenter = Named(button, L"ContentPresenter"); presenter && First(presenter, 71))
           Set(presenter, X::FrameworkElement::MarginProperty(), winrt::box_value(X::Thickness{2, 2, 2, 2}));
         // Keep the native icon/font/bindings, but centre both icon branches and
@@ -1071,13 +1238,7 @@ class QuickPage {
       }
       return false; // Visit all native buttons without stopping the traversal.
     });
-    // Reserve the occupied action slots and the battery width.
-    if (title_ && settingsRow_.ActualWidth() > 0) {
-      double available = std::max(
-          0., settingsRow_.ActualWidth() - shortcuts_.ActualWidth() - left.ActualWidth() - 6. - 12.);
-      if (title_.MaxWidth() != available)
-        title_.MaxWidth(available);
-    }
+    PositionBattery(left);
   }
   void Footer() {
     auto footer = Named(view_, L"FooterGrid");
@@ -1178,6 +1339,90 @@ class QuickPage {
     Set(pager, U::PipsPager::SelectedPipStyleProperty(),
         pip(selectedPip_, 1., selectedPx / pipScale));
   }
+  void TileShape(C::Grid const &l1) {
+    if (shapingTiles_)
+      return;
+    if (!settings_.pillQuickTiles) {
+      tileShapeJournal_.Restore();
+      return;
+    }
+    shapingTiles_ = true;
+    struct Reset {
+      bool &flag;
+      ~Reset() { flag = false; }
+    } reset{shapingTiles_};
+    auto toggles = Named(l1, L"TogglesGroup");
+    if (!toggles)
+      return;
+    std::vector<C::GridViewItem> tiles;
+    Find(toggles, [&](auto const &element) {
+      if (auto tile = element.template try_as<C::GridViewItem>())
+        tiles.push_back(tile);
+      return false;
+    });
+    auto set = [&](X::DependencyObject const &object, X::DependencyProperty const &property,
+                   X::CornerRadius const &radius) {
+      if (winrt::unbox_value<X::CornerRadius>(object.GetValue(property)) == radius)
+        return;
+      tileShapeJournal_.Save(object, property);
+      object.SetValue(property, winrt::box_value(radius));
+    };
+    for (auto const &tile : tiles) {
+      struct Plate {
+        C::Control control;
+        winrt::Windows::Foundation::Rect bounds;
+      };
+      std::vector<Plate> plates;
+      // These are the actual shell tile controls. A custom PaginatedToggleButton
+      // need not expose ButtonBase; its template can also start with zero radii.
+      Find(tile, [&](auto const &element) {
+        auto type = Class(element);
+        if (type != L"ControlCenter.PaginatedToggleButton" &&
+            type != L"QuickActions.AccessibleToggleButton" &&
+            element.Name() != L"ToggleButton" && element.Name() != L"SplitL2Button")
+          return false;
+        auto control = element.template try_as<C::Control>();
+        if (!control || control.ActualHeight() < 16 || control.ActualWidth() < 16)
+          return false;
+        auto bounds = control.TransformToVisual(tile).TransformBounds(
+            {0, 0, float(control.ActualWidth()), float(control.ActualHeight())});
+        if (std::isfinite(bounds.X) && std::isfinite(bounds.Y) &&
+            std::isfinite(bounds.Width) && std::isfinite(bounds.Height))
+          plates.push_back({control, bounds});
+        return false;
+      });
+      if (plates.empty())
+        continue;
+      float left = INFINITY, right = -INFINITY;
+      for (auto const &plate : plates) {
+        left = std::min(left, plate.bounds.X);
+        right = std::max(right, plate.bounds.X + plate.bounds.Width);
+      }
+      for (auto const &plate : plates) {
+        auto const &bounds = plate.bounds;
+        double half = bounds.Height / 2.;
+        bool outerLeft = std::abs(bounds.X - left) <= 1.,
+             outerRight = std::abs(bounds.X + bounds.Width - right) <= 1.;
+        X::CornerRadius radius{outerLeft ? half : 0., outerRight ? half : 0.,
+                               outerRight ? half : 0., outerLeft ? half : 0.};
+        set(plate.control, C::Control::CornerRadiusProperty(), radius);
+        // The shell paints state backgrounds on ContentPresenter, including
+        // templates which do not bind its radius to Control.CornerRadius.
+        Find(plate.control, [&](auto const &element) {
+          if (element == plate.control || element.ActualHeight() < bounds.Height - 2 ||
+              element.ActualWidth() < bounds.Width - 2)
+            return false;
+          if (auto presenter = element.template try_as<C::ContentPresenter>())
+            set(presenter, C::ContentPresenter::CornerRadiusProperty(), radius);
+          else if (auto border = element.template try_as<C::Border>())
+            set(border, C::Border::CornerRadiusProperty(), radius);
+          else if (auto grid = element.template try_as<C::Grid>())
+            set(grid, C::Grid::CornerRadiusProperty(), radius);
+          return false;
+        });
+      }
+    }
+  }
   void TileRows(C::Grid const &l1) {
     if (!originalSetQuickRows)
       return;
@@ -1186,13 +1431,13 @@ class QuickPage {
     });
     if (!paginated || paginated == tiledView_.get())
       return;
-    // The IPaginatedGridView subobject at +0x10 is returned by this image's
+    // The IPaginatedGridView subobject at +0x18 is returned by this image's
     // QueryInterface. Verify the complete object's vtable before calling it.
-    constexpr GUID iid{0xab1ce38d, 0x0d8e, 0x55a0, {0x87, 0xb5, 0x89, 0x0c, 0xd5, 0x4f, 0x67, 0x22}};
+    constexpr GUID iid{0xad3ad37e, 0x5360, 0x5f2c, {0x86, 0x50, 0x6d, 0xd9, 0x61, 0x6e, 0x1d, 0x71}};
     winrt::com_ptr<::IUnknown> iface;
     if (FAILED(winrt::get_unknown(paginated)->QueryInterface(iid, iface.put_void())))
       return;
-    auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x10;
+    auto self = reinterpret_cast<BYTE *>(iface.get()) - 0x18;
     if (*reinterpret_cast<void **>(self) != quickGridVtable)
       return;
     int rows = *reinterpret_cast<int const *>(self + 0xa8);
@@ -1204,7 +1449,7 @@ class QuickPage {
       return;
     try {
       journal_.undo.push_back([iface] {
-        RestoreQuickRows(reinterpret_cast<BYTE *>(iface.get()) - 0x10);
+        RestoreQuickRows(reinterpret_cast<BYTE *>(iface.get()) - 0x18);
       });
     } catch (...) {
       RestoreQuickRows(self);
@@ -1382,7 +1627,7 @@ class QuickPage {
       header_ = C::StackPanel();
       header_.Margin({4, 0, 0, 0});
       header_.Children().Append(SettingsRow());
-      if (ddc_)
+      if (settings_.brightnessEnabled)
         header_.Children().Append(BrightnessRow());
       Set(grid, C::ListViewBase::HeaderProperty(), header_);
     }
@@ -1640,15 +1885,20 @@ class QuickPage {
       }
       DarkBlock(l1);
       TileRows(l1);
+      TileShape(l1);
       Pager();
       Sliders(l1);
       PlaceDisplayActions();
       Footer();
       FrameReveal();
-      if (bright_ && bright_.IsLoaded() && !thinSliders_.count(winrt::get_abi(bright_))) {
-        auto look = Look();
-        look.Geometry(bright_);
-        look.Thin(bright_, [](double half) { return X::Thickness{8 - half, 0, 8 - half, 0}; });
+      auto brightness = nativeBright_ ? nativeBright_ : bright_;
+      auto &seen = nativeBright_ ? nativeBrightnessSeen_ : thinSliders_;
+      if (brightness && brightness.IsLoaded() && !seen.count(winrt::get_abi(brightness))) {
+        auto look = nativeBright_
+                        ? SliderLook{nativeBrightnessJournal_, nativeBrightnessRevoke_, seen}
+                        : Look();
+        look.Geometry(brightness);
+        look.Thin(brightness, [](double half) { return X::Thickness{8 - half, 0, 8 - half, 0}; });
       }
     } catch (...) {
       Wh_Log(L"Quick Settings layout: %08X", winrt::to_hresult());
@@ -1698,6 +1948,13 @@ public:
         settings_.quickShortcuts != next.quickShortcuts)
       return false;
     auto previous = std::exchange(settings_, next);
+    if (previous.pillQuickTiles != next.pillQuickTiles) {
+      if (!next.pillQuickTiles)
+        tileShapeJournal_.Restore();
+      dirty_ = true;
+      if (auto l1 = Named(view_, L"L1Grid").try_as<C::Grid>())
+        TileShape(l1);
+    }
     if (quickMixerButton_ && previous.altQuickMixer != next.altQuickMixer)
       quickMixerButton_.Content(next.altQuickMixer ? IInspectable(Icon(L"sliders-horizontal"))
                                                  : originalMixerIcon_);
@@ -1751,6 +2008,8 @@ public:
       } catch (...) {
       }
     revoke_.clear();
+    RestoreNativeBrightness();
+    tileShapeJournal_.Restore();
     unavailableBrightness_.Restore();
     journal_.Restore();
     view_ = nullptr;
