@@ -22,7 +22,7 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - The brightness row places the native Windows slider or the DDC/CI slider between Night light and Display settings. Night light uses the native quick action when available and opens Night light settings otherwise.
 - **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
 - Choose the default or pill shape independently for Quick Settings tiles and closed Sound selection fields under **Appearance**.
-- Set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
+- In **Appearance**, set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
 
 **Sound**
 

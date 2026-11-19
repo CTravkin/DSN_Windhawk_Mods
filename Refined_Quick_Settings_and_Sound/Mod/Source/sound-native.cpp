@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.7.1
+// @version 0.7.2
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 173
+// Build: 174
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -42,7 +42,7 @@ is restored when the mod is unloaded.
 - The brightness row places the native Windows slider, or the DDC/CI slider, between Night light and Display settings. Night light uses the native quick action when available and opens its settings otherwise.
 - Choose up to five **Additional shortcuts** to the right of **Settings**, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots and duplicate shortcuts are skipped. The Display shortcut is also skipped when the brightness row already has a Display button.
 - Choose the default or pill shape independently for Quick Settings tiles and closed Sound selection fields under **Appearance**.
-- Set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
+- In **Appearance**, set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
 
 **Sound**
 
@@ -144,24 +144,6 @@ in this source file.
   $description:de-DE: Prozentpunkte pro Mausradschritt über einem Lautstärkeregler, von 1 bis 100
   $description:pt-BR: Pontos percentuais por passo da roda sobre um controle de volume, de 1 a 100
   $description:zh-CN: 在音量滑块上滚动一格改变的百分点，范围为 1 到 100
-- quickActionRows: "2"
-  $name: Rows of tiles
-  $name:ru-RU: Строки плиток
-  $name:es-ES: Filas de mosaicos
-  $name:de-DE: Kachelzeilen in den Schnelleinstellungen
-  $name:pt-BR: Linhas de blocos nas configurações rápidas
-  $name:zh-CN: 快速设置磁贴行数
-  $description: How many rows fit on each Quick Settings page
-  $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
-  $description:es-ES: Número de filas de mosaicos por página de Configuración rápida
-  $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
-  $description:pt-BR: Número de linhas por página das Configurações rápidas
-  $description:zh-CN: 每页快速设置显示的磁贴行数
-  $options:
-  - "1": "1"
-  - "2": "2"
-  - "3": "3"
-  - "4": "4"
 - brightnessMode: auto
   $name: Display brightness
   $name:ru-RU: Яркость дисплея
@@ -194,13 +176,37 @@ in this source file.
   - auto: 自动
   - disabled: 禁用
 - appearance:
+  - quickActionRows: "2"
+    $name: Rows of tiles
+    $name:ru-RU: Строки плиток
+    $name:es-ES: Filas de mosaicos
+    $name:de-DE: Kachelzeilen in den Schnelleinstellungen
+    $name:pt-BR: Linhas de blocos nas configurações rápidas
+    $name:zh-CN: 快速设置磁贴行数
+    $description: How many rows fit on each Quick Settings page
+    $description:ru-RU: Сколько строк помещается на одной странице быстрых настроек
+    $description:es-ES: Número de filas de mosaicos por página de Configuración rápida
+    $description:de-DE: Anzahl der Kachelzeilen pro Seite der Schnelleinstellungen
+    $description:pt-BR: Número de linhas por página das Configurações rápidas
+    $description:zh-CN: 每页快速设置显示的磁贴行数
+    $options:
+    - "1": "1"
+    - "2": "2"
+    - "3": "3"
+    - "4": "4"
   - quickTiles: default
-    $name: Quick Settings tile shape
-    $name:ru-RU: Форма плиток быстрых настроек
-    $name:es-ES: Forma de los mosaicos rápidos
-    $name:de-DE: Form der Schnelleinstellungskacheln
-    $name:pt-BR: Formato dos blocos rápidos
-    $name:zh-CN: 快速设置磁贴形状
+    $name: Tile shape
+    $name:ru-RU: Форма плиток
+    $name:es-ES: Forma de los mosaicos
+    $name:de-DE: Kachelform
+    $name:pt-BR: Forma dos blocos
+    $name:zh-CN: 磁贴形状
+    $description: In Pills mode, Quick Settings tiles have rounded outer edges
+    $description:ru-RU: В режиме «Капсулы» скругляются внешние края плиток быстрых настроек
+    $description:es-ES: En el modo Cápsulas se redondean los bordes exteriores de los mosaicos de Configuración rápida
+    $description:de-DE: Die Kapselform rundet die Außenkanten der Schnelleinstellungskacheln ab
+    $description:pt-BR: No modo Cápsulas, as bordas externas dos blocos das Configurações rápidas ficam arredondadas
+    $description:zh-CN: 选择胶囊形后，快速设置磁贴的外侧边缘会变圆
     $options:
     - default: Default
     - pills: Pills
@@ -220,18 +226,18 @@ in this source file.
     - default: 默认
     - pills: 胶囊形
   - soundPickers: default
-    $name: Sound selection field shape
-    $name:ru-RU: Форма полей выбора в Sound
-    $name:es-ES: Forma de los campos de sonido
-    $name:de-DE: Form der Sound-Auswahlfelder
-    $name:pt-BR: Formato dos campos de som
-    $name:zh-CN: 声音选择框形状
-    $description: Applies only to the closed output, input and spatial sound fields
-    $description:ru-RU: Только закрытые поля устройства вывода, ввода и пространственного звука
-    $description:es-ES: Solo los campos cerrados de salida, entrada y sonido espacial
-    $description:de-DE: Nur die geschlossenen Auswahlfelder für Ausgabe, Eingabe und Raumklang
-    $description:pt-BR: Somente os campos fechados de saída, entrada e som espacial
-    $description:zh-CN: 仅用于关闭状态下的输出、输入和空间音效选择框
+    $name: Sound field shape
+    $name:ru-RU: Форма полей в «Звуке»
+    $name:es-ES: Forma de los selectores
+    $name:de-DE: Form der Soundfelder
+    $name:pt-BR: Forma dos seletores
+    $name:zh-CN: 声音选框形状
+    $description: Pills mode rounds the closed selectors for output, input and spatial sound on the Sound page
+    $description:ru-RU: В режиме «Капсулы» скругляются закрытые поля выбора вывода, ввода и пространственного звука
+    $description:es-ES: En el modo Cápsulas se redondean los selectores cerrados de salida, entrada y sonido espacial en el panel Sonido
+    $description:de-DE: Die Kapselform rundet die geschlossenen Auswahlfelder für Ausgabe, Eingabe und Raumklang auf der Soundseite ab
+    $description:pt-BR: No modo Cápsulas, os seletores fechados de saída, entrada e som espacial ficam arredondados no painel Som
+    $description:zh-CN: 选择胶囊形后，声音面板中的输出、输入和空间音效选择框在关闭时呈胶囊形
     $options:
     - default: Default
     - pills: Pills
@@ -782,7 +788,9 @@ inline ModSettings ReadSettings() {
   settings.trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   settings.brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
-  auto rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
+  auto rows = WindhawkUtils::StringSetting::make(L"appearance.quickActionRows");
+  if (!*rows.get())
+    rows = WindhawkUtils::StringSetting::make(L"quickActionRows");
   std::wstring_view rowCount(rows.get());
   if (rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4')
     settings.quickActionRows = rowCount.front() - L'0';
