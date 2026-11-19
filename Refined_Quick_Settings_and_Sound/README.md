@@ -19,10 +19,15 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 **Quick Settings**
 
 - Choose up to five **Additional shortcuts** to the right of **Settings**, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots and duplicate shortcuts are skipped. The Display shortcut is also skipped when the brightness row already has a Display button.
-- The brightness row places the native Windows slider or the DDC/CI slider between Night light and Display settings. Night light uses the native quick action when available and opens Night light settings otherwise.
-- **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
-- Choose the default or pill shape independently for Quick Settings tiles and closed Sound selection fields under **Appearance**.
-- In **Appearance**, set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
+- **Display brightness** uses the Windows slider in the default **Auto** mode and falls back to DDC/CI on compatible monitors with DDC/CI enabled. **Disable** hides the brightness row.
+- The mod places Night light and Display settings beside the brightness slider. If the native slider cannot be moved, Windows keeps its original row. Night light uses the native quick action when available and opens Night light settings otherwise.
+- On devices with a battery, the battery button moves into the **Settings** row.
+
+**Appearance**
+
+- **Rows of tiles** sets 1–4 rows per page with Windows pagination. If the mod cannot recognize the tile grid layout, Windows uses its default row count.
+- **Tile shape** rounds the outer edges of Quick Settings tiles in **Pills** mode.
+- **Sound field shape** rounds the closed output, input and spatial sound selectors in **Pills** mode.
 
 **Sound**
 
@@ -41,11 +46,11 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - **Device Manager** is available in the network and battery icon menus.
 - **Alternative icons** includes the animated volume and wired network icons from the original mod. Each location has its own switch. Switching one off uses the Windows icon there.
 
+The interface is available in English, Russian, Spanish, German, Brazilian Portuguese and Simplified Chinese.
+
 ## Platforms
 
-Windows 11 24H2 or later with ShellHost Quick Settings, x86-64. The original mod was developed on build **26300**, primarily at **125%** display scale. Shell updates can change the XAML elements and symbols the mod uses. DDC/CI brightness requires a compatible monitor with DDC/CI enabled.
-
-Added labels are available in English, Russian, Spanish, German, Brazilian Portuguese and Simplified Chinese.
+Requires Windows 11 24H2 or later (x64) and [Windhawk](https://windhawk.net/).
 
 ## Operations
 
@@ -59,6 +64,8 @@ Added labels are available in English, Russian, Spanish, German, Brazilian Portu
 ### Usage
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
+
+After updating from DSN version 0.7.1 or earlier, check **Rows of tiles** under **Appearance**.
 
 ### Build and verification
 

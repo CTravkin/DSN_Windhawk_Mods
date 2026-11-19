@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.7.2
+// @version 0.7.3
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 174
+// Build: 175
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -38,11 +38,16 @@ is restored when the mod is unloaded.
 
 **Quick Settings**
 
-- **Display brightness** defaults to **Auto**. It keeps the Windows slider when available or adds one for a monitor with a usable DDC/CI range. **Disable** hides the brightness row.
-- The brightness row places the native Windows slider, or the DDC/CI slider, between Night light and Display settings. Night light uses the native quick action when available and opens its settings otherwise.
 - Choose up to five **Additional shortcuts** to the right of **Settings**, including Notifications, Graphics, Advanced network settings, Power and Windows Update. Empty slots and duplicate shortcuts are skipped. The Display shortcut is also skipped when the brightness row already has a Display button.
-- Choose the default or pill shape independently for Quick Settings tiles and closed Sound selection fields under **Appearance**.
-- In **Appearance**, set **Rows of tiles** to 1–4. Windows paginates the available tiles. If the mod cannot recognize the installed ControlCenter layout, Windows uses its default row count.
+- **Display brightness** uses the Windows slider in the default **Auto** mode and falls back to DDC/CI on compatible monitors with DDC/CI enabled. **Disable** hides the brightness row.
+- The mod places Night light and Display settings beside the brightness slider. If the native slider cannot be moved, Windows keeps its original row. Night light uses the native quick action when available and opens Night light settings otherwise.
+- On devices with a battery, the battery button moves into the **Settings** row.
+
+**Appearance**
+
+- **Rows of tiles** sets 1–4 rows per page with Windows pagination. If the mod cannot recognize the tile grid layout, Windows uses its default row count.
+- **Tile shape** rounds the outer edges of Quick Settings tiles in **Pills** mode.
+- **Sound field shape** rounds the closed output, input and spatial sound selectors in **Pills** mode.
 
 **Sound**
 
@@ -62,18 +67,17 @@ is restored when the mod is unloaded.
 - Device Manager is available in the network and battery icon menus.
 - **Alternative icons** includes the animated volume and wired network icons from the original mod. Each location has its own switch. Switching one off uses the Windows icon there.
 
+The interface is available in English, Russian, Spanish, German, Brazilian Portuguese and Simplified Chinese.
+
 ## Platforms
 
-- Windows 11 24H2 or later (Quick Settings hosted by ShellHost), x86-64.
-  The original mod was developed on build 26300, primarily at 125% scale.
-- Other Windows builds and display scales need validation. The mod depends on
-  internal shell XAML elements and symbols which can change with Windows updates.
-- DDC/CI brightness requires a compatible monitor with DDC/CI enabled.
-- Added labels are available in English, Russian, Spanish, German, Brazilian Portuguese and Simplified Chinese.
+Requires Windows 11 24H2 or later (x64).
 
 ## Usage
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
+
+After updating from DSN version 0.7.1 or earlier, check **Rows of tiles** under **Appearance**.
 
 Disable other mods or styles that change the same controls. If the panels do not update after enabling the mod, close and reopen them. If needed, restart ShellHost and check the Windhawk log.
 
@@ -212,7 +216,7 @@ in this source file.
     - pills: Pills
     $options:ru-RU:
     - default: По умолчанию
-    - pills: Капсулы (pills)
+    - pills: Капсулы
     $options:es-ES:
     - default: Predeterminada
     - pills: Cápsulas
@@ -227,7 +231,7 @@ in this source file.
     - pills: 胶囊形
   - soundPickers: default
     $name: Sound field shape
-    $name:ru-RU: Форма полей в «Звуке»
+    $name:ru-RU: Форма полей устройств
     $name:es-ES: Forma de los selectores
     $name:de-DE: Form der Soundfelder
     $name:pt-BR: Forma dos seletores
@@ -243,7 +247,7 @@ in this source file.
     - pills: Pills
     $options:ru-RU:
     - default: По умолчанию
-    - pills: Капсулы (pills)
+    - pills: Капсулы
     $options:es-ES:
     - default: Predeterminada
     - pills: Cápsulas
