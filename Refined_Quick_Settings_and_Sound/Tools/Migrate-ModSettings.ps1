@@ -50,14 +50,29 @@ for ($index = 1; $index -le 5; ++$index) {
     Move-Setting "quickSettings.shortcut$index" "quickSettings.additionalShortcuts.shortcut$index" $initial
 }
 
-$hasGroupedApps = @($settings.Keys | Where-Object {
-    $_ -cmatch '^sound\.hiddenApplications\[\d+\]$' -and
-        ![string]::IsNullOrWhiteSpace([string] $settings[$_])
-}).Count -gt 0
-$oldApps = @($settings.Keys | Where-Object { $_ -cmatch '^hiddenApplications\[\d+\]$' })
-foreach ($key in $oldApps) {
-    if (!$hasGroupedApps) { $settings["sound.$key"] = $settings[$key] }
-    $settings.Remove($key)
+function Test-ReadableHiddenApps([string] $prefix) {
+    $blanks = 0
+    for ($index = 0; $blanks -lt 32; ++$index) {
+        $value = [string] $settings["$prefix[$index]"]
+        if ([string]::IsNullOrEmpty($value)) {
+            ++$blanks
+        } elseif ($value -match '[^ \t\r\n]') {
+            return $true
+        } else {
+            $blanks = 0
+        }
+    }
+    return $false
 }
+
+$oldApps = @($settings.Keys | Where-Object { $_ -cmatch '^hiddenApplications\[\d+\]$' })
+$groupedApps = @($settings.Keys | Where-Object { $_ -cmatch '^sound\.hiddenApplications\[\d+\]$' })
+if ($oldApps.Count -and !(Test-ReadableHiddenApps 'sound.hiddenApplications') -and
+    (!$groupedApps.Count -or (Test-ReadableHiddenApps 'hiddenApplications'))) {
+    # Treat the list as a unit so previously ignored rows cannot become active.
+    foreach ($key in $groupedApps) { $settings.Remove($key) }
+    foreach ($key in $oldApps) { $settings["sound.$key"] = $settings[$key] }
+}
+foreach ($key in $oldApps) { $settings.Remove($key) }
 
 ConvertTo-Json -InputObject $settings -Depth 32

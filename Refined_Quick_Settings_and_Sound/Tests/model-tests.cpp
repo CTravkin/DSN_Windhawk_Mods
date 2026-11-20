@@ -129,7 +129,8 @@ int main() {
           {L"quickSettings.additionalShortcuts.shortcut1", L"display"},
           {L"quickSettings.additionalShortcuts.shortcut4", L"none"},
           {L"quickSettings.shortcut1", L"none"}, {L"quickSettings.shortcut4", L"graphics"},
-          {L"sound.hiddenApplications[0]", L""}, {L"hiddenApplications[3]", L"Example.exe"}};
+          {L"sound.hiddenApplications[0]", L""}, {L"hiddenApplications[0]", L"First.exe"},
+          {L"hiddenApplications[32]", L"Example.exe"}, {L"hiddenApplications[65]", L"BeyondGap.exe"}};
       auto readInt = [&](PCWSTR key) { return numbers[key]; };
       auto readString = [&](PCWSTR key) { return strings[key]; };
       auto settings = native::ReadPanelSettings(readInt, readString);
@@ -139,24 +140,36 @@ int main() {
           !settings.pillSoundPickers || !settings.sound.microphoneAuto || settings.sound.spatialSound ||
           settings.sound.systemVolumeRight != Right::DeviceSettings ||
           settings.quickShortcuts[0] != Shortcut::None || settings.quickShortcuts[3] != Shortcut::Graphics ||
-          settings.hidden != std::vector<std::wstring>{L"example.exe"}) {
+          settings.hidden != std::vector<std::wstring>{L"first.exe", L"example.exe"}) {
         std::puts("FAIL: Windhawk's grouped defaults masked saved values during an upgrade");
         return 16;
       }
       numbers[L"sound.volumeWheelStep"] = 11;
       strings[L"sound.systemVolumeRight"] = L"percentage";
       strings[L"sound.hiddenApplications[0]"] = L"New.exe";
+      strings[L"sound.hiddenApplications[32]"] = L"Final.exe";
       settings = native::ReadPanelSettings(readInt, readString);
       if (settings.volumeWheelStep != 11 || settings.sound.systemVolumeRight != Right::Percentage ||
-          settings.hidden != std::vector<std::wstring>{L"new.exe"}) {
+          settings.hidden != std::vector<std::wstring>{L"new.exe", L"final.exe"}) {
         std::puts("FAIL: migrated settings overrode explicit grouped changes");
         return 16;
       }
+      for (int i = 0; i < 33; ++i) {
+        auto index = std::to_wstring(i);
+        strings[L"sound.hiddenApplications[" + index + L"]"] = L"App" + index + L".exe";
+      }
+      settings = native::ReadPanelSettings(readInt, readString);
+      if (settings.hidden.size() != 33 || settings.hidden.back() != L"app32.exe") {
+        std::puts("FAIL: a full hidden-app list was truncated at 32 entries");
+        return 16;
+      }
       numbers[L"sound.volumeWheelStep"] = 2;
-      strings[L"sound.hiddenApplications[0]"] = L"";
+      std::erase_if(strings, [](auto const &entry) {
+        return entry.first.starts_with(L"hiddenApplications[") ||
+               entry.first.starts_with(L"sound.hiddenApplications[");
+      });
       strings.erase(L"brightnessMode");
       strings.erase(L"quickSettings.shortcut1");
-      strings.erase(L"hiddenApplications[3]");
       settings = native::ReadPanelSettings(readInt, readString);
       if (settings.volumeWheelStep != 2 || !settings.quickSoundAccess || !settings.hidden.empty()) {
         std::puts("FAIL: grouped defaults could not be selected again after migration");

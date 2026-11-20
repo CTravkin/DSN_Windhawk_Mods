@@ -62,9 +62,16 @@ inline ModSettings ReadPanelSettings(auto readInt, auto readString) {
                                                             : sound::QuickShortcut::None};
 
   auto readHidden = [&](PCWSTR path) {
-    for (int i = 0; i < 32; ++i) {
+    // Windhawk exposes individual slots without reporting the array length.
+    for (int i = 0, blanks = 0; blanks < 32; ++i) {
       auto key = path + (L"[" + std::to_wstring(i) + L"]");
-      sound::AddHiddenApp(settings.hidden, readString(key.c_str()));
+      auto value = readString(key.c_str());
+      if (value.empty()) {
+        ++blanks;
+        continue;
+      }
+      blanks = 0;
+      sound::AddHiddenApp(settings.hidden, value);
     }
   };
   readHidden(L"sound.hiddenApplications");
