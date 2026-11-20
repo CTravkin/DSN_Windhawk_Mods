@@ -372,11 +372,7 @@ void VerifyFolderSnapshots(const fs::path& root) {
     fs::rename(renamed, renamedAgain);
     fs::last_write_time(folder, sameTime);
     Require(fs::last_write_time(folder) == sameTime, "preserve the directory timestamp after renaming an alias");
-    WaitForFolderPins(folder, {});
-    WaitUntil([&] {
-        const auto names = TestFolderPins(folder);
-        return names && *names == explorer_item_pins::PinNames{renamedAgain.filename().native()};
-    }, "retry the identity lookup even when the directory timestamp stays the same", 8000);
+    WaitForFolderPins(folder, {renamedAgain.filename().native()});
     fs::rename(renamedAgain, renamed);
     fs::last_write_time(folder, sameTime + std::chrono::seconds(2));
     orderingPins.Invalidate(folder);
@@ -396,9 +392,13 @@ void VerifyFolderSnapshots(const fs::path& root) {
     const auto originalPin = busyFolder / L"Pinned.txt";
     const auto heldPin = heldFolder / originalPin.filename();
     const auto returnedPin = busyFolder / L"Returned under a new name.txt";
+    const auto deletedPin = busyFolder / L"Deleted.txt";
     std::ofstream(originalPin) << "pin that may return";
+    std::ofstream(deletedPin) << "pin that stays missing";
     Require(store.SetPinned(busyFolder, ReadItem(originalPin), true), "persist a pin for the busy folder");
+    Require(store.SetPinned(busyFolder, ReadItem(deletedPin), true), "persist a second pin for the busy folder");
     fs::rename(originalPin, heldPin);
+    fs::remove(deletedPin);
     WaitForFolderPins(busyFolder, {});
     const auto busyTime = fs::last_write_time(busyFolder) + std::chrono::seconds(2);
     fs::last_write_time(busyFolder, busyTime);
@@ -413,8 +413,26 @@ void VerifyFolderSnapshots(const fs::path& root) {
             "avoid an immediate third full scan after repeated misses even if the folder timestamp changes");
     WaitUntil([&] { TestFolderPins(busyFolder); return orderingPins.Cached(returnedPin) == true; },
               "retry the deferred scan and restore the pin by ID", 15000);
-    fs::rename(returnedPin, originalPin);
-    fs::last_write_time(busyFolder, busyTime + std::chrono::seconds(2));
+
+    auto aliasTime = fs::last_write_time(busyFolder);
+    for (int scan = 0; scan < 2; ++scan) {
+        aliasTime += std::chrono::seconds(2);
+        fs::last_write_time(busyFolder, aliasTime);
+        WaitForFolderPins(busyFolder, {returnedPin.filename().native()});
+    }
+    const auto movedAgain = busyFolder / L"Renamed again.txt";
+    fs::rename(returnedPin, movedAgain);
+    fs::last_write_time(busyFolder, aliasTime + std::chrono::seconds(2));
+    orderingPins.Invalidate(busyFolder);
+    TestFolderPins(busyFolder);
+    std::optional<bool> pinnedAfterSecondRename;
+    WaitUntil([&] {
+        pinnedAfterSecondRename = orderingPins.Cached(movedAgain);
+        return pinnedAfterSecondRename.has_value();
+    }, "complete the first background refresh after renaming an alias during backoff");
+    Require(*pinnedAfterSecondRename, "find a twice-renamed pin on the first refresh during backoff");
+
+    fs::rename(movedAgain, originalPin);
     WaitForFolderPins(busyFolder, {originalPin.filename().native()});
     std::cout << "PASS repeated misses defer full scans and preserve pin restoration\n";
 
