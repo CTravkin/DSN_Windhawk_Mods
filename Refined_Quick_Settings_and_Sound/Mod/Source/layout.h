@@ -1357,8 +1357,8 @@ class SoundPage {
         L"Mikrofonlautstärke", L"Volume do microfone", L"麦克风音量"));
     X::Automation::AutomationProperties::SetAutomationId(microphone_, L"NativeSoundInputVolume");
     microphoneSettings_ = Button(page_, sound::Text(
-        L"Microphone settings", L"Параметры микрофона", L"Configuración del micrófono",
-        L"Mikrofoneinstellungen", L"Configurações do microfone", L"麦克风设置"));
+        L"Input device settings", L"Параметры устройства ввода", L"Configuración del dispositivo de entrada",
+        L"Einstellungen des Eingabegeräts", L"Configurações do dispositivo de entrada", L"输入设备设置"));
     X::Automation::AutomationProperties::SetAutomationId(microphoneSettings_, L"NativeSoundInputProperties");
     microphoneSettings_.Content(DeviceSettingsIcon());
     C::Grid::SetColumn(microphoneSettings_, 2);

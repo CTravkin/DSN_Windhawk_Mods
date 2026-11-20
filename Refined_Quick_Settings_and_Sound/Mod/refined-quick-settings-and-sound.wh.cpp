@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.10
+// @version 0.9.11
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 193
+// Build: 194
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -123,7 +123,7 @@ in this source file.
     $name:pt-BR: "Silenciar com o botão do meio"
     $name:zh-CN: "单击鼠标中键静音"
     $description: "Middle-click the taskbar volume icon to mute or unmute"
-    $description:ru-RU: "Средний клик по значку громкости на панели задач выключает или включает звук"
+    $description:ru-RU: "Клик средней кнопкой мыши по значку громкости на панели задач выключает или включает звук"
     $description:es-ES: "El botón central sobre el icono de volumen de la barra de tareas silencia o reactiva el sonido"
     $description:de-DE: "Ein Mittelklick auf das Lautstärkesymbol in der Taskleiste schaltet den Ton aus oder wieder ein"
     $description:pt-BR: "O botão do meio no ícone de volume da barra de tarefas ativa ou desativa o som"
@@ -186,12 +186,12 @@ in this source file.
     $name:de-DE: Verknüpfung zu den Mikrofoneinstellungen
     $name:pt-BR: Atalho para as configurações do microfone
     $name:zh-CN: 麦克风设置快捷方式
-    $description: Shows the volume percentage or a button for the selected microphone’s settings to the right of the slider. Select the number to set the volume to 100%
-    $description:ru-RU: Справа от ползунка отображается громкость в процентах или кнопка параметров выбранного микрофона. Нажатие на число устанавливает громкость на 100 %
-    $description:es-ES: A la derecha del control se muestra el volumen en porcentaje o un botón para configurar el micrófono seleccionado. Pulsa el número para ajustar el volumen al 100 %
-    $description:de-DE: Rechts vom Regler steht die Lautstärke in Prozent oder eine Schaltfläche für die Einstellungen des ausgewählten Mikrofons. Ein Klick auf die Zahl setzt die Lautstärke auf 100 %
-    $description:pt-BR: À direita do controle aparece o volume em porcentagem ou um botão para as configurações do microfone selecionado. Clique no número para definir o volume como 100%
-    $description:zh-CN: 在滑块右侧显示音量百分比或所选麦克风的设置按钮。点击数字可将音量设为 100%
+    $description: Shows a button for the selected input device’s settings in place of the volume percentage
+    $description:ru-RU: Отображение кнопки для перехода к настройкам выбранного устройства ввода вместо процента громкости
+    $description:es-ES: Muestra un botón para abrir la configuración del dispositivo de entrada seleccionado en lugar del porcentaje de volumen
+    $description:de-DE: Zeigt statt der Lautstärke in Prozent eine Schaltfläche für die Einstellungen des ausgewählten Eingabegeräts an
+    $description:pt-BR: Exibe um botão para abrir as configurações do dispositivo de entrada selecionado no lugar da porcentagem do volume
+    $description:zh-CN: 显示所选输入设备的设置快捷按钮，替代音量百分比
     $options:
     - percentage: None (Percentage)
     - deviceSettings: Device settings
@@ -217,12 +217,12 @@ in this source file.
     $name:de-DE: Verknüpfung zu den Soundeinstellungen
     $name:pt-BR: Atalho para as configurações de som
     $name:zh-CN: 声音设置快捷方式
-    $description: Choosing the percentage or device settings moves the Sound settings button to the header. Select the number to set the volume to 100%
-    $description:ru-RU: При выборе процентов или параметров устройства кнопка параметров звука переносится в заголовок. Нажатие на число устанавливает громкость на 100 %
-    $description:es-ES: Si se elige el porcentaje o la configuración del dispositivo, el botón de sonido pasa al encabezado. Pulsa el número para ajustar el volumen al 100 %
-    $description:de-DE: Bei Prozent oder Geräteeinstellungen wandert die Schaltfläche für die Soundeinstellungen in die Kopfzeile. Ein Klick auf die Zahl setzt die Lautstärke auf 100 %
-    $description:pt-BR: Ao escolher a porcentagem ou as configurações do dispositivo, o botão de configurações de som passa para o cabeçalho. Clique no número para definir o volume como 100%
-    $description:zh-CN: 选择百分比或设备设置时，声音设置按钮移至标题栏。点击数字可将音量设为 100%
+    $description: Shows a shortcut to Sound settings, a shortcut to the selected output device’s settings, or the system volume percentage
+    $description:ru-RU: Отображение перехода к настройкам звука, параметрам выбранного устройства вывода или процента общей громкости
+    $description:es-ES: Muestra un acceso a la configuración de sonido, un acceso a la configuración del dispositivo de salida seleccionado o el porcentaje del volumen del sistema
+    $description:de-DE: Zeigt eine Schaltfläche für die Soundeinstellungen, eine für die Einstellungen des ausgewählten Ausgabegeräts oder die Systemlautstärke in Prozent an
+    $description:pt-BR: Exibe um atalho para as configurações de som, um atalho para as configurações do dispositivo de saída selecionado ou a porcentagem do volume do sistema
+    $description:zh-CN: 显示声音设置快捷按钮、所选输出设备的设置快捷按钮或系统音量百分比
     $options:
     - soundSettings: Sound settings
     - percentage: None (Percentage)
@@ -4522,8 +4522,8 @@ class SoundPage {
         L"Mikrofonlautstärke", L"Volume do microfone", L"麦克风音量"));
     X::Automation::AutomationProperties::SetAutomationId(microphone_, L"NativeSoundInputVolume");
     microphoneSettings_ = Button(page_, sound::Text(
-        L"Microphone settings", L"Параметры микрофона", L"Configuración del micrófono",
-        L"Mikrofoneinstellungen", L"Configurações do microfone", L"麦克风设置"));
+        L"Input device settings", L"Параметры устройства ввода", L"Configuración del dispositivo de entrada",
+        L"Einstellungen des Eingabegeräts", L"Configurações do dispositivo de entrada", L"输入设备设置"));
     X::Automation::AutomationProperties::SetAutomationId(microphoneSettings_, L"NativeSoundInputProperties");
     microphoneSettings_.Content(DeviceSettingsIcon());
     C::Grid::SetColumn(microphoneSettings_, 2);
