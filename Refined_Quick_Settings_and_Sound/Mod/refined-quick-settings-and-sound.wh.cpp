@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.5
+// @version 0.9.6
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 188
+// Build: 189
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -4493,20 +4493,22 @@ class SoundPage {
     icon.Width(16);
     icon.Height(16);
     icon.IsHitTestVisible(false);
-    // Keep the two rails of the system MixVolumes glyph and replace its
-    // lower-right speaker with the system microphone at the same scale.
-    for (auto rect : {winrt::Windows::Foundation::Rect{0, 0, 16, 7.5f},
-                      winrt::Windows::Foundation::Rect{0, 7.5f, 6.1f, 8.5f}}) {
+    // Keep the MixVolumes rails and lift the upper one to leave room for
+    // a readable microphone below its knob.
+    auto addRail = [&](winrt::Windows::Foundation::Rect rect, double lift) {
       auto rails = SymbolGlyph(page_, 0xf4c3);
       M::RectangleGeometry clip;
       clip.Rect(rect);
       rails.Clip(clip);
+      rails.Margin({0, -lift, 0, lift});
       icon.Children().Append(rails);
-    }
-    auto mic = SymbolGlyph(page_, 0xe720, 7.5);
+    };
+    addRail({0, 0, 16, 7}, 1);
+    addRail({0, 8, 6, 8}, 0);
+    auto mic = SymbolGlyph(page_, 0xe720, 10);
     mic.HorizontalAlignment(X::HorizontalAlignment::Right);
     mic.VerticalAlignment(X::VerticalAlignment::Bottom);
-    mic.Margin({0, 0, .7, 1});
+    mic.Margin({0, 0, .5, 0});
     icon.Children().Append(mic);
     return icon;
   }
