@@ -61,6 +61,7 @@ class SoundPage {
   C::StackPanel inputBlock_{nullptr};
   C::Button mixerSettings_{nullptr}, soundSettings_{nullptr};
   C::Button outputSettings_{nullptr}, microphoneMute_{nullptr};
+  C::Canvas headerSettingsOverlay_{nullptr};
   C::Grid headerSettingsSlot_{nullptr}, microphoneRow_{nullptr};
   X::FrameworkElement spatialSection_{nullptr}, spatialHeading_{nullptr};
   C::Button spatialPicker_{nullptr};
@@ -1439,29 +1440,56 @@ class SoundPage {
       pending_ = audio_.Send({sound::Action::MasterMute});
     }));
   }
+  void AlignSettingsHeader() {
+    if (!settings_.sound.settingsInHeader || !headerSettingsOverlay_.IsLoaded() ||
+        pageTitle_.ActualHeight() <= 0 || outputSettings_.ActualWidth() <= 0)
+      return;
+    auto output = outputSettings_.TransformToVisual(headerSettingsOverlay_).TransformPoint(
+        {float(outputSettings_.ActualWidth() / 2), 0});
+    auto title = pageTitle_.TransformToVisual(headerSettingsOverlay_).TransformPoint(
+        {0, float(pageTitle_.ActualHeight() / 2)});
+    auto left = output.X - headerSettingsSlot_.Width() / 2;
+    auto top = title.Y - headerSettingsSlot_.Height() / 2;
+    auto previousLeft = C::Canvas::GetLeft(headerSettingsSlot_);
+    auto previousTop = C::Canvas::GetTop(headerSettingsSlot_);
+    if (!std::isfinite(previousLeft) || std::abs(previousLeft - left) > .01)
+      C::Canvas::SetLeft(headerSettingsSlot_, left);
+    if (!std::isfinite(previousTop) || std::abs(previousTop - top) > .01)
+      C::Canvas::SetTop(headerSettingsSlot_, top);
+    if (headerSettingsSlot_.Visibility() != X::Visibility::Visible)
+      headerSettingsSlot_.Visibility(X::Visibility::Visible);
+  }
   void PrepareSettingsHeader() {
-    auto header = Named(page_, L"PageHeader");
-    // Use a header grid that contains the title, never a grid in the body.
+    // The title container can be narrow. Host the button in a common grid
+    // and use the actual output button as the horizontal reference.
     C::Grid grid{nullptr};
-    for (auto ancestor = Parent(pageTitle_); ancestor && ancestor != page_;
-         ancestor = Parent(ancestor)) {
-      if (auto candidate = ancestor.try_as<C::Grid>())
+    for (auto ancestor = Parent(outputSettings_); ancestor; ancestor = Parent(ancestor)) {
+      if (auto candidate = ancestor.try_as<C::Grid>();
+          candidate && Find(candidate, [&](auto const &element) { return element == pageTitle_; })) {
         grid = candidate;
-      if (ancestor == header)
+        break;
+      }
+      if (ancestor == page_)
         break;
     }
-    if (!header || !grid || !Find(header, [&](auto const &element) { return element == grid; }))
+    if (!grid)
       return;
+    headerSettingsOverlay_ = C::Canvas();
+    C::Grid::SetColumnSpan(headerSettingsOverlay_, std::max(1u, grid.ColumnDefinitions().Size()));
+    C::Grid::SetRowSpan(headerSettingsOverlay_, std::max(1u, grid.RowDefinitions().Size()));
     headerSettingsSlot_ = C::Grid();
     headerSettingsSlot_.Width(32);
     headerSettingsSlot_.Height(32);
-    headerSettingsSlot_.Margin({0, 0, 20, 0});
-    headerSettingsSlot_.HorizontalAlignment(X::HorizontalAlignment::Right);
-    headerSettingsSlot_.VerticalAlignment(X::VerticalAlignment::Center);
     headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
-    C::Grid::SetColumnSpan(headerSettingsSlot_, std::max(1u, grid.ColumnDefinitions().Size()));
-    C::Grid::SetRowSpan(headerSettingsSlot_, std::max(1u, grid.RowDefinitions().Size()));
-    Add(grid, headerSettingsSlot_);
+    headerSettingsOverlay_.Children().Append(headerSettingsSlot_);
+    Add(grid, headerSettingsOverlay_);
+    Keep(page_.LayoutUpdated(winrt::auto_revoke, [this](auto &&, auto &&) {
+      try {
+        AlignSettingsHeader();
+      } catch (winrt::hresult_error const &) {
+        // Layout can fire while the shell is detaching the page.
+      }
+    }));
   }
   void PositionSoundSettings() {
     if (!soundSettings_)
@@ -1480,9 +1508,9 @@ class SoundPage {
       C::Grid::SetColumn(soundSettings_, inHeader ? 0 : 2);
       target.Children().Append(soundSettings_);
     }
-    auto visibility = inHeader ? X::Visibility::Visible : X::Visibility::Collapsed;
-    headerSettingsSlot_.Visibility(visibility);
-    outputSettings_.Visibility(visibility);
+    outputSettings_.Visibility(inHeader ? X::Visibility::Visible : X::Visibility::Collapsed);
+    if (!inHeader)
+      headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
   }
   void ApplySpatialVisibility() {
     if (settings_.sound.spatialSound) {
