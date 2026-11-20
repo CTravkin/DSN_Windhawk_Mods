@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cwctype>
 #include <cstdint>
@@ -123,6 +124,25 @@ struct Snapshot {
   bool inputVolumeAvailable = false, inputMuteAvailable = false, inputMuted = false;
   unsigned long long revision = 0;
   unsigned long long applied = 0;
+};
+enum class InputVolumeProbe { Idle, Poll, Failed };
+inline bool UnsupportedInputVolume(HRESULT result) {
+  return result == E_NOINTERFACE || result == E_NOTIMPL ||
+         result == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+}
+class InputVolumeRetry {
+  unsigned failures_ = 0;
+
+public:
+  std::chrono::seconds Delay(InputVolumeProbe probe) {
+    if (probe == InputVolumeProbe::Failed) {
+      auto delay = std::chrono::seconds{1 << failures_};
+      failures_ = std::min(failures_ + 1, 3u);
+      return delay;
+    }
+    failures_ = 0;
+    return std::chrono::seconds{probe == InputVolumeProbe::Poll ? 1 : 0};
+  }
 };
 enum class SystemVolumeRight { SoundSettings, Percentage, DeviceSettings };
 struct SoundOptions {

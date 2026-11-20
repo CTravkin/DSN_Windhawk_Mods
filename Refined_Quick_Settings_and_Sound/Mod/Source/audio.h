@@ -181,6 +181,7 @@ class Audio final {
   std::atomic<bool> inputVolumeEnabled_{false};
   std::wstring inputVolumeId_;
   bool inputVolumeRejected_ = false;
+  InputVolumeRetry inputVolumeRetry_;
   std::shared_ptr<VolumeFeed> volumeFeed_ = std::make_shared<VolumeFeed>();
   winrt::com_ptr<VolumeNotify> volumeObserver_;
   std::map<std::wstring, SavedVolume> masters_;
@@ -309,39 +310,50 @@ class Audio final {
     inputVolumeObserver_ = nullptr;
     inputVolume_ = nullptr;
   }
-  void ReadInputVolume(Snapshot &state) {
+  InputVolumeProbe FailedInputVolumeRead(HRESULT result) {
+    UnbindInputVolume();
+    inputVolumeRejected_ = UnsupportedInputVolume(result);
+    return inputVolumeRejected_ ? InputVolumeProbe::Idle : InputVolumeProbe::Failed;
+  }
+  InputVolumeProbe ReadInputVolume(Snapshot &state) {
     auto id = inputVolumeEnabled_ ? state.inputId : std::wstring{};
     if (id != inputVolumeId_) {
       UnbindInputVolume();
       inputVolumeId_ = id;
       inputVolumeRejected_ = false;
+      inputVolumeRetry_ = {};
     }
-    if (id.empty() || inputVolumeRejected_)
-      return;
+    if (id.empty() || inputVolumeRejected_) {
+      UnbindInputVolume();
+      return InputVolumeProbe::Idle;
+    }
     if (!inputVolume_) {
       winrt::com_ptr<IMMDevice> device;
-      if (SUCCEEDED(enumerator_->GetDevice(id.c_str(), device.put())))
-        device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr,
-                         inputVolume_.put_void());
+      if (FAILED(enumerator_->GetDevice(id.c_str(), device.put())) || !device)
+        return InputVolumeProbe::Failed;
+      auto result = device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr,
+                                     inputVolume_.put_void());
+      if (FAILED(result))
+        return FailedInputVolumeRead(result);
       if (!inputVolume_)
-        return;
+        return InputVolumeProbe::Failed;
       inputVolumeObserver_ = winrt::make_self<InputVolumeNotify>(wake_);
       if (FAILED(inputVolume_->RegisterControlChangeNotify(inputVolumeObserver_.get())))
         inputVolumeObserver_ = nullptr;
     }
-    if (FAILED(inputVolume_->GetMasterVolumeLevelScalar(&state.inputVolume))) {
-      UnbindInputVolume();
-      return;
-    }
+    auto result = inputVolume_->GetMasterVolumeLevelScalar(&state.inputVolume);
+    if (FAILED(result) || !std::isfinite(state.inputVolume))
+      return FailedInputVolumeRead(result);
     float low, high, step;
     // Software endpoint volume also works for virtual devices. A fixed range
     // means the device offers no adjustment, regardless of its form factor.
     state.inputVolumeAvailable =
-        std::isfinite(state.inputVolume) &&
-        (FAILED(inputVolume_->GetVolumeRange(&low, &high, &step)) || high > low);
+        FAILED(inputVolume_->GetVolumeRange(&low, &high, &step)) || high > low;
     BOOL muted = FALSE;
     state.inputMuteAvailable = SUCCEEDED(inputVolume_->GetMute(&muted));
     state.inputMuted = muted;
+    return state.inputVolumeAvailable && !inputVolumeObserver_ ? InputVolumeProbe::Poll
+                                                              : InputVolumeProbe::Idle;
   }
   void SetInputVolume(Command const &cmd, float value) {
     // A queued drag or click can outlive a default device change. Keep both
@@ -355,7 +367,7 @@ class Audio final {
       winrt::check_hresult(inputVolume_->SetMute(!muted, nullptr));
     } else {
       auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
-      if (result == E_NOTIMPL || result == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED))
+      if (UnsupportedInputVolume(result))
         inputVolumeRejected_ = true;
       winrt::check_hresult(result);
     }
@@ -399,7 +411,7 @@ class Audio final {
       SetDefault(cmd.id);
     }
   }
-  bool Read() {
+  std::chrono::seconds Read() {
     Snapshot state;
     state.revision = ++revision_;
     state.applied = applied_;
@@ -448,11 +460,9 @@ class Audio final {
             state.input = snapshot_.input;
         }
       }
-    if (inputIdKnown || !inputVolumeEnabled_)
-      ReadInputVolume(state);
-    // A usable device can refuse callback registration. Keep its visible
-    // level synchronized even when only polling is available.
-    retry |= state.inputVolumeAvailable && !inputVolumeObserver_;
+    auto inputProbe = inputIdKnown || !inputVolumeEnabled_ ? ReadInputVolume(state)
+                                                         : InputVolumeProbe::Idle;
+    auto inputDelay = inputVolumeRetry_.Delay(inputProbe);
     // The shell's own lists serve output devices, application sessions and
     // spatial sound; this worker serves the added input selector, the master
     // volume and the tray.
@@ -462,7 +472,7 @@ class Audio final {
     }
     if (publish_)
       publish_();
-    return retry;
+    return retry ? std::chrono::seconds{1} : inputDelay;
   }
   void Run() noexcept {
     bool apartment = false;
@@ -490,9 +500,9 @@ class Audio final {
           }
           applied_ = cmd.serial;
         }
-        bool retry = true;
+        auto retryAfter = std::chrono::seconds{1};
         try {
-          retry = Read();
+          retryAfter = Read();
         } catch (winrt::hresult_error const &ex) {
           {
             std::lock_guard lock(mutex_);
@@ -507,8 +517,8 @@ class Audio final {
         auto signalled = [&] { return stop_ || wake_->changed; };
         // Failed reads and endpoint activation may have no notification to
         // wake the worker again. Retry only until the audio state recovers.
-        if (retry)
-          wake_->cv.wait_for(lock, std::chrono::seconds(1), signalled);
+        if (retryAfter.count())
+          wake_->cv.wait_for(lock, retryAfter, signalled);
         else
           wake_->cv.wait(lock, signalled);
         wake_->changed = false;

@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.1
+// @version 0.9.2
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 184
+// Build: 185
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -79,7 +79,7 @@ Requires Windows 11 24H2 or later (x64).
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
 
-After a manual update from DSN 0.8.5 or earlier, review saved choices under **Taskbar**, **Sound**, and **Quick Settings**. Their Windhawk configuration keys changed in 0.9.0.
+On update from an earlier DSN release, the mod uses saved values when the grouped controls still hold their defaults. To show those values in the settings editor and allow the defaults to be selected again, [move the old keys to the grouped settings](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Refined_Quick_Settings_and_Sound#moving-saved-dsn-settings-to-the-new-groups).
 
 Disable other mods or styles that change the same controls. If the panels do not update after enabling the mod, close and reopen them. If needed, restart ShellHost and check the Windhawk log.
 
@@ -953,6 +953,7 @@ in this source file.
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cwctype>
 #include <cstdint>
@@ -1073,6 +1074,25 @@ struct Snapshot {
   bool inputVolumeAvailable = false, inputMuteAvailable = false, inputMuted = false;
   unsigned long long revision = 0;
   unsigned long long applied = 0;
+};
+enum class InputVolumeProbe { Idle, Poll, Failed };
+inline bool UnsupportedInputVolume(HRESULT result) {
+  return result == E_NOINTERFACE || result == E_NOTIMPL ||
+         result == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED);
+}
+class InputVolumeRetry {
+  unsigned failures_ = 0;
+
+public:
+  std::chrono::seconds Delay(InputVolumeProbe probe) {
+    if (probe == InputVolumeProbe::Failed) {
+      auto delay = std::chrono::seconds{1 << failures_};
+      failures_ = std::min(failures_ + 1, 3u);
+      return delay;
+    }
+    failures_ = 0;
+    return std::chrono::seconds{probe == InputVolumeProbe::Poll ? 1 : 0};
+  }
 };
 enum class SystemVolumeRight { SoundSettings, Percentage, DeviceSettings };
 struct SoundOptions {
@@ -1277,6 +1297,7 @@ class Audio final {
   std::atomic<bool> inputVolumeEnabled_{false};
   std::wstring inputVolumeId_;
   bool inputVolumeRejected_ = false;
+  InputVolumeRetry inputVolumeRetry_;
   std::shared_ptr<VolumeFeed> volumeFeed_ = std::make_shared<VolumeFeed>();
   winrt::com_ptr<VolumeNotify> volumeObserver_;
   std::map<std::wstring, SavedVolume> masters_;
@@ -1405,39 +1426,50 @@ class Audio final {
     inputVolumeObserver_ = nullptr;
     inputVolume_ = nullptr;
   }
-  void ReadInputVolume(Snapshot &state) {
+  InputVolumeProbe FailedInputVolumeRead(HRESULT result) {
+    UnbindInputVolume();
+    inputVolumeRejected_ = UnsupportedInputVolume(result);
+    return inputVolumeRejected_ ? InputVolumeProbe::Idle : InputVolumeProbe::Failed;
+  }
+  InputVolumeProbe ReadInputVolume(Snapshot &state) {
     auto id = inputVolumeEnabled_ ? state.inputId : std::wstring{};
     if (id != inputVolumeId_) {
       UnbindInputVolume();
       inputVolumeId_ = id;
       inputVolumeRejected_ = false;
+      inputVolumeRetry_ = {};
     }
-    if (id.empty() || inputVolumeRejected_)
-      return;
+    if (id.empty() || inputVolumeRejected_) {
+      UnbindInputVolume();
+      return InputVolumeProbe::Idle;
+    }
     if (!inputVolume_) {
       winrt::com_ptr<IMMDevice> device;
-      if (SUCCEEDED(enumerator_->GetDevice(id.c_str(), device.put())))
-        device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr,
-                         inputVolume_.put_void());
+      if (FAILED(enumerator_->GetDevice(id.c_str(), device.put())) || !device)
+        return InputVolumeProbe::Failed;
+      auto result = device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr,
+                                     inputVolume_.put_void());
+      if (FAILED(result))
+        return FailedInputVolumeRead(result);
       if (!inputVolume_)
-        return;
+        return InputVolumeProbe::Failed;
       inputVolumeObserver_ = winrt::make_self<InputVolumeNotify>(wake_);
       if (FAILED(inputVolume_->RegisterControlChangeNotify(inputVolumeObserver_.get())))
         inputVolumeObserver_ = nullptr;
     }
-    if (FAILED(inputVolume_->GetMasterVolumeLevelScalar(&state.inputVolume))) {
-      UnbindInputVolume();
-      return;
-    }
+    auto result = inputVolume_->GetMasterVolumeLevelScalar(&state.inputVolume);
+    if (FAILED(result) || !std::isfinite(state.inputVolume))
+      return FailedInputVolumeRead(result);
     float low, high, step;
     // Software endpoint volume also works for virtual devices. A fixed range
     // means the device offers no adjustment, regardless of its form factor.
     state.inputVolumeAvailable =
-        std::isfinite(state.inputVolume) &&
-        (FAILED(inputVolume_->GetVolumeRange(&low, &high, &step)) || high > low);
+        FAILED(inputVolume_->GetVolumeRange(&low, &high, &step)) || high > low;
     BOOL muted = FALSE;
     state.inputMuteAvailable = SUCCEEDED(inputVolume_->GetMute(&muted));
     state.inputMuted = muted;
+    return state.inputVolumeAvailable && !inputVolumeObserver_ ? InputVolumeProbe::Poll
+                                                              : InputVolumeProbe::Idle;
   }
   void SetInputVolume(Command const &cmd, float value) {
     // A queued drag or click can outlive a default device change. Keep both
@@ -1451,7 +1483,7 @@ class Audio final {
       winrt::check_hresult(inputVolume_->SetMute(!muted, nullptr));
     } else {
       auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
-      if (result == E_NOTIMPL || result == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED))
+      if (UnsupportedInputVolume(result))
         inputVolumeRejected_ = true;
       winrt::check_hresult(result);
     }
@@ -1495,7 +1527,7 @@ class Audio final {
       SetDefault(cmd.id);
     }
   }
-  bool Read() {
+  std::chrono::seconds Read() {
     Snapshot state;
     state.revision = ++revision_;
     state.applied = applied_;
@@ -1544,11 +1576,9 @@ class Audio final {
             state.input = snapshot_.input;
         }
       }
-    if (inputIdKnown || !inputVolumeEnabled_)
-      ReadInputVolume(state);
-    // A usable device can refuse callback registration. Keep its visible
-    // level synchronized even when only polling is available.
-    retry |= state.inputVolumeAvailable && !inputVolumeObserver_;
+    auto inputProbe = inputIdKnown || !inputVolumeEnabled_ ? ReadInputVolume(state)
+                                                         : InputVolumeProbe::Idle;
+    auto inputDelay = inputVolumeRetry_.Delay(inputProbe);
     // The shell's own lists serve output devices, application sessions and
     // spatial sound; this worker serves the added input selector, the master
     // volume and the tray.
@@ -1558,7 +1588,7 @@ class Audio final {
     }
     if (publish_)
       publish_();
-    return retry;
+    return retry ? std::chrono::seconds{1} : inputDelay;
   }
   void Run() noexcept {
     bool apartment = false;
@@ -1586,9 +1616,9 @@ class Audio final {
           }
           applied_ = cmd.serial;
         }
-        bool retry = true;
+        auto retryAfter = std::chrono::seconds{1};
         try {
-          retry = Read();
+          retryAfter = Read();
         } catch (winrt::hresult_error const &ex) {
           {
             std::lock_guard lock(mutex_);
@@ -1603,8 +1633,8 @@ class Audio final {
         auto signalled = [&] { return stop_ || wake_->changed; };
         // Failed reads and endpoint activation may have no notification to
         // wake the worker again. Retry only until the audio state recovers.
-        if (retry)
-          wake_->cv.wait_for(lock, std::chrono::seconds(1), signalled);
+        if (retryAfter.count())
+          wake_->cv.wait_for(lock, retryAfter, signalled);
         else
           wake_->cv.wait(lock, signalled);
         wake_->changed = false;
@@ -9561,6 +9591,82 @@ inline void StopHost() {
 
 
 
+namespace native {
+inline ModSettings ReadPanelSettings(auto readInt, auto readString) {
+  ModSettings settings;
+  // Windhawk keeps old paths and adds the initial values of new paths on upgrade.
+  // Until the legacy entries are moved in the editor, an unchanged new default
+  // can take its effective value from the old path.
+  auto stringSetting = [&](PCWSTR key, std::wstring_view initial, PCWSTR legacyKey) {
+    auto value = readString(key);
+    if (value.empty() || value == initial) {
+      auto previous = readString(legacyKey);
+      if (!previous.empty())
+        return previous;
+    }
+    return value.empty() ? std::wstring(initial) : value;
+  };
+
+  auto brightness = readString(L"quickSettings.brightnessMode");
+  auto oldBrightness = readString(L"brightnessMode");
+  bool hasGroupedDefaults = !brightness.empty();
+  // Both settings were present in every DSN schema with the old taskbar fields.
+  bool hasLegacyTaskbar = !oldBrightness.empty() || !readString(L"quickSettings.shortcut1").empty();
+  auto intSetting = [&](PCWSTR key, int initial, PCWSTR legacyKey) {
+    auto value = hasGroupedDefaults ? readInt(key) : initial;
+    return value == initial && hasLegacyTaskbar ? readInt(legacyKey) : value;
+  };
+
+  settings.quickSoundAccess = intSetting(L"taskbar.openSoundFromVolumeIcon", 1, L"quickSoundAccess") != 0;
+  settings.trayMiddleClickMute = intSetting(L"taskbar.middleClickMute", 0, L"trayMiddleClickMute") != 0;
+  settings.volumeWheelStep = sound::VolumeWheelStep(intSetting(L"sound.volumeWheelStep", 2, L"volumeWheelStep"));
+  settings.brightnessEnabled = (brightness.empty() || brightness == L"auto" ? oldBrightness
+                                                                            : brightness) != L"disabled";
+  settings.pillQuickTiles = stringSetting(L"quickSettings.tileShape", L"default", L"appearance.quickTiles") == L"pills";
+  settings.pillSoundPickers = stringSetting(L"sound.selectorShape", L"default", L"appearance.soundPickers") == L"pills";
+
+  auto microphone = stringSetting(L"sound.microphoneVolumeMode", L"disabled", L"microphoneVolume");
+  auto microphoneRight = readString(L"sound.microphoneVolumeRight");
+  auto systemRight = readString(L"sound.systemVolumeRight");
+  if ((systemRight.empty() || systemRight == L"soundSettings") &&
+      readString(L"soundSettingsPosition") == L"header")
+    systemRight = L"deviceSettings";
+  auto spatial = stringSetting(L"sound.spatialSoundMenu", L"enabled", L"spatialSoundMenu");
+  settings.sound = sound::ParseSoundOptions(microphone, microphoneRight, systemRight, spatial);
+
+  auto oldRowKey = readString(L"appearance.quickActionRows").empty() ? L"quickActionRows"
+                                                                   : L"appearance.quickActionRows";
+  auto rows = stringSetting(L"quickSettings.tileRows", L"2", oldRowKey);
+  if (rows.size() == 1 && rows.front() >= L'1' && rows.front() <= L'4')
+    settings.quickActionRows = rows.front() - L'0';
+
+  for (size_t i = 0; i < settings.quickShortcuts.size(); ++i) {
+    auto slot = std::to_wstring(i + 1);
+    auto value = stringSetting((L"quickSettings.additionalShortcuts.shortcut" + slot).c_str(),
+                               i == 0 ? L"display" : L"none",
+                               (L"quickSettings.shortcut" + slot).c_str());
+    settings.quickShortcuts[i] = sound::ParseQuickShortcut(value);
+  }
+  if (!hasGroupedDefaults && !hasLegacyTaskbar)
+    settings.quickShortcuts = {readInt(L"showDisplaySettings") ? sound::QuickShortcut::Display
+                                                            : sound::QuickShortcut::None};
+
+  auto readHidden = [&](PCWSTR path) {
+    for (int i = 0; i < 32; ++i) {
+      auto key = path + (L"[" + std::to_wstring(i) + L"]");
+      sound::AddHiddenApp(settings.hidden, readString(key.c_str()));
+    }
+  };
+  readHidden(L"sound.hiddenApplications");
+  if (settings.hidden.empty())
+    readHidden(L"hiddenApplications");
+  ReadAlternativeIcons(settings, readInt);
+  return settings;
+}
+} // namespace native
+
+
+
 #include <ws2ipdef.h>
 #include <iphlpapi.h>
 namespace native::tray {
@@ -10970,59 +11076,17 @@ inline void Shutdown() {
 
 namespace native {
 inline bool explorer = false;
-inline void ReadHiddenApps(std::vector<std::wstring> &hidden) {
-  hidden.clear();
-  // Windhawk exposes indexed values but no array length. Allow empty rows
-  // between names, including rows left blank in the settings editor.
-  for (int i = 0, blanks = 0; blanks < 32; ++i) {
-    auto name = WindhawkUtils::StringSetting::make(L"sound.hiddenApplications[%d]", i);
-    if (!*name.get()) {
-      ++blanks;
-      continue;
-    }
-    blanks = 0;
-    sound::AddHiddenApp(hidden, name.get());
-  }
-  if (!hidden.empty()) {
+inline ModSettings ReadSettings() {
+  auto readString = [](PCWSTR key) {
+    auto value = WindhawkUtils::StringSetting::make(key);
+    return std::wstring(value.get());
+  };
+  auto settings = ReadPanelSettings(Wh_GetIntSetting, readString);
+  if (!settings.hidden.empty()) {
     if (!Wh_GetIntValue(L"usesHiddenAppRows", 0))
       Wh_SetIntValue(L"usesHiddenAppRows", 1);
   } else if (!Wh_GetIntValue(L"usesHiddenAppRows", 0)) {
-    auto legacy = WindhawkUtils::StringSetting::make(L"hiddenApps");
-    hidden = sound::ParseHidden(legacy.get());
-  }
-}
-inline ModSettings ReadSettings() {
-  ModSettings settings;
-  auto quickShape = WindhawkUtils::StringSetting::make(L"quickSettings.tileShape");
-  auto pickerShape = WindhawkUtils::StringSetting::make(L"sound.selectorShape");
-  settings.pillQuickTiles = std::wstring_view(quickShape.get()) == L"pills";
-  settings.pillSoundPickers = std::wstring_view(pickerShape.get()) == L"pills";
-  ReadHiddenApps(settings.hidden);
-  settings.volumeWheelStep = sound::VolumeWheelStep(Wh_GetIntSetting(L"sound.volumeWheelStep"));
-  settings.quickSoundAccess = Wh_GetIntSetting(L"taskbar.openSoundFromVolumeIcon") != 0;
-  settings.trayMiddleClickMute = Wh_GetIntSetting(L"taskbar.middleClickMute") != 0;
-  auto brightness = WindhawkUtils::StringSetting::make(L"quickSettings.brightnessMode");
-  settings.brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
-  auto microphone = WindhawkUtils::StringSetting::make(L"sound.microphoneVolumeMode");
-  auto microphoneRight = WindhawkUtils::StringSetting::make(L"sound.microphoneVolumeRight");
-  auto systemRight = WindhawkUtils::StringSetting::make(L"sound.systemVolumeRight");
-  auto spatial = WindhawkUtils::StringSetting::make(L"sound.spatialSoundMenu");
-  settings.sound = sound::ParseSoundOptions(microphone.get(), microphoneRight.get(),
-                                          systemRight.get(), spatial.get());
-  auto rows = WindhawkUtils::StringSetting::make(L"quickSettings.tileRows");
-  std::wstring_view rowCount(rows.get());
-  if (rowCount.size() == 1 && rowCount.front() >= L'1' && rowCount.front() <= L'4')
-    settings.quickActionRows = rowCount.front() - L'0';
-  using S = sound::QuickShortcut;
-  auto first = WindhawkUtils::StringSetting::make(L"quickSettings.additionalShortcuts.shortcut1");
-  ReadAlternativeIcons(settings, Wh_GetIntSetting);
-  if (*first.get()) {
-    for (int i = 0; i < int(settings.quickShortcuts.size()); ++i) {
-      auto slot = WindhawkUtils::StringSetting::make(L"quickSettings.additionalShortcuts.shortcut%d", i + 1);
-      settings.quickShortcuts[i] = sound::ParseQuickShortcut(slot.get());
-    }
-  } else {
-    settings.quickShortcuts = {Wh_GetIntSetting(L"showDisplaySettings") ? S::Display : S::None};
+    settings.hidden = sound::ParseHidden(readString(L"hiddenApps"));
   }
   return settings;
 }

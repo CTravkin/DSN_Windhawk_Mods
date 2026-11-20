@@ -3,6 +3,7 @@
 #define WH_MOD_ID L"native-model-test"
 #include <windhawk_api.h>
 #include "quick.h"
+#include "settings.h"
 #include <cstdio>
 namespace F = winrt::Windows::Foundation;
 struct Store {
@@ -109,6 +110,81 @@ int main() {
       return 14;
     }
     std::puts("PASS: Endpoint volume can be reset from zero or a partial level");
+    {
+      // Windhawk materializes the new defaults as well as retaining the old keys.
+      std::map<std::wstring, int> numbers{{L"taskbar.openSoundFromVolumeIcon", 1},
+                                         {L"taskbar.middleClickMute", 0},
+                                         {L"sound.volumeWheelStep", 2},
+                                         {L"quickSoundAccess", 0},
+                                         {L"trayMiddleClickMute", 1},
+                                         {L"volumeWheelStep", 7}};
+      std::map<std::wstring, std::wstring> strings{
+          {L"quickSettings.brightnessMode", L"auto"}, {L"brightnessMode", L"disabled"},
+          {L"quickSettings.tileRows", L"2"}, {L"appearance.quickActionRows", L"4"},
+          {L"quickSettings.tileShape", L"default"}, {L"appearance.quickTiles", L"pills"},
+          {L"sound.selectorShape", L"default"}, {L"appearance.soundPickers", L"pills"},
+          {L"sound.microphoneVolumeMode", L"disabled"}, {L"microphoneVolume", L"auto"},
+          {L"sound.spatialSoundMenu", L"enabled"}, {L"spatialSoundMenu", L"disabled"},
+          {L"sound.systemVolumeRight", L"soundSettings"}, {L"soundSettingsPosition", L"header"},
+          {L"quickSettings.additionalShortcuts.shortcut1", L"display"},
+          {L"quickSettings.additionalShortcuts.shortcut4", L"none"},
+          {L"quickSettings.shortcut1", L"none"}, {L"quickSettings.shortcut4", L"graphics"},
+          {L"sound.hiddenApplications[0]", L""}, {L"hiddenApplications[3]", L"Example.exe"}};
+      auto readInt = [&](PCWSTR key) { return numbers[key]; };
+      auto readString = [&](PCWSTR key) { return strings[key]; };
+      auto settings = native::ReadPanelSettings(readInt, readString);
+      using Shortcut = sound::QuickShortcut;
+      if (settings.quickSoundAccess || !settings.trayMiddleClickMute || settings.volumeWheelStep != 7 ||
+          settings.brightnessEnabled || settings.quickActionRows != 4 || !settings.pillQuickTiles ||
+          !settings.pillSoundPickers || !settings.sound.microphoneAuto || settings.sound.spatialSound ||
+          settings.sound.systemVolumeRight != Right::DeviceSettings ||
+          settings.quickShortcuts[0] != Shortcut::None || settings.quickShortcuts[3] != Shortcut::Graphics ||
+          settings.hidden != std::vector<std::wstring>{L"example.exe"}) {
+        std::puts("FAIL: Windhawk's grouped defaults masked saved values during an upgrade");
+        return 16;
+      }
+      numbers[L"sound.volumeWheelStep"] = 11;
+      strings[L"sound.systemVolumeRight"] = L"percentage";
+      strings[L"sound.hiddenApplications[0]"] = L"New.exe";
+      settings = native::ReadPanelSettings(readInt, readString);
+      if (settings.volumeWheelStep != 11 || settings.sound.systemVolumeRight != Right::Percentage ||
+          settings.hidden != std::vector<std::wstring>{L"new.exe"}) {
+        std::puts("FAIL: migrated settings overrode explicit grouped changes");
+        return 16;
+      }
+      numbers[L"sound.volumeWheelStep"] = 2;
+      strings[L"sound.hiddenApplications[0]"] = L"";
+      strings.erase(L"brightnessMode");
+      strings.erase(L"quickSettings.shortcut1");
+      strings.erase(L"hiddenApplications[3]");
+      settings = native::ReadPanelSettings(readInt, readString);
+      if (settings.volumeWheelStep != 2 || !settings.quickSoundAccess || !settings.hidden.empty()) {
+        std::puts("FAIL: grouped defaults could not be selected again after migration");
+        return 16;
+      }
+      std::puts("PASS: upgrade retains saved Sound, Taskbar and Quick Settings preferences");
+    }
+    {
+      using Probe = sound::InputVolumeProbe;
+      sound::InputVolumeRetry retry;
+      size_t attempt = 0;
+      for (int delay : {1, 2, 4, 8, 8}) {
+        if (retry.Delay(Probe::Failed).count() != delay) {
+          std::printf("FAIL: microphone retry %zu had the wrong delay\n", ++attempt);
+          return 15;
+        }
+        ++attempt;
+      }
+      if (retry.Delay(Probe::Idle).count() != 0 || retry.Delay(Probe::Failed).count() != 1 ||
+          retry.Delay(Probe::Poll).count() != 1 || retry.Delay(Probe::Failed).count() != 1 ||
+          !sound::UnsupportedInputVolume(E_NOTIMPL) || !sound::UnsupportedInputVolume(E_NOINTERFACE) ||
+          !sound::UnsupportedInputVolume(HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED)) ||
+          sound::UnsupportedInputVolume(HRESULT_FROM_WIN32(ERROR_DEVICE_NOT_CONNECTED))) {
+        std::puts("FAIL: microphone retry must reset on recovery and distinguish unsupported endpoints");
+        return 15;
+      }
+      std::puts("PASS: microphone failures back off and stop polling after recovery or unsupported results");
+    }
     auto soundRequest = native::SoundRequestToken(0xfffffff0, 1);
     if (soundRequest == native::SoundRequestToken(0xfffffff0, 2) ||
         native::SoundEventMatchesRequest(soundRequest, 0xffffffef) ||
