@@ -1470,7 +1470,7 @@ class SoundPage {
   void AlignSettingsHeader() {
     if (!settings_.sound.settingsInHeader || !headerSettingsOverlay_.IsLoaded() ||
         !headerBack_.IsLoaded() || headerBack_.ActualWidth() <= 0 ||
-        page_.ActualWidth() <= 0 || footerBorder_.ActualWidth() <= 0)
+        page_.ActualWidth() <= 0)
       return;
     auto back = headerBack_.TransformToVisual(page_).TransformPoint(
         {float(headerBack_.ActualWidth()), 0});
@@ -1483,18 +1483,6 @@ class SoundPage {
       C::Canvas::SetLeft(headerSettingsSlot_, position.X);
     if (!std::isfinite(previousTop) || std::abs(previousTop - position.Y) > .01)
       C::Canvas::SetTop(headerSettingsSlot_, position.Y);
-    // Match the gear's center even if the footer buttons use a smaller plate.
-    auto innerRight = footerBorder_.ActualWidth() - footerBorder_.BorderThickness().Right -
-                      footerBorder_.Padding().Right;
-    auto footerRight = footerBorder_.TransformToVisual(page_).TransformPoint(
-        {float(innerRight), 0}).X;
-    auto centerInPage = leftInPage + headerSettingsSlot_.Width() / 2;
-    auto rightMargin = footerRight - (centerInPage + outputSettings_.Width() / 2);
-    auto margin = footerRows_.Margin();
-    if (std::abs(margin.Right - rightMargin) > .01) {
-      margin.Right = rightMargin;
-      footerRows_.Margin(margin);
-    }
     if (headerSettingsSlot_.Visibility() != X::Visibility::Visible)
       headerSettingsSlot_.Visibility(X::Visibility::Visible);
   }
@@ -1551,7 +1539,6 @@ class SoundPage {
     outputSettings_.Visibility(inHeader ? X::Visibility::Visible : X::Visibility::Collapsed);
     if (!inHeader)
       headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
-    FooterMargins();
     SettingsGear(soundSettings_);
   }
   void ApplySpatialVisibility() {
@@ -2271,10 +2258,7 @@ public:
     auto root = page_.XamlRoot();
     double s = root ? root.RasterizationScale() : 1.;
     double step = StepPx(s), half = std::round(16 * s), border = std::max(1., std::round(s));
-    double right = headerSettingsSlot_ && settings_.sound.settingsInHeader
-                       ? footerRows_.Margin().Right
-                       : 20.;
-    footerRows_.Margin({20, (step - border - half) / s, right, (step - half) / s});
+    footerRows_.Margin({20, (step - border - half) / s, 20, (step - half) / s});
     microphoneRow_.Margin({0, 0, 0, (step - half * 2) / s});
   }
   // The SV divider lies on the footer's base acrylic, the line above All
