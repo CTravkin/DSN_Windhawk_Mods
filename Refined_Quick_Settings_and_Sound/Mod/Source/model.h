@@ -124,17 +124,29 @@ struct Snapshot {
   unsigned long long revision = 0;
   unsigned long long applied = 0;
 };
+enum class SystemVolumeRight { SoundSettings, Percentage, DeviceSettings };
 struct SoundOptions {
-  bool microphoneAuto = false, spatialSound = true, settingsInHeader = false;
+  bool microphoneAuto = false, microphoneDeviceSettings = false, spatialSound = true;
+  SystemVolumeRight systemVolumeRight = SystemVolumeRight::SoundSettings;
+  bool SettingsInHeader() const { return systemVolumeRight != SystemVolumeRight::SoundSettings; }
   bool operator==(SoundOptions const &) const = default;
 };
-inline SoundOptions ParseSoundOptions(std::wstring_view microphone, std::wstring_view spatial,
-                                      std::wstring_view settingsPosition) {
-  return {microphone == L"auto", spatial != L"disabled", settingsPosition == L"header"};
+inline SoundOptions ParseSoundOptions(std::wstring_view microphone, std::wstring_view microphoneRight,
+                                      std::wstring_view systemRight, std::wstring_view spatial) {
+  SoundOptions options;
+  options.microphoneAuto = microphone == L"auto";
+  options.microphoneDeviceSettings = microphoneRight == L"deviceSettings";
+  options.spatialSound = spatial != L"disabled";
+  if (systemRight == L"percentage")
+    options.systemVolumeRight = SystemVolumeRight::Percentage;
+  else if (systemRight == L"deviceSettings")
+    options.systemVolumeRight = SystemVolumeRight::DeviceSettings;
+  return options;
 }
 inline bool ShowMicrophoneRow(SoundOptions options, Snapshot const &state) {
   return options.microphoneAuto && !state.inputId.empty() && state.inputVolumeAvailable;
 }
+inline bool CanResetEndpointVolume(double value) { return value >= 0 && value < 100; }
 inline std::wstring AudioDevicePropertiesUri(std::wstring_view id) {
   if (id.empty())
     return {};

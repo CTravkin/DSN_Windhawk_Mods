@@ -72,13 +72,20 @@ struct Model : winrt::implements<Model, native::D::ICustomPropertyProvider> {
 };
 int main() {
   try {
-    auto defaults = sound::ParseSoundOptions(L"", L"", L"");
-    auto customized = sound::ParseSoundOptions(L"auto", L"disabled", L"header");
+    using Right = sound::SystemVolumeRight;
+    auto defaults = sound::ParseSoundOptions(L"", L"", L"", L"");
+    auto customized = sound::ParseSoundOptions(L"auto", L"deviceSettings", L"deviceSettings", L"disabled");
+    auto percentages = sound::ParseSoundOptions(L"auto", L"percentage", L"percentage", L"enabled");
+    auto system = sound::ParseSoundOptions(L"disabled", L"other", L"soundSettings", L"enabled");
     sound::Snapshot input;
-    if (defaults.microphoneAuto || !defaults.spatialSound || defaults.settingsInHeader ||
-        !customized.microphoneAuto || customized.spatialSound || !customized.settingsInHeader ||
+    if (defaults.microphoneAuto || defaults.microphoneDeviceSettings || !defaults.spatialSound ||
+        defaults.systemVolumeRight != Right::SoundSettings || defaults.SettingsInHeader() ||
+        !customized.microphoneAuto || !customized.microphoneDeviceSettings || customized.spatialSound ||
+        customized.systemVolumeRight != Right::DeviceSettings || !customized.SettingsInHeader() ||
+        percentages.microphoneDeviceSettings || percentages.systemVolumeRight != Right::Percentage ||
+        !percentages.SettingsInHeader() || system.microphoneDeviceSettings || system.SettingsInHeader() ||
         sound::ShowMicrophoneRow(customized, input)) {
-      std::puts("FAIL: Sound options preserve existing defaults and hide a missing microphone");
+      std::puts("FAIL: Volume rows must use the selected trailing controls and show one Sound settings button");
       return 13;
     }
     input.inputId = L"{0.0.1.00000000}.{aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb}";
@@ -96,6 +103,12 @@ int main() {
       return 13;
     }
     std::puts("PASS: Sound options preserve defaults, gate the microphone row and link to the selected endpoint");
+    if (!sound::CanResetEndpointVolume(0) || !sound::CanResetEndpointVolume(57) ||
+        sound::CanResetEndpointVolume(100) || sound::CanResetEndpointVolume(NAN)) {
+      std::puts("FAIL: The endpoint reset button must work below 100 and be inactive at 100 or when unavailable");
+      return 14;
+    }
+    std::puts("PASS: Endpoint volume can be reset from zero or a partial level");
     auto soundRequest = native::SoundRequestToken(0xfffffff0, 1);
     if (soundRequest == native::SoundRequestToken(0xfffffff0, 2) ||
         native::SoundEventMatchesRequest(soundRequest, 0xffffffef) ||
