@@ -453,7 +453,7 @@ class QuickPage {
       name = sound::Text(L"Graphics", L"Графика", L"Gráficos", L"Grafik",
                          L"Elementos gráficos", L"图形");
       uri = L"ms-settings:display-advancedgraphics";
-      glyph = 0xe7f4;
+      glyph = 0xe950; // Component
       break;
     case S::NetworkSettings:
       name = sound::Text(L"Advanced network settings", L"Сетевые параметры",

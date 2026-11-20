@@ -147,6 +147,7 @@ class SoundPage {
   // The header gear uses the back button's native template and hover plate.
   // Both positions can use the same system QA_All_Settings animation.
   void SettingsGear(C::Button const &button) {
+    constexpr double gearSize = 16;
     try {
       gearJournal_.Restore();
       bool inHeader = headerSettingsSlot_ && settings_.sound.SettingsInHeader();
@@ -168,7 +169,7 @@ class SoundPage {
         button.Margin(style ? X::Thickness{-2, -2, -2, -2} : X::Thickness{});
       }
       if (!settings_.altSoundGear) {
-        button.Content(SymbolGlyph(page_, 0xe713, 16));
+        button.Content(SymbolGlyph(page_, 0xe713, gearSize));
         return;
       }
       auto factory = NativeAnimatedFactory();
@@ -176,8 +177,8 @@ class SoundPage {
       auto icon = factory.as<U::IAnimatedIconFactory>().CreateInstance(nullptr, inner);
       auto statics = factory.as<U::IAnimatedIconStatics>();
       icon.Source(NativeSource(L"ControlCenter.QA_All_Settings"));
-      icon.Width(16);
-      icon.Height(16);
+      icon.Width(gearSize);
+      icon.Height(gearSize);
       icon.IsHitTestVisible(false);
       button.Content(icon);
       auto watch = [&](X::DependencyProperty const &property) {
@@ -209,7 +210,7 @@ class SoundPage {
       }
     } catch (...) {
       Wh_Log(L"SoundGearIconError %08X", winrt::to_hresult());
-      button.Content(SymbolGlyph(page_, 0xe713, 14));
+      button.Content(SymbolGlyph(page_, 0xe713, gearSize));
     }
   }
   template <class R> void Keep(R &&r) {
