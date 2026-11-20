@@ -12,7 +12,7 @@ struct Menu {
   MenuKind kind;
   C::Button button{nullptr};
   C::TextBlock label{nullptr};
-  C::FontIcon endpointIcon{nullptr};
+  C::FontIcon leadingIcon{nullptr};
   C::Flyout flyout{nullptr};
   C::ListView list{nullptr};
   X::FrameworkElement arrow{nullptr};
@@ -313,9 +313,8 @@ class SoundPage {
     SliderLook{journal_, revoke_, thinSliders_}.Geometry(slider);
     ThinSlider(slider);
   }
-  // Glyphs centred on the row/button height. At 125% (40 px rows/buttons, 20 px
-  // glyph) the native insets put dropdown rows 1 px high and closed OD/ID/SS
-  // buttons 1 px low. Margins, not transforms, keep the glyphs on the pixel grid.
+  // Optical offsets for flyout rows and the default closed picker. At 125%,
+  // 0.8 DIP corresponds to one physical pixel.
   static constexpr double listGlyphDrop = .8, buttonGlyphRaise = .8;
   std::set<void *> thinSliders_;
   // Thin look: SliderLook. VM rows keep the right edge on the badge column.
@@ -460,8 +459,8 @@ class SoundPage {
               Add(parent, glyph);
               Set(text, X::UIElement::OpacityProperty(), winrt::box_value(0.));
             }
-            if (item.IsSelected() && menu->endpointIcon)
-              menu->endpointIcon.Glyph(text.Text());
+            if (item.IsSelected() && menu->leadingIcon)
+              menu->leadingIcon.Glyph(text.Text());
           }
         }
         return false;
@@ -559,17 +558,17 @@ class SoundPage {
           text = device.name;
           break;
         }
-    if (m->endpointIcon && m->kind == MenuKind::Output) {
+    if (m->leadingIcon && m->kind == MenuKind::Output) {
       auto code = String(ModelValue(selected, L"EndpointIcon"));
       if (code.size() == 1)
-        m->endpointIcon.Glyph(code);
+        m->leadingIcon.Glyph(code);
       else if (auto item = m->list.ContainerFromItem(selected).try_as<X::DependencyObject>())
         Find(item, [&](auto const &e) {
           if (auto glyph = e.template try_as<C::TextBlock>();
               glyph && glyph.Text().size() == 1 && C::Grid::GetColumn(glyph) == 0 &&
               Parent(glyph).template try_as<C::Grid>() &&
               Parent(glyph).template as<C::Grid>().ColumnDefinitions().Size() == 3) {
-            m->endpointIcon.Glyph(glyph.Text());
+            m->leadingIcon.Glyph(glyph.Text());
             return true;
           }
           return false;
@@ -603,6 +602,13 @@ class SoundPage {
       if (button.Padding() != X::Thickness{}) {
         pickerShapeJournal_.Save(button, C::Control::PaddingProperty());
         button.Padding({0, 0, 0, 0});
+      }
+      // The capsule centres its glyphs on both axes; the default picker's
+      // optical lift would move the leading glyph above the cap's centre.
+      auto icon = menu->leadingIcon;
+      if (icon && icon.Margin() != X::Thickness{}) {
+        pickerShapeJournal_.Save(icon, X::FrameworkElement::MarginProperty());
+        icon.Margin({});
       }
       // Centre each end glyph on the outer cap's axis. The Button template
       // puts its border before Content, so account for that inset explicitly:
@@ -639,15 +645,12 @@ class SoundPage {
     X::Automation::AutomationProperties::SetName(m->button, nativeName.empty() ? name : nativeName.c_str());
     m->button.VerticalContentAlignment(X::VerticalAlignment::Center);
     auto g = Grid(L"17,*,12");
-    if (kind == MenuKind::Spatial) {
-      auto phones = SymbolGlyph(owner, 0xe7f6, 16);
-      phones.Margin({0, -buttonGlyphRaise, 0, buttonGlyphRaise});
-      g.Children().Append(phones);
-    } else {
-      m->endpointIcon = SymbolGlyph(owner, kind == MenuKind::Input ? 0xe720 : 0xe7f5);
-      m->endpointIcon.Margin({0, -buttonGlyphRaise, 0, buttonGlyphRaise});
-      g.Children().Append(m->endpointIcon);
-    }
+    wchar_t glyph = kind == MenuKind::Input     ? 0xe720
+                    : kind == MenuKind::Spatial ? 0xe7f6
+                                                : 0xe7f5;
+    m->leadingIcon = SymbolGlyph(owner, glyph);
+    m->leadingIcon.Margin({0, -buttonGlyphRaise, 0, buttonGlyphRaise});
+    g.Children().Append(m->leadingIcon);
     m->label = C::TextBlock();
     TextLine(m->label, 19.6);
     m->label.TextTrimming(X::TextTrimming::CharacterEllipsis);
