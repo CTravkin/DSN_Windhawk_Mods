@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.3
+// @version 0.9.4
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 186
+// Build: 187
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -79,17 +79,7 @@ Requires Windows 11 24H2 or later (x64).
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
 
-On update from an earlier DSN release, the mod uses saved values when the grouped controls still hold their defaults. To show those values in the settings editor and allow the defaults to be selected again, [move the old keys to the grouped settings](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Refined_Quick_Settings_and_Sound#moving-saved-dsn-settings-to-the-new-groups).
-
 Disable other mods or styles that change the same controls. If the panels do not update after enabling the mod, close and reopen them. If needed, restart ShellHost and check the Windhawk log.
-
-## Updating from the Windhawk catalog version 0.1.154
-
-If **Hidden applications** was filled in before the update, move those entries before adding any new rows under **Hide from the volume mixer**.
-
-1. Open **Advanced** → **Mod settings**. In the **Load** menu, choose **Load formatted**.
-2. Replace the `hiddenApps` string with one indexed setting per entry. For example, `"hiddenApps": "iCloud; Example.exe"` becomes `"sound.hiddenApplications[0]": "iCloud"` and `"sound.hiddenApplications[1]": "Example.exe"`. If rows are already filled in, use the next free indices. Remove `hiddenApps` in the same edit and keep the other settings.
-3. Click **Save** and check that the entries appear under **Hide from the volume mixer** on the **Settings** tab.
 
 ## Licenses
 
@@ -912,14 +902,7 @@ inline ModSettings ReadSettings() {
     auto value = WindhawkUtils::StringSetting::make(key);
     return std::wstring(value.get());
   };
-  auto settings = ReadPanelSettings(Wh_GetIntSetting, readString);
-  if (!settings.hidden.empty()) {
-    if (!Wh_GetIntValue(L"usesHiddenAppRows", 0))
-      Wh_SetIntValue(L"usesHiddenAppRows", 1);
-  } else if (!Wh_GetIntValue(L"usesHiddenAppRows", 0)) {
-    settings.hidden = sound::ParseHidden(readString(L"hiddenApps"));
-  }
-  return settings;
+  return ReadPanelSettings(Wh_GetIntSetting, readString);
 }
 } // namespace native
 BOOL Wh_ModInit() {

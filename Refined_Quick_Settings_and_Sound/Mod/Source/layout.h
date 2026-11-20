@@ -1190,7 +1190,7 @@ class SoundPage {
         if (name.empty())
           name = root.Name();
         // A new row whose binding has not resolved yet cannot be matched against
-        // hiddenApps; keep it transparent (max 500 ms) instead of showing it.
+        // the hidden-app list; keep it transparent for at most 500 ms.
         bool unnamed = name.empty();
         if (unnamed) {
           auto now = GetTickCount64();

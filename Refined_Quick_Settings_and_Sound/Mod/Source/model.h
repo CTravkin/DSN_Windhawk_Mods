@@ -63,18 +63,6 @@ inline void AddHiddenApp(std::vector<std::wstring> &apps, std::wstring_view name
   if (first != name.npos)
     apps.push_back(Lower(std::wstring(name.substr(first, name.find_last_not_of(L" \t\r\n") - first + 1))));
 }
-inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
-  std::vector<std::wstring> result;
-  size_t start = 0;
-  while (start < text.size()) {
-    auto end = text.find_first_of(L";,\r\n", start);
-    if (end == text.npos)
-      end = text.size();
-    AddHiddenApp(result, std::wstring_view(text).substr(start, end - start));
-    start = end + 1;
-  }
-  return result;
-}
 inline int VolumeWheelStep(int value) {
   return value >= 1 && value <= 100 ? value : 2;
 }

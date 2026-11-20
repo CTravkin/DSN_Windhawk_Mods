@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.3
+// @version 0.9.4
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 186
+// Build: 187
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -79,17 +79,7 @@ Requires Windows 11 24H2 or later (x64).
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
 
-On update from an earlier DSN release, the mod uses saved values when the grouped controls still hold their defaults. To show those values in the settings editor and allow the defaults to be selected again, [move the old keys to the grouped settings](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Refined_Quick_Settings_and_Sound#moving-saved-dsn-settings-to-the-new-groups).
-
 Disable other mods or styles that change the same controls. If the panels do not update after enabling the mod, close and reopen them. If needed, restart ShellHost and check the Windhawk log.
-
-## Updating from the Windhawk catalog version 0.1.154
-
-If **Hidden applications** was filled in before the update, move those entries before adding any new rows under **Hide from the volume mixer**.
-
-1. Open **Advanced** → **Mod settings**. In the **Load** menu, choose **Load formatted**.
-2. Replace the `hiddenApps` string with one indexed setting per entry. For example, `"hiddenApps": "iCloud; Example.exe"` becomes `"sound.hiddenApplications[0]": "iCloud"` and `"sound.hiddenApplications[1]": "Example.exe"`. If rows are already filled in, use the next free indices. Remove `hiddenApps` in the same edit and keep the other settings.
-3. Click **Save** and check that the entries appear under **Hide from the volume mixer** on the **Settings** tab.
 
 ## Licenses
 
@@ -1012,18 +1002,6 @@ inline void AddHiddenApp(std::vector<std::wstring> &apps, std::wstring_view name
   auto first = name.find_first_not_of(L" \t\r\n");
   if (first != name.npos)
     apps.push_back(Lower(std::wstring(name.substr(first, name.find_last_not_of(L" \t\r\n") - first + 1))));
-}
-inline std::vector<std::wstring> ParseHidden(std::wstring const &text) {
-  std::vector<std::wstring> result;
-  size_t start = 0;
-  while (start < text.size()) {
-    auto end = text.find_first_of(L";,\r\n", start);
-    if (end == text.npos)
-      end = text.size();
-    AddHiddenApp(result, std::wstring_view(text).substr(start, end - start));
-    start = end + 1;
-  }
-  return result;
 }
 inline int VolumeWheelStep(int value) {
   return value >= 1 && value <= 100 ? value : 2;
@@ -4359,7 +4337,7 @@ class SoundPage {
         if (name.empty())
           name = root.Name();
         // A new row whose binding has not resolved yet cannot be matched against
-        // hiddenApps; keep it transparent (max 500 ms) instead of showing it.
+        // the hidden-app list; keep it transparent for at most 500 ms.
         bool unnamed = name.empty();
         if (unnamed) {
           auto now = GetTickCount64();
@@ -9594,79 +9572,37 @@ inline void StopHost() {
 namespace native {
 inline ModSettings ReadPanelSettings(auto readInt, auto readString) {
   ModSettings settings;
-  // Windhawk keeps old paths and adds the initial values of new paths on upgrade.
-  // Until the legacy entries are moved in the editor, an unchanged new default
-  // can take its effective value from the old path.
-  auto stringSetting = [&](PCWSTR key, std::wstring_view initial, PCWSTR legacyKey) {
-    auto value = readString(key);
-    if (value.empty() || value == initial) {
-      auto previous = readString(legacyKey);
-      if (!previous.empty())
-        return previous;
-    }
-    return value.empty() ? std::wstring(initial) : value;
-  };
+  settings.quickSoundAccess = readInt(L"taskbar.openSoundFromVolumeIcon") != 0;
+  settings.trayMiddleClickMute = readInt(L"taskbar.middleClickMute") != 0;
+  settings.volumeWheelStep = sound::VolumeWheelStep(readInt(L"sound.volumeWheelStep"));
+  settings.brightnessEnabled = readString(L"quickSettings.brightnessMode") != L"disabled";
+  settings.pillQuickTiles = readString(L"quickSettings.tileShape") == L"pills";
+  settings.pillSoundPickers = readString(L"sound.selectorShape") == L"pills";
+  settings.sound = sound::ParseSoundOptions(readString(L"sound.microphoneVolumeMode"),
+                                           readString(L"sound.microphoneVolumeRight"),
+                                           readString(L"sound.systemVolumeRight"),
+                                           readString(L"sound.spatialSoundMenu"));
 
-  auto brightness = readString(L"quickSettings.brightnessMode");
-  auto oldBrightness = readString(L"brightnessMode");
-  bool hasGroupedDefaults = !brightness.empty();
-  // Both settings were present in every DSN schema with the old taskbar fields.
-  bool hasLegacyTaskbar = !oldBrightness.empty() || !readString(L"quickSettings.shortcut1").empty();
-  auto intSetting = [&](PCWSTR key, int initial, PCWSTR legacyKey) {
-    auto value = hasGroupedDefaults ? readInt(key) : initial;
-    return value == initial && hasLegacyTaskbar ? readInt(legacyKey) : value;
-  };
-
-  settings.quickSoundAccess = intSetting(L"taskbar.openSoundFromVolumeIcon", 1, L"quickSoundAccess") != 0;
-  settings.trayMiddleClickMute = intSetting(L"taskbar.middleClickMute", 0, L"trayMiddleClickMute") != 0;
-  settings.volumeWheelStep = sound::VolumeWheelStep(intSetting(L"sound.volumeWheelStep", 2, L"volumeWheelStep"));
-  settings.brightnessEnabled = (brightness.empty() || brightness == L"auto" ? oldBrightness
-                                                                            : brightness) != L"disabled";
-  settings.pillQuickTiles = stringSetting(L"quickSettings.tileShape", L"default", L"appearance.quickTiles") == L"pills";
-  settings.pillSoundPickers = stringSetting(L"sound.selectorShape", L"default", L"appearance.soundPickers") == L"pills";
-
-  auto microphone = stringSetting(L"sound.microphoneVolumeMode", L"disabled", L"microphoneVolume");
-  auto microphoneRight = readString(L"sound.microphoneVolumeRight");
-  auto systemRight = readString(L"sound.systemVolumeRight");
-  if ((systemRight.empty() || systemRight == L"soundSettings") &&
-      readString(L"soundSettingsPosition") == L"header")
-    systemRight = L"deviceSettings";
-  auto spatial = stringSetting(L"sound.spatialSoundMenu", L"enabled", L"spatialSoundMenu");
-  settings.sound = sound::ParseSoundOptions(microphone, microphoneRight, systemRight, spatial);
-
-  auto oldRowKey = readString(L"appearance.quickActionRows").empty() ? L"quickActionRows"
-                                                                   : L"appearance.quickActionRows";
-  auto rows = stringSetting(L"quickSettings.tileRows", L"2", oldRowKey);
+  auto rows = readString(L"quickSettings.tileRows");
   if (rows.size() == 1 && rows.front() >= L'1' && rows.front() <= L'4')
     settings.quickActionRows = rows.front() - L'0';
 
   for (size_t i = 0; i < settings.quickShortcuts.size(); ++i) {
-    auto slot = std::to_wstring(i + 1);
-    auto value = stringSetting((L"quickSettings.additionalShortcuts.shortcut" + slot).c_str(),
-                               i == 0 ? L"display" : L"none",
-                               (L"quickSettings.shortcut" + slot).c_str());
-    settings.quickShortcuts[i] = sound::ParseQuickShortcut(value);
+    auto key = L"quickSettings.additionalShortcuts.shortcut" + std::to_wstring(i + 1);
+    settings.quickShortcuts[i] = sound::ParseQuickShortcut(readString(key.c_str()));
   }
-  if (!hasGroupedDefaults && !hasLegacyTaskbar)
-    settings.quickShortcuts = {readInt(L"showDisplaySettings") ? sound::QuickShortcut::Display
-                                                            : sound::QuickShortcut::None};
 
-  auto readHidden = [&](PCWSTR path) {
-    // Windhawk exposes individual slots without reporting the array length.
-    for (int i = 0, blanks = 0; blanks < 32; ++i) {
-      auto key = path + (L"[" + std::to_wstring(i) + L"]");
-      auto value = readString(key.c_str());
-      if (value.empty()) {
-        ++blanks;
-        continue;
-      }
-      blanks = 0;
-      sound::AddHiddenApp(settings.hidden, value);
+  // Windhawk exposes individual slots without reporting the array length.
+  for (int i = 0, blanks = 0; blanks < 32; ++i) {
+    auto key = L"sound.hiddenApplications[" + std::to_wstring(i) + L"]";
+    auto value = readString(key.c_str());
+    if (value.empty()) {
+      ++blanks;
+      continue;
     }
-  };
-  readHidden(L"sound.hiddenApplications");
-  if (settings.hidden.empty())
-    readHidden(L"hiddenApplications");
+    blanks = 0;
+    sound::AddHiddenApp(settings.hidden, value);
+  }
   ReadAlternativeIcons(settings, readInt);
   return settings;
 }
@@ -11088,14 +11024,7 @@ inline ModSettings ReadSettings() {
     auto value = WindhawkUtils::StringSetting::make(key);
     return std::wstring(value.get());
   };
-  auto settings = ReadPanelSettings(Wh_GetIntSetting, readString);
-  if (!settings.hidden.empty()) {
-    if (!Wh_GetIntValue(L"usesHiddenAppRows", 0))
-      Wh_SetIntValue(L"usesHiddenAppRows", 1);
-  } else if (!Wh_GetIntValue(L"usesHiddenAppRows", 0)) {
-    settings.hidden = sound::ParseHidden(readString(L"hiddenApps"));
-  }
-  return settings;
+  return ReadPanelSettings(Wh_GetIntSetting, readString);
 }
 } // namespace native
 BOOL Wh_ModInit() {

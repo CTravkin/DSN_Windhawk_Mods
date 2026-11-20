@@ -67,19 +67,6 @@ Requires Windows 11 24H2 or later (x64) and [Windhawk](https://windhawk.net/).
 
 Open Quick Settings with Win+A and Sound with Win+Ctrl+V. When **Quick access to Sound** is enabled, the taskbar volume icon opens Sound as well. Adjust the mod's options on its **Settings** tab in Windhawk.
 
-### Moving saved DSN settings to the new groups
-
-Windhawk keeps old settings when it adds defaults for the new groups. The mod uses the old values for controls still set to those defaults. Move the old keys once so the editor shows the effective values and you can select the defaults again.
-
-1. In the mod's **Advanced** tab, open **Mod settings** and choose **Load** → **Load formatted**. Save the JSON to `settings-before.json` as a backup.
-2. Run [the settings converter](Tools/Migrate-ModSettings.ps1) with that file.
-
-   ```powershell
-   .\Tools\Migrate-ModSettings.ps1 -InputPath .\settings-before.json
-   ```
-
-3. Replace the text in **Mod settings** with the JSON printed by the converter and select **Save**. Reopen the **Settings** tab to see the grouped values.
-
 ### Build and verification
 
 Run from this mod directory with Python 3 on `PATH` and Windhawk installed. `Build-Mod.ps1` uses `C:/Program Files/Windhawk/Compiler` and Engine 1.7.3.

@@ -111,47 +111,52 @@ int main() {
     }
     std::puts("PASS: Endpoint volume can be reset from zero or a partial level");
     {
-      // Windhawk materializes the new defaults as well as retaining the old keys.
+      // Old values that Windhawk may still store cannot override grouped settings.
       std::map<std::wstring, int> numbers{{L"taskbar.openSoundFromVolumeIcon", 1},
                                          {L"taskbar.middleClickMute", 0},
                                          {L"sound.volumeWheelStep", 2},
                                          {L"quickSoundAccess", 0},
-                                         {L"trayMiddleClickMute", 1},
                                          {L"volumeWheelStep", 7}};
       std::map<std::wstring, std::wstring> strings{
           {L"quickSettings.brightnessMode", L"auto"}, {L"brightnessMode", L"disabled"},
-          {L"quickSettings.tileRows", L"2"}, {L"appearance.quickActionRows", L"4"},
-          {L"quickSettings.tileShape", L"default"}, {L"appearance.quickTiles", L"pills"},
-          {L"sound.selectorShape", L"default"}, {L"appearance.soundPickers", L"pills"},
-          {L"sound.microphoneVolumeMode", L"disabled"}, {L"microphoneVolume", L"auto"},
-          {L"sound.spatialSoundMenu", L"enabled"}, {L"spatialSoundMenu", L"disabled"},
-          {L"sound.systemVolumeRight", L"soundSettings"}, {L"soundSettingsPosition", L"header"},
+          {L"quickSettings.tileRows", L"2"}, {L"quickSettings.tileShape", L"default"},
+          {L"sound.selectorShape", L"default"}, {L"sound.microphoneVolumeMode", L"disabled"},
+          {L"sound.spatialSoundMenu", L"enabled"}, {L"sound.systemVolumeRight", L"soundSettings"},
           {L"quickSettings.additionalShortcuts.shortcut1", L"display"},
-          {L"quickSettings.additionalShortcuts.shortcut4", L"none"},
-          {L"quickSettings.shortcut1", L"none"}, {L"quickSettings.shortcut4", L"graphics"},
-          {L"sound.hiddenApplications[0]", L""}, {L"hiddenApplications[0]", L"First.exe"},
-          {L"hiddenApplications[32]", L"Example.exe"}, {L"hiddenApplications[65]", L"BeyondGap.exe"}};
+          {L"quickSettings.shortcut1", L"none"}, {L"hiddenApplications[0]", L"Old.exe"}};
       auto readInt = [&](PCWSTR key) { return numbers[key]; };
       auto readString = [&](PCWSTR key) { return strings[key]; };
       auto settings = native::ReadPanelSettings(readInt, readString);
       using Shortcut = sound::QuickShortcut;
-      if (settings.quickSoundAccess || !settings.trayMiddleClickMute || settings.volumeWheelStep != 7 ||
-          settings.brightnessEnabled || settings.quickActionRows != 4 || !settings.pillQuickTiles ||
-          !settings.pillSoundPickers || !settings.sound.microphoneAuto || settings.sound.spatialSound ||
-          settings.sound.systemVolumeRight != Right::DeviceSettings ||
-          settings.quickShortcuts[0] != Shortcut::None || settings.quickShortcuts[3] != Shortcut::Graphics ||
-          settings.hidden != std::vector<std::wstring>{L"first.exe", L"example.exe"}) {
-        std::puts("FAIL: Windhawk's grouped defaults masked saved values during an upgrade");
+      if (!settings.quickSoundAccess || settings.trayMiddleClickMute || settings.volumeWheelStep != 2 ||
+          !settings.brightnessEnabled || settings.quickActionRows != 2 || settings.pillQuickTiles ||
+          settings.pillSoundPickers || settings.sound.microphoneAuto || !settings.sound.spatialSound ||
+          settings.sound.systemVolumeRight != Right::SoundSettings ||
+          settings.quickShortcuts[0] != Shortcut::Display || !settings.hidden.empty()) {
+        std::puts("FAIL: Old values overrode the grouped defaults");
         return 16;
       }
+      numbers[L"taskbar.openSoundFromVolumeIcon"] = 0;
+      numbers[L"taskbar.middleClickMute"] = 1;
       numbers[L"sound.volumeWheelStep"] = 11;
+      strings[L"quickSettings.brightnessMode"] = L"disabled";
+      strings[L"quickSettings.tileRows"] = L"4";
+      strings[L"quickSettings.tileShape"] = L"pills";
+      strings[L"sound.selectorShape"] = L"pills";
+      strings[L"sound.microphoneVolumeMode"] = L"auto";
+      strings[L"sound.spatialSoundMenu"] = L"disabled";
       strings[L"sound.systemVolumeRight"] = L"percentage";
+      strings[L"quickSettings.additionalShortcuts.shortcut4"] = L"graphics";
       strings[L"sound.hiddenApplications[0]"] = L"New.exe";
       strings[L"sound.hiddenApplications[32]"] = L"Final.exe";
+      strings[L"sound.hiddenApplications[65]"] = L"BeyondGap.exe";
       settings = native::ReadPanelSettings(readInt, readString);
-      if (settings.volumeWheelStep != 11 || settings.sound.systemVolumeRight != Right::Percentage ||
+      if (settings.quickSoundAccess || !settings.trayMiddleClickMute || settings.volumeWheelStep != 11 ||
+          settings.brightnessEnabled || settings.quickActionRows != 4 || !settings.pillQuickTiles ||
+          !settings.pillSoundPickers || !settings.sound.microphoneAuto || settings.sound.spatialSound ||
+          settings.sound.systemVolumeRight != Right::Percentage || settings.quickShortcuts[3] != Shortcut::Graphics ||
           settings.hidden != std::vector<std::wstring>{L"new.exe", L"final.exe"}) {
-        std::puts("FAIL: migrated settings overrode explicit grouped changes");
+        std::puts("FAIL: Grouped preferences or sparse hidden-app rows were not applied");
         return 16;
       }
       for (int i = 0; i < 33; ++i) {
@@ -163,19 +168,7 @@ int main() {
         std::puts("FAIL: a full hidden-app list was truncated at 32 entries");
         return 16;
       }
-      numbers[L"sound.volumeWheelStep"] = 2;
-      std::erase_if(strings, [](auto const &entry) {
-        return entry.first.starts_with(L"hiddenApplications[") ||
-               entry.first.starts_with(L"sound.hiddenApplications[");
-      });
-      strings.erase(L"brightnessMode");
-      strings.erase(L"quickSettings.shortcut1");
-      settings = native::ReadPanelSettings(readInt, readString);
-      if (settings.volumeWheelStep != 2 || !settings.quickSoundAccess || !settings.hidden.empty()) {
-        std::puts("FAIL: grouped defaults could not be selected again after migration");
-        return 16;
-      }
-      std::puts("PASS: upgrade retains saved Sound, Taskbar and Quick Settings preferences");
+      std::puts("PASS: grouped preferences ignore old keys and preserve long and sparse hidden-app lists");
     }
     {
       using Probe = sound::InputVolumeProbe;
@@ -280,10 +273,8 @@ int main() {
     sound::AddHiddenApp(names, L"  Foo, Inc. ");
     sound::AddHiddenApp(names, L" ");
     sound::AddHiddenApp(names, L"STEAM.exe");
-    if (names != std::vector<std::wstring>{L"foo, inc.", L"steam.exe"} ||
-        sound::ParseHidden(L"FOO; Steam.exe, Slack") !=
-            std::vector<std::wstring>{L"foo", L"steam.exe", L"slack"}) {
-      std::puts("FAIL: Hidden app rows keep punctuation and legacy groups still split");
+    if (names != std::vector<std::wstring>{L"foo, inc.", L"steam.exe"}) {
+      std::puts("FAIL: Hidden app rows must keep punctuation and skip blanks");
       return 7;
     }
     std::puts("PASS: Volume wheel and hidden app setting behavior");
