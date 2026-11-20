@@ -61,6 +61,7 @@ class SoundPage {
   C::StackPanel inputBlock_{nullptr};
   C::Button mixerSettings_{nullptr}, soundSettings_{nullptr};
   C::Button outputSettings_{nullptr}, microphoneMute_{nullptr};
+  C::Button headerBack_{nullptr};
   C::Canvas headerSettingsOverlay_{nullptr};
   C::Grid headerSettingsSlot_{nullptr}, microphoneRow_{nullptr};
   X::FrameworkElement spatialSection_{nullptr}, spatialHeading_{nullptr};
@@ -149,9 +150,15 @@ class SoundPage {
       gearJournal_.Restore();
       if (auto style = Resource(page_, L"FooterIconButtonStyle").try_as<X::Style>()) {
         button.Style(style);
-        button.Width(36);
-        button.Height(36);
-        button.Margin({-2, -2, -2, -2});
+        if (headerSettingsSlot_ && settings_.sound.settingsInHeader) {
+          button.Width(headerSettingsSlot_.Width());
+          button.Height(headerSettingsSlot_.Height());
+          button.Margin({});
+        } else {
+          button.Width(36);
+          button.Height(36);
+          button.Margin({-2, -2, -2, -2});
+        }
       }
       if (!settings_.altSoundGear) {
         button.Content(SymbolGlyph(page_, 0xe713, 16));
@@ -1406,7 +1413,6 @@ class SoundPage {
                            L"Configurações de som", L"声音设置"));
     soundSettings_ = settings;
     X::Automation::AutomationProperties::SetAutomationId(settings, L"NativeSoundSettings");
-    SettingsGear(settings);
     C::Grid::SetColumn(settings, 2);
     footer_.Children().Append(settings);
     auto nativeBorder = footerBorder_;
@@ -1442,30 +1448,41 @@ class SoundPage {
   }
   void AlignSettingsHeader() {
     if (!settings_.sound.settingsInHeader || !headerSettingsOverlay_.IsLoaded() ||
-        pageTitle_.ActualHeight() <= 0 || outputSettings_.ActualWidth() <= 0)
+        !headerBack_.IsLoaded() || headerBack_.ActualWidth() <= 0 ||
+        page_.ActualWidth() <= 0 || footerBorder_.ActualWidth() <= 0)
       return;
-    auto output = outputSettings_.TransformToVisual(headerSettingsOverlay_).TransformPoint(
-        {float(outputSettings_.ActualWidth() / 2), 0});
-    auto title = pageTitle_.TransformToVisual(headerSettingsOverlay_).TransformPoint(
-        {0, float(pageTitle_.ActualHeight() / 2)});
-    auto left = output.X - headerSettingsSlot_.Width() / 2;
-    auto top = title.Y - headerSettingsSlot_.Height() / 2;
+    auto back = headerBack_.TransformToVisual(page_).TransformPoint(
+        {float(headerBack_.ActualWidth()), 0});
+    auto leftInPage = page_.ActualWidth() - back.X;
+    auto position = page_.TransformToVisual(headerSettingsOverlay_).TransformPoint(
+        {float(leftInPage), back.Y});
     auto previousLeft = C::Canvas::GetLeft(headerSettingsSlot_);
     auto previousTop = C::Canvas::GetTop(headerSettingsSlot_);
-    if (!std::isfinite(previousLeft) || std::abs(previousLeft - left) > .01)
-      C::Canvas::SetLeft(headerSettingsSlot_, left);
-    if (!std::isfinite(previousTop) || std::abs(previousTop - top) > .01)
-      C::Canvas::SetTop(headerSettingsSlot_, top);
+    if (!std::isfinite(previousLeft) || std::abs(previousLeft - position.X) > .01)
+      C::Canvas::SetLeft(headerSettingsSlot_, position.X);
+    if (!std::isfinite(previousTop) || std::abs(previousTop - position.Y) > .01)
+      C::Canvas::SetTop(headerSettingsSlot_, position.Y);
+    // Keep both device buttons on the same right edge as the mirrored gear.
+    auto innerRight = footerBorder_.ActualWidth() - footerBorder_.BorderThickness().Right -
+                      footerBorder_.Padding().Right;
+    auto footerRight = footerBorder_.TransformToVisual(page_).TransformPoint(
+        {float(innerRight), 0}).X;
+    auto rightMargin = footerRight - (leftInPage + headerSettingsSlot_.Width());
+    auto margin = footerRows_.Margin();
+    if (std::abs(margin.Right - rightMargin) > .01) {
+      margin.Right = rightMargin;
+      footerRows_.Margin(margin);
+    }
     if (headerSettingsSlot_.Visibility() != X::Visibility::Visible)
       headerSettingsSlot_.Visibility(X::Visibility::Visible);
   }
   void PrepareSettingsHeader() {
-    // The title container can be narrow. Host the button in a common grid
-    // and use the actual output button as the horizontal reference.
+    // The header's native container can be narrow. Host the overlay in a
+    // common grid so its coordinates cover both the header and the footer.
     C::Grid grid{nullptr};
-    for (auto ancestor = Parent(outputSettings_); ancestor; ancestor = Parent(ancestor)) {
+    for (auto ancestor = Parent(footerBorder_); ancestor; ancestor = Parent(ancestor)) {
       if (auto candidate = ancestor.try_as<C::Grid>();
-          candidate && Find(candidate, [&](auto const &element) { return element == pageTitle_; })) {
+          candidate && Find(candidate, [&](auto const &element) { return element == headerBack_; })) {
         grid = candidate;
         break;
       }
@@ -1478,8 +1495,8 @@ class SoundPage {
     C::Grid::SetColumnSpan(headerSettingsOverlay_, std::max(1u, grid.ColumnDefinitions().Size()));
     C::Grid::SetRowSpan(headerSettingsOverlay_, std::max(1u, grid.RowDefinitions().Size()));
     headerSettingsSlot_ = C::Grid();
-    headerSettingsSlot_.Width(32);
-    headerSettingsSlot_.Height(32);
+    headerSettingsSlot_.Width(headerBack_.Width());
+    headerSettingsSlot_.Height(headerBack_.Height());
     headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
     headerSettingsOverlay_.Children().Append(headerSettingsSlot_);
     Add(grid, headerSettingsOverlay_);
@@ -1498,6 +1515,7 @@ class SoundPage {
     if (!headerSettingsSlot_) {
       if (inHeader)
         Wh_Log(L"Sound header layout unavailable; keeping the settings button beside volume");
+      SettingsGear(soundSettings_);
       return;
     }
     auto target = inHeader ? headerSettingsSlot_ : footer_;
@@ -1511,6 +1529,8 @@ class SoundPage {
     outputSettings_.Visibility(inHeader ? X::Visibility::Visible : X::Visibility::Collapsed);
     if (!inHeader)
       headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
+    FooterMargins();
+    SettingsGear(soundSettings_);
   }
   void ApplySpatialVisibility() {
     if (settings_.sound.spatialSound) {
@@ -1686,10 +1706,8 @@ public:
     ApplySpatialVisibility();
     Mixer();
     Master(oldFooter, style);
-    if (pageTitle_)
-      PrepareSettingsHeader();
-    PositionSoundSettings();
     if (auto back = Named(page_, L"BackButton").try_as<C::Button>()) {
+      headerBack_ = back;
       Set(back, X::FrameworkElement::WidthProperty(), winrt::box_value(32.));
       Set(back, X::FrameworkElement::HeightProperty(), winrt::box_value(32.));
       Set(back, X::FrameworkElement::MinWidthProperty(), winrt::box_value(0.));
@@ -1754,6 +1772,7 @@ public:
           uint32_t index = 0;
           parent.Children().IndexOf(back, index);
           Add(parent, clone, index + 1);
+          headerBack_ = clone;
           auto weakBack = winrt::make_weak(back);
           auto weakPage = winrt::make_weak(page_);
           Keep(clone.Click(winrt::auto_revoke, [weakBack, weakPage](auto &&, auto &&) {
@@ -1790,6 +1809,9 @@ public:
         }
       }
     }
+    if (headerBack_)
+      PrepareSettingsHeader();
+    PositionSoundSettings();
     for (auto name : {L"PageTitleText", L"PageTitle"})
       if (auto t = Named(page_, name).try_as<C::TextBlock>()) {
         journal_.Save(t, C::TextBlock::TextProperty());
@@ -2227,7 +2249,10 @@ public:
     auto root = page_.XamlRoot();
     double s = root ? root.RasterizationScale() : 1.;
     double step = StepPx(s), half = std::round(16 * s), border = std::max(1., std::round(s));
-    footerRows_.Margin({20, (step - border - half) / s, 20, (step - half) / s});
+    double right = headerSettingsSlot_ && settings_.sound.settingsInHeader
+                       ? footerRows_.Margin().Right
+                       : 20.;
+    footerRows_.Margin({20, (step - border - half) / s, right, (step - half) / s});
     microphoneRow_.Margin({0, 0, 0, (step - half * 2) / s});
   }
   // The SV divider lies on the footer's base acrylic, the line above All
