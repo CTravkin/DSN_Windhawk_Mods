@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.7.4
+// @version 0.8.1
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 176
+// Build: 178
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -55,6 +55,8 @@ is restored when the mod is unloaded.
 - Change the output and input devices and the spatial sound provider from
   dropdown lists.
 - Below them is a reworked Volume mixer for the apps. It starts collapsed the first time Sound opens in each ShellHost process and remembers its state on subsequent openings.
+- **Microphone volume** is off by default. **Auto** shows a slider for the selected microphone when its level is adjustable. The row can mute the microphone without changing its level and open its Windows properties.
+- Turn off **Spatial sound** to hide the mode selector. Move the **Sound settings shortcut** to the header to open the selected output device's properties from the button next to system volume.
 - Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - **Hide from the volume mixer** takes app names or executable names, one per row. Hidden apps keep playing audio.
@@ -179,6 +181,99 @@ in this source file.
   $options:zh-CN:
   - auto: 自动
   - disabled: 禁用
+- microphoneVolume: disabled
+  $name: Microphone volume
+  $name:ru-RU: Громкость микрофона
+  $name:es-ES: Volumen del micrófono
+  $name:de-DE: Mikrofonlautstärke
+  $name:pt-BR: Volume do microfone
+  $name:zh-CN: 麦克风音量
+  $description: Shows a slider for the selected microphone above the system volume
+  $description:ru-RU: Показывает ползунок громкости выбранного микрофона над общей громкостью
+  $description:es-ES: Muestra un control para el micrófono seleccionado encima del volumen del sistema
+  $description:de-DE: Zeigt über der Systemlautstärke einen Regler für das ausgewählte Mikrofon an
+  $description:pt-BR: Mostra um controle para o microfone selecionado acima do volume do sistema
+  $description:zh-CN: 在系统音量上方显示所选麦克风的音量滑块
+  $options:
+  - auto: Auto
+  - disabled: Off
+  $options:ru-RU:
+  - auto: Авто
+  - disabled: Выключено
+  $options:es-ES:
+  - auto: Automático
+  - disabled: Desactivado
+  $options:de-DE:
+  - auto: Automatisch
+  - disabled: Aus
+  $options:pt-BR:
+  - auto: Automático
+  - disabled: Desativado
+  $options:zh-CN:
+  - auto: 自动
+  - disabled: 关闭
+- spatialSoundMenu: enabled
+  $name: Spatial sound
+  $name:ru-RU: Пространственный звук
+  $name:es-ES: Sonido espacial
+  $name:de-DE: Raumklang
+  $name:pt-BR: Som espacial
+  $name:zh-CN: 空间音效
+  $description: Menu for selecting a spatial audio mode
+  $description:ru-RU: Меню выбора режима пространственного аудио
+  $description:es-ES: Menú para elegir un modo de audio espacial
+  $description:de-DE: Menü zur Auswahl des Raumklangmodus
+  $description:pt-BR: Menu para escolher um modo de áudio espacial
+  $description:zh-CN: 用于选择空间音频模式的菜单
+  $options:
+  - enabled: On
+  - disabled: Off
+  $options:ru-RU:
+  - enabled: Включено
+  - disabled: Выключено
+  $options:es-ES:
+  - enabled: Activado
+  - disabled: Desactivado
+  $options:de-DE:
+  - enabled: Ein
+  - disabled: Aus
+  $options:pt-BR:
+  - enabled: Ativado
+  - disabled: Desativado
+  $options:zh-CN:
+  - enabled: 开启
+  - disabled: 关闭
+- soundSettingsPosition: volume
+  $name: Sound settings shortcut
+  $name:ru-RU: Переход к настройкам звука
+  $name:es-ES: Acceso a la configuración de sonido
+  $name:de-DE: Verknüpfung zu den Soundeinstellungen
+  $name:pt-BR: Atalho para as configurações de som
+  $name:zh-CN: 声音设置快捷方式
+  $description: Location of the button that opens Windows sound settings
+  $description:ru-RU: Позиция кнопки перехода к параметрам системного звука
+  $description:es-ES: Ubicación del botón que abre la configuración de sonido de Windows
+  $description:de-DE: Position der Schaltfläche für die Windows-Soundeinstellungen
+  $description:pt-BR: Posição do botão que abre as configurações de som do Windows
+  $description:zh-CN: 打开 Windows 声音设置的按钮位置
+  $options:
+  - volume: To the right of volume
+  - header: In the panel header
+  $options:ru-RU:
+  - volume: Справа от громкости
+  - header: В заголовке панели
+  $options:es-ES:
+  - volume: A la derecha del volumen
+  - header: En el encabezado del panel
+  $options:de-DE:
+  - volume: Rechts neben der Lautstärke
+  - header: Im Kopfbereich
+  $options:pt-BR:
+  - volume: À direita do volume
+  - header: No cabeçalho do painel
+  $options:zh-CN:
+  - volume: 在音量滑块右侧
+  - header: 在面板标题栏
 - appearance:
   - quickActionRows: "2"
     $name: Rows of tiles
@@ -792,6 +887,10 @@ inline ModSettings ReadSettings() {
   settings.trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   settings.brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
+  auto microphone = WindhawkUtils::StringSetting::make(L"microphoneVolume");
+  auto spatial = WindhawkUtils::StringSetting::make(L"spatialSoundMenu");
+  auto soundPosition = WindhawkUtils::StringSetting::make(L"soundSettingsPosition");
+  settings.sound = sound::ParseSoundOptions(microphone.get(), spatial.get(), soundPosition.get());
   auto rows = WindhawkUtils::StringSetting::make(L"appearance.quickActionRows");
   if (!*rows.get())
     rows = WindhawkUtils::StringSetting::make(L"quickActionRows");

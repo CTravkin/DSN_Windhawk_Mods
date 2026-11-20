@@ -49,6 +49,7 @@ inline std::atomic<bool> stopping = false;
 inline HMODULE module = nullptr;
 struct ModSettings {
   std::vector<std::wstring> hidden;
+  sound::SoundOptions sound;
   bool brightnessEnabled = true;
   bool pillQuickTiles = false, pillSoundPickers = false;
   int quickActionRows = 2;

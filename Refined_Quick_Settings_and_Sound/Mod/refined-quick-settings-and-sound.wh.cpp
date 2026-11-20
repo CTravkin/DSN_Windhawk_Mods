@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.7.4
+// @version 0.8.1
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 176
+// Build: 178
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -55,6 +55,8 @@ is restored when the mod is unloaded.
 - Change the output and input devices and the spatial sound provider from
   dropdown lists.
 - Below them is a reworked Volume mixer for the apps. It starts collapsed the first time Sound opens in each ShellHost process and remembers its state on subsequent openings.
+- **Microphone volume** is off by default. **Auto** shows a slider for the selected microphone when its level is adjustable. The row can mute the microphone without changing its level and open its Windows properties.
+- Turn off **Spatial sound** to hide the mode selector. Move the **Sound settings shortcut** to the header to open the selected output device's properties from the button next to system volume.
 - Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - **Hide from the volume mixer** takes app names or executable names, one per row. Hidden apps keep playing audio.
@@ -179,6 +181,99 @@ in this source file.
   $options:zh-CN:
   - auto: 自动
   - disabled: 禁用
+- microphoneVolume: disabled
+  $name: Microphone volume
+  $name:ru-RU: Громкость микрофона
+  $name:es-ES: Volumen del micrófono
+  $name:de-DE: Mikrofonlautstärke
+  $name:pt-BR: Volume do microfone
+  $name:zh-CN: 麦克风音量
+  $description: Shows a slider for the selected microphone above the system volume
+  $description:ru-RU: Показывает ползунок громкости выбранного микрофона над общей громкостью
+  $description:es-ES: Muestra un control para el micrófono seleccionado encima del volumen del sistema
+  $description:de-DE: Zeigt über der Systemlautstärke einen Regler für das ausgewählte Mikrofon an
+  $description:pt-BR: Mostra um controle para o microfone selecionado acima do volume do sistema
+  $description:zh-CN: 在系统音量上方显示所选麦克风的音量滑块
+  $options:
+  - auto: Auto
+  - disabled: Off
+  $options:ru-RU:
+  - auto: Авто
+  - disabled: Выключено
+  $options:es-ES:
+  - auto: Automático
+  - disabled: Desactivado
+  $options:de-DE:
+  - auto: Automatisch
+  - disabled: Aus
+  $options:pt-BR:
+  - auto: Automático
+  - disabled: Desativado
+  $options:zh-CN:
+  - auto: 自动
+  - disabled: 关闭
+- spatialSoundMenu: enabled
+  $name: Spatial sound
+  $name:ru-RU: Пространственный звук
+  $name:es-ES: Sonido espacial
+  $name:de-DE: Raumklang
+  $name:pt-BR: Som espacial
+  $name:zh-CN: 空间音效
+  $description: Menu for selecting a spatial audio mode
+  $description:ru-RU: Меню выбора режима пространственного аудио
+  $description:es-ES: Menú para elegir un modo de audio espacial
+  $description:de-DE: Menü zur Auswahl des Raumklangmodus
+  $description:pt-BR: Menu para escolher um modo de áudio espacial
+  $description:zh-CN: 用于选择空间音频模式的菜单
+  $options:
+  - enabled: On
+  - disabled: Off
+  $options:ru-RU:
+  - enabled: Включено
+  - disabled: Выключено
+  $options:es-ES:
+  - enabled: Activado
+  - disabled: Desactivado
+  $options:de-DE:
+  - enabled: Ein
+  - disabled: Aus
+  $options:pt-BR:
+  - enabled: Ativado
+  - disabled: Desativado
+  $options:zh-CN:
+  - enabled: 开启
+  - disabled: 关闭
+- soundSettingsPosition: volume
+  $name: Sound settings shortcut
+  $name:ru-RU: Переход к настройкам звука
+  $name:es-ES: Acceso a la configuración de sonido
+  $name:de-DE: Verknüpfung zu den Soundeinstellungen
+  $name:pt-BR: Atalho para as configurações de som
+  $name:zh-CN: 声音设置快捷方式
+  $description: Location of the button that opens Windows sound settings
+  $description:ru-RU: Позиция кнопки перехода к параметрам системного звука
+  $description:es-ES: Ubicación del botón que abre la configuración de sonido de Windows
+  $description:de-DE: Position der Schaltfläche für die Windows-Soundeinstellungen
+  $description:pt-BR: Posição do botão que abre as configurações de som do Windows
+  $description:zh-CN: 打开 Windows 声音设置的按钮位置
+  $options:
+  - volume: To the right of volume
+  - header: In the panel header
+  $options:ru-RU:
+  - volume: Справа от громкости
+  - header: В заголовке панели
+  $options:es-ES:
+  - volume: A la derecha del volumen
+  - header: En el encabezado del panel
+  $options:de-DE:
+  - volume: Rechts neben der Lautstärke
+  - header: Im Kopfbereich
+  $options:pt-BR:
+  - volume: À direita do volume
+  - header: No cabeçalho do painel
+  $options:zh-CN:
+  - volume: 在音量滑块右侧
+  - header: 在面板标题栏
 - appearance:
   - quickActionRows: "2"
     $name: Rows of tiles
@@ -923,10 +1018,30 @@ struct Snapshot {
   std::wstring outputId, inputId, error;
   float master = 0;
   bool muted = false, masterAvailable = false;
+  float inputVolume = 0;
+  bool inputVolumeAvailable = false, inputMuteAvailable = false, inputMuted = false;
   unsigned long long revision = 0;
   unsigned long long applied = 0;
 };
-enum class Action { MasterVolume, MasterMute, ToggleEndpointMute, Input, Refresh };
+struct SoundOptions {
+  bool microphoneAuto = false, spatialSound = true, settingsInHeader = false;
+  bool operator==(SoundOptions const &) const = default;
+};
+inline SoundOptions ParseSoundOptions(std::wstring_view microphone, std::wstring_view spatial,
+                                      std::wstring_view settingsPosition) {
+  return {microphone == L"auto", spatial != L"disabled", settingsPosition == L"header"};
+}
+inline bool ShowMicrophoneRow(SoundOptions options, Snapshot const &state) {
+  return options.microphoneAuto && !state.inputId.empty() && state.inputVolumeAvailable;
+}
+inline std::wstring AudioDevicePropertiesUri(std::wstring_view id) {
+  if (id.empty())
+    return {};
+  return std::wstring(L"ms-settings:sound-properties?endpointId=").append(id);
+}
+enum class Action {
+  MasterVolume, MasterMute, ToggleEndpointMute, Input, InputVolume, InputMute, Refresh
+};
 struct Command {
   Action action = Action::Refresh;
   std::wstring id;
@@ -1028,14 +1143,25 @@ class Audio final {
     std::mutex mutex;
     std::condition_variable cv;
     bool changed = true;
+    void Signal() {
+      std::lock_guard lock(mutex);
+      changed = true;
+      cv.notify_one();
+    }
+  };
+  struct InputVolumeNotify : winrt::implements<InputVolumeNotify, IAudioEndpointVolumeCallback> {
+    std::shared_ptr<Wake> wake;
+    explicit InputVolumeNotify(std::shared_ptr<Wake> value) : wake(std::move(value)) {}
+    HRESULT STDMETHODCALLTYPE OnNotify(PAUDIO_VOLUME_NOTIFICATION_DATA) noexcept override {
+      wake->Signal();
+      return S_OK;
+    }
   };
   struct Notify : winrt::implements<Notify, IMMNotificationClient> {
     std::shared_ptr<Wake> wake;
     explicit Notify(std::shared_ptr<Wake> value) : wake(std::move(value)) {}
     void Signal() {
-      std::lock_guard lock(wake->mutex);
-      wake->changed = true;
-      wake->cv.notify_one();
+      wake->Signal();
     }
     HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow, ERole, LPCWSTR) override {
       Signal();
@@ -1083,6 +1209,11 @@ class Audio final {
   std::function<void()> publish_;
   winrt::com_ptr<IMMDeviceEnumerator> enumerator_;
   winrt::com_ptr<IAudioEndpointVolume> master_;
+  winrt::com_ptr<IAudioEndpointVolume> inputVolume_;
+  winrt::com_ptr<InputVolumeNotify> inputVolumeObserver_;
+  std::atomic<bool> inputVolumeEnabled_{false};
+  std::wstring inputVolumeId_;
+  bool inputVolumeRejected_ = false;
   std::shared_ptr<VolumeFeed> volumeFeed_ = std::make_shared<VolumeFeed>();
   winrt::com_ptr<VolumeNotify> volumeObserver_;
   std::map<std::wstring, SavedVolume> masters_;
@@ -1205,6 +1336,63 @@ class Audio final {
       ++completed;
     }
   }
+  void UnbindInputVolume() {
+    if (inputVolume_ && inputVolumeObserver_)
+      inputVolume_->UnregisterControlChangeNotify(inputVolumeObserver_.get());
+    inputVolumeObserver_ = nullptr;
+    inputVolume_ = nullptr;
+  }
+  void ReadInputVolume(Snapshot &state) {
+    auto id = inputVolumeEnabled_ ? state.inputId : std::wstring{};
+    if (id != inputVolumeId_) {
+      UnbindInputVolume();
+      inputVolumeId_ = id;
+      inputVolumeRejected_ = false;
+    }
+    if (id.empty() || inputVolumeRejected_)
+      return;
+    if (!inputVolume_) {
+      winrt::com_ptr<IMMDevice> device;
+      if (SUCCEEDED(enumerator_->GetDevice(id.c_str(), device.put())))
+        device->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, nullptr,
+                         inputVolume_.put_void());
+      if (!inputVolume_)
+        return;
+      inputVolumeObserver_ = winrt::make_self<InputVolumeNotify>(wake_);
+      if (FAILED(inputVolume_->RegisterControlChangeNotify(inputVolumeObserver_.get())))
+        inputVolumeObserver_ = nullptr;
+    }
+    if (FAILED(inputVolume_->GetMasterVolumeLevelScalar(&state.inputVolume))) {
+      UnbindInputVolume();
+      return;
+    }
+    float low, high, step;
+    // Software endpoint volume also works for virtual devices. A fixed range
+    // means the device offers no adjustment, regardless of its form factor.
+    state.inputVolumeAvailable =
+        std::isfinite(state.inputVolume) &&
+        (FAILED(inputVolume_->GetVolumeRange(&low, &high, &step)) || high > low);
+    BOOL muted = FALSE;
+    state.inputMuteAvailable = SUCCEEDED(inputVolume_->GetMute(&muted));
+    state.inputMuted = muted;
+  }
+  void SetInputVolume(Command const &cmd, float value) {
+    // A queued drag or click can outlive a default device change. Keep both
+    // operations tied to the endpoint that was visible when the event fired.
+    if (!inputVolumeEnabled_ || !inputVolume_ || cmd.id != inputVolumeId_ ||
+        cmd.id != DefaultDevice(eCapture))
+      return;
+    if (cmd.action == Action::InputMute) {
+      BOOL muted = FALSE;
+      winrt::check_hresult(inputVolume_->GetMute(&muted));
+      winrt::check_hresult(inputVolume_->SetMute(!muted, nullptr));
+    } else {
+      auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
+      if (result == E_NOTIMPL || result == HRESULT_FROM_WIN32(ERROR_NOT_SUPPORTED))
+        inputVolumeRejected_ = true;
+      winrt::check_hresult(result);
+    }
+  }
   void Execute(Command const &cmd) {
     error_.clear();
     auto value = Clamp(cmd.value);
@@ -1227,6 +1415,8 @@ class Audio final {
         value = saved.Toggle(before, muted);
       winrt::check_hresult(master_->SetMasterVolumeLevelScalar(value, nullptr));
       winrt::check_hresult(master_->SetMute(value <= 0, nullptr));
+    } else if (cmd.action == Action::InputVolume || cmd.action == Action::InputMute) {
+      SetInputVolume(cmd, value);
     } else if (cmd.action == Action::Input) {
       winrt::com_ptr<IMMDevice> target;
       winrt::check_hresult(enumerator_->GetDevice(cmd.id.c_str(), target.put()));
@@ -1269,12 +1459,14 @@ class Audio final {
     bool retry = !state.outputId.empty() && !state.masterAvailable;
     // The input list and the endpoint volume have independent failure modes.
     // Publish the current volume even if an endpoint collection is unavailable.
+    bool inputIdKnown = false;
     for (auto flow : {eRender, eCapture})
       try {
         if (flow == eRender)
           state.output = Devices(flow, state.outputId);
         else {
           state.inputId = DefaultDevice(flow);
+          inputIdKnown = true;
           state.input = Devices(flow, state.inputId);
         }
       } catch (winrt::hresult_error const &) {
@@ -1283,10 +1475,17 @@ class Audio final {
         if (flow == eRender && snapshot_.outputId == state.outputId)
           state.output = snapshot_.output;
         else if (flow == eCapture) {
-          state.inputId = snapshot_.inputId;
-          state.input = snapshot_.input;
+          if (!inputIdKnown)
+            state.inputId = snapshot_.inputId;
+          if (snapshot_.inputId == state.inputId)
+            state.input = snapshot_.input;
         }
       }
+    if (inputIdKnown || !inputVolumeEnabled_)
+      ReadInputVolume(state);
+    // A usable device can refuse callback registration. Keep its visible
+    // level synchronized even when only polling is available.
+    retry |= state.inputVolumeAvailable && !inputVolumeObserver_;
     // The shell's own lists serve output devices, application sessions and
     // spatial sound; this worker serves the added input selector, the master
     // volume and the tray.
@@ -1368,6 +1567,8 @@ class Audio final {
       master_->UnregisterControlChangeNotify(volumeObserver_.get());
     volumeObserver_ = nullptr;
     master_ = nullptr;
+    UnbindInputVolume();
+    inputVolumeId_.clear();
     enumerator_ = nullptr;
     if (apartment)
       winrt::uninit_apartment();
@@ -1378,7 +1579,7 @@ public:
   Audio(Audio const &) = delete;
   Audio &operator=(Audio const &) = delete;
   ~Audio() { Stop(); }
-  void Start(std::function<void()> publish) {
+  void Start(std::function<void()> publish, bool inputVolumeEnabled = false) {
     publish_ = std::move(publish);
     {
       std::lock_guard lock(volumeFeed_->mutex);
@@ -1386,6 +1587,7 @@ public:
       volumeFeed_->active = true;
     }
     stop_ = false;
+    inputVolumeEnabled_ = inputVolumeEnabled;
     worker_ = std::thread([this] { Run(); });
   }
   void Stop() {
@@ -1412,12 +1614,12 @@ public:
       std::lock_guard lock(mutex_);
       commands_.push_back(std::move(command));
     }
-    {
-      std::lock_guard lock(wake_->mutex);
-      wake_->changed = true;
-    }
-    wake_->cv.notify_one();
+    wake_->Signal();
     return serial;
+  }
+  void EnableInputVolume(bool enabled) {
+    inputVolumeEnabled_ = enabled;
+    wake_->Signal();
   }
   Snapshot Get() {
     Snapshot state;
@@ -1508,6 +1710,7 @@ inline std::atomic<bool> stopping = false;
 inline HMODULE module = nullptr;
 struct ModSettings {
   std::vector<std::wstring> hidden;
+  sound::SoundOptions sound;
   bool brightnessEnabled = true;
   bool pillQuickTiles = false, pillSoundPickers = false;
   int quickActionRows = 2;
@@ -2933,23 +3136,34 @@ class SoundPage {
   X::FrameworkElement arrow_{nullptr};
   C::StackPanel inputBlock_{nullptr};
   C::Button mixerSettings_{nullptr}, soundSettings_{nullptr};
+  C::Button outputSettings_{nullptr}, microphoneMute_{nullptr};
+  C::Grid headerSettingsSlot_{nullptr}, microphoneRow_{nullptr};
+  X::FrameworkElement spatialSection_{nullptr}, spatialHeading_{nullptr};
+  C::Button spatialPicker_{nullptr};
+  Journal spatialVisibilityJournal_;
   Journal gearJournal_;
   Journal pickerShapeJournal_;
   ModSettings settings_;
   std::shared_ptr<Menu> input_;
   C::Slider master_{nullptr};
+  C::Slider microphone_{nullptr};
   C::Button masterIcon_{nullptr};
   C::Grid footer_{nullptr};
+  C::StackPanel footerRows_{nullptr};
   C::Border footerBorder_{nullptr};
   X::Style pickerBase_{nullptr};
   std::shared_ptr<AnimatedVolume> masterAnimation_;
-  sound::WheelVolume masterWheel_;
+  sound::WheelVolume masterWheel_, microphoneWheel_;
   VolumeToolTip volumeTip_;
   std::function<void()> volumeChanged_;
   bool preparing_ = false, prepared_ = false, rowsDirty_ = true;
   std::vector<std::pair<winrt::weak_ref<C::TextBlock>, M::TranslateTransform>> textBaselines_;
   sound::Audio audio_;
   bool sync_ = false, expanded_ = true, restoring_ = false;
+  bool microphoneSync_ = false;
+  std::optional<bool> microphoneMuted_;
+  std::wstring microphoneId_;
+  unsigned long long microphonePending_ = 0;
   int glyph_ = -2;
   std::wstring inputSignature_;
   sound::Snapshot latest_;
@@ -3152,10 +3366,11 @@ class SoundPage {
   std::set<void *> thinSliders_;
   // Thin look: SliderLook. VM rows keep the right edge on the badge column.
   void ThinSlider(C::Slider const &slider) {
-    SliderLook{journal_, revoke_, thinSliders_, slider == master_}.Thin(
-        slider, [this, slider](double half) {
-          return slider == master_ ? X::Thickness{12 - half, 0, 12 - half, 0}
-                                   : X::Thickness{12 - half, 0, -half, 0};
+    bool endpoint = slider == master_ || slider == microphone_;
+    SliderLook{journal_, revoke_, thinSliders_, endpoint}.Thin(
+        slider, [endpoint](double half) {
+          return endpoint ? X::Thickness{12 - half, 0, 12 - half, 0}
+                          : X::Thickness{12 - half, 0, -half, 0};
         });
   }
   void AlignRows() {
@@ -3987,6 +4202,7 @@ class SoundPage {
   }
   void PrepareMixerRows() {
     SliderGeometry(master_);
+    SliderGeometry(microphone_);
     auto style = Resource(page_, L"HeaderIconSliderStyle").try_as<X::Style>();
     std::vector<C::Slider> found;
     Find(mixerList_, [&](auto const &e) {
@@ -4079,6 +4295,141 @@ class SoundPage {
       frame_.Height(value);
     }
   }
+  static void OpenDeviceProperties(std::wstring const &id) {
+    auto uri = sound::AudioDevicePropertiesUri(id);
+    if (!uri.empty())
+      ShellExecuteW(nullptr, L"open", uri.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+  }
+  C::Slider EndpointSlider(C::Grid const &row, X::Style const &style, PCWSTR name) {
+    C::Slider slider;
+    slider.Style(style);
+    slider.MinWidth(0);
+    slider.MinHeight(0);
+    slider.Height(32);
+    slider.Margin({12, 0, 12, 0});
+    slider.Maximum(100);
+    slider.StepFrequency(1);
+    X::Automation::AutomationProperties::SetName(slider, name);
+    C::Grid::SetColumn(slider, 1);
+    row.Children().Append(slider);
+    return slider;
+  }
+  void WatchEndpointSlider(C::Slider const &slider, sound::WheelVolume &wheel) {
+    volumeTip_.Watch(page_, slider, journal_, revoke_);
+    ListenVolumeWheel(
+        slider, [this, slider, &wheel](auto &&, X::Input::PointerRoutedEventArgs const &args) {
+          try {
+            if (!slider.IsEnabled())
+              return;
+            auto properties = args.GetCurrentPoint(slider).Properties();
+            int delta = properties.MouseWheelDelta();
+            if (properties.IsHorizontalMouseWheel() || !delta)
+              return;
+            if (!args.Handled()) {
+              args.Handled(true);
+              slider.Value(wheel.Next(slider.Value(), slider.Minimum(), slider.Maximum(),
+                                      delta, settings_.volumeWheelStep));
+            }
+            volumeTip_.Show(page_, slider, slider.Value());
+          } catch (...) {
+            Wh_Log(L"Endpoint volume wheel: %08X", winrt::to_hresult());
+          }
+        }, revoke_);
+  }
+  C::Grid MicrophoneSettingsIcon() {
+    auto icon = Grid(L"*");
+    icon.Width(16);
+    icon.Height(16);
+    icon.IsHitTestVisible(false);
+    // Keep the two rails of the system MixVolumes glyph and replace its
+    // lower-right speaker with the system microphone at the same scale.
+    for (auto rect : {winrt::Windows::Foundation::Rect{0, 0, 16, 7.5f},
+                      winrt::Windows::Foundation::Rect{0, 7.5f, 6.1f, 8.5f}}) {
+      auto rails = SymbolGlyph(page_, 0xf4c3);
+      M::RectangleGeometry clip;
+      clip.Rect(rect);
+      rails.Clip(clip);
+      icon.Children().Append(rails);
+    }
+    auto mic = SymbolGlyph(page_, 0xe720, 7.5);
+    mic.HorizontalAlignment(X::HorizontalAlignment::Right);
+    mic.VerticalAlignment(X::VerticalAlignment::Bottom);
+    mic.Margin({0, 0, .7, 1});
+    icon.Children().Append(mic);
+    return icon;
+  }
+  void MicrophoneRow(X::Style const &sliderStyle) {
+    microphoneRow_ = Grid(L"32,*,32");
+    microphoneRow_.Visibility(X::Visibility::Collapsed);
+    footerRows_.Children().Append(microphoneRow_);
+    microphoneMute_ = Button(page_, L"");
+    X::Automation::AutomationProperties::SetAutomationId(microphoneMute_, L"NativeSoundInputMute");
+    microphoneRow_.Children().Append(microphoneMute_);
+    microphone_ = EndpointSlider(microphoneRow_, sliderStyle, sound::Text(
+        L"Microphone volume", L"Громкость микрофона", L"Volumen del micrófono",
+        L"Mikrofonlautstärke", L"Volume do microfone", L"麦克风音量"));
+    X::Automation::AutomationProperties::SetAutomationId(microphone_, L"NativeSoundInputVolume");
+    auto properties = Button(page_, sound::Text(
+        L"Microphone settings", L"Параметры микрофона", L"Configuración del micrófono",
+        L"Mikrofoneinstellungen", L"Configurações do microfone", L"麦克风设置"));
+    X::Automation::AutomationProperties::SetAutomationId(properties, L"NativeSoundInputProperties");
+    properties.Content(MicrophoneSettingsIcon());
+    C::Grid::SetColumn(properties, 2);
+    microphoneRow_.Children().Append(properties);
+    Keep(properties.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+      auto state = audio_.Get();
+      if (sound::ShowMicrophoneRow(settings_.sound, state))
+        OpenDeviceProperties(state.inputId);
+    }));
+    Keep(microphoneMute_.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+      if (settings_.sound.microphoneAuto && !microphoneId_.empty())
+        microphonePending_ = audio_.Send({sound::Action::InputMute, microphoneId_});
+    }));
+    Keep(microphone_.ValueChanged(winrt::auto_revoke, [this](auto &&, auto const &args) {
+      if (!microphoneSync_ && settings_.sound.microphoneAuto && !microphoneId_.empty())
+        microphonePending_ = audio_.Send(
+            {sound::Action::InputVolume, microphoneId_, float(args.NewValue() / 100)});
+    }));
+    WatchEndpointSlider(microphone_, microphoneWheel_);
+  }
+  void ApplyMicrophone(sound::Snapshot const &state) {
+    if (!microphone_)
+      return;
+    auto visible = sound::ShowMicrophoneRow(settings_.sound, state);
+    auto visibility = visible ? X::Visibility::Visible : X::Visibility::Collapsed;
+    if (microphoneRow_.Visibility() != visibility) {
+      microphoneRow_.Visibility(visibility);
+      if (!visible)
+        volumeTip_.Hide();
+    }
+    auto id = visible ? state.inputId : std::wstring{};
+    if (id != microphoneId_) {
+      microphoneId_ = std::move(id);
+      microphonePending_ = 0;
+      microphoneWheel_ = {};
+    }
+    if (!visible || state.applied < microphonePending_)
+      return;
+    auto value = std::round(sound::Clamp(state.inputVolume) * 100);
+    if (microphone_.Value() != value) {
+      microphoneSync_ = true;
+      microphone_.Value(value);
+      microphoneSync_ = false;
+    }
+    if (microphoneMute_.IsEnabled() != state.inputMuteAvailable)
+      microphoneMute_.IsEnabled(state.inputMuteAvailable);
+    if (microphoneMuted_ != state.inputMuted) {
+      microphoneMuted_ = state.inputMuted;
+      microphoneMute_.Content(SymbolGlyph(page_, state.inputMuted ? 0xec54 : 0xe720));
+      auto name = state.inputMuted
+          ? sound::Text(L"Unmute microphone", L"Включить звук микрофона", L"Activar el sonido del micrófono",
+                        L"Mikrofonstummschaltung aufheben", L"Reativar o som do microfone", L"取消麦克风静音")
+          : sound::Text(L"Mute microphone", L"Выключить звук микрофона", L"Silenciar el micrófono",
+                        L"Mikrofon stummschalten", L"Silenciar microfone", L"将麦克风静音");
+      X::Automation::AutomationProperties::SetName(microphoneMute_, name);
+      C::ToolTipService::SetToolTip(microphoneMute_, winrt::box_value(name));
+    }
+  }
   void Master(C::ItemsControl const &oldFooter, X::Style const &sliderStyle) {
     // Keep the actual Footer and its native group/border visible. The shell uses
     // that slot when measuring the advanced page; a sibling is not equivalent.
@@ -4104,8 +4455,11 @@ class SoundPage {
       }));
     }
     auto original = footerBorder_.Child();
+    footerRows_ = C::StackPanel();
+    MicrophoneRow(sliderStyle);
     footer_ = Grid(L"32,*,32");
     footer_.Name(L"NativeSoundMasterRow");
+    footerRows_.Children().Append(footer_);
     FooterMargins();
     masterIcon_ = Button(page_, sound::Text(L"Turn sound on or off", L"Включить или выключить звук",
                           L"Activar o desactivar el sonido", L"Ton ein- oder ausschalten",
@@ -4119,26 +4473,31 @@ class SoundPage {
         Wh_Log(L"MasterAnimationError %08X", winrt::to_hresult());
       }
     footer_.Children().Append(masterIcon_);
-    master_ = C::Slider();
-    master_.Style(sliderStyle);
-    master_.MinWidth(0);
-    master_.MinHeight(0);
-    master_.Height(32);
-    master_.Margin({12, 0, 12, 0});
-    master_.Maximum(100);
-    master_.StepFrequency(1);
-    C::Grid::SetColumn(master_, 1);
-    footer_.Children().Append(master_);
-    X::Automation::AutomationProperties::SetName(master_, sound::Text(L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke", L"Volume do sistema", L"系统音量"));
+    master_ = EndpointSlider(footer_, sliderStyle, sound::Text(
+        L"System volume", L"Общая громкость", L"Volumen del sistema", L"Systemlautstärke",
+        L"Volume do sistema", L"系统音量"));
     auto settings = Button(page_, sound::Text(L"Sound settings", L"Параметры звука",
                            L"Configuración de sonido", L"Soundeinstellungen",
                            L"Configurações de som", L"声音设置"));
     soundSettings_ = settings;
+    X::Automation::AutomationProperties::SetAutomationId(settings, L"NativeSoundSettings");
     SettingsGear(settings);
     C::Grid::SetColumn(settings, 2);
     footer_.Children().Append(settings);
     auto nativeBorder = footerBorder_;
-    nativeBorder.Child(footer_);
+    outputSettings_ = Button(page_, sound::Text(
+        L"Output device settings", L"Параметры устройства вывода", L"Configuración del dispositivo de salida",
+        L"Einstellungen des Ausgabegeräts", L"Configurações do dispositivo de saída", L"输出设备设置"));
+    X::Automation::AutomationProperties::SetAutomationId(outputSettings_, L"NativeSoundOutputProperties");
+    outputSettings_.Content(SymbolGlyph(page_, 0xf4c3));
+    outputSettings_.Visibility(X::Visibility::Collapsed);
+    outputSettings_.IsEnabled(false);
+    C::Grid::SetColumn(outputSettings_, 2);
+    footer_.Children().Append(outputSettings_);
+    Keep(outputSettings_.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
+      OpenDeviceProperties(audio_.Get().outputId);
+    }));
+    nativeBorder.Child(footerRows_);
     journal_.undo.push_back([nativeBorder, original] { nativeBorder.Child(original); });
     Keep(settings.Click(winrt::auto_revoke, [](auto &&, auto &&) {
       ShellExecuteW(nullptr, L"open", L"ms-settings:sound", nullptr, nullptr, SW_SHOWNORMAL);
@@ -4151,33 +4510,73 @@ class SoundPage {
         MasterGlyph(value, value <= 0);
       }
     }));
-    volumeTip_.Watch(page_, master_, journal_, revoke_);
-    ListenVolumeWheel(
-        master_, [this](auto &&, X::Input::PointerRoutedEventArgs const &args) {
-          try {
-            if (!master_.IsEnabled())
-              return;
-            auto point = args.GetCurrentPoint(master_);
-            if (point.Properties().IsHorizontalMouseWheel())
-              return;
-            int delta = point.Properties().MouseWheelDelta();
-            if (!delta)
-              return;
-            if (args.Handled()) {
-              volumeTip_.Show(page_, master_, master_.Value());
-              return;
-            }
-            args.Handled(true);
-            master_.Value(masterWheel_.Next(master_.Value(), master_.Minimum(),
-                                           master_.Maximum(), delta, settings_.volumeWheelStep));
-            volumeTip_.Show(page_, master_, master_.Value());
-          } catch (...) {
-            Wh_Log(L"MasterWheelError %08X", winrt::to_hresult());
-          }
-        }, revoke_);
+    WatchEndpointSlider(master_, masterWheel_);
     Keep(masterIcon_.Click(winrt::auto_revoke, [this](auto &&, auto &&) {
       pending_ = audio_.Send({sound::Action::MasterMute});
     }));
+  }
+  void PrepareSettingsHeader() {
+    auto header = Named(page_, L"PageHeader");
+    // Use a header grid that contains the title, never a grid in the body.
+    C::Grid grid{nullptr};
+    for (auto ancestor = Parent(pageTitle_); ancestor && ancestor != page_;
+         ancestor = Parent(ancestor)) {
+      if (auto candidate = ancestor.try_as<C::Grid>())
+        grid = candidate;
+      if (ancestor == header)
+        break;
+    }
+    if (!header || !grid || !Find(header, [&](auto const &element) { return element == grid; }))
+      return;
+    headerSettingsSlot_ = C::Grid();
+    headerSettingsSlot_.Width(32);
+    headerSettingsSlot_.Height(32);
+    headerSettingsSlot_.Margin({0, 0, 20, 0});
+    headerSettingsSlot_.HorizontalAlignment(X::HorizontalAlignment::Right);
+    headerSettingsSlot_.VerticalAlignment(X::VerticalAlignment::Center);
+    headerSettingsSlot_.Visibility(X::Visibility::Collapsed);
+    C::Grid::SetColumnSpan(headerSettingsSlot_, std::max(1u, grid.ColumnDefinitions().Size()));
+    C::Grid::SetRowSpan(headerSettingsSlot_, std::max(1u, grid.RowDefinitions().Size()));
+    Add(grid, headerSettingsSlot_);
+  }
+  void PositionSoundSettings() {
+    if (!soundSettings_)
+      return;
+    bool inHeader = settings_.sound.settingsInHeader;
+    if (!headerSettingsSlot_) {
+      if (inHeader)
+        Wh_Log(L"Sound header layout unavailable; keeping the settings button beside volume");
+      return;
+    }
+    auto target = inHeader ? headerSettingsSlot_ : footer_;
+    auto previous = inHeader ? footer_ : headerSettingsSlot_;
+    uint32_t index;
+    if (previous.Children().IndexOf(soundSettings_, index)) {
+      previous.Children().RemoveAt(index);
+      C::Grid::SetColumn(soundSettings_, inHeader ? 0 : 2);
+      target.Children().Append(soundSettings_);
+    }
+    auto visibility = inHeader ? X::Visibility::Visible : X::Visibility::Collapsed;
+    headerSettingsSlot_.Visibility(visibility);
+    outputSettings_.Visibility(visibility);
+  }
+  void ApplySpatialVisibility() {
+    if (settings_.sound.spatialSound) {
+      spatialVisibilityJournal_.Restore();
+      return;
+    }
+    if (auto menu = MenuFor(MenuKind::Spatial); menu && menu->open)
+      menu->flyout.Hide();
+    auto collapse = [&](X::FrameworkElement const &element) {
+      spatialVisibilityJournal_.Save(element, X::UIElement::VisibilityProperty());
+      element.Visibility(X::Visibility::Collapsed);
+    };
+    if (spatialSection_)
+      collapse(spatialSection_);
+    else if (spatialPicker_) {
+      collapse(spatialHeading_);
+      collapse(spatialPicker_);
+    }
   }
 
 public:
@@ -4202,11 +4601,22 @@ public:
     }
   }
   void RefreshMasterNow() {
-    if (master_ && page_.IsLoaded())
-      ApplyMaster(State());
+    if (master_ && page_.IsLoaded()) {
+      auto state = State();
+      ApplyMaster(state);
+      ApplyMicrophone(state);
+    }
   }
   void ApplySettings(ModSettings const &next) {
     auto previous = std::exchange(settings_, next);
+    if (previous.sound.microphoneAuto != next.sound.microphoneAuto) {
+      audio_.EnableInputVolume(next.sound.microphoneAuto);
+      ApplyMicrophone(audio_.Get());
+    }
+    if (previous.sound.spatialSound != next.sound.spatialSound)
+      ApplySpatialVisibility();
+    if (previous.sound.settingsInHeader != next.sound.settingsInHeader)
+      PositionSoundSettings();
     if (previous.pillSoundPickers != next.pillSoundPickers)
       ApplyPickerShapes();
     if (previous.altSoundMixer != next.altSoundMixer)
@@ -4246,11 +4656,14 @@ public:
       c.applied = s.applied;
       c.error = s.error;
       c.masterNoticeAt = 0;
+      c.inputVolumeAvailable = false;
       return c;
     }
     return s;
   }
   void ApplyMaster(sound::Snapshot const &state) {
+    if (outputSettings_ && outputSettings_.IsEnabled() != !state.outputId.empty())
+      outputSettings_.IsEnabled(!state.outputId.empty());
     if (!master_ || state.applied < pending_)
       return;
     // While the user moves SV, the echo of an earlier value from Core Audio is
@@ -4309,8 +4722,21 @@ public:
     ConvertList(output, MenuKind::Output, outputTitle.as<C::TextBlock>());
     Input(Parent(outputTitle).as<C::Panel>());
     ConvertList(spatial, MenuKind::Spatial, spatialTitle.as<C::TextBlock>());
+    spatialHeading_ = spatialTitle;
+    spatialPicker_ = MenuFor(MenuKind::Spatial)->button;
+    // Hide the dedicated group along with its margins and separator.
+    for (auto group = Parent(spatialTitle); group && group != page_; group = Parent(group)) {
+      if (Find(group, [&](auto const &e) { return e == outputTitle || e == mixer || e == inputBlock_; }))
+        break;
+      if (Find(group, [&](auto const &e) { return e == spatialPicker_; }))
+        spatialSection_ = group;
+    }
+    ApplySpatialVisibility();
     Mixer();
     Master(oldFooter, style);
+    if (pageTitle_)
+      PrepareSettingsHeader();
+    PositionSoundSettings();
     if (auto back = Named(page_, L"BackButton").try_as<C::Button>()) {
       Set(back, X::FrameworkElement::WidthProperty(), winrt::box_value(32.));
       Set(back, X::FrameworkElement::HeightProperty(), winrt::box_value(32.));
@@ -4446,7 +4872,7 @@ public:
         }
       });
     }
-    audio_.Start(volumeChanged_);
+    audio_.Start(volumeChanged_, settings_.sound.microphoneAuto);
     return true;
   }
   void PrepareInitialLayout() {
@@ -4466,6 +4892,7 @@ public:
       latest_ = state;
       SyncInput(state);
       ApplyMaster(state);
+      ApplyMicrophone(state);
       for (auto const &menu : menus_)
         if (menu != input_)
           Summary(menu);
@@ -4509,7 +4936,7 @@ public:
     if (auto name = String(ModelValue(out->list.SelectedItem(), L"EndpointFriendlyName"));
         !name.empty() && name != current)
       return false;
-    if (spatial && !spatial->list.Items().Size())
+    if (settings_.sound.spatialSound && spatial && !spatial->list.Items().Size())
       return false;
     if (!expanded_)
       return true;
@@ -4843,12 +5270,13 @@ public:
   // Divider -> SV rail and SV rail -> panel edge: one StepPx each. The divider
   // is a 1 DIP border (one pixel), the SV control 32 DIP (centre at 16).
   void FooterMargins() {
-    if (!footer_)
+    if (!footerRows_)
       return;
     auto root = page_.XamlRoot();
     double s = root ? root.RasterizationScale() : 1.;
     double step = StepPx(s), half = std::round(16 * s), border = std::max(1., std::round(s));
-    footer_.Margin({20, (step - border - half) / s, 20, (step - half) / s});
+    footerRows_.Margin({20, (step - border - half) / s, 20, (step - half) / s});
+    microphoneRow_.Margin({0, 0, 0, (step - half * 2) / s});
   }
   // The SV divider lies on the footer's base acrylic, the line above All
   // settings on the tiles' layer (#09FFFFFF, = the Sound content's
@@ -5232,6 +5660,7 @@ public:
         Summary(menu);
     auto const &state = latest_;
     ApplyMaster(state);
+    ApplyMicrophone(state);
     SyncInput(state);
     for (auto const &menu : menus_)
       if (menu->open)
@@ -5288,6 +5717,7 @@ public:
       gearStory_.Stop();
     pickerShapeJournal_.Restore();
     gearJournal_.Restore();
+    spatialVisibilityJournal_.Restore();
     for (auto const &menu : menus_) {
       menu->flyout.Hide();
       if (menu->arrowStory)
@@ -5346,6 +5776,8 @@ public:
       gearStory_.Stop();
     pickerShapeJournal_.Restore();
     gearJournal_.Restore();
+    spatialVisibilityJournal_.undo.clear();
+    spatialVisibilityJournal_.saved.clear();
     for (auto const &menu : menus_) {
       menu->flyout.Hide();
       if (menu->arrowStory)
@@ -10399,6 +10831,10 @@ inline ModSettings ReadSettings() {
   settings.trayMiddleClickMute = Wh_GetIntSetting(L"trayMiddleClickMute") != 0;
   auto brightness = WindhawkUtils::StringSetting::make(L"brightnessMode");
   settings.brightnessEnabled = std::wstring_view(brightness.get()) != L"disabled";
+  auto microphone = WindhawkUtils::StringSetting::make(L"microphoneVolume");
+  auto spatial = WindhawkUtils::StringSetting::make(L"spatialSoundMenu");
+  auto soundPosition = WindhawkUtils::StringSetting::make(L"soundSettingsPosition");
+  settings.sound = sound::ParseSoundOptions(microphone.get(), spatial.get(), soundPosition.get());
   auto rows = WindhawkUtils::StringSetting::make(L"appearance.quickActionRows");
   if (!*rows.get())
     rows = WindhawkUtils::StringSetting::make(L"quickActionRows");

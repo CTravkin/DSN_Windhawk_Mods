@@ -72,6 +72,30 @@ struct Model : winrt::implements<Model, native::D::ICustomPropertyProvider> {
 };
 int main() {
   try {
+    auto defaults = sound::ParseSoundOptions(L"", L"", L"");
+    auto customized = sound::ParseSoundOptions(L"auto", L"disabled", L"header");
+    sound::Snapshot input;
+    if (defaults.microphoneAuto || !defaults.spatialSound || defaults.settingsInHeader ||
+        !customized.microphoneAuto || customized.spatialSound || !customized.settingsInHeader ||
+        sound::ShowMicrophoneRow(customized, input)) {
+      std::puts("FAIL: Sound options preserve existing defaults and hide a missing microphone");
+      return 13;
+    }
+    input.inputId = L"{0.0.1.00000000}.{aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb}";
+    if (sound::ShowMicrophoneRow(customized, input)) {
+      std::puts("FAIL: A microphone without a usable level control gets a slider");
+      return 13;
+    }
+    input.inputVolumeAvailable = true;
+    if (!sound::ShowMicrophoneRow(customized, input) ||
+        sound::ShowMicrophoneRow(defaults, input) ||
+        !sound::AudioDevicePropertiesUri(L"").empty() ||
+        sound::AudioDevicePropertiesUri(input.inputId) !=
+            L"ms-settings:sound-properties?endpointId={0.0.1.00000000}.{aaaaaaaa-0000-1111-2222-bbbbbbbbbbbb}") {
+      std::puts("FAIL: The input row and its link must target the available selected microphone");
+      return 13;
+    }
+    std::puts("PASS: Sound options preserve defaults, gate the microphone row and link to the selected endpoint");
     auto soundRequest = native::SoundRequestToken(0xfffffff0, 1);
     if (soundRequest == native::SoundRequestToken(0xfffffff0, 2) ||
         native::SoundEventMatchesRequest(soundRequest, 0xffffffef) ||

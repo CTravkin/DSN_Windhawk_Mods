@@ -119,10 +119,30 @@ struct Snapshot {
   std::wstring outputId, inputId, error;
   float master = 0;
   bool muted = false, masterAvailable = false;
+  float inputVolume = 0;
+  bool inputVolumeAvailable = false, inputMuteAvailable = false, inputMuted = false;
   unsigned long long revision = 0;
   unsigned long long applied = 0;
 };
-enum class Action { MasterVolume, MasterMute, ToggleEndpointMute, Input, Refresh };
+struct SoundOptions {
+  bool microphoneAuto = false, spatialSound = true, settingsInHeader = false;
+  bool operator==(SoundOptions const &) const = default;
+};
+inline SoundOptions ParseSoundOptions(std::wstring_view microphone, std::wstring_view spatial,
+                                      std::wstring_view settingsPosition) {
+  return {microphone == L"auto", spatial != L"disabled", settingsPosition == L"header"};
+}
+inline bool ShowMicrophoneRow(SoundOptions options, Snapshot const &state) {
+  return options.microphoneAuto && !state.inputId.empty() && state.inputVolumeAvailable;
+}
+inline std::wstring AudioDevicePropertiesUri(std::wstring_view id) {
+  if (id.empty())
+    return {};
+  return std::wstring(L"ms-settings:sound-properties?endpointId=").append(id);
+}
+enum class Action {
+  MasterVolume, MasterMute, ToggleEndpointMute, Input, InputVolume, InputMute, Refresh
+};
 struct Command {
   Action action = Action::Refresh;
   std::wstring id;

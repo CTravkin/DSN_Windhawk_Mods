@@ -34,6 +34,9 @@ This edition is based on [HeyOkay's original mod](https://github.com/HeyOkay/Ref
 - The "Sound output" page is now simply "Sound".
 - Change the output and input devices and the spatial sound provider from dropdown lists.
 - Below them is a reworked Volume mixer for the apps. It starts collapsed the first time Sound opens in each ShellHost process and remembers its state on subsequent openings.
+- **Microphone volume** defaults to **Off**. **Auto** adds a volume slider above system volume when the selected microphone has an adjustable level. Its buttons mute and unmute the microphone without changing its level and open that device's Windows properties.
+- **Spatial sound** controls whether the spatial audio menu appears. It is on by default.
+- **Sound settings shortcut** can move the system sound settings button into the header. The button beside system volume then opens the properties of the selected output device.
 - Volume sliders show the new value when dragged or scrolled. The default wheel step is 2 percentage points.
 - Press an app's icon to mute and restore it, or its volume number to set it to 100.
 - **Hide from the volume mixer** takes app names or executable names, one per row. Hidden apps keep playing audio.
