@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.7
+// @version 0.9.8
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 190
+// Build: 191
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -1714,11 +1714,18 @@ public:
 } // namespace sound
 
 
-// Lucide ISC assets: the mixer settings glyph and ethernet-port for the
-// taskbar network icon; all other glyphs are system Segoe Fluent Icons via
-// SymbolGlyph().
+// Lucide ISC assets are used for the mixer and the taskbar Ethernet icon.
+// The two vertical sliders are shared by the Sound device settings buttons.
 namespace sound {
 inline PCWSTR IconMarkup(std::wstring_view name) {
+  if (name == L"device-settings")
+    return LR"icon(
+<Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2"
+      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+      Data="M7 3V5 M7 11V21 M17 3V13 M17 19V21
+            M7 6 A2 2 0 1 1 7 10 A2 2 0 1 1 7 6 Z
+            M17 14 A2 2 0 1 1 17 18 A2 2 0 1 1 17 14 Z"/>
+)icon";
   if (name == L"sliders-horizontal")
     return LR"icon(<Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M10 5H3"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M12 19H3"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M14 3v4"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M16 17v4"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M21 12h-9"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M21 19h-5"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M21 5h-7"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M8 10v4"/><Path Stroke="{ThemeResource SystemControlForegroundBaseHighBrush}" StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="M8 12H3"/>)icon";
   return L"";
@@ -4489,29 +4496,8 @@ class SoundPage {
           }
         }, revoke_);
   }
-  C::Grid MicrophoneSettingsIcon() {
-    auto icon = Grid(L"*");
-    icon.Width(16);
-    icon.Height(16);
-    icon.IsHitTestVisible(false);
-    // Keep the MixVolumes rails and lift the upper one to leave room for
-    // a readable microphone below its knob.
-    auto addRail = [&](winrt::Windows::Foundation::Rect rect, double lift) {
-      auto rails = SymbolGlyph(page_, 0xf4c3);
-      M::RectangleGeometry clip;
-      clip.Rect(rect);
-      rails.Clip(clip);
-      rails.Margin({0, -lift, 0, lift});
-      icon.Children().Append(rails);
-    };
-    addRail({0, 0, 16, 7}, 1);
-    addRail({0, 8, 6, 8}, 0);
-    auto mic = SymbolGlyph(page_, 0xe720, 10);
-    mic.HorizontalAlignment(X::HorizontalAlignment::Right);
-    mic.VerticalAlignment(X::VerticalAlignment::Bottom);
-    mic.Margin({0, 0, .5, 0});
-    icon.Children().Append(mic);
-    return icon;
+  static X::FrameworkElement DeviceSettingsIcon() {
+    return Icon(L"device-settings", 16, 2);
   }
   void MicrophoneRow(X::Style const &sliderStyle) {
     microphoneRow_ = Grid(L"32,*,32");
@@ -4528,7 +4514,7 @@ class SoundPage {
         L"Microphone settings", L"Параметры микрофона", L"Configuración del micrófono",
         L"Mikrofoneinstellungen", L"Configurações do microfone", L"麦克风设置"));
     X::Automation::AutomationProperties::SetAutomationId(microphoneSettings_, L"NativeSoundInputProperties");
-    microphoneSettings_.Content(MicrophoneSettingsIcon());
+    microphoneSettings_.Content(DeviceSettingsIcon());
     C::Grid::SetColumn(microphoneSettings_, 2);
     microphoneRow_.Children().Append(microphoneSettings_);
     microphoneLevelButton_ = EndpointLevelButton(microphoneRow_, microphone_, microphoneWheel_,
@@ -4655,7 +4641,7 @@ class SoundPage {
         L"Output device settings", L"Параметры устройства вывода", L"Configuración del dispositivo de salida",
         L"Einstellungen des Ausgabegeräts", L"Configurações do dispositivo de saída", L"输出设备设置"));
     X::Automation::AutomationProperties::SetAutomationId(outputSettings_, L"NativeSoundOutputProperties");
-    outputSettings_.Content(SymbolGlyph(page_, 0xf4c3));
+    outputSettings_.Content(DeviceSettingsIcon());
     outputSettings_.Visibility(X::Visibility::Collapsed);
     outputSettings_.IsEnabled(false);
     C::Grid::SetColumn(outputSettings_, 2);

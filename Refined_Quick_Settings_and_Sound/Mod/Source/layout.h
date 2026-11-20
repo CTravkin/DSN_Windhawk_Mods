@@ -1342,29 +1342,8 @@ class SoundPage {
           }
         }, revoke_);
   }
-  C::Grid MicrophoneSettingsIcon() {
-    auto icon = Grid(L"*");
-    icon.Width(16);
-    icon.Height(16);
-    icon.IsHitTestVisible(false);
-    // Keep the MixVolumes rails and lift the upper one to leave room for
-    // a readable microphone below its knob.
-    auto addRail = [&](winrt::Windows::Foundation::Rect rect, double lift) {
-      auto rails = SymbolGlyph(page_, 0xf4c3);
-      M::RectangleGeometry clip;
-      clip.Rect(rect);
-      rails.Clip(clip);
-      rails.Margin({0, -lift, 0, lift});
-      icon.Children().Append(rails);
-    };
-    addRail({0, 0, 16, 7}, 1);
-    addRail({0, 8, 6, 8}, 0);
-    auto mic = SymbolGlyph(page_, 0xe720, 10);
-    mic.HorizontalAlignment(X::HorizontalAlignment::Right);
-    mic.VerticalAlignment(X::VerticalAlignment::Bottom);
-    mic.Margin({0, 0, .5, 0});
-    icon.Children().Append(mic);
-    return icon;
+  static X::FrameworkElement DeviceSettingsIcon() {
+    return Icon(L"device-settings", 16, 2);
   }
   void MicrophoneRow(X::Style const &sliderStyle) {
     microphoneRow_ = Grid(L"32,*,32");
@@ -1381,7 +1360,7 @@ class SoundPage {
         L"Microphone settings", L"Параметры микрофона", L"Configuración del micrófono",
         L"Mikrofoneinstellungen", L"Configurações do microfone", L"麦克风设置"));
     X::Automation::AutomationProperties::SetAutomationId(microphoneSettings_, L"NativeSoundInputProperties");
-    microphoneSettings_.Content(MicrophoneSettingsIcon());
+    microphoneSettings_.Content(DeviceSettingsIcon());
     C::Grid::SetColumn(microphoneSettings_, 2);
     microphoneRow_.Children().Append(microphoneSettings_);
     microphoneLevelButton_ = EndpointLevelButton(microphoneRow_, microphone_, microphoneWheel_,
@@ -1508,7 +1487,7 @@ class SoundPage {
         L"Output device settings", L"Параметры устройства вывода", L"Configuración del dispositivo de salida",
         L"Einstellungen des Ausgabegeräts", L"Configurações do dispositivo de saída", L"输出设备设置"));
     X::Automation::AutomationProperties::SetAutomationId(outputSettings_, L"NativeSoundOutputProperties");
-    outputSettings_.Content(SymbolGlyph(page_, 0xf4c3));
+    outputSettings_.Content(DeviceSettingsIcon());
     outputSettings_.Visibility(X::Visibility::Collapsed);
     outputSettings_.IsEnabled(false);
     C::Grid::SetColumn(outputSettings_, 2);
