@@ -117,12 +117,13 @@ int main() {
       return 14;
     }
     std::puts("PASS: muting displays zero and unmuting restores the displayed endpoint level");
-    if (!sound::CanResetEndpointVolume(0) || !sound::CanResetEndpointVolume(57) ||
-        sound::CanResetEndpointVolume(100) || sound::CanResetEndpointVolume(NAN)) {
-      std::puts("FAIL: The endpoint reset button must work below 100 and be inactive at 100 or when unavailable");
+    if (!sound::CanResetVolume(0) || !sound::CanResetVolume(57) ||
+        sound::CanResetVolume(100) || sound::CanResetVolume(NAN) ||
+        sound::CanResetVolume(0, true) || !sound::CanResetVolume(57, true)) {
+      std::puts("FAIL: A visible numeric volume below 100 must reset, including zero when shown");
       return 14;
     }
-    std::puts("PASS: Endpoint volume can be reset from zero or a partial level");
+    std::puts("PASS: A visible numeric volume can be reset from zero or a partial level");
     {
       // Old values that Windhawk may still store cannot override grouped settings.
       std::map<std::wstring, int> numbers{{L"taskbar.openSoundFromVolumeIcon", 1},

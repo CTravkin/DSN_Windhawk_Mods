@@ -1300,7 +1300,7 @@ class SoundPage {
     auto label = std::isfinite(value) ? std::to_wstring(std::lround(value)) : L"\u2014";
     if (text.Text() != label)
       text.Text(label);
-    auto enabled = sound::CanResetEndpointVolume(value);
+    auto enabled = sound::CanResetVolume(value);
     if (button.IsEnabled() != enabled)
       button.IsEnabled(enabled);
   }
@@ -1313,7 +1313,7 @@ class SoundPage {
     C::Grid::SetColumn(button, 2);
     row.Children().Append(button);
     Keep(button.Click(winrt::auto_revoke, [slider, &wheel](auto &&, auto &&) {
-      if (slider.IsEnabled() && sound::CanResetEndpointVolume(slider.Value())) {
+      if (slider.IsEnabled() && sound::CanResetVolume(slider.Value())) {
         wheel = {};
         slider.Value(100);
       }
@@ -2423,21 +2423,20 @@ public:
   // Level column: the number, or the mute glyph at 0.
   static void ShowLevel(AppRow &row, double value) {
     long n = std::lround(value);
+    bool showMute = n <= 0 && row.alternateMute;
     if (row.level)
       row.level.Text(std::to_wstring(n));
     if (row.levelButton) {
-      row.levelButton.Visibility(n <= 0 && row.alternateMute ? X::Visibility::Collapsed
-                                                       : X::Visibility::Visible);
+      row.levelButton.Visibility(showMute ? X::Visibility::Collapsed : X::Visibility::Visible);
       // At 100 the button is disabled rather than taken out of hit testing: a
       // hit-test change under the pointer leaves the button's pointer-over state
       // set, and its hover plate came back on the next visual state update.
-      bool enabled = n > 0 && n < 100;
+      bool enabled = sound::CanResetVolume(n, row.alternateMute);
       if (row.levelButton.IsEnabled() != enabled)
         row.levelButton.IsEnabled(enabled);
     }
     if (row.levelMute)
-      row.levelMute.Visibility(n <= 0 && row.alternateMute ? X::Visibility::Visible
-                                                          : X::Visibility::Collapsed);
+      row.levelMute.Visibility(showMute ? X::Visibility::Visible : X::Visibility::Collapsed);
   }
   void SetAppMuteIcon(AppRow &row, C::Slider const &slider) {
     row.alternateMute = settings_.altAppUnmute;
@@ -2509,14 +2508,13 @@ public:
         winrt::box_value(X::HorizontalAlignment::Center));
     Set(toggle, C::Control::VerticalContentAlignmentProperty(),
         winrt::box_value(X::VerticalAlignment::Center));
-    // The mute indicator replaces the number in the level column at 0. The
-    // app's volume is shown as a number in the column under the SV settings
+    // The app's volume is shown as a number in the column under the SV settings
     // button: 32 DIP wide, 12 DIP after the slider, i.e. inside the row's 64 DIP
     // right margin (negative margin; a Grid does not clip).
     // The number sits in a 32 DIP button with the same hover plate as the mute
-    // button: pressing it (1-99) sets the app's volume to 100, written to the
-    // session's model like the mouse wheel. At 100 it takes no input; at 0 the
-    // mute button takes its place.
+    // button: pressing it below 100 sets the app's volume to 100, written to
+    // the session's model like the mouse wheel. At 0 the alternate mute icon
+    // can replace the number and restore the previous level instead.
     row->levelButton = VolumeLevelButton();
     row->levelButton.HorizontalAlignment(X::HorizontalAlignment::Right);
     row->levelButton.Margin({0, 0, -44, 0});
@@ -2531,7 +2529,7 @@ public:
         if (!s)
           return;
         auto value = std::lround(s.Value());
-        if (value < 1 || value > 99)
+        if (!sound::CanResetVolume(value, row->alternateMute))
           return;
         if (RowModel(s) != row->model)
           row->model = RowModel(s);
@@ -2542,10 +2540,8 @@ public:
         Wh_Log(L"Mixer level button: %08X", winrt::to_hresult());
       }
     }));
-    // At 0 a 32 DIP button with the SV's own glyph (QA_Volume, Mute state, same
-    // size) replaces the number; pressing it unmutes like the app icon does: the
-    // native toggle is toggled through UI Automation, so its command and the
-    // mod's restore run exactly as for a click on the icon.
+    // In alternate icon mode a 32 DIP mute button replaces the number at 0.
+    // It runs the app icon's native toggle and the mod's restore through UI Automation.
     {
       auto unmute = sound::Text(L"Unmute", L"Включить звук", L"Activar sonido", L"Stummschaltung aufheben",
                               L"Ativar som", L"取消静音");

@@ -157,7 +157,9 @@ inline SoundOptions ParseSoundOptions(std::wstring_view microphone, std::wstring
 inline bool ShowMicrophoneRow(SoundOptions options, Snapshot const &state) {
   return options.microphoneAuto && !state.inputId.empty() && state.inputVolumeAvailable;
 }
-inline bool CanResetEndpointVolume(double value) { return value >= 0 && value < 100; }
+inline bool CanResetVolume(double value, bool showMuteAtZero = false) {
+  return value >= 0 && value < 100 && (value > 0 || !showMuteAtZero);
+}
 inline std::wstring AudioDevicePropertiesUri(std::wstring_view id) {
   if (id.empty())
     return {};
