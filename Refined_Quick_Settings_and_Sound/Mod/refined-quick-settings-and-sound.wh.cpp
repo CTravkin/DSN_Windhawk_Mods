@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.7.3
+// @version 0.7.4
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 175
+// Build: 176
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -1497,6 +1497,13 @@ namespace P = C::Primitives;
 namespace M = X::Media;
 namespace D = X::Data;
 using winrt::Windows::Foundation::IInspectable;
+// Windhawk skips its default online cache for local mods. Use the catalog
+// cache for this mod explicitly, with Windhawk still matching the DLL's PDB ID.
+inline constexpr WH_HOOK_SYMBOLS_OPTIONS shellSymbolOptions{
+    .optionsSize = sizeof(WH_HOOK_SYMBOLS_OPTIONS),
+    .onlineCacheUrl = L"https://ramensoftware.github.io/windhawk-mod-symbol-cache/"
+                      L"refined-quick-settings-and-sound/",
+};
 inline std::atomic<bool> stopping = false;
 inline HMODULE module = nullptr;
 struct ModSettings {
@@ -8835,8 +8842,8 @@ namespace native {
 // partially constructed `this`. Pattern validated in ControlCenter.pdb.
 using Focus = int(WINAPI *)(void *, void *);
 using Connect = int(WINAPI *)(void *, int, void *);
-inline Focus originalViewFocus = nullptr, originalPageFocus = nullptr;
-inline Connect originalViewConnect = nullptr, originalPageConnect = nullptr;
+inline Focus originalPageFocus = nullptr;
+inline Connect originalViewConnect = nullptr;
 inline std::atomic<int> discoveryState{0}; // 0 waiting, 1 installing, 2 ready, 3 failed
 inline std::mutex discoveryMutex;
 inline std::mutex discoveryInstallMutex;
@@ -8869,11 +8876,6 @@ inline void Discovered(void *object, bool deferred) noexcept {
   }
   insideDiscovery = false;
 }
-inline int WINAPI ViewFocus(void *self, void *args) {
-  auto result = originalViewFocus(self, args);
-  Discovered(self, false);
-  return result;
-}
 inline int WINAPI PageFocus(void *self, void *args) {
   auto result = originalPageFocus(self, args);
   Discovered(self, false);
@@ -8884,11 +8886,6 @@ inline int WINAPI ViewConnect(void *self, int id, void *target) {
   Discovered(target, true);
   return result;
 }
-inline int WINAPI PageConnect(void *self, int id, void *target) {
-  auto result = originalPageConnect(self, id, target);
-  Discovered(target, true);
-  return result;
-}
 inline bool HookControlCenter(HMODULE controlCenter, bool applyNow) {
   std::lock_guard installLock(discoveryInstallMutex);
   if (stopping)
@@ -8896,25 +8893,20 @@ inline bool HookControlCenter(HMODULE controlCenter, bool applyNow) {
   int expected = 0;
   if (!discoveryState.compare_exchange_strong(expected, 1))
     return expected != 3;
+  // These entry points discover the Quick Settings view and the Sound page.
+  // Adding extra hooks here can make Windhawk reject a usable catalog cache
+  // and require the PDB even if the extra hooks are marked optional.
   WindhawkUtils::SYMBOL_HOOK controlCenterDllHooks[] = {
-      {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::ControlCenter::implementation::ControlCenterView,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnGotFocus(void *))"},
-       &originalViewFocus,
-       ViewFocus},
       {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::ControlCenter::implementation::ControlCenterView,struct winrt::Windows::UI::Xaml::Markup::IComponentConnector>::Connect(int,void *))"},
        &originalViewConnect,
-       ViewConnect,
-       true},
+       ViewConnect},
       {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::ControlCenter::implementation::FullScreenPage,struct winrt::Windows::UI::Xaml::Controls::IControlOverrides>::OnGotFocus(void *))"},
        &originalPageFocus,
-       PageFocus,
-       true},
-      {{LR"(public: virtual int __cdecl winrt::impl::produce<struct winrt::ControlCenter::implementation::FullScreenPage,struct winrt::Windows::UI::Xaml::Markup::IComponentConnector>::Connect(int,void *))"},
-       &originalPageConnect,
-       PageConnect,
-       true},
+       PageFocus},
   };
   bool ok = WindhawkUtils::HookSymbols(controlCenter, controlCenterDllHooks,
-                                       ARRAYSIZE(controlCenterDllHooks));
+                                       ARRAYSIZE(controlCenterDllHooks), &shellSymbolOptions) &&
+            originalViewConnect && originalPageFocus;
   if (ok)
     HookQuickRows(controlCenter);
   if (ok && applyNow)
@@ -10162,7 +10154,7 @@ inline bool HookTray(HMODULE module) {
         L"struct winrt::Windows::UI::Xaml::Input::TappedRoutedEventArgs)"},
        &originalTapped,
        Tapped}};
-  auto result = WindhawkUtils::HookSymbols(module, hooks, ARRAYSIZE(hooks));
+  auto result = WindhawkUtils::HookSymbols(module, hooks, ARRAYSIZE(hooks), &shellSymbolOptions);
   return result;
 }
 using Load = decltype(&LoadLibraryExW);
@@ -10201,7 +10193,7 @@ inline bool Initialize(HINSTANCE instance) {
        &getHost},
       {{LR"(public: int __cdecl TaskbarHost::FrameHeight(void)const )"}, &frameHeight},
       {{LR"(public: void __cdecl std::_Ref_count_base::_Decref(void))"}, &decref}};
-  if (!WindhawkUtils::HookSymbols(taskbar, roots, ARRAYSIZE(roots)))
+  if (!WindhawkUtils::HookSymbols(taskbar, roots, ARRAYSIZE(roots), &shellSymbolOptions))
     Wh_Log(L"Taskbar root symbols unavailable; constructor/tap discovery retained");
   if (auto module = GetModuleHandleW(L"SystemTray.dll")) {
     moduleHooked = true;

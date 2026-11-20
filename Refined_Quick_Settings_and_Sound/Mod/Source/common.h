@@ -38,6 +38,13 @@ namespace P = C::Primitives;
 namespace M = X::Media;
 namespace D = X::Data;
 using winrt::Windows::Foundation::IInspectable;
+// Windhawk skips its default online cache for local mods. Use the catalog
+// cache for this mod explicitly, with Windhawk still matching the DLL's PDB ID.
+inline constexpr WH_HOOK_SYMBOLS_OPTIONS shellSymbolOptions{
+    .optionsSize = sizeof(WH_HOOK_SYMBOLS_OPTIONS),
+    .onlineCacheUrl = L"https://ramensoftware.github.io/windhawk-mod-symbol-cache/"
+                      L"refined-quick-settings-and-sound/",
+};
 inline std::atomic<bool> stopping = false;
 inline HMODULE module = nullptr;
 struct ModSettings {
