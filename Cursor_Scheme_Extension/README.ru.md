@@ -53,6 +53,14 @@ Cursor Scheme Extension заменяет встроенные курсоры п�
 
 ### Установка
 
+#### Из каталога Windhawk (рекомендуется)
+
+В Windhawk откройте раздел **Обзор**, найдите **Cursor Scheme Extension**, откройте его карточку и нажмите **Установить**.
+
+[Страница мода в каталоге Windhawk](https://windhawk.net/mods/cursor-scheme-extension)
+
+#### Из исходника (вручную)
+
 1. В Windhawk выбрать «Создать новую модификацию».
 2. Заменить содержимое `mod.wh.cpp` полным [исходником мода](Mod/cursor-scheme-extension.wh.cpp).
 3. Скомпилировать мод, выйти из редактора и убедиться, что **Cursor Scheme Extension** включен на главной странице Windhawk.

@@ -53,6 +53,14 @@ Do not use multiple mods to replace the same cursors in the same application: th
 
 ### Installation
 
+#### Windhawk catalog (recommended)
+
+In Windhawk, open **Explore**, search for **Cursor Scheme Extension**, open its page, and select **Install**.
+
+[Mod page in the Windhawk catalog](https://windhawk.net/mods/cursor-scheme-extension)
+
+#### From source (manual)
+
 1. Open Windhawk and choose **Create a New Mod**.
 2. Replace the contents of `mod.wh.cpp` with the complete [mod source](Mod/cursor-scheme-extension.wh.cpp).
 3. Select **Compile Mod**, exit the editor, and check that **Cursor Scheme Extension** is enabled on the Windhawk home page.

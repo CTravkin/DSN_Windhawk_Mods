@@ -55,6 +55,14 @@ If a theme or rule controls the same border, set the corresponding Windows Borde
 
 ### Installation
 
+#### Windhawk catalog (recommended)
+
+In Windhawk, open **Explore**, search for **Windows Border Switch**, open its page, and select **Install**.
+
+[Mod page in the Windhawk catalog](https://windhawk.net/mods/windows-border-switch)
+
+#### From source (manual)
+
 1. Open Windhawk and choose **Create a New Mod**.
 2. Replace the contents of `mod.wh.cpp` with the complete [mod source](Mod/windows-border-switch.wh.cpp).
 3. Select **Compile Mod**, exit the editor, and check that **Windows Border Switch** is enabled on the Windhawk home page.

@@ -26,7 +26,13 @@ Each Windows account uses a separate `pins-<SID>.json` file in the mod's Windhaw
 
 ### Installation
 
-Install Explorer Item Pins from the Windhawk catalog. To build a local copy from source, follow these steps.
+#### Windhawk catalog (recommended)
+
+In Windhawk, open **Explore**, search for **Explorer Item Pins**, open its page, and select **Install**.
+
+[Mod page in the Windhawk catalog](https://windhawk.net/mods/explorer-item-pins)
+
+#### From source (manual)
 
 1. Open Windhawk and choose **Create a New Mod**.
 2. Replace the contents of `mod.wh.cpp` with the complete [mod source](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Explorer_Item_Pins/Mod/explorer-item-pins.wh.cpp).

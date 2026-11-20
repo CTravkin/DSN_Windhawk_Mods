@@ -55,6 +55,14 @@ Windows Border Switch скрывает системные рамки окон и
 
 ### Установка
 
+#### Из каталога Windhawk (рекомендуется)
+
+В Windhawk откройте раздел **Обзор**, найдите **Windows Border Switch**, откройте его карточку и нажмите **Установить**.
+
+[Страница мода в каталоге Windhawk](https://windhawk.net/mods/windows-border-switch)
+
+#### Из исходника (вручную)
+
 1. В Windhawk выбрать «Создать новую модификацию».
 2. Заменить содержимое `mod.wh.cpp` полным [исходником мода](Mod/windows-border-switch.wh.cpp).
 3. Скомпилировать мод, выйти из редактора и убедиться, что **Windows Border Switch** включен на главной странице Windhawk.

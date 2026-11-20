@@ -58,6 +58,14 @@ Requires Windows 11 24H2 or later (x64) and [Windhawk](https://windhawk.net/).
 
 ### Installation
 
+#### Windhawk catalog (recommended)
+
+In Windhawk, open **Explore**, search for **Refined Quick Settings and Sound**, open its page, and select **Install**.
+
+[Mod page in the Windhawk catalog](https://windhawk.net/mods/refined-quick-settings-and-sound)
+
+#### From source (manual)
+
 1. Install [Windhawk](https://windhawk.net/) and open [the standalone source](Mod/refined-quick-settings-and-sound.wh.cpp).
 2. Disable the original Refined Quick Settings and Sound and any mods or styles that change the same controls.
 3. In Windhawk, choose **Create a New Mod** and replace the contents of `mod.wh.cpp` with the standalone source. Select **Compile Mod**, exit the editor and check that the mod is enabled.
