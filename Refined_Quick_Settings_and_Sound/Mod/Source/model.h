@@ -84,6 +84,9 @@ inline bool Hidden(std::vector<std::wstring> const &patterns, std::wstring const
                      [&](auto const &p) { return text.find(p) != text.npos; });
 }
 inline float Clamp(float value) { return std::clamp(value, 0.f, 1.f); }
+inline double EndpointVolumePercent(float value, bool muted) {
+  return muted ? 0 : std::round(Clamp(value) * 100);
+}
 inline int VolumeIcon(float value, bool mute) {
   return mute ? -1 : value <= 0 ? 0 : value <= .33f ? 1 : value <= .66f ? 2 : 3;
 }

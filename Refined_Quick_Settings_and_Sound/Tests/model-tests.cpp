@@ -104,6 +104,19 @@ int main() {
       return 13;
     }
     std::puts("PASS: Sound options preserve defaults, gate the microphone row and link to the selected endpoint");
+    input.inputVolume = .64f;
+    input.inputMuted = true;
+    if (sound::EndpointVolumePercent(input.inputVolume, input.inputMuted) != 0 ||
+        input.inputVolume != .64f) {
+      std::puts("FAIL: a muted endpoint must display zero and retain its stored level");
+      return 14;
+    }
+    input.inputMuted = false;
+    if (sound::EndpointVolumePercent(input.inputVolume, input.inputMuted) != 64) {
+      std::puts("FAIL: unmuting must show the stored endpoint level");
+      return 14;
+    }
+    std::puts("PASS: muting displays zero and unmuting restores the displayed endpoint level");
     if (!sound::CanResetEndpointVolume(0) || !sound::CanResetEndpointVolume(57) ||
         sound::CanResetEndpointVolume(100) || sound::CanResetEndpointVolume(NAN)) {
       std::puts("FAIL: The endpoint reset button must work below 100 and be inactive at 100 or when unavailable");

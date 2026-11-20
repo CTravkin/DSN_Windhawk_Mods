@@ -1408,7 +1408,7 @@ class SoundPage {
     }
     if (!visible || state.applied < microphonePending_)
       return;
-    auto value = std::round(sound::Clamp(state.inputVolume) * 100);
+    auto value = sound::EndpointVolumePercent(state.inputVolume, state.inputMuted);
     if (microphone_.Value() != value) {
       microphoneSync_ = true;
       microphone_.Value(value);
@@ -1709,7 +1709,7 @@ public:
     master_.IsEnabled(state.masterAvailable);
     masterIcon_.IsEnabled(state.masterAvailable);
     if (!dragging)
-      master_.Value(state.muted ? 0 : std::round(state.master * 100));
+      master_.Value(sound::EndpointVolumePercent(state.master, state.muted));
     UpdateEndpointLevelButton(masterLevelButton_, state.masterAvailable ? master_.Value() : NAN);
     sync_ = false;
     if (!dragging)

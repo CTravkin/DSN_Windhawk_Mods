@@ -7,7 +7,7 @@
 // @description:de-DE Mehr Optionen für die Schnelleinstellungen und direkter Zugriff auf die Soundeinstellungen
 // @description:pt-BR Mais opções para as configurações rápidas e acesso direto aos ajustes de som
 // @description:zh-CN 快速设置面板的更多选项，快速打开声音设置
-// @version 0.9.8
+// @version 0.9.9
 // @author HeyOkay, CTravkin
 // @github https://github.com/HeyOkay
 // @homepage https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -17,7 +17,7 @@
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lole32 -loleaut32 -lruntimeobject -liphlpapi -lshlwapi -lshell32 -lpowrprof -luuid
 // @license GPL-3.0-only
 // ==/WindhawkMod==
-// Build: 191
+// Build: 192
 // Modified by Constantine Travkin on 2026-11-14.
 // Based on HeyOkay's v0.1.154 (source blob 7229ac098ad0e8732905b831259d2aa99984bb31).
 // Upstream: https://github.com/HeyOkay/Refined-Quick-Settings-and-Sound
@@ -1024,6 +1024,9 @@ inline bool Hidden(std::vector<std::wstring> const &patterns, std::wstring const
                      [&](auto const &p) { return text.find(p) != text.npos; });
 }
 inline float Clamp(float value) { return std::clamp(value, 0.f, 1.f); }
+inline double EndpointVolumePercent(float value, bool muted) {
+  return muted ? 0 : std::round(Clamp(value) * 100);
+}
 inline int VolumeIcon(float value, bool mute) {
   return mute ? -1 : value <= 0 ? 0 : value <= .33f ? 1 : value <= .66f ? 2 : 3;
 }
@@ -1455,16 +1458,22 @@ class Audio final {
     if (!inputVolumeEnabled_ || !inputVolume_ || cmd.id != inputVolumeId_ ||
         cmd.id != DefaultDevice(eCapture))
       return;
+    BOOL muted = FALSE;
     if (cmd.action == Action::InputMute) {
-      BOOL muted = FALSE;
       winrt::check_hresult(inputVolume_->GetMute(&muted));
       winrt::check_hresult(inputVolume_->SetMute(!muted, nullptr));
-    } else {
-      auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
-      if (UnsupportedInputVolume(result))
-        inputVolumeRejected_ = true;
-      winrt::check_hresult(result);
+      return;
     }
+    bool canMute = SUCCEEDED(inputVolume_->GetMute(&muted));
+    // Keep the last gain when muting at zero, if the endpoint supports mute.
+    if (value <= 0 && canMute && SUCCEEDED(inputVolume_->SetMute(TRUE, nullptr)))
+      return;
+    auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
+    if (UnsupportedInputVolume(result))
+      inputVolumeRejected_ = true;
+    winrt::check_hresult(result);
+    if (value > 0 && canMute && muted)
+      winrt::check_hresult(inputVolume_->SetMute(FALSE, nullptr));
   }
   void Execute(Command const &cmd) {
     error_.clear();
@@ -4562,7 +4571,7 @@ class SoundPage {
     }
     if (!visible || state.applied < microphonePending_)
       return;
-    auto value = std::round(sound::Clamp(state.inputVolume) * 100);
+    auto value = sound::EndpointVolumePercent(state.inputVolume, state.inputMuted);
     if (microphone_.Value() != value) {
       microphoneSync_ = true;
       microphone_.Value(value);
@@ -4863,7 +4872,7 @@ public:
     master_.IsEnabled(state.masterAvailable);
     masterIcon_.IsEnabled(state.masterAvailable);
     if (!dragging)
-      master_.Value(state.muted ? 0 : std::round(state.master * 100));
+      master_.Value(sound::EndpointVolumePercent(state.master, state.muted));
     UpdateEndpointLevelButton(masterLevelButton_, state.masterAvailable ? master_.Value() : NAN);
     sync_ = false;
     if (!dragging)
@@ -7062,9 +7071,9 @@ class QuickPage {
     shortcuts_.Spacing(7.2);
     C::Grid::SetColumn(shortcuts_, 2);
     row.Children().Append(shortcuts_);
-    display_ = ShortcutButton(sound::QuickShortcut::Display);
+    display_ = ShortcutButton(sound::QuickShortcut::Display, 16);
     NightButton();
-    shortcutButtons_ = {{sound::QuickShortcut::Display, display_}};
+    shortcutButtons_.clear();
     visibleShortcuts_.clear();
     settingsRow_ = row;
     return row;
@@ -7100,7 +7109,7 @@ class QuickPage {
     C::ToolTipService::SetToolTip(b, winrt::box_value(name));
     return b;
   }
-  C::Button ShortcutButton(sound::QuickShortcut action) {
+  C::Button ShortcutButton(sound::QuickShortcut action, double iconSize = 13.6) {
     using S = sound::QuickShortcut;
     PCWSTR name = nullptr, uri = nullptr;
     wchar_t glyph = 0;
@@ -7165,7 +7174,7 @@ class QuickPage {
     }
     auto button = IconButton(name);
     button.Margin({4, 0, 4, 0});
-    button.Content(SymbolGlyph(view_, glyph, 13.6));
+    button.Content(SymbolGlyph(view_, glyph, iconSize));
     Keep(button.Click(winrt::auto_revoke, [uri](auto &&, auto &&) {
       ShellExecuteW(nullptr, L"open", uri, nullptr, nullptr, SW_SHOWNORMAL);
     }));

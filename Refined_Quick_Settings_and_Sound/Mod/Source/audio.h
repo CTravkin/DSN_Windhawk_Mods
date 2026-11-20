@@ -361,16 +361,22 @@ class Audio final {
     if (!inputVolumeEnabled_ || !inputVolume_ || cmd.id != inputVolumeId_ ||
         cmd.id != DefaultDevice(eCapture))
       return;
+    BOOL muted = FALSE;
     if (cmd.action == Action::InputMute) {
-      BOOL muted = FALSE;
       winrt::check_hresult(inputVolume_->GetMute(&muted));
       winrt::check_hresult(inputVolume_->SetMute(!muted, nullptr));
-    } else {
-      auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
-      if (UnsupportedInputVolume(result))
-        inputVolumeRejected_ = true;
-      winrt::check_hresult(result);
+      return;
     }
+    bool canMute = SUCCEEDED(inputVolume_->GetMute(&muted));
+    // Keep the last gain when muting at zero, if the endpoint supports mute.
+    if (value <= 0 && canMute && SUCCEEDED(inputVolume_->SetMute(TRUE, nullptr)))
+      return;
+    auto result = inputVolume_->SetMasterVolumeLevelScalar(value, nullptr);
+    if (UnsupportedInputVolume(result))
+      inputVolumeRejected_ = true;
+    winrt::check_hresult(result);
+    if (value > 0 && canMute && muted)
+      winrt::check_hresult(inputVolume_->SetMute(FALSE, nullptr));
   }
   void Execute(Command const &cmd) {
     error_.clear();
