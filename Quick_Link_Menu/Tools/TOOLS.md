@@ -10,6 +10,10 @@ For icons, match the glyphs in the installed Settings view model against
 Segoe Fluent Icons. Main rows can reuse a glyph when Windows uses it for
 the same concept. Within each submenu, the packager checks glyph uniqueness.
 
+For a row with related shortcuts, the Windhawk group uses the row's caption.
+The first setting in that group is the row's visibility switch, followed by
+the individual shortcuts.
+
 From the repository root, run `node Quick_Link_Menu/Tools/package-mod.mjs` after
 editing either input. Add `--check` to verify that the standalone source matches
 the inputs.

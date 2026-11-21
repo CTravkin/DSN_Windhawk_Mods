@@ -653,7 +653,7 @@
     "rows": [
       {
         "id": "security",
-        "glyph": "e83d",
+        "glyph": "ea18",
         "action": "panel:5",
         "resource": "shell32.dll,-32014",
         "names": [
@@ -667,7 +667,7 @@
         "children": [
           {
             "id": "maintenance",
-            "glyph": "0",
+            "glyph": "f760",
             "action": "control:Microsoft.ActionCenter",
             "resource": "shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
             "names": [
@@ -739,7 +739,7 @@
         "children": [
           {
             "id": "sharing",
-            "glyph": "e774",
+            "glyph": "f193",
             "action": "control:Microsoft.NetworkAndSharingCenter",
             "resource": "shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
             "names": [
@@ -767,7 +767,7 @@
           },
           {
             "id": "internetOptions",
-            "glyph": "0",
+            "glyph": "e774",
             "action": "exe:inetcpl.cpl",
             "resource": "shell:{A3DD4F92-658A-410F-84FD-6FBBBEF2FFFE}",
             "names": [
@@ -783,7 +783,7 @@
       },
       {
         "id": "hardware",
-        "glyph": "e772",
+        "glyph": "e7f3",
         "action": "panel:2",
         "resource": "shell32.dll,-32008",
         "names": [
@@ -797,7 +797,7 @@
         "children": [
           {
             "id": "deviceManager",
-            "glyph": "e7f8",
+            "glyph": "e772",
             "action": "exe:mmc.exe;devmgmt.msc",
             "resource": "twinui.pcshell.dll,-10916",
             "names": [
@@ -897,7 +897,7 @@
           },
           {
             "id": "windowsFeatures",
-            "glyph": "e762",
+            "glyph": "e950",
             "action": "exe:OptionalFeatures.exe",
             "resource": "appwiz.cpl,-188",
             "names": [
@@ -927,7 +927,7 @@
         "children": [
           {
             "id": "credentials",
-            "glyph": "e8d2",
+            "glyph": "e8d7",
             "action": "control:Microsoft.CredentialManager",
             "resource": "shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
             "names": [
@@ -941,7 +941,7 @@
           },
           {
             "id": "uac",
-            "glyph": "e83d",
+            "glyph": "e7ef",
             "action": "exe:UserAccountControlSettings.exe",
             "resource": "shell32.dll,-24317",
             "names": [
@@ -1015,7 +1015,7 @@
       },
       {
         "id": "clockRegion",
-        "glyph": "e775",
+        "glyph": "e917",
         "action": "panel:6",
         "resource": "shell32.dll,-32026",
         "names": [
@@ -1225,7 +1225,7 @@
         "children": [
           {
             "id": "optimize",
-            "glyph": "ebc4",
+            "glyph": "eda2",
             "action": "exe:dfrgui.exe",
             "resource": "tools:dfrgui",
             "names": [
@@ -1283,7 +1283,7 @@
         "children": [
           {
             "id": "taskScheduler",
-            "glyph": "e823",
+            "glyph": "e787",
             "action": "exe:mmc.exe;taskschd.msc",
             "resource": "tools:Task Scheduler",
             "names": [
@@ -1297,7 +1297,7 @@
           },
           {
             "id": "componentServices",
-            "glyph": "0",
+            "glyph": "e950",
             "action": "exe:mmc.exe;comexp.msc",
             "resource": "tools:Component Services",
             "names": [
@@ -1313,7 +1313,7 @@
       },
       {
         "id": "eventViewer",
-        "glyph": "e81c",
+        "glyph": "f0e3",
         "action": "native:10914",
         "resource": "twinui.pcshell.dll,-10914",
         "names": [
@@ -1341,7 +1341,7 @@
           },
           {
             "id": "resources",
-            "glyph": "0",
+            "glyph": "ec49",
             "action": "exe:resmon.exe",
             "resource": "tools:Resource Monitor",
             "names": [
@@ -1383,7 +1383,7 @@
           },
           {
             "id": "memoryDiagnostic",
-            "glyph": "0",
+            "glyph": "eea0",
             "action": "exe:MdSched.exe",
             "resource": "tools:Memory Diagnostics Tool",
             "names": [
@@ -1536,7 +1536,7 @@
     "rows": [
       {
         "id": "run",
-        "glyph": "e751",
+        "glyph": "e8ad",
         "action": "native:10925",
         "resource": "",
         "names": [
@@ -1551,7 +1551,7 @@
       },
       {
         "id": "taskManager",
-        "glyph": "e9d9",
+        "glyph": "f120",
         "action": "native:10921",
         "resource": "",
         "names": [
@@ -1566,7 +1566,7 @@
       },
       {
         "id": "explorer",
-        "glyph": "e8b7",
+        "glyph": "ec51",
         "action": "native:10923",
         "resource": "",
         "names": [
@@ -1582,7 +1582,7 @@
             "id": "desktop",
             "glyph": "e7f4",
             "action": "folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641",
-            "resource": "",
+            "resource": "shell32.dll,-21769",
             "names": [
               "Desktop",
               "Рабочий стол",
@@ -1594,9 +1594,9 @@
           },
           {
             "id": "computer",
-            "glyph": "e7f8",
+            "glyph": "e770",
             "action": "folder:0AC0837C-BBF8-452A-850D-79D08E667CA7",
-            "resource": "",
+            "resource": "windows.storage.dll,-9216",
             "names": [
               "This PC",
               "Этот компьютер",
@@ -1608,15 +1608,15 @@
           },
           {
             "id": "personal",
-            "glyph": "e77b",
+            "glyph": "ec25",
             "action": "folder:F3CE0F7C-4901-4ACC-8648-D5D44B04EF8F",
-            "resource": "",
+            "resource": "shell32.dll,-22076",
             "names": [
-              "Personal folder",
-              "Персональная папка",
+              "Personal Folder",
+              "Личная папка",
               "Carpeta personal",
               "Persönlicher Ordner",
-              "Pasta pessoal",
+              "Pasta Pessoal",
               "个人文件夹"
             ]
           },
@@ -1624,7 +1624,7 @@
             "id": "documents",
             "glyph": "e8a5",
             "action": "folder:FDD39AD0-238F-46AF-ADB4-6C85480369C7",
-            "resource": "",
+            "resource": "windows.storage.dll,-21770",
             "names": [
               "Documents",
               "Документы",
@@ -1639,7 +1639,7 @@
             "id": "pictures",
             "glyph": "e91b",
             "action": "folder:33E28130-4E1E-4676-835A-98395C3BC3BB",
-            "resource": "",
+            "resource": "windows.storage.dll,-21779",
             "names": [
               "Pictures",
               "Изображения",
@@ -1654,7 +1654,7 @@
             "id": "downloads",
             "glyph": "e896",
             "action": "folder:374DE290-123F-4565-9164-39C4925E467B",
-            "resource": "",
+            "resource": "windows.storage.dll,-21798",
             "names": [
               "Downloads",
               "Загрузки",
@@ -1668,7 +1668,7 @@
             "id": "recycleBin",
             "glyph": "e74d",
             "action": "folder:B7534046-3ECB-4C18-BE4E-64CD4CB7D6AC",
-            "resource": "",
+            "resource": "shell32.dll,-8964",
             "names": [
               "Recycle Bin",
               "Корзина",
@@ -1698,7 +1698,7 @@
       },
       {
         "id": "desktop",
-        "glyph": "e7c4",
+        "glyph": "e7fb",
         "action": "native:10926",
         "resource": "",
         "names": [

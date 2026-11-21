@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.6
+// @version         0.2.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 12
+// Build: 13
 
 // ==WindhawkModReadme==
 /*
@@ -31,7 +31,8 @@ A submenu offers related shortcuts and can be opened with the arrow or **Right**
 **Enter** runs the main action. The power row opens the Windows power submenu,
 with **Lock** as its first command.
 
-In the mod settings, choose which rows and submenu items appear. Change how
+In the mod settings, the related shortcuts are listed with their main row.
+Choose which rows and submenu items appear, and change how
 submenus open on hover at the top of the settings page. Disabling all entries
 restores the stock Win+X menu.
 
@@ -333,7 +334,6 @@ std::wstring SettingsCaption(std::wstring_view id) {
 
 std::wstring SystemCaption(CatalogItem const& item) {
     const auto [kind, target] = Split(item.action, L':');
-    if (kind == L"folder") return ShellName(FolderId(target));
     const auto [resourceKind, resource] = Split(item.resource, L':');
     if (resourceKind == L"shell") return RegistryShellName(resource);
     if (resourceKind == L"tools") {
@@ -345,6 +345,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
         return Indirect((L"@{windows?ms-resource://" + std::wstring(resource) + L"}").c_str());
     }
     if (*item.resource) return SystemString(item.resource);
+    if (kind == L"folder") return ShellName(FolderId(target));
     if (kind == L"native") return Twinui(target);
     return {};
 }
@@ -352,8 +353,6 @@ std::wstring SystemCaption(CatalogItem const& item) {
 std::wstring Caption(Destination const& destination) {
     if (destination.original) return std::wstring(destination.original.Text());
     const auto& item = *destination.item;
-    if (std::wstring_view(item.action).starts_with(L"folder:"))
-        return SystemCaption(item);
     auto& cached = captionCache[&item - catalog];
     if (!cached) {
         auto caption = SystemCaption(item);
