@@ -1,0 +1,1825 @@
+[
+  {
+    "id": "windowsSettings",
+    "names": [
+      "Settings",
+      "Параметры",
+      "Configuración",
+      "Einstellungen",
+      "Configurações",
+      "设置"
+    ],
+    "rows": [
+      {
+        "id": "system",
+        "glyph": "e7f3",
+        "action": "uri:system",
+        "resource": "twinui.pcshell.dll,-10915",
+        "names": [
+          "System",
+          "Система",
+          "Sistema",
+          "System",
+          "Sistema",
+          "系统"
+        ],
+        "children": [
+          {
+            "id": "display",
+            "glyph": "e7f4",
+            "action": "uri:display",
+            "resource": "s:SettingsPagePCSystemDisplay",
+            "names": [
+              "Display",
+              "Дисплей",
+              "Pantalla",
+              "Anzeige",
+              "Tela",
+              "显示"
+            ]
+          },
+          {
+            "id": "sound",
+            "glyph": "e767",
+            "action": "uri:sound",
+            "resource": "s:SettingsPageAudio",
+            "names": [
+              "Sound",
+              "Звук",
+              "Sonido",
+              "Sound",
+              "Som",
+              "声音"
+            ]
+          },
+          {
+            "id": "power",
+            "glyph": "e7e8",
+            "action": "uri:powersleep",
+            "resource": "s:SettingsPagePowerAndBattery",
+            "names": [
+              "Power",
+              "Питание",
+              "Energía",
+              "Strom",
+              "Energia",
+              "电源"
+            ]
+          },
+          {
+            "id": "storage",
+            "glyph": "eda2",
+            "action": "uri:storagesense",
+            "resource": "s:SettingsPageStorageSenseStorageOverview",
+            "names": [
+              "Storage",
+              "Память",
+              "Almacenamiento",
+              "Speicher",
+              "Armazenamento",
+              "存储"
+            ]
+          },
+          {
+            "id": "advanced",
+            "glyph": "ec7a",
+            "action": "uri:developers",
+            "resource": "s:SettingsPageAdvancedSystemSettings",
+            "names": [
+              "Advanced",
+              "Дополнительно",
+              "Opciones avanzadas",
+              "Erweitert",
+              "Avançado",
+              "高级"
+            ]
+          },
+          {
+            "id": "about",
+            "glyph": "e946",
+            "action": "uri:about",
+            "resource": "s:SettingsPageAbout",
+            "names": [
+              "About",
+              "О системе",
+              "Acerca de",
+              "Info",
+              "Sobre",
+              "系统信息"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "devices",
+        "glyph": "e702",
+        "action": "uri:devices",
+        "resource": "",
+        "names": [
+          "Bluetooth & devices",
+          "Bluetooth и устройства",
+          "Bluetooth y dispositivos",
+          "Bluetooth und Geräte",
+          "Bluetooth e dispositivos",
+          "蓝牙和设备"
+        ],
+        "children": [
+          {
+            "id": "devices",
+            "glyph": "e772",
+            "action": "uri:connecteddevices",
+            "resource": "s:SettingsPageDevices",
+            "names": [
+              "Devices",
+              "Устройства",
+              "Dispositivos",
+              "Geräte",
+              "Dispositivos",
+              "设备"
+            ]
+          },
+          {
+            "id": "printers",
+            "glyph": "e749",
+            "action": "uri:printers",
+            "resource": "s:SettingsPageDevicesPrinters",
+            "names": [
+              "Printers & scanners",
+              "Принтеры и сканеры",
+              "Impresoras y escáneres",
+              "Drucker und Scanner",
+              "Impressoras e scanners",
+              "打印机和扫描仪"
+            ]
+          },
+          {
+            "id": "cameras",
+            "glyph": "e722",
+            "action": "uri:camera",
+            "resource": "s:SettingsPageDevicesCameras",
+            "names": [
+              "Cameras",
+              "Камеры",
+              "Cámaras",
+              "Kameras",
+              "Câmeras",
+              "摄像头"
+            ]
+          },
+          {
+            "id": "mouse",
+            "glyph": "e962",
+            "action": "uri:mousetouchpad",
+            "resource": "s:SettingsPagePCSystemDeviceSettings",
+            "names": [
+              "Mouse",
+              "Мышь",
+              "Mouse",
+              "Maus",
+              "Mouse",
+              "鼠标"
+            ]
+          },
+          {
+            "id": "keyboard",
+            "glyph": "e765",
+            "action": "uri:devices-keyboard",
+            "resource": "s:SettingsPageDevicesKeyboard",
+            "names": [
+              "Keyboard",
+              "Клавиатура",
+              "Teclado",
+              "Tastatur",
+              "Teclado",
+              "键盘"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "network",
+        "glyph": "e774",
+        "action": "uri:network-status",
+        "resource": "shell32.dll,-32010",
+        "names": [
+          "Network & internet",
+          "Сеть и Интернет",
+          "Red e Internet",
+          "Netzwerk und Internet",
+          "Rede e Internet",
+          "网络和 Internet"
+        ],
+        "children": [
+          {
+            "id": "ethernet",
+            "glyph": "e839",
+            "action": "uri:network-ethernet",
+            "resource": "s:SettingsPageNetworkEthernet",
+            "names": [
+              "Ethernet",
+              "Ethernet",
+              "Ethernet",
+              "Ethernet",
+              "Ethernet",
+              "以太网"
+            ]
+          },
+          {
+            "id": "wifi",
+            "glyph": "e701",
+            "action": "uri:network-wifi",
+            "resource": "s:SettingsPageNetworkWiFi",
+            "names": [
+              "Wi-Fi",
+              "Wi-Fi",
+              "Wi-Fi",
+              "WLAN",
+              "Wi-Fi",
+              "WLAN"
+            ]
+          },
+          {
+            "id": "hotspot",
+            "glyph": "e704",
+            "action": "uri:network-mobilehotspot",
+            "resource": "s:SettingsPageNetworkMobileHotspot",
+            "names": [
+              "Mobile hotspot",
+              "Мобильный хот-спот",
+              "Zona con cobertura inalámbrica móvil",
+              "Mobiler Hotspot",
+              "Hotspot móvel",
+              "移动热点"
+            ]
+          },
+          {
+            "id": "vpn",
+            "glyph": "e705",
+            "action": "uri:network-vpn",
+            "resource": "s:SettingsPageNetworkVPN",
+            "names": [
+              "VPN",
+              "VPN",
+              "VPN",
+              "VPN",
+              "VPN",
+              "VPN"
+            ]
+          },
+          {
+            "id": "proxy",
+            "glyph": "e968",
+            "action": "uri:network-proxy",
+            "resource": "s:SettingsPageNetworkProxy",
+            "names": [
+              "Proxy",
+              "Прокси-сервер",
+              "Proxy",
+              "Proxy",
+              "Proxy",
+              "代理"
+            ]
+          },
+          {
+            "id": "advancedNetwork",
+            "glyph": "eda3",
+            "action": "uri:network-advancedsettings",
+            "resource": "s:SettingsPageNetworkManageAdapterOptions",
+            "names": [
+              "Advanced network settings",
+              "Дополнительные сетевые параметры",
+              "Configuración de red avanzada",
+              "Erweiterte Netzwerkeinstellungen",
+              "Configurações avançadas de rede",
+              "高级网络设置"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "personalization",
+        "glyph": "e771",
+        "action": "uri:personalization",
+        "resource": "",
+        "names": [
+          "Personalization",
+          "Персонализация",
+          "Personalización",
+          "Personalisierung",
+          "Personalização",
+          "个性化"
+        ],
+        "children": [
+          {
+            "id": "background",
+            "glyph": "eb9f",
+            "action": "uri:personalization-background",
+            "resource": "s:SettingsPageBackground",
+            "names": [
+              "Background",
+              "Фон",
+              "Fondo",
+              "Hintergrund",
+              "Tela de fundo",
+              "背景"
+            ]
+          },
+          {
+            "id": "colors",
+            "glyph": "e2b1",
+            "action": "uri:personalization-colors",
+            "resource": "s:SettingsPageColors",
+            "names": [
+              "Colors",
+              "Цвета",
+              "Colores",
+              "Farben",
+              "Cores",
+              "颜色"
+            ]
+          },
+          {
+            "id": "themes",
+            "glyph": "e771",
+            "action": "uri:themes",
+            "resource": "s:SettingsPageThemes",
+            "names": [
+              "Themes",
+              "Темы",
+              "Temas",
+              "Designs",
+              "Temas",
+              "主题"
+            ]
+          },
+          {
+            "id": "lockScreen",
+            "glyph": "ee3f",
+            "action": "uri:lockscreen",
+            "resource": "s:SettingsPageLockScreen",
+            "names": [
+              "Lock screen",
+              "Экран блокировки",
+              "Pantalla de bloqueo",
+              "Sperrbildschirm",
+              "Tela de bloqueio",
+              "锁屏界面"
+            ]
+          },
+          {
+            "id": "start",
+            "glyph": "e8fc",
+            "action": "uri:personalization-start",
+            "resource": "s:SettingsPageStart",
+            "names": [
+              "Start",
+              "Пуск",
+              "Inicio",
+              "Start",
+              "Iniciar",
+              "开始"
+            ]
+          },
+          {
+            "id": "taskbar",
+            "glyph": "e90e",
+            "action": "uri:taskbar",
+            "resource": "s:SettingsPageTaskbar",
+            "names": [
+              "Taskbar",
+              "Панель задач",
+              "Barra de tareas",
+              "Taskleiste",
+              "Barra de tarefas",
+              "任务栏"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "apps",
+        "glyph": "e71d",
+        "action": "category:installed-apps;SystemSettings_StorageSense_AppSizesListFilter_DisplayStringValue",
+        "resource": "",
+        "names": [
+          "Apps",
+          "Приложения",
+          "Aplicaciones",
+          "Apps",
+          "Aplicativos",
+          "应用"
+        ],
+        "children": [
+          {
+            "id": "installed",
+            "glyph": "e71d",
+            "action": "uri:installed-apps",
+            "resource": "s:SettingsPageInstalledApps",
+            "names": [
+              "Installed apps",
+              "Установленные приложения",
+              "Aplicaciones instaladas",
+              "Installierte Apps",
+              "Aplicativos instalados",
+              "安装的应用"
+            ]
+          },
+          {
+            "id": "defaults",
+            "glyph": "e73a",
+            "action": "uri:defaultapps",
+            "resource": "s:SettingsPageAppsDefaults",
+            "names": [
+              "Default apps",
+              "Приложения по умолчанию",
+              "Aplicaciones predeterminadas",
+              "Standard-Apps",
+              "Aplicativos padrão",
+              "默认应用"
+            ]
+          },
+          {
+            "id": "startup",
+            "glyph": "e7b5",
+            "action": "uri:startupapps",
+            "resource": "s:SettingsPageStartup",
+            "names": [
+              "Startup",
+              "Автозагрузка",
+              "Inicio",
+              "Autostart",
+              "Inicialização",
+              "启动"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "accounts",
+        "glyph": "e77b",
+        "action": "uri:accounts",
+        "resource": "",
+        "names": [
+          "Accounts",
+          "Учетные записи",
+          "Cuentas",
+          "Konten",
+          "Contas",
+          "帐户"
+        ],
+        "children": [
+          {
+            "id": "signIn",
+            "glyph": "e8d7",
+            "action": "uri:signinoptions",
+            "resource": "s:SettingsPageSignInOptions",
+            "names": [
+              "Sign-in options",
+              "Варианты входа",
+              "Opciones de inicio de sesión",
+              "Anmeldeoptionen",
+              "Opções de entrada",
+              "登录选项"
+            ]
+          },
+          {
+            "id": "backup",
+            "glyph": "e11c",
+            "action": "uri:backup",
+            "resource": "s:SettingsPageRestoreOneBackup",
+            "names": [
+              "Windows Backup",
+              "Архивация Windows",
+              "Copias de seguridad de Windows",
+              "Windows-Sicherung",
+              "Backup do Windows",
+              "Windows 备份"
+            ]
+          },
+          {
+            "id": "passkeys",
+            "glyph": "e8d2",
+            "action": "uri:savedpasskeys",
+            "resource": "s:SettingsPagePasskeysManagement",
+            "names": [
+              "Passkeys",
+              "Ключи доступа",
+              "Claves de paso",
+              "Passkeys",
+              "Chaves de acesso",
+              "通行密钥"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "timeLanguage",
+        "glyph": "e823",
+        "action": "category:dateandtime;SystemSettings_DateTime_IsTimeSetAutomaticallyEnabled_ToggleSwitch",
+        "resource": "",
+        "names": [
+          "Time & language",
+          "Время и язык",
+          "Hora e idioma",
+          "Zeit und Sprache",
+          "Hora e idioma",
+          "时间和语言"
+        ],
+        "children": [
+          {
+            "id": "dateTime",
+            "glyph": "ec92",
+            "action": "uri:dateandtime",
+            "resource": "s:SettingsPageTimeRegionDateTime",
+            "names": [
+              "Date & time",
+              "Дата и время",
+              "Fecha y hora",
+              "Datum und Uhrzeit",
+              "Data e hora",
+              "日期和时间"
+            ]
+          },
+          {
+            "id": "language",
+            "glyph": "f2b7",
+            "action": "uri:regionlanguage",
+            "resource": "s:SettingsPageTimeRegionLanguage",
+            "names": [
+              "Language & region",
+              "Язык и регион",
+              "Idioma y región",
+              "Sprache und Region",
+              "Idioma e região",
+              "语言和区域"
+            ]
+          },
+          {
+            "id": "typing",
+            "glyph": "e765",
+            "action": "uri:typing",
+            "resource": "s:SettingsPageTimeRegionKeyboard",
+            "names": [
+              "Typing",
+              "Ввод",
+              "Escritura",
+              "Eingabe",
+              "Digitação",
+              "输入"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "gaming",
+        "glyph": "e7fc",
+        "action": "category:gaming-gamemode;SystemSettings_Gaming_GameMode_Toggle_ToggleSwitch",
+        "resource": "",
+        "names": [
+          "Gaming",
+          "Игры",
+          "Juegos",
+          "Spielen",
+          "Jogos",
+          "游戏"
+        ],
+        "children": []
+      },
+      {
+        "id": "accessibility",
+        "glyph": "e776",
+        "action": "uri:easeofaccess",
+        "resource": "shell32.dll,-32000",
+        "names": [
+          "Accessibility",
+          "Специальные возможности",
+          "Accesibilidad",
+          "Barrierefreiheit",
+          "Acessibilidade",
+          "辅助功能"
+        ],
+        "children": []
+      },
+      {
+        "id": "privacy",
+        "glyph": "e72e",
+        "action": "uri:privacy",
+        "resource": "s:SettingsPageGroupPrivacy-2",
+        "names": [
+          "Privacy & security",
+          "Конфиденциальность и защита",
+          "Privacidad y seguridad",
+          "Datenschutz und Sicherheit",
+          "Privacidade e segurança",
+          "隐私和安全性"
+        ],
+        "children": []
+      },
+      {
+        "id": "update",
+        "glyph": "e895",
+        "action": "uri:windowsupdate",
+        "resource": "",
+        "names": [
+          "Windows Update",
+          "Центр обновления Windows",
+          "Windows Update",
+          "Windows Update",
+          "Windows Update",
+          "Windows 更新"
+        ],
+        "children": []
+      }
+    ],
+    "descriptions": [
+      "Windows Settings categories and pages",
+      "Разделы и страницы приложения «Параметры»",
+      "Categorías y páginas de Configuración de Windows",
+      "Kategorien und Seiten der Windows-Einstellungen",
+      "Categorias e páginas das Configurações do Windows",
+      "Windows 设置的类别和页面"
+    ]
+  },
+  {
+    "id": "controlPanel",
+    "names": [
+      "Control Panel",
+      "Панель управления",
+      "Panel de control",
+      "Systemsteuerung",
+      "Painel de Controle",
+      "控制面板"
+    ],
+    "rows": [
+      {
+        "id": "security",
+        "glyph": "e83d",
+        "action": "panel:5",
+        "resource": "shell32.dll,-32014",
+        "names": [
+          "System and Security",
+          "Система и безопасность",
+          "Sistema y seguridad",
+          "System und Sicherheit",
+          "Sistema e Segurança",
+          "系统和安全"
+        ],
+        "children": [
+          {
+            "id": "maintenance",
+            "glyph": "0",
+            "action": "control:Microsoft.ActionCenter",
+            "resource": "shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
+            "names": [
+              "Security and Maintenance",
+              "Центр безопасности и обслуживания",
+              "Seguridad y mantenimiento",
+              "Sicherheit und Wartung",
+              "Segurança e Manutenção",
+              "安全和维护"
+            ]
+          },
+          {
+            "id": "firewall",
+            "glyph": "e83d",
+            "action": "exe:Firewall.cpl",
+            "resource": "shell:{4026492F-2F69-46B8-B9BF-5654FC07E423}",
+            "names": [
+              "Windows Defender Firewall",
+              "Брандмауэр Защитника Windows",
+              "Firewall de Windows Defender",
+              "Windows Defender Firewall",
+              "Firewall do Windows Defender",
+              "Windows Defender 防火墙"
+            ]
+          },
+          {
+            "id": "powerOptions",
+            "glyph": "e7e8",
+            "action": "exe:powercfg.cpl",
+            "resource": "shell:{025A5937-A6BE-4686-A844-36FE4BEC8B6D}",
+            "names": [
+              "Power Options",
+              "Электропитание",
+              "Opciones de energía",
+              "Energieoptionen",
+              "Opções de Energia",
+              "电源选项"
+            ]
+          },
+          {
+            "id": "bitlocker",
+            "glyph": "e72e",
+            "action": "control:Microsoft.BitLockerDriveEncryption",
+            "resource": "shell:{D9EF8727-CAC2-4E60-809E-86F80A666C91}",
+            "names": [
+              "BitLocker Drive Encryption",
+              "Шифрование диска BitLocker",
+              "Cifrado de unidad BitLocker",
+              "BitLocker-Laufwerkverschlüsselung",
+              "Criptografia de Unidade de Disco BitLocker",
+              "BitLocker 驱动器加密"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "network",
+        "glyph": "e839",
+        "action": "panel:3",
+        "resource": "shell32.dll,-32010",
+        "names": [
+          "Network and Internet",
+          "Сеть и Интернет",
+          "Redes e Internet",
+          "Netzwerk und Internet",
+          "Rede e Internet",
+          "网络和 Internet"
+        ],
+        "children": [
+          {
+            "id": "sharing",
+            "glyph": "e774",
+            "action": "control:Microsoft.NetworkAndSharingCenter",
+            "resource": "shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
+            "names": [
+              "Network and Sharing Center",
+              "Центр управления сетями и общим доступом",
+              "Centro de redes y recursos compartidos",
+              "Netzwerk- und Freigabecenter",
+              "Central de Rede e Compartilhamento",
+              "网络和共享中心"
+            ]
+          },
+          {
+            "id": "connections",
+            "glyph": "e839",
+            "action": "exe:ncpa.cpl",
+            "resource": "twinui.pcshell.dll,-10912",
+            "names": [
+              "Network Connections",
+              "Сетевые подключения",
+              "Conexiones de red",
+              "Netzwerkverbindungen",
+              "Conexões de Rede",
+              "网络连接"
+            ]
+          },
+          {
+            "id": "internetOptions",
+            "glyph": "0",
+            "action": "exe:inetcpl.cpl",
+            "resource": "shell:{A3DD4F92-658A-410F-84FD-6FBBBEF2FFFE}",
+            "names": [
+              "Internet Options",
+              "Свойства браузера",
+              "Opciones de Internet",
+              "Internetoptionen",
+              "Opções da Internet",
+              "Internet 选项"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hardware",
+        "glyph": "e772",
+        "action": "panel:2",
+        "resource": "shell32.dll,-32008",
+        "names": [
+          "Hardware and Sound",
+          "Оборудование и звук",
+          "Hardware y sonido",
+          "Hardware und Sound",
+          "Hardware e Sons",
+          "硬件和声音"
+        ],
+        "children": [
+          {
+            "id": "deviceManager",
+            "glyph": "e7f8",
+            "action": "exe:mmc.exe;devmgmt.msc",
+            "resource": "twinui.pcshell.dll,-10916",
+            "names": [
+              "Device Manager",
+              "Диспетчер устройств",
+              "Administrador de dispositivos",
+              "Geräte-Manager",
+              "Gerenciador de Dispositivos",
+              "设备管理器"
+            ]
+          },
+          {
+            "id": "sound",
+            "glyph": "e767",
+            "action": "exe:mmsys.cpl",
+            "resource": "shell:{F2DDFC82-8F12-4CDD-B7DC-D4FE1425AA4D}",
+            "names": [
+              "Sound",
+              "Звук",
+              "Sonido",
+              "Sound",
+              "Som",
+              "声音"
+            ]
+          },
+          {
+            "id": "mouse",
+            "glyph": "e962",
+            "action": "exe:main.cpl",
+            "resource": "shell:{6C8EEC18-8D75-41B2-A177-8831D59D2D50}",
+            "names": [
+              "Mouse",
+              "Мышь",
+              "Mouse",
+              "Maus",
+              "Mouse",
+              "鼠标"
+            ]
+          },
+          {
+            "id": "keyboard",
+            "glyph": "e765",
+            "action": "control:keyboard",
+            "resource": "shell:{725BE8F7-668E-4C7B-8F90-46BDB0936430}",
+            "names": [
+              "Keyboard",
+              "Клавиатура",
+              "Teclado",
+              "Tastatur",
+              "Teclado",
+              "键盘"
+            ]
+          },
+          {
+            "id": "controllers",
+            "glyph": "e7fc",
+            "action": "exe:joy.cpl",
+            "resource": "joy.cpl,-100",
+            "names": [
+              "Game Controllers",
+              "Игровые устройства",
+              "Dispositivos de juego",
+              "Gamecontroller",
+              "Controladores de Jogo",
+              "游戏控制器"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "programs",
+        "glyph": "0",
+        "action": "panel:8",
+        "resource": "shell32.dll,-32006",
+        "names": [
+          "Programs",
+          "Программы",
+          "Programas",
+          "Programme",
+          "Programas",
+          "程序"
+        ],
+        "children": [
+          {
+            "id": "programsFeatures",
+            "glyph": "e71d",
+            "action": "exe:appwiz.cpl",
+            "resource": "shell:{7B81BE6A-CE2B-4676-A29E-EB907A5126C5}",
+            "names": [
+              "Programs and Features",
+              "Программы и компоненты",
+              "Programas y características",
+              "Programme und Features",
+              "Programas e Recursos",
+              "程序和功能"
+            ]
+          },
+          {
+            "id": "windowsFeatures",
+            "glyph": "e762",
+            "action": "exe:OptionalFeatures.exe",
+            "resource": "",
+            "names": [
+              "Turn Windows features on or off",
+              "Включение или отключение компонентов Windows",
+              "Activar o desactivar las características de Windows",
+              "Windows-Features aktivieren oder deaktivieren",
+              "Ativar ou desativar recursos do Windows",
+              "启用或关闭 Windows 功能"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "userAccounts",
+        "glyph": "e716",
+        "action": "panel:9",
+        "resource": "shell32.dll,-32002",
+        "names": [
+          "User Accounts",
+          "Учетные записи пользователей",
+          "Cuentas de usuario",
+          "Benutzerkonten",
+          "Contas de Usuário",
+          "用户帐户"
+        ],
+        "children": [
+          {
+            "id": "credentials",
+            "glyph": "e8d2",
+            "action": "control:Microsoft.CredentialManager",
+            "resource": "shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
+            "names": [
+              "Credential Manager",
+              "Диспетчер учетных данных",
+              "Administrador de credenciales",
+              "Anmeldeinformationsverwaltung",
+              "Gerenciador de Credenciais",
+              "凭据管理器"
+            ]
+          },
+          {
+            "id": "uac",
+            "glyph": "e83d",
+            "action": "exe:UserAccountControlSettings.exe",
+            "resource": "",
+            "names": [
+              "Change User Account Control settings",
+              "Изменение параметров контроля учетных записей",
+              "Cambiar configuración de Control de cuentas de usuario",
+              "Einstellungen der Benutzerkontensteuerung ändern",
+              "Alterar configurações de Controle de Conta de Usuário",
+              "更改用户帐户控制设置"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "appearance",
+        "glyph": "0",
+        "action": "panel:1",
+        "resource": "shell32.dll,-32018",
+        "names": [
+          "Appearance and Personalization",
+          "Оформление и персонализация",
+          "Apariencia y personalización",
+          "Darstellung und Anpassung",
+          "Aparência e Personalização",
+          "外观和个性化"
+        ],
+        "children": [
+          {
+            "id": "explorerOptions",
+            "glyph": "e8b7",
+            "action": "control:folders",
+            "resource": "shell:{6DFD7C5C-2451-11D3-A299-00C04F8EF6AF}",
+            "names": [
+              "File Explorer Options",
+              "Параметры Проводника",
+              "Opciones del Explorador de archivos",
+              "Explorer-Optionen",
+              "Opções do Explorador de Arquivos",
+              "文件资源管理器选项"
+            ]
+          },
+          {
+            "id": "desktopIcons",
+            "glyph": "e7f4",
+            "action": "exe:rundll32.exe;shell32.dll,Control_RunDLL desk.cpl,,0",
+            "resource": "",
+            "names": [
+              "Desktop Icon Settings",
+              "Параметры значков рабочего стола",
+              "Configuración de iconos de escritorio",
+              "Desktopsymboleinstellungen",
+              "Configurações de Ícones da Área de Trabalho",
+              "桌面图标设置"
+            ]
+          },
+          {
+            "id": "colorManagement",
+            "glyph": "e790",
+            "action": "exe:colorcpl.exe",
+            "resource": "shell:{B2C761C6-29BC-4F19-9251-E6195265BAF1}",
+            "names": [
+              "Color Management",
+              "Управление цветом",
+              "Administración del color",
+              "Farbverwaltung",
+              "Gerenciamento de Cores",
+              "颜色管理"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "clockRegion",
+        "glyph": "e787",
+        "action": "panel:6",
+        "resource": "shell32.dll,-32026",
+        "names": [
+          "Clock and Region",
+          "Часы и регион",
+          "Reloj y región",
+          "Zeit und Region",
+          "Relógio e Região",
+          "时钟和区域"
+        ],
+        "children": [
+          {
+            "id": "dateTime",
+            "glyph": "e823",
+            "action": "exe:timedate.cpl",
+            "resource": "shell:{E2E7934B-DCE5-43C4-9576-7FE4F75E7480}",
+            "names": [
+              "Date and Time",
+              "Дата и время",
+              "Fecha y hora",
+              "Datum und Uhrzeit",
+              "Data e Hora",
+              "日期和时间"
+            ]
+          },
+          {
+            "id": "region",
+            "glyph": "e774",
+            "action": "exe:intl.cpl",
+            "resource": "shell:{62D8ED13-C9D0-4CE8-A914-47DD628FB1B0}",
+            "names": [
+              "Region",
+              "Региональные стандарты",
+              "Región",
+              "Region",
+              "Região",
+              "区域"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "accessibility",
+        "glyph": "0",
+        "action": "panel:7",
+        "resource": "shell32.dll,-32000",
+        "names": [
+          "Ease of Access",
+          "Специальные возможности",
+          "Accesibilidad",
+          "Erleichterte Bedienung",
+          "Facilidade de Acesso",
+          "轻松使用"
+        ],
+        "children": []
+      }
+    ],
+    "descriptions": [
+      "Classic Control Panel categories and windows",
+      "Категории и классические окна Панели управления",
+      "Categorías y ventanas clásicas del Panel de control",
+      "Kategorien und klassische Fenster der Systemsteuerung",
+      "Categorias e janelas clássicas do Painel de Controle",
+      "控制面板类别和经典窗口"
+    ]
+  },
+  {
+    "id": "administration",
+    "names": [
+      "Administration",
+      "Администрирование",
+      "Administración",
+      "Verwaltung",
+      "Administração",
+      "管理"
+    ],
+    "rows": [
+      {
+        "id": "tools",
+        "glyph": "e90f",
+        "action": "shell:{D20EA4E1-3957-11d2-A40B-0C5020524153}",
+        "resource": "tools:Windows Tools",
+        "names": [
+          "Windows Tools",
+          "Инструменты Windows",
+          "Herramientas de Windows",
+          "Windows-Tools",
+          "Ferramentas do Windows",
+          "Windows 工具"
+        ],
+        "children": [
+          {
+            "id": "userCertificates",
+            "glyph": "0",
+            "action": "exe:mmc.exe;certmgr.msc",
+            "resource": "",
+            "names": [
+              "Current User Certificates",
+              "Сертификаты текущего пользователя",
+              "Certificados del usuario actual",
+              "Zertifikate des aktuellen Benutzers",
+              "Certificados do usuário atual",
+              "当前用户证书"
+            ]
+          },
+          {
+            "id": "machineCertificates",
+            "glyph": "0",
+            "action": "exe:mmc.exe;certlm.msc",
+            "resource": "",
+            "names": [
+              "Local Computer Certificates",
+              "Сертификаты локального компьютера",
+              "Certificados del equipo local",
+              "Zertifikate des lokalen Computers",
+              "Certificados do computador local",
+              "本地计算机证书"
+            ]
+          },
+          {
+            "id": "firewallAdvanced",
+            "glyph": "e83d",
+            "action": "exe:mmc.exe;WF.msc",
+            "resource": "tools:Windows Defender Firewall with Advanced Security",
+            "names": [
+              "Windows Defender Firewall with Advanced Security",
+              "Монитор брандмауэра Защитника Windows в режиме повышенной безопасности",
+              "Firewall de Windows Defender con seguridad avanzada",
+              "Windows Defender Firewall mit erweiterter Sicherheit",
+              "Firewall do Windows Defender com Segurança Avançada",
+              "高级安全 Windows Defender 防火墙"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "computerManagement",
+        "glyph": "e7f8",
+        "action": "native:10918",
+        "resource": "",
+        "names": [
+          "Computer Management",
+          "Управление компьютером",
+          "Administración de equipos",
+          "Computerverwaltung",
+          "Gerenciamento do Computador",
+          "计算机管理"
+        ],
+        "children": [
+          {
+            "id": "sharedFolders",
+            "glyph": "e8b7",
+            "action": "exe:mmc.exe;fsmgmt.msc",
+            "resource": "",
+            "names": [
+              "Shared Folders",
+              "Общие папки",
+              "Carpetas compartidas",
+              "Freigegebene Ordner",
+              "Pastas Compartilhadas",
+              "共享文件夹"
+            ]
+          },
+          {
+            "id": "localUsers",
+            "glyph": "e716",
+            "action": "exe:mmc.exe;lusrmgr.msc",
+            "resource": "",
+            "names": [
+              "Local Users and Groups",
+              "Локальные пользователи и группы",
+              "Usuarios y grupos locales",
+              "Lokale Benutzer und Gruppen",
+              "Usuários e Grupos Locais",
+              "本地用户和组"
+            ]
+          },
+          {
+            "id": "wmi",
+            "glyph": "0",
+            "action": "exe:mmc.exe;WmiMgmt.msc",
+            "resource": "",
+            "names": [
+              "WMI Control",
+              "Управление WMI",
+              "Control WMI",
+              "WMI-Steuerung",
+              "Controle WMI",
+              "WMI 控制"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "diskManagement",
+        "glyph": "eda2",
+        "action": "native:10917",
+        "resource": "",
+        "names": [
+          "Disk Management",
+          "Управление дисками",
+          "Administración de discos",
+          "Datenträgerverwaltung",
+          "Gerenciamento de Disco",
+          "磁盘管理"
+        ],
+        "children": [
+          {
+            "id": "optimize",
+            "glyph": "0",
+            "action": "exe:dfrgui.exe",
+            "resource": "tools:dfrgui",
+            "names": [
+              "Optimize Drives",
+              "Оптимизация дисков",
+              "Optimizar unidades",
+              "Laufwerke optimieren",
+              "Otimizar Unidades",
+              "优化驱动器"
+            ]
+          },
+          {
+            "id": "cleanup",
+            "glyph": "e74d",
+            "action": "exe:cleanmgr.exe",
+            "resource": "tools:Disk Cleanup",
+            "names": [
+              "Disk Cleanup",
+              "Очистка диска",
+              "Liberador de espacio en disco",
+              "Datenträgerbereinigung",
+              "Limpeza de Disco",
+              "磁盘清理"
+            ]
+          },
+          {
+            "id": "recoveryDrive",
+            "glyph": "e88e",
+            "action": "exe:RecoveryDrive.exe",
+            "resource": "tools:RecoveryDrive",
+            "names": [
+              "Recovery Drive",
+              "Диск восстановления",
+              "Unidad de recuperación",
+              "Wiederherstellungslaufwerk",
+              "Unidade de Recuperação",
+              "恢复驱动器"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "services",
+        "glyph": "0",
+        "action": "exe:mmc.exe;services.msc",
+        "resource": "tools:services",
+        "names": [
+          "Services",
+          "Службы",
+          "Servicios",
+          "Dienste",
+          "Serviços",
+          "服务"
+        ],
+        "children": [
+          {
+            "id": "taskScheduler",
+            "glyph": "e823",
+            "action": "exe:mmc.exe;taskschd.msc",
+            "resource": "tools:Task Scheduler",
+            "names": [
+              "Task Scheduler",
+              "Планировщик задач",
+              "Programador de tareas",
+              "Aufgabenplanung",
+              "Agendador de Tarefas",
+              "任务计划程序"
+            ]
+          },
+          {
+            "id": "componentServices",
+            "glyph": "0",
+            "action": "exe:mmc.exe;comexp.msc",
+            "resource": "tools:Component Services",
+            "names": [
+              "Component Services",
+              "Службы компонентов",
+              "Servicios de componentes",
+              "Komponentendienste",
+              "Serviços de Componentes",
+              "组件服务"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "eventViewer",
+        "glyph": "e81c",
+        "action": "native:10914",
+        "resource": "",
+        "names": [
+          "Event Viewer",
+          "Просмотр событий",
+          "Visor de eventos",
+          "Ereignisanzeige",
+          "Visualizador de Eventos",
+          "事件查看器"
+        ],
+        "children": [
+          {
+            "id": "performance",
+            "glyph": "e9d9",
+            "action": "exe:perfmon.exe",
+            "resource": "tools:Performance Monitor",
+            "names": [
+              "Performance Monitor",
+              "Системный монитор",
+              "Monitor de rendimiento",
+              "Leistungsüberwachung",
+              "Monitor de Desempenho",
+              "性能监视器"
+            ]
+          },
+          {
+            "id": "resources",
+            "glyph": "0",
+            "action": "exe:resmon.exe",
+            "resource": "tools:Resource Monitor",
+            "names": [
+              "Resource Monitor",
+              "Монитор ресурсов",
+              "Monitor de recursos",
+              "Ressourcenmonitor",
+              "Monitor de Recursos",
+              "资源监视器"
+            ]
+          },
+          {
+            "id": "reliability",
+            "glyph": "e81c",
+            "action": "exe:perfmon.exe;/rel",
+            "resource": "",
+            "names": [
+              "Reliability Monitor",
+              "Монитор стабильности системы",
+              "Monitor de confiabilidad",
+              "Zuverlässigkeitsüberwachung",
+              "Monitor de Confiabilidade",
+              "可靠性监视器"
+            ]
+          },
+          {
+            "id": "systemInfo",
+            "glyph": "e946",
+            "action": "exe:msinfo32.exe",
+            "resource": "tools:System Information",
+            "names": [
+              "System Information",
+              "Сведения о системе",
+              "Información del sistema",
+              "Systeminformationen",
+              "Informações do Sistema",
+              "系统信息"
+            ]
+          },
+          {
+            "id": "memoryDiagnostic",
+            "glyph": "0",
+            "action": "exe:MdSched.exe",
+            "resource": "tools:Memory Diagnostics Tool",
+            "names": [
+              "Windows Memory Diagnostic",
+              "Средство проверки памяти Windows",
+              "Diagnóstico de memoria de Windows",
+              "Windows-Speicherdiagnose",
+              "Diagnóstico de Memória do Windows",
+              "Windows 内存诊断"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "registry",
+        "glyph": "0",
+        "action": "exe:regedit.exe",
+        "resource": "tools:Registry Editor",
+        "names": [
+          "Registry Editor",
+          "Редактор реестра",
+          "Editor del Registro",
+          "Registrierungs-Editor",
+          "Editor do Registro",
+          "注册表编辑器"
+        ],
+        "children": [
+          {
+            "id": "systemConfiguration",
+            "glyph": "e713",
+            "action": "exe:msconfig.exe",
+            "resource": "tools:System Configuration",
+            "names": [
+              "System Configuration",
+              "Конфигурация системы",
+              "Configuración del sistema",
+              "Systemkonfiguration",
+              "Configuração do Sistema",
+              "系统配置"
+            ]
+          },
+          {
+            "id": "groupPolicy",
+            "glyph": "0",
+            "action": "exe:mmc.exe;gpedit.msc",
+            "resource": "",
+            "names": [
+              "Local Group Policy Editor",
+              "Редактор локальной групповой политики",
+              "Editor de directivas de grupo local",
+              "Editor für lokale Gruppenrichtlinien",
+              "Editor de Política de Grupo Local",
+              "本地组策略编辑器"
+            ]
+          },
+          {
+            "id": "localSecurity",
+            "glyph": "e72e",
+            "action": "exe:mmc.exe;secpol.msc",
+            "resource": "tools:Security Configuration Management",
+            "names": [
+              "Local Security Policy",
+              "Локальная политика безопасности",
+              "Directiva de seguridad local",
+              "Lokale Sicherheitsrichtlinie",
+              "Política de Segurança Local",
+              "本地安全策略"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "terminal",
+        "glyph": "e756",
+        "action": "native:10960",
+        "resource": "",
+        "names": [
+          "Terminal",
+          "Терминал",
+          "Terminal",
+          "Terminal",
+          "Terminal",
+          "终端"
+        ],
+        "children": [
+          {
+            "id": "terminalAdmin",
+            "glyph": "e7ef",
+            "action": "native:10961",
+            "resource": "",
+            "names": [
+              "Terminal (Admin)",
+              "Терминал (Администратор)",
+              "Terminal (Administrador)",
+              "Terminal (Administrator)",
+              "Terminal (Administrador)",
+              "终端（管理员）"
+            ]
+          },
+          {
+            "id": "powershell",
+            "glyph": "0",
+            "action": "exe:WindowsPowerShell/v1.0/powershell.exe",
+            "resource": "twinui.pcshell.dll,-10928",
+            "names": [
+              "Windows PowerShell",
+              "Windows PowerShell",
+              "Windows PowerShell",
+              "Windows PowerShell",
+              "Windows PowerShell",
+              "Windows PowerShell"
+            ]
+          },
+          {
+            "id": "commandPrompt",
+            "glyph": "e756",
+            "action": "exe:cmd.exe",
+            "resource": "twinui.pcshell.dll,-10919",
+            "names": [
+              "Command Prompt",
+              "Командная строка",
+              "Símbolo del sistema",
+              "Eingabeaufforderung",
+              "Prompt de Comando",
+              "命令提示符"
+            ]
+          }
+        ]
+      }
+    ],
+    "descriptions": [
+      "System consoles, diagnostics, and terminals",
+      "Системные оснастки, диагностика и терминалы",
+      "Consolas del sistema, diagnóstico y terminales",
+      "Systemkonsolen, Diagnose und Terminals",
+      "Consoles do sistema, diagnóstico e terminais",
+      "系统控制台、诊断和终端"
+    ]
+  },
+  {
+    "id": "commands",
+    "names": [
+      "Basic commands",
+      "Основные команды",
+      "Comandos básicos",
+      "Grundbefehle",
+      "Comandos básicos",
+      "基本命令"
+    ],
+    "rows": [
+      {
+        "id": "run",
+        "glyph": "e751",
+        "action": "native:10925",
+        "resource": "",
+        "names": [
+          "Run",
+          "Выполнить",
+          "Ejecutar",
+          "Ausführen",
+          "Executar",
+          "运行"
+        ],
+        "children": []
+      },
+      {
+        "id": "taskManager",
+        "glyph": "e9d9",
+        "action": "native:10921",
+        "resource": "",
+        "names": [
+          "Task Manager",
+          "Диспетчер задач",
+          "Administrador de tareas",
+          "Task-Manager",
+          "Gerenciador de Tarefas",
+          "任务管理器"
+        ],
+        "children": []
+      },
+      {
+        "id": "explorer",
+        "glyph": "e8b7",
+        "action": "native:10923",
+        "resource": "",
+        "names": [
+          "File Explorer",
+          "Проводник",
+          "Explorador de archivos",
+          "Datei-Explorer",
+          "Explorador de Arquivos",
+          "文件资源管理器"
+        ],
+        "children": [
+          {
+            "id": "desktop",
+            "glyph": "e7f4",
+            "action": "folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641",
+            "resource": "",
+            "names": [
+              "Desktop",
+              "Рабочий стол",
+              "Escritorio",
+              "Desktop",
+              "Área de Trabalho",
+              "桌面"
+            ]
+          },
+          {
+            "id": "computer",
+            "glyph": "e7f8",
+            "action": "folder:0AC0837C-BBF8-452A-850D-79D08E667CA7",
+            "resource": "",
+            "names": [
+              "This PC",
+              "Этот компьютер",
+              "Este equipo",
+              "Dieser PC",
+              "Este Computador",
+              "此电脑"
+            ]
+          },
+          {
+            "id": "personal",
+            "glyph": "e77b",
+            "action": "folder:F3CE0F7C-4901-4ACC-8648-D5D44B04EF8F",
+            "resource": "",
+            "names": [
+              "Personal folder",
+              "Персональная папка",
+              "Carpeta personal",
+              "Persönlicher Ordner",
+              "Pasta pessoal",
+              "个人文件夹"
+            ]
+          },
+          {
+            "id": "documents",
+            "glyph": "e8a5",
+            "action": "folder:FDD39AD0-238F-46AF-ADB4-6C85480369C7",
+            "resource": "",
+            "names": [
+              "Documents",
+              "Документы",
+              "Documentos",
+              "Dokumente",
+              "Documentos",
+              "文档"
+            ],
+            "enabled": false
+          },
+          {
+            "id": "pictures",
+            "glyph": "e91b",
+            "action": "folder:33E28130-4E1E-4676-835A-98395C3BC3BB",
+            "resource": "",
+            "names": [
+              "Pictures",
+              "Изображения",
+              "Imágenes",
+              "Bilder",
+              "Imagens",
+              "图片"
+            ],
+            "enabled": false
+          },
+          {
+            "id": "downloads",
+            "glyph": "e896",
+            "action": "folder:374DE290-123F-4565-9164-39C4925E467B",
+            "resource": "",
+            "names": [
+              "Downloads",
+              "Загрузки",
+              "Descargas",
+              "Downloads",
+              "Downloads",
+              "下载"
+            ]
+          },
+          {
+            "id": "recycleBin",
+            "glyph": "e74d",
+            "action": "folder:B7534046-3ECB-4C18-BE4E-64CD4CB7D6AC",
+            "resource": "",
+            "names": [
+              "Recycle Bin",
+              "Корзина",
+              "Papelera de reciclaje",
+              "Papierkorb",
+              "Lixeira",
+              "回收站"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "find",
+        "glyph": "e721",
+        "action": "native:10924",
+        "resource": "",
+        "names": [
+          "Search",
+          "Найти",
+          "Buscar",
+          "Suchen",
+          "Pesquisar",
+          "搜索"
+        ],
+        "enabled": false,
+        "children": []
+      },
+      {
+        "id": "desktop",
+        "glyph": "e7c4",
+        "action": "native:10926",
+        "resource": "",
+        "names": [
+          "Desktop",
+          "Рабочий стол",
+          "Escritorio",
+          "Desktop",
+          "Área de Trabalho",
+          "桌面"
+        ],
+        "enabled": false,
+        "children": []
+      },
+      {
+        "id": "power",
+        "glyph": "e7e8",
+        "action": "power:menu",
+        "resource": "",
+        "names": [
+          "Shut down or sign out",
+          "Завершение работы или выход из системы",
+          "Apagar o cerrar sesión",
+          "Herunterfahren oder abmelden",
+          "Desligar ou sair",
+          "关机或注销"
+        ],
+        "children": [
+          {
+            "id": "lock",
+            "glyph": "e72e",
+            "action": "lock:session",
+            "resource": "",
+            "names": [
+              "Lock",
+              "Блокировать",
+              "Bloquear",
+              "Sperren",
+              "Bloquear",
+              "锁定"
+            ]
+          },
+          {
+            "id": "signOut",
+            "glyph": "e8ac",
+            "action": "power:signOut",
+            "resource": "",
+            "names": [
+              "Sign out",
+              "Выход",
+              "Cerrar sesión",
+              "Abmelden",
+              "Sair",
+              "注销"
+            ]
+          },
+          {
+            "id": "sleep",
+            "glyph": "e708",
+            "action": "power:sleep",
+            "resource": "",
+            "names": [
+              "Sleep",
+              "Спящий режим",
+              "Suspender",
+              "Energie sparen",
+              "Suspender",
+              "睡眠"
+            ]
+          },
+          {
+            "id": "hibernate",
+            "glyph": "0",
+            "action": "power:hibernate",
+            "resource": "",
+            "names": [
+              "Hibernate",
+              "Гибернация",
+              "Hibernar",
+              "Ruhezustand",
+              "Hibernar",
+              "休眠"
+            ]
+          },
+          {
+            "id": "shutdown",
+            "glyph": "e7e8",
+            "action": "power:shutdown",
+            "resource": "",
+            "names": [
+              "Shut down",
+              "Завершение работы",
+              "Apagar",
+              "Herunterfahren",
+              "Desligar",
+              "关机"
+            ]
+          },
+          {
+            "id": "restart",
+            "glyph": "e72c",
+            "action": "power:restart",
+            "resource": "",
+            "names": [
+              "Restart",
+              "Перезагрузка",
+              "Reiniciar",
+              "Neu starten",
+              "Reiniciar",
+              "重启"
+            ]
+          }
+        ]
+      }
+    ],
+    "descriptions": [
+      "File Explorer, system actions, and power",
+      "Проводник, системные действия и питание",
+      "Explorador de archivos, acciones del sistema y energía",
+      "Datei-Explorer, Systemaktionen und Energie",
+      "Explorador de Arquivos, ações do sistema e energia",
+      "文件资源管理器、系统操作和电源"
+    ]
+  }
+]
