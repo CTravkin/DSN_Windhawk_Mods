@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.1.1
+// @version         0.1.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -luuid
 // ==/WindhawkMod==
-// Build: 2
+// Build: 3
 
 // ==WindhawkModReadme==
 /*
@@ -87,6 +87,7 @@ incompatible with Windows 10 Win+X Restorer.
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <memory>
 #include <optional>
 #include <string>
@@ -239,12 +240,19 @@ X::FrameworkElement FindNamed(X::DependencyObject const& node, std::wstring_view
     return nullptr;
 }
 
-constexpr double arrowWidth = 32;
+constexpr double arrowHitWidth = 32;
+constexpr double arrowBackgroundSize = 20;
+
+winrt::Windows::Foundation::Point ChevronCenter(MenuSession const& active) {
+    return active.chevron.TransformToVisual(active.layout).TransformPoint({
+        static_cast<float>(active.chevron.ActualWidth() / 2.0),
+        static_cast<float>(active.chevron.ActualHeight() / 2.0),
+    });
+}
 
 HoverZone PointerZone(MenuSession const& active, I::PointerRoutedEventArgs const& args) {
     const auto x = args.GetCurrentPoint(active.layout).Position().X;
-    const bool rtl = active.split.FlowDirection() == X::FlowDirection::RightToLeft;
-    return (rtl ? x <= arrowWidth : x >= active.layout.ActualWidth() - arrowWidth) ?
+    return std::abs(x - ChevronCenter(active).X) <= arrowHitWidth / 2.0 ?
         HoverZone::Arrow : HoverZone::Body;
 }
 
@@ -256,6 +264,10 @@ void UpdateHoverVisual(MenuSession const& active) {
             active.arrowBackground.Background(active.layout.Background());
         }
         if (active.arrowBackground.Background()) {
+            const auto center = ChevronCenter(active);
+            auto offset = active.arrowBackground.RenderTransform().as<X::Media::TranslateTransform>();
+            offset.X(center.X - active.layout.ActualWidth() / 2.0);
+            offset.Y(center.Y - active.layout.ActualHeight() / 2.0);
             // Only CommonStates changes here. The native focus visuals stay active.
             X::VisualStateManager::GoToState(active.split, L"Normal", false);
             active.arrowBackground.Visibility(X::Visibility::Visible);
@@ -287,8 +299,11 @@ void AddArrowBackground(MenuSession& active) {
     if (!active.commonStates) return;
 
     C::Border background;
-    background.Width(arrowWidth);
-    background.HorizontalAlignment(X::HorizontalAlignment::Right);
+    background.Width(arrowBackgroundSize);
+    background.Height(arrowBackgroundSize);
+    background.HorizontalAlignment(X::HorizontalAlignment::Center);
+    background.VerticalAlignment(X::VerticalAlignment::Center);
+    background.RenderTransform(X::Media::TranslateTransform());
     background.CornerRadius(active.layout.CornerRadius());
     background.IsHitTestVisible(false);
     background.Visibility(X::Visibility::Collapsed);
