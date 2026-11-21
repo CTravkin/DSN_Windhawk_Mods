@@ -27,8 +27,8 @@ The mod targets Windows 11 x64. Native testing was performed on Windows 11
 ## Usage
 
 The switches in each Windhawk settings group follow the menu order.
-Each row with a submenu groups **Show in menu** and its individual shortcuts
-under the name of the main row.
+The main switch appears directly under the row's name, with any related
+shortcuts grouped below it.
 **Search**, **Desktop**, and the **Documents** and **Pictures** shortcuts under
 File Explorer start off. Items also depend on availability in Windows.
 

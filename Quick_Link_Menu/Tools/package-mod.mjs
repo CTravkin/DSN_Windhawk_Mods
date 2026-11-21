@@ -6,7 +6,6 @@ const blocks = JSON.parse(readFileSync(localFile('../Mod/Source/Catalog.json'), 
 const source = readFileSync(localFile('../Mod/Source/QuickLinkMenu.cpp'), 'utf8').replace(/\r\n/g, '\n');
 const target = localFile('../Mod/quick-link-menu.wh.cpp');
 const locales = ['', ':ru-RU', ':es-ES', ':de-DE', ':pt-BR', ':zh-CN'];
-const visibilityNames = ['Show in menu', 'Показывать в меню', 'Mostrar en el menú', 'Im Menü anzeigen', 'Mostrar no menu', '在菜单中显示'];
 const optionNames = [
   ['Open submenus on hover', 'Раскрытие подменю при наведении', 'Apertura de submenús al pasar el puntero', 'Untermenüs beim Darüberfahren öffnen', 'Abrir submenus ao passar o ponteiro', '悬停时打开子菜单'],
   ['Immediately', 'Сразу', 'Inmediatamente', 'Sofort', 'Imediatamente', '立即打开'],
@@ -38,9 +37,9 @@ function checkGlyphs(items, path, allowRepeats = false) {
   }
 }
 
-function addSetting(entry, indent, id = entry.id, names = entry.names) {
+function addSetting(entry, indent, id = entry.id) {
   settings.push(`${indent}- ${id}: ${entry.enabled !== false}`);
-  labels(settings, `${indent}  `, '$name', names);
+  labels(settings, `${indent}  `, '$name', entry.names);
 }
 
 function addDefinition(entry, group, key, parent) {
@@ -67,22 +66,21 @@ checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu', true);
 blocks.forEach((block, group) => {
   settings.push(`- ${block.id}:`);
   for (const row of block.rows) {
+    const hasChildren = row.children.length > 0;
     const rowKey = `${block.id}.${row.id}`;
-    if (!row.children.length) {
-      addSetting(row, '  ');
-      addDefinition(row, group, rowKey, -1);
-      continue;
-    }
+    const switchId = hasChildren ? `${row.id}Visible` : row.id;
+    addSetting(row, '  ', switchId);
+    const parent = addDefinition(row, group, `${block.id}.${switchId}`, -1);
 
+    if (!hasChildren) continue;
     settings.push(`  - ${row.id}:`);
-    addSetting(row, '    ', 'enabled', visibilityNames);
-    const parent = addDefinition(row, group, `${rowKey}.enabled`, -1);
     checkGlyphs(row.children, rowKey);
     for (const child of row.children) {
       addSetting(child, '    ');
       addDefinition(child, group, `${rowKey}.${child.id}`, parent);
     }
-    labels(settings, '    ', '$name', row.names);
+    // Windhawk renders the internal key when the group name is empty or missing.
+    settings.push('    $name: " "');
   }
   labels(settings, '  ', '$name', block.names);
   labels(settings, '  ', '$description', block.descriptions);
