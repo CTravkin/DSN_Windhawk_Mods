@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.1.2
+// @version         0.1.4
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -luuid
 // ==/WindhawkMod==
-// Build: 3
+// Build: 5
 
 // ==WindhawkModReadme==
 /*
@@ -120,6 +120,7 @@ struct MenuSession {
 
     C::Grid layout{nullptr};
     X::FrameworkElement chevron{nullptr};
+    C::Canvas arrowLayer{nullptr};
     C::Border arrowBackground{nullptr};
     X::VisualStateGroup commonStates{nullptr};
     AV::IExpandCollapseProvider expand{nullptr};
@@ -241,10 +242,9 @@ X::FrameworkElement FindNamed(X::DependencyObject const& node, std::wstring_view
 }
 
 constexpr double arrowHitWidth = 32;
-constexpr double arrowBackgroundSize = 20;
 
-winrt::Windows::Foundation::Point ChevronCenter(MenuSession const& active) {
-    return active.chevron.TransformToVisual(active.layout).TransformPoint({
+winrt::Windows::Foundation::Point ChevronCenter(MenuSession const& active, X::UIElement const& relativeTo) {
+    return active.chevron.TransformToVisual(relativeTo).TransformPoint({
         static_cast<float>(active.chevron.ActualWidth() / 2.0),
         static_cast<float>(active.chevron.ActualHeight() / 2.0),
     });
@@ -252,31 +252,38 @@ winrt::Windows::Foundation::Point ChevronCenter(MenuSession const& active) {
 
 HoverZone PointerZone(MenuSession const& active, I::PointerRoutedEventArgs const& args) {
     const auto x = args.GetCurrentPoint(active.layout).Position().X;
-    return std::abs(x - ChevronCenter(active).X) <= arrowHitWidth / 2.0 ?
+    return std::abs(x - ChevronCenter(active, active.layout).X) <= arrowHitWidth / 2.0 ?
         HoverZone::Arrow : HoverZone::Body;
 }
 
 void UpdateHoverVisual(MenuSession const& active) {
     if (!active.arrowBackground) return;
-    if (active.zone == HoverZone::Arrow) {
-        if (!active.arrowBackground.Background()) {
-            X::VisualStateManager::GoToState(active.split, L"PointerOver", false);
-            active.arrowBackground.Background(active.layout.Background());
-        }
-        if (active.arrowBackground.Background()) {
-            const auto center = ChevronCenter(active);
-            auto offset = active.arrowBackground.RenderTransform().as<X::Media::TranslateTransform>();
-            offset.X(center.X - active.layout.ActualWidth() / 2.0);
-            offset.Y(center.Y - active.layout.ActualHeight() / 2.0);
-            // Only CommonStates changes here. The native focus visuals stay active.
-            X::VisualStateManager::GoToState(active.split, L"Normal", false);
-            active.arrowBackground.Visibility(X::Visibility::Visible);
-        }
-    } else {
-        active.arrowBackground.Visibility(X::Visibility::Collapsed);
+    if (active.zone != HoverZone::Arrow) {
+        active.arrowBackground.Opacity(0);
         if (active.zone == HoverZone::Body)
             X::VisualStateManager::GoToState(active.split, L"PointerOver", false);
+        return;
     }
+
+    if (!active.arrowBackground.Background()) {
+        X::VisualStateManager::GoToState(active.split, L"PointerOver", false);
+        active.arrowBackground.Background(active.layout.Background());
+    }
+    const auto row = active.layout.TransformToVisual(active.arrowLayer).TransformBounds({
+        0, 0, static_cast<float>(active.layout.ActualWidth()), static_cast<float>(active.layout.ActualHeight()),
+    });
+    const double center = ChevronCenter(active, active.arrowLayer).X;
+    const double width = (std::min)({static_cast<double>(row.Height),
+                                    2 * (center - row.X), 2 * (row.X + row.Width - center)});
+    if (width <= 0 || !active.arrowBackground.Background()) return;
+
+    active.arrowBackground.Width(width);
+    active.arrowBackground.Height(row.Height);
+    C::Canvas::SetLeft(active.arrowBackground, center - width / 2);
+    C::Canvas::SetTop(active.arrowBackground, row.Y);
+    // Only CommonStates changes here. The native focus visuals stay active.
+    X::VisualStateManager::GoToState(active.split, L"Normal", false);
+    active.arrowBackground.Opacity(1);
 }
 
 void SetHoverZone(MenuSession& active, HoverZone zone) {
@@ -298,19 +305,18 @@ void AddArrowBackground(MenuSession& active) {
     }
     if (!active.commonStates) return;
 
+    // An absolutely positioned child of Canvas cannot grow the menu's grid.
+    C::Canvas overlay;
+    overlay.IsHitTestVisible(false);
+    C::Grid::SetColumnSpan(overlay, (std::max)(1u, active.layout.ColumnDefinitions().Size()));
+    C::Grid::SetRowSpan(overlay, (std::max)(1u, active.layout.RowDefinitions().Size()));
+    C::Canvas::SetZIndex(overlay, -1);
     C::Border background;
-    background.Width(arrowBackgroundSize);
-    background.Height(arrowBackgroundSize);
-    background.HorizontalAlignment(X::HorizontalAlignment::Center);
-    background.VerticalAlignment(X::VerticalAlignment::Center);
-    background.RenderTransform(X::Media::TranslateTransform());
     background.CornerRadius(active.layout.CornerRadius());
-    background.IsHitTestVisible(false);
-    background.Visibility(X::Visibility::Collapsed);
-    C::Grid::SetColumnSpan(background, (std::max)(1u, active.layout.ColumnDefinitions().Size()));
-    C::Grid::SetRowSpan(background, (std::max)(1u, active.layout.RowDefinitions().Size()));
-    C::Canvas::SetZIndex(background, -1);
-    active.layout.Children().Append(background);
+    background.Opacity(0);
+    overlay.Children().Append(background);
+    active.layout.Children().Append(overlay);
+    active.arrowLayer = overlay;
     active.arrowBackground = background;
     active.visualStateChanged = active.commonStates.CurrentStateChanged(winrt::auto_revoke,
         [](auto const&, X::VisualStateChangedEventArgs const& args) {
