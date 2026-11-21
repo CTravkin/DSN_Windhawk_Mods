@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.5
+// @version         0.2.6
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 11
+// Build: 12
 
 // ==WindhawkModReadme==
 /*
@@ -307,8 +307,28 @@ std::wstring ToolsName(std::wstring_view shortcut) {
     PWSTR result{};
     if (FAILED(SHGetKnownFolderPath(FOLDERID_CommonAdminTools, KF_FLAG_DONT_VERIFY, nullptr, &result))) return {};
     std::unique_ptr<wchar_t, CoTaskMemory> root(result);
-    const auto path = std::wstring(root.get()) + L"\\" + std::wstring(shortcut) + L".lnk";
-    return ShellName(ShellId(path));
+    const auto directory = std::wstring(root.get()) + L"\\";
+    const auto fileName = std::wstring(shortcut) + L".lnk";
+    const auto ini = directory + L"desktop.ini";
+    wchar_t resource[512]{};
+    if (GetPrivateProfileStringW(L"LocalizedFileNames", fileName.c_str(), L"", resource,
+                                 ARRAYSIZE(resource), ini.c_str())) {
+        if (auto title = Indirect(resource); !title.empty()) return title;
+    }
+    return ShellName(ShellId(directory + fileName));
+}
+
+std::wstring SettingsCaption(std::wstring_view id) {
+    const auto base = L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
+                      std::wstring(id);
+    // Windows uses the short title on systems without a battery.
+    if (id == L"SettingsPagePowerAndBattery") {
+        SYSTEM_POWER_STATUS status{};
+        if (GetSystemPowerStatus(&status) && status.BatteryFlag == 128) {
+            if (auto title = Indirect((base + L"/AlternateDisplayName}").c_str()); !title.empty()) return title;
+        }
+    }
+    return Indirect((base + L"/DisplayName}").c_str());
 }
 
 std::wstring SystemCaption(CatalogItem const& item) {
@@ -320,10 +340,9 @@ std::wstring SystemCaption(CatalogItem const& item) {
         if (resource == L"Windows Tools") return RegistryShellName(L"{D20EA4E1-3957-11D2-A40B-0C5020524153}");
         return ToolsName(resource);
     }
-    if (resourceKind == L"s") {
-        const auto address = L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SearchResources/" +
-            std::wstring(resource) + L"/Description}";
-        return Indirect(address.c_str());
+    if (resourceKind == L"settings") return SettingsCaption(resource);
+    if (resourceKind == L"pri") {
+        return Indirect((L"@{windows?ms-resource://" + std::wstring(resource) + L"}").c_str());
     }
     if (*item.resource) return SystemString(item.resource);
     if (kind == L"native") return Twinui(target);

@@ -28,12 +28,12 @@ function labels(target, indent, key, names) {
   });
 }
 
-function checkGlyphs(items, path) {
+function checkGlyphs(items, path, allowRepeats = false) {
   const used = new Set();
   for (const { glyph, id } of items) {
     if (!/^(0|[a-f0-9]{4})$/.test(glyph)) throw new Error(`Invalid glyph at ${path}.${id}`);
     if (glyph === '0') continue;
-    if (used.has(glyph)) throw new Error(`Repeated glyph ${glyph} in ${path}`);
+    if (!allowRepeats && used.has(glyph)) throw new Error(`Repeated glyph ${glyph} in ${path}`);
     used.add(glyph);
   }
 }
@@ -63,7 +63,7 @@ locales.forEach((suffix, i) => {
   });
 });
 
-checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu');
+checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu', true);
 blocks.forEach((block, group) => {
   settings.push(`- ${block.id}:`);
   for (const row of block.rows) {

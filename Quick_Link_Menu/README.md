@@ -13,7 +13,11 @@ Panel, administration tools, and basic commands in four groups.
   with **Lock** first.
 - File Explorer opens its configured start page. Its submenu offers shortcuts
   to the current user's folders and other shell locations.
-- Menu items use Segoe Fluent Icons in the native icon slots.
+- Menu items use Segoe Fluent Icons in the native icon slots. Settings shortcuts
+  follow the icons in Settings where the corresponding glyph is available.
+- Shortcut captions follow the Windows display language. Settings shortcuts use
+  the page titles, and classic tools use shell labels or localized Windows
+  resources.
 
 ## Platforms
 
