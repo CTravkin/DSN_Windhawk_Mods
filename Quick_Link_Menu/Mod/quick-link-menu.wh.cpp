@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.10
+// @version         0.2.11
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 16
+// Build: 17
 
 // ==WindhawkModReadme==
 /*
@@ -1167,11 +1167,11 @@ constexpr CatalogItem catalog[] = {
      {L"Power Options", L"Электропитание", L"Opciones de energía", L"Energieoptionen", L"Opções de Energia", L"电源选项"}},
     {L"controlPanel.security.bitlocker", 1, 43, true, 0xe72e, L"control:Microsoft.BitLockerDriveEncryption", L"shell:{D9EF8727-CAC2-4E60-809E-86F80A666C91}",
      {L"BitLocker Drive Encryption", L"Шифрование диска BitLocker", L"Cifrado de unidad BitLocker", L"BitLocker-Laufwerkverschlüsselung", L"Criptografia de Unidade de Disco BitLocker", L"BitLocker 驱动器加密"}},
-    {L"controlPanel.networkVisible", 1, -1, true, 0xe774, L"panel:3", L"shell32.dll,-32010",
+    {L"controlPanel.networkVisible", 1, -1, true, 0xee77, L"panel:3", L"shell32.dll,-32010",
      {L"Network and Internet", L"Сеть и Интернет", L"Redes e Internet", L"Netzwerk und Internet", L"Rede e Internet", L"网络和 Internet"}},
-    {L"controlPanel.network.sharing", 1, 48, true, 0xf193, L"control:Microsoft.NetworkAndSharingCenter", L"shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
+    {L"controlPanel.network.sharing", 1, 48, true, 0xec27, L"control:Microsoft.NetworkAndSharingCenter", L"shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
      {L"Network and Sharing Center", L"Центр управления сетями и общим доступом", L"Centro de redes y recursos compartidos", L"Netzwerk- und Freigabecenter", L"Central de Rede e Compartilhamento", L"网络和共享中心"}},
-    {L"controlPanel.network.connections", 1, 48, true, 0xe839, L"exe:ncpa.cpl", L"twinui.pcshell.dll,-10912",
+    {L"controlPanel.network.connections", 1, 48, true, 0xeda3, L"exe:ncpa.cpl", L"twinui.pcshell.dll,-10912",
      {L"Network Connections", L"Сетевые подключения", L"Conexiones de red", L"Netzwerkverbindungen", L"Conexões de Rede", L"网络连接"}},
     {L"controlPanel.network.internetOptions", 1, 48, true, 0xe774, L"exe:inetcpl.cpl", L"shell:{A3DD4F92-658A-410F-84FD-6FBBBEF2FFFE}",
      {L"Internet Options", L"Свойства браузера", L"Opciones de Internet", L"Internetoptionen", L"Opções da Internet", L"Internet 选项"}},

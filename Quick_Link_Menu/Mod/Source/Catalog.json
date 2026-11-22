@@ -725,7 +725,7 @@
       },
       {
         "id": "network",
-        "glyph": "e774",
+        "glyph": "ee77",
         "action": "panel:3",
         "resource": "shell32.dll,-32010",
         "names": [
@@ -739,7 +739,7 @@
         "children": [
           {
             "id": "sharing",
-            "glyph": "f193",
+            "glyph": "ec27",
             "action": "control:Microsoft.NetworkAndSharingCenter",
             "resource": "shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
             "names": [
@@ -753,7 +753,7 @@
           },
           {
             "id": "connections",
-            "glyph": "e839",
+            "glyph": "eda3",
             "action": "exe:ncpa.cpl",
             "resource": "twinui.pcshell.dll,-10912",
             "names": [
