@@ -26,7 +26,6 @@ for (const [group, key, value, title] of [
   ['commandOptions', null, null, 'Настройки команд'],
   ['commandOptions', 'terminalAsAdmin', false, 'Терминал от имени администратора'],
   ['commandOptions', 'primaryPowerAction', 'shutdown', 'Завершение работы'],
-  ['commandOptions', 'createTask', false, 'Создание задачи'],
 ]) {
   test(`${[group, key].filter(Boolean).join('.')} has a label and hint in six languages`, () => {
     const block = setting(group, key, value);
@@ -42,6 +41,10 @@ for (const [group, key, value, title] of [
     }
   });
 }
+
+test('command settings omit the removed task dialog', () => {
+  assert.ok(!lines.some((line) => /^\s*- createTask:/.test(line)));
+});
 
 for (const [group, key, value, options] of [
   ['general', 'submenuHover', 'immediate', ['immediate', 'delayed', 'arrow', 'click']],

@@ -46,9 +46,7 @@ has no submenu arrow.
 
 In **Command settings**, you can make administrator Terminal the main Terminal
 action and select a main power command. The default is **Shut down**. Choosing
-**None** keeps the general power submenu. **Create new task** opens a dialog
-from the **Run** row and can request elevation through UAC. **Win+R** opens the
-Windows Run dialog.
+**None** keeps the general power submenu.
 
 Turning off the power row hides it with its submenu. With all menu rows disabled,
 the stock Win+X menu opens.
