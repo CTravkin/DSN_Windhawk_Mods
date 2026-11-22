@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 const localFile = (name) => fileURLToPath(new URL(name, import.meta.url));
 const blocks = JSON.parse(readFileSync(localFile('../Mod/Source/Catalog.json'), 'utf8'));
 const source = readFileSync(localFile('../Mod/Source/QuickLinkMenu.cpp'), 'utf8').replace(/\r\n/g, '\n');
+const availability = readFileSync(localFile('../Mod/Source/Availability.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
 const target = localFile('../Mod/quick-link-menu.wh.cpp');
 const locales = ['', ':ru-RU', ':es-ES', ':de-DE', ':pt-BR', ':zh-CN'];
 const optionNames = [
@@ -66,6 +67,12 @@ locales.forEach((suffix, i) => {
   });
 });
 
+settings.push('- hideAdminCommands: false');
+labels(settings, '  ', '$name', ['Hide administrator commands', 'Скрыть команды администратора', 'Ocultar comandos de administrador', 'Administratorbefehle ausblenden', 'Ocultar comandos de administrador', '隐藏管理员命令']);
+labels(settings, '  ', '$description', ['Hide commands that require credentials or cannot be elevated in the current session', 'Скрывать команды, если для повышения прав нужны учетные данные или повышение запрещено', 'Oculta comandos que requieren credenciales o no pueden elevarse en la sesión actual', 'Befehle ausblenden, die Anmeldedaten erfordern oder in dieser Sitzung nicht erhöht werden können', 'Oculta comandos que exigem credenciais ou não podem ser elevados na sessão atual', '隐藏需要凭据或无法在当前会话中提升权限的命令']);
+settings.push('- showHandCursor: true');
+labels(settings, '  ', '$name', ['Show hand cursor over commands', 'Показывать курсор-руку над командами', 'Mostrar el puntero de mano sobre los comandos', 'Handzeiger über Befehlen anzeigen', 'Mostrar o cursor de mão sobre os comandos', '悬停在命令上时显示手形指针']);
+
 checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu', true);
 blocks.forEach((block, group) => {
   settings.push(`- ${block.id}:`);
@@ -90,12 +97,13 @@ blocks.forEach((block, group) => {
   labels(settings, '  ', '$description', block.descriptions);
 });
 
-for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG']) {
+for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERATED_AVAILABILITY']) {
   if (source.split(token).length !== 2) throw new Error(`Missing or repeated ${token}`);
 }
 const packed = source
   .replace('// GENERATED_SETTINGS', () => `// ==WindhawkModSettings==\n/*\n${settings.join('\n')}\n*/\n// ==/WindhawkModSettings==`)
-  .replace('// GENERATED_CATALOG', () => `constexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`);
+  .replace('// GENERATED_CATALOG', () => `constexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`)
+  .replace('// GENERATED_AVAILABILITY', () => availability);
 
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== packed) {
@@ -104,4 +112,4 @@ if (process.argv.includes('--check')) {
 } else {
   writeFileSync(target, packed);
 }
-console.log(`Quick Link Menu: ${blocks.length} groups, ${definitions.length} switches, ${locales.length} languages`);
+console.log(`Quick Link Menu: ${blocks.length} groups, ${definitions.length} item switches, 2 additional switches, ${locales.length} languages`);

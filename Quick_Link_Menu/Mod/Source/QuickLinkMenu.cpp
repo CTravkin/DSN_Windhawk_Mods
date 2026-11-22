@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.13
+// @version         0.3.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 19
+// Build: 21
 
 // ==WindhawkModReadme==
 /*
@@ -33,7 +33,9 @@ with **Lock** as its first command.
 
 In the mod settings, the related shortcuts are listed with their main row.
 Choose which rows and submenu items appear, and change how
-submenus open on hover at the top of the settings page. Disabling all entries
+submenus open on hover at the top of the settings page. A hand cursor marks
+areas that run a command. The optional administrator filter hides commands
+that require credentials or are blocked from elevation. Disabling all entries
 restores the stock Win+X menu.
 
 Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
@@ -105,6 +107,8 @@ enum class HoverZone { Outside, Body, Arrow };
 
 struct Settings {
     HoverMode mode{};
+    bool hideAdminCommands{};
+    bool showHandCursor{};
     std::array<bool, std::size(catalog)> enabled{};
 };
 
@@ -141,6 +145,12 @@ struct RowInteraction {
     X::DispatcherTimer::Tick_revoker tick;
 };
 
+struct CursorEvents {
+    X::UIElement::PointerEntered_revoker entered;
+    X::UIElement::PointerMoved_revoker moved;
+    X::UIElement::PointerExited_revoker exited;
+};
+
 struct MenuSession {
     C::MenuFlyout menu{nullptr};
     std::vector<C::MenuFlyoutItemBase> original;
@@ -149,8 +159,12 @@ struct MenuSession {
     winrt::Windows::Foundation::IInspectable oldPowerIcon{nullptr};
     bool powerChanged{};
     bool menuChanged{};
+    HCURSOR commandCursor{};
+    HCURSOR previousCursor{};
+    X::UIElement cursorElement{nullptr};
     std::vector<std::unique_ptr<RowInteraction>> rows;
     std::vector<C::MenuFlyoutItem::Click_revoker> clicks;
+    std::vector<CursorEvents> cursorEvents;
     P::FlyoutBase::Opened_revoker opened;
     P::FlyoutBase::Closed_revoker closed;
 };
@@ -188,6 +202,8 @@ void LoadSettings() {
     next.mode = option == L"delayed" ? HoverMode::Delayed :
                 option == L"arrow" ? HoverMode::Arrow : HoverMode::Immediate;
     Wh_FreeStringSetting(value);
+    next.hideAdminCommands = Wh_GetIntSetting(L"hideAdminCommands") != 0;
+    next.showHandCursor = Wh_GetIntSetting(L"showHandCursor") != 0;
     for (size_t i = 0; i < std::size(catalog); ++i)
         next.enabled[i] = Wh_GetIntSetting(catalog[i].key) != 0;
     std::lock_guard guard(settingsLock);
@@ -296,10 +312,6 @@ std::wstring ProgramPath(std::wstring_view program) {
     return SystemPath(program, program == L"regedit.exe");
 }
 
-bool Exists(std::wstring const& path) {
-    return !path.empty() && GetFileAttributesW(path.c_str()) != INVALID_FILE_ATTRIBUTES;
-}
-
 std::pair<std::wstring_view, std::wstring_view> Split(std::wstring_view value, wchar_t divider) {
     const size_t pos = value.find(divider);
     return {value.substr(0, pos), pos == value.npos ? std::wstring_view{} : value.substr(pos + 1)};
@@ -386,23 +398,34 @@ Provider GetProvider(X::UIElement const& item, AP::PatternInterface pattern) {
     return peer ? peer.GetPattern(pattern).try_as<Provider>() : nullptr;
 }
 
-bool Launch(PCWSTR target, PCWSTR arguments = nullptr) {
-    return reinterpret_cast<INT_PTR>(ShellExecuteW(nullptr, L"open", target, arguments, nullptr, SW_SHOWNORMAL)) > 32;
+DWORD LaunchWithShell(SHELLEXECUTEINFOW& info) {
+    info.cbSize = sizeof(info);
+    info.nShow = SW_SHOWNORMAL;
+    if (ShellExecuteExW(&info)) return ERROR_SUCCESS;
+    const auto error = GetLastError();
+    return error ? error : ERROR_GEN_FAILURE;
 }
 
-bool LaunchPidl(Pidl const& target) {
-    if (!target) return false;
+DWORD Launch(PCWSTR target, PCWSTR arguments = nullptr) {
     SHELLEXECUTEINFOW info{};
-    info.cbSize = sizeof(info);
+    info.lpVerb = L"open";
+    info.lpFile = target;
+    info.lpParameters = arguments;
+    return LaunchWithShell(info);
+}
+
+DWORD LaunchPidl(Pidl const& target) {
+    if (!target) return ERROR_FILE_NOT_FOUND;
+    SHELLEXECUTEINFOW info{};
     info.fMask = SEE_MASK_IDLIST;
     info.lpIDList = target.get();
-    info.nShow = SW_SHOWNORMAL;
-    return ShellExecuteExW(&info) != FALSE;
+    return LaunchWithShell(info);
 }
 
 struct SettingsRoute {
     HMODULE module{};
     unsigned serial;
+    PCWSTR itemKey;
     std::wstring pageElementId;
     std::wstring appName;
 };
@@ -421,23 +444,32 @@ void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data)
     std::unique_ptr<SettingsRoute> route(static_cast<SettingsRoute*>(data));
     FreeLibraryWhenCallbackReturns(callback, route->module);
     const HRESULT initialized = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-    if (FAILED(initialized)) return;
+    if (FAILED(initialized)) {
+        Wh_Log(L"Could not initialize Settings navigation for %s (0x%08X)", route->itemKey, initialized);
+        return;
+    }
     struct Apartment {
         ~Apartment() { CoUninitialize(); }
     } apartment;
     try {
-        winrt::com_ptr<IUIAutomation> automation;
-        if (FAILED(CoCreateInstance(__uuidof(CUIAutomation), nullptr, CLSCTX_INPROC_SERVER,
-                                   __uuidof(IUIAutomation), automation.put_void()))) return;
+        winrt::com_ptr<IUIAutomation2> automation;
+        winrt::check_hresult(CoCreateInstance(__uuidof(CUIAutomation8), nullptr, CLSCTX_INPROC_SERVER,
+                                             __uuidof(IUIAutomation2), automation.put_void()));
+        winrt::check_hresult(automation->put_ConnectionTimeout(400));
+        winrt::check_hresult(automation->put_TransactionTimeout(400));
         const auto pageId = TextCondition(*automation, UIA_AutomationIdPropertyId, route->pageElementId.c_str());
         const auto barId = TextCondition(*automation, UIA_AutomationIdPropertyId, L"PermanentNavigationViewBreadcrumbBar");
         const auto crumbType = TextCondition(*automation, UIA_ClassNamePropertyId,
                                             L"Microsoft.UI.Xaml.Controls.BreadcrumbBarItem");
-        if (!pageId || !barId || !crumbType) return;
+        if (!pageId || !barId || !crumbType) {
+            Wh_Log(L"Could not prepare Settings navigation for %s", route->itemKey);
+            return;
+        }
 
         // Wait for the URI's landing page, then invoke its parent breadcrumb.
         // Automation identifiers are independent of the Windows display language.
-        for (int i = 0; i < 24 && !unloading && settingsNavigation == route->serial; ++i) {
+        const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(2200);
+        while (!unloading && settingsNavigation == route->serial && std::chrono::steady_clock::now() < deadline) {
             const HWND hwnd = FindWindowW(L"ApplicationFrameWindow", route->appName.c_str());
             winrt::com_ptr<IUIAutomationElement> window, page, bar, parent;
             winrt::com_ptr<IUIAutomationElementArray> crumbs;
@@ -451,11 +483,14 @@ void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data)
                 SUCCEEDED(crumbs->GetElement(0, parent.put())) && parent &&
                 SUCCEEDED(parent->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern),
                                                      invoke.put_void())) && invoke &&
-                settingsNavigation == route->serial && !unloading && SUCCEEDED(invoke->Invoke())) return;
+                settingsNavigation == route->serial && !unloading && std::chrono::steady_clock::now() < deadline &&
+                SUCCEEDED(invoke->Invoke())) return;
             Sleep(90);
         }
     } catch (...) {
     }
+    if (!unloading && settingsNavigation == route->serial)
+        Wh_Log(L"Could not navigate to the Settings category for %s", route->itemKey);
 }
 
 void RunDestination(MenuSession& active, Destination destination) {
@@ -465,7 +500,7 @@ void RunDestination(MenuSession& active, Destination destination) {
             auto menu = active.menu;
             invoke.Invoke();
             menu.Hide();
-        }
+        } else Wh_Log(L"Could not invoke the original Win+X command %s", destination.item->key);
         return;
     }
 
@@ -473,14 +508,15 @@ void RunDestination(MenuSession& active, Destination destination) {
     const auto [kind, target] = Split(item.action, L':');
     auto menu = active.menu;
     menu.Hide();
-    bool opened = false;
+    DWORD error = ERROR_NOT_SUPPORTED;
     if (kind == L"uri" || kind == L"category") {
         const auto [page, pageElementId] = Split(target, L';');
         const auto address = L"ms-settings:" + std::wstring(page);
-        opened = Launch(address.c_str());
-        if (opened && kind == L"category") {
+        error = Launch(address.c_str());
+        if (error == ERROR_SUCCESS && kind == L"category") {
             auto route = std::make_unique<SettingsRoute>();
             route->serial = settingsNavigation;
+            route->itemKey = item.key;
             route->pageElementId = pageElementId;
             route->appName = Twinui(L"10922");
             if (route->appName.empty()) route->appName = L"Settings";
@@ -491,17 +527,18 @@ void RunDestination(MenuSession& active, Destination destination) {
                 else
                     FreeLibrary(route->module);
             }
+            if (route) Wh_Log(L"Could not schedule Settings category navigation for %s", item.key);
         }
     } else if (kind == L"folder") {
-        opened = LaunchPidl(FolderId(target));
+        error = LaunchPidl(FolderId(target));
     } else if (kind == L"panel") {
-        opened = LaunchPidl(ShellId(ControlPath(target)));
+        error = LaunchPidl(ShellId(ControlPath(target)));
     } else if (kind == L"lock") {
-        opened = LockWorkStation() != FALSE;
+        error = LockWorkStation() ? ERROR_SUCCESS : ERROR_GEN_FAILURE;
     } else if (kind == L"control") {
         const auto command = target.starts_with(L"Microsoft.") ? L"/name " + std::wstring(target) :
                                                                   std::wstring(target);
-        opened = Launch(SystemPath(L"control.exe").c_str(), command.c_str());
+        error = Launch(SystemPath(L"control.exe").c_str(), command.c_str());
     } else if (kind == L"exe") {
         const auto [program, argument] = Split(target, L';');
         const auto path = ProgramPath(program);
@@ -509,12 +546,13 @@ void RunDestination(MenuSession& active, Destination destination) {
         if (argument.ends_with(L".msc")) parameters = L"\"" + SystemPath(argument) + L"\"";
         if (program.ends_with(L".cpl")) {
             parameters = L"\"" + path + L"\"";
-            opened = Launch(SystemPath(L"control.exe").c_str(), parameters.c_str());
+            error = Launch(SystemPath(L"control.exe").c_str(), parameters.c_str());
         } else {
-            opened = Launch(path.c_str(), parameters.empty() ? nullptr : parameters.c_str());
+            error = Launch(path.c_str(), parameters.empty() ? nullptr : parameters.c_str());
         }
     }
-    if (!opened) Wh_Log(L"Could not open Quick Link menu item %s", item.key);
+    if (error != ERROR_SUCCESS && error != ERROR_CANCELLED)
+        Wh_Log(L"Could not open Win+X command %s (Win32 error %lu)", item.key, error);
 }
 
 X::FrameworkElement FindNamed(X::DependencyObject const& node, std::wstring_view name) {
@@ -539,6 +577,23 @@ HoverZone PointerZone(RowInteraction const& active, I::PointerRoutedEventArgs co
     const auto x = args.GetCurrentPoint(active.layout).Position().X;
     return std::abs(x - ChevronCenter(active, active.layout).X) <= arrowHitWidth / 2.0 ?
         HoverZone::Arrow : HoverZone::Body;
+}
+
+void ClearCommandCursor(MenuSession& active) {
+    if (!active.cursorElement) return;
+    active.cursorElement = nullptr;
+    if (GetCursor() == active.commandCursor) SetCursor(active.previousCursor);
+}
+
+void UpdateCommandCursor(MenuSession& active, X::UIElement const& element, bool command) {
+    if (!active.commandCursor) return;
+    if (!command) {
+        if (active.cursorElement == element) ClearCommandCursor(active);
+        return;
+    }
+    if (!active.cursorElement) active.previousCursor = GetCursor();
+    active.cursorElement = element;
+    if (GetCursor() != active.commandCursor) SetCursor(active.commandCursor);
 }
 
 void UpdateHoverVisual(RowInteraction const& active) {
@@ -578,6 +633,13 @@ void SetHoverZone(RowInteraction& active, HoverZone zone) {
          (active.mode == HoverMode::Arrow && zone == HoverZone::Arrow));
     UpdateHoverVisual(active);
     if (active.openOnUpdate) active.hoverUpdate.Start();
+}
+
+void UpdatePointerZone(RowInteraction& active, I::PointerRoutedEventArgs const& args) {
+    const auto zone = PointerZone(active, args);
+    if (args.Pointer().PointerDeviceType() == PointerType::Mouse)
+        UpdateCommandCursor(*active.owner, active.split, active.destination.item && zone == HoverZone::Body);
+    SetHoverZone(active, zone);
 }
 
 void AddArrowBackground(RowInteraction& active) {
@@ -642,20 +704,21 @@ bool AttachPointerEvents(RowInteraction& active) {
                 // In arrow-only mode we drive the native PointerOver state explicitly
                 // because the XAML handler pairs it with starting the submenu timer.
                 if (active.mode == HoverMode::Arrow && active.expand) args.Handled(true);
-                SetHoverZone(active, PointerZone(active, args));
+                UpdatePointerZone(active, args);
             });
         });
     active.pointerMoved = active.layout.PointerMoved(winrt::auto_revoke,
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
                 if (args.Pointer().PointerDeviceType() != PointerType::Touch)
-                    SetHoverZone(active, PointerZone(active, args));
+                    UpdatePointerZone(active, args);
             });
         });
     active.pointerExited = active.layout.PointerExited(winrt::auto_revoke,
         [row = &active](auto const&, auto const&) {
             OnRow(row, [](auto& active) {
                 active.pressedPointer.reset();
+                UpdateCommandCursor(*active.owner, active.split, false);
                 SetHoverZone(active, HoverZone::Outside);
             });
         });
@@ -683,7 +746,10 @@ bool AttachPointerEvents(RowInteraction& active) {
         });
     active.pointerCanceled = active.layout.PointerCanceled(winrt::auto_revoke,
         [row = &active](auto const&, auto const&) {
-            OnRow(row, [](auto& active) { active.pressedPointer.reset(); });
+            OnRow(row, [](auto& active) {
+                active.pressedPointer.reset();
+                UpdateCommandCursor(*active.owner, active.split, false);
+            });
         });
     return true;
 }
@@ -733,18 +799,6 @@ C::MenuFlyoutItem StockPowerAction(StockMenu const& stock, std::wstring_view act
     return item && !expected.empty() && Normalize(item.Text()) == Normalize(expected) ? item : nullptr;
 }
 
-bool ControlRegistered(std::wstring_view resource) {
-    const auto [kind, guid] = Split(resource, L':');
-    if (kind != L"shell") return true;
-    const auto key = L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\ControlPanel\\NameSpace\\" +
-                     std::wstring(guid);
-    HKEY handle{};
-    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, key.c_str(), 0, KEY_READ, &handle) != ERROR_SUCCESS)
-        return false;
-    RegCloseKey(handle);
-    return true;
-}
-
 bool ExplorerStartsOnThisPc() {
     DWORD destination{};
     DWORD bytes = sizeof(destination);
@@ -769,27 +823,18 @@ bool IsHomeEdition() {
            edition == PRODUCT_CORE_SINGLELANGUAGE || edition == PRODUCT_CORE_COUNTRYSPECIFIC;
 }
 
-std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& stock) {
+// GENERATED_AVAILABILITY
+
+std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& stock,
+                                   AvailabilitySnapshot const& availability, bool hideAdminCommands) {
+    const auto index = &item - catalog;
+    if (availability.unavailable[index] || (hideAdminCommands && availability.credentialsRequired[index]))
+        return std::nullopt;
     auto [kind, target] = Split(item.action, L':');
     Destination destination{&item};
     if (kind == L"native" || kind == L"power") {
         destination.original = kind == L"native" ? StockAction(stock, target) : StockPowerAction(stock, target);
         if (!destination.original || !destination.original.IsEnabled()) return std::nullopt;
-    } else if (kind == L"exe") {
-        const auto [name, args] = Split(target, L';');
-        if (!Exists(ProgramPath(name)) || (args.ends_with(L".msc") && !Exists(SystemPath(args))))
-            return std::nullopt;
-        if ((args == L"gpedit.msc" || args == L"secpol.msc" || args == L"lusrmgr.msc") && IsHomeEdition())
-            return std::nullopt;
-    } else if (kind == L"control") {
-        if (!ControlRegistered(item.resource) || (target == L"Microsoft.BitLockerDriveEncryption" && IsHomeEdition()))
-            return std::nullopt;
-    } else if (kind == L"folder") {
-        if ((std::wstring_view(item.key) == L"commands.submenus.explorer.computer" && ExplorerStartsOnThisPc()) ||
-            !FolderId(target)) return std::nullopt;
-    } else if (kind == L"uri") {
-        if (target == L"network-wifi" && !HasWirelessInterface()) return std::nullopt;
-        if (target == L"devices-keyboard" && SystemCaption(item).empty()) return std::nullopt;
     }
     return destination;
 }
@@ -806,6 +851,7 @@ void RemoveRowVisual(RowInteraction& row) {
 void Restore() noexcept {
     auto old = std::move(session);
     if (!old) return;
+    ClearCommandCursor(*old);
     for (auto const& row : old->rows) {
         try { RemoveRowVisual(*row); } catch (...) {}
     }
@@ -838,6 +884,25 @@ C::MenuFlyoutItem CreateLeaf(MenuSession& pending, Destination const& destinatio
         if (unloading || session.get() != owner) return;
         try { RunDestination(*owner, destination); } catch (...) { Wh_Log(L"Win+X command failed"); }
     }));
+    if (pending.commandCursor) {
+        const auto enterOrMove = [owner](auto const& sender, I::PointerRoutedEventArgs const& args) {
+            if (unloading || session.get() != owner) return;
+            try {
+                if (args.Pointer().PointerDeviceType() == PointerType::Mouse)
+                    UpdateCommandCursor(*owner, sender.template as<X::UIElement>(), true);
+            } catch (...) {
+                Wh_Log(L"Could not update the Win+X command cursor");
+            }
+        };
+        pending.cursorEvents.push_back({
+            leaf.PointerEntered(winrt::auto_revoke, enterOrMove),
+            leaf.PointerMoved(winrt::auto_revoke, enterOrMove),
+            leaf.PointerExited(winrt::auto_revoke, [owner](auto const& sender, auto const&) {
+                if (unloading || session.get() != owner) return;
+                UpdateCommandCursor(*owner, sender.template try_as<X::UIElement>(), false);
+            }),
+        });
+    }
     return leaf;
 }
 
@@ -881,9 +946,13 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     }
     if (stock.powerRows.size() < 3 || stock.powerRows.size() > 5) return;
 
+    RefreshAvailability();
+    const auto availability = ReadAvailability();
+
     auto pending = std::make_unique<MenuSession>();
     pending->menu = menu;
     pending->original = stock.rows;
+    if (snapshot.showHandCursor) pending->commandCursor = LoadCursorW(nullptr, IDC_HAND);
     pending->power = stock.power;
     for (auto const& item : stock.power.Items()) pending->originalPower.push_back(item);
     pending->oldPowerIcon = stock.power.ReadLocalValue(C::MenuFlyoutSubItem::IconProperty());
@@ -896,13 +965,13 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
         const auto& item = catalog[index];
         if (item.parent >= 0 || !snapshot.enabled[index]) continue;
         const bool power = std::wstring_view(item.action) == L"power:menu";
-        auto destination = power ? std::optional<Destination>{} : Resolve(item, stock);
-        if (!power && !destination) continue;
+        const auto destination = power ? std::optional<Destination>{} :
+            Resolve(item, stock, availability, snapshot.hideAdminCommands);
 
         std::vector<C::MenuFlyoutItem> children;
         for (size_t child = index + 1; child < std::size(catalog) && catalog[child].parent == static_cast<int>(index); ++child) {
             if (!snapshot.enabled[child]) continue;
-            if (const auto resolved = Resolve(catalog[child], stock)) {
+            if (const auto resolved = Resolve(catalog[child], stock, availability, snapshot.hideAdminCommands)) {
                 if (auto leaf = CreateLeaf(*pending, *resolved)) children.push_back(leaf);
             }
         }
@@ -915,15 +984,16 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             AddInteraction(*pending, stock.power, {}, snapshot.mode);
             entry = stock.power;
         } else if (children.empty()) {
+            if (!destination) continue;
             entry = CreateLeaf(*pending, *destination);
         } else {
-            const auto caption = Caption(*destination);
+            const auto caption = Caption(destination.value_or(Destination{&item}));
             if (caption.empty()) continue;
             C::MenuFlyoutSubItem split;
             split.Text(caption);
             if (item.glyph) split.Icon(MakeIcon(item.glyph));
             for (auto const& child : children) split.Items().Append(child);
-            AddInteraction(*pending, split, *destination, snapshot.mode);
+            AddInteraction(*pending, split, destination.value_or(Destination{}), snapshot.mode);
             entry = split;
         }
         if (!entry) continue;
@@ -1033,12 +1103,16 @@ BOOL Wh_ModInit() {
 
 void Wh_ModAfterInit() {
     subclassPresent = WindhawkUtils::SetWindowSubclassFromAnyThread(trayWindow, TraySubclass, 0);
-    if (!subclassPresent || !SendMessageW(trayWindow, setupMessage, 1, 0))
+    if (!subclassPresent || !SendMessageW(trayWindow, setupMessage, 1, 0)) {
         Wh_Log(L"Could not initialize the Quick Link menu hooks");
+        return;
+    }
+    RefreshAvailability();
 }
 
 void Wh_ModSettingsChanged() {
     LoadSettings();
+    RefreshAvailability(true);
 }
 
 void Wh_ModBeforeUninit() {

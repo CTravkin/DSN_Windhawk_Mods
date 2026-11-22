@@ -36,6 +36,15 @@ File Explorer start off. Items also depend on availability in Windows.
 use the Windows delay or open immediately over the arrow. In the latter mode,
 the arrow has a separate hover background and the row retains its native hover.
 
+**Hide administrator commands** is off by default. When enabled, it hides
+known administrator commands if the current session needs credentials or policy
+prevents elevation. Commands that only need UAC consent are still shown.
+
+**Show hand cursor over commands** is on by default. The hand marks areas
+that run a command. If a main destination is unavailable, its available
+shortcuts stay in a submenu. A row with a main action and no available shortcuts
+has no submenu arrow.
+
 Turning off all power commands hides the power row. With all menu rows
 disabled, the stock Win+X menu opens.
 
