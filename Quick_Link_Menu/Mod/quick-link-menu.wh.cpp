@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.12
+// @version         0.2.13
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 18
+// Build: 19
 
 // ==WindhawkModReadme==
 /*
@@ -1826,11 +1826,11 @@ void AddArrowBackground(RowInteraction& active) {
         });
 }
 
-void AttachPointerEvents(RowInteraction& active) {
+bool AttachPointerEvents(RowInteraction& active) {
     active.split.ApplyTemplate();
     active.layout = FindNamed(active.split, L"LayoutRoot").try_as<C::Grid>();
     active.chevron = FindNamed(active.split, L"SubItemChevron");
-    if (!active.layout || !active.chevron) return;
+    if (!active.layout || !active.chevron) return false;
     active.expand = GetProvider<AV::IExpandCollapseProvider>(active.split, AP::PatternInterface::ExpandCollapse);
     if (active.mode != HoverMode::Delayed && active.expand) {
         // Let XAML finish routing the enter event before opening its submenu.
@@ -1872,7 +1872,7 @@ void AttachPointerEvents(RowInteraction& active) {
                 SetHoverZone(active, HoverZone::Outside);
             });
         });
-    if (!active.destination.item) return;
+    if (!active.destination.item) return true;
 
     active.pointerPressed = active.layout.PointerPressed(winrt::auto_revoke,
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
@@ -1898,6 +1898,7 @@ void AttachPointerEvents(RowInteraction& active) {
         [row = &active](auto const&, auto const&) {
             OnRow(row, [](auto& active) { active.pressedPointer.reset(); });
         });
+    return true;
 }
 
 C::FontIcon MakeIcon(wchar_t glyph) {
@@ -2029,6 +2030,10 @@ void Restore() noexcept {
             else
                 old->power.SetValue(C::MenuFlyoutSubItem::IconProperty(), old->oldPowerIcon);
         }
+    } catch (...) {
+        Wh_Log(L"Could not restore the original Win+X power submenu");
+    }
+    try {
         if (old->menuChanged) old->menu.Items().ReplaceAll(old->original);
     } catch (...) {
         Wh_Log(L"Could not restore the original Win+X menu");
@@ -2143,8 +2148,18 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
 
     pending->opened = menu.Opened(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
         if (unloading || session.get() != owner) return;
-        for (auto const& row : owner->rows)
-            OnRow(row.get(), AttachPointerEvents);
+        try {
+            for (auto const& row : owner->rows) {
+                if (!AttachPointerEvents(*row)) {
+                    Wh_Log(L"Incompatible Win+X submenu template; restoring the Windows menu");
+                    Restore();
+                    return;
+                }
+            }
+        } catch (...) {
+            Wh_Log(L"Could not initialize Win+X submenu interactions; restoring the Windows menu");
+            Restore();
+        }
     });
     pending->closed = menu.Closed(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
         if (session.get() == owner) Restore();
