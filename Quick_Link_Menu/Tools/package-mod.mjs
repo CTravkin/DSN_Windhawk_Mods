@@ -11,7 +11,7 @@ const wide = (value) => `L${JSON.stringify(value)}`;
 const settings = [];
 const definitions = [];
 const keys = new Set();
-const sectionSwitch = 'sectionEnabled';
+const sectionKeys = blocks.map(({ id }) => `${id}Enabled`);
 
 function labels(target, indent, key, names) {
   if (names.length !== locales.length || names.some((name) => !name)) {
@@ -97,11 +97,10 @@ labels(settings, '  ', '$description', ['Additional settings for individual comm
 
 checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu', true);
 blocks.forEach((block, group) => {
+  settings.push(`- ${sectionKeys[group]}: true`);
+  labels(settings, '  ', '$name', block.names);
+  labels(settings, '  ', '$description', block.descriptions);
   settings.push(`- ${block.id}:`);
-  settings.push(`  - ${sectionSwitch}: true`);
-  // Windhawk uses the internal key as the title when the name is empty or missing.
-  settings.push('    $name: " "');
-  keys.add(`${block.id}.${sectionSwitch}`);
   for (const row of block.rows) {
     const hasChildren = row.children.length > 0;
     const rowKey = `${block.id}.${row.id}`;
@@ -119,8 +118,8 @@ blocks.forEach((block, group) => {
     // Windhawk renders the internal key when the group name is empty or missing.
     settings.push('    $name: " "');
   }
-  labels(settings, '  ', '$name', block.names);
-  labels(settings, '  ', '$description', block.descriptions);
+  // The switch above already carries the section title and description.
+  settings.push('  $name: " "');
 });
 
 for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERATED_AVAILABILITY']) {
@@ -129,8 +128,8 @@ for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERA
 const packed = source
   .replace('// GENERATED_SETTINGS', () => `// ==WindhawkModSettings==\n/*\n${settings.join('\n')}\n*/\n// ==/WindhawkModSettings==`)
   .replace('// GENERATED_CATALOG', () => {
-    const sectionKeys = blocks.map(({ id }) => `    ${wide(`${id}.${sectionSwitch}`)},`);
-    return `constexpr PCWSTR sectionEnabledKeys[] = {\n${sectionKeys.join('\n')}\n};\n\nconstexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`;
+    const sectionDefinitions = sectionKeys.map((key) => `    ${wide(key)},`);
+    return `constexpr PCWSTR sectionEnabledKeys[] = {\n${sectionDefinitions.join('\n')}\n};\n\nconstexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`;
   })
   .replace('// GENERATED_AVAILABILITY', () => availability);
 

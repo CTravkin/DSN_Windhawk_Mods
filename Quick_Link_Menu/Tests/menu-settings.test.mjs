@@ -42,10 +42,21 @@ for (const [group, key, value, title, hint] of [
   });
 }
 
-test('every command section starts with an unlabeled switch enabled by default', () => {
+test('the section title and description belong to the top-level switch', () => {
   for (const group of ['windowsSettings', 'controlPanel', 'administration', 'commands']) {
-    assert.equal(lines[lines.indexOf(`- ${group}:`) + 1], '  - sectionEnabled: true', group);
-    assert.deepEqual(setting(group, 'sectionEnabled', true), ['    $name: " "']);
+    const start = lines.indexOf(`- ${group}Enabled: true`);
+    assert.ok(start >= 0, `${group} needs a top-level switch enabled by default`);
+    const end = lines.indexOf(`- ${group}:`);
+    assert.equal(end, lines.findIndex((line, index) => index > start && line.startsWith('- ')));
+    const block = lines.slice(start + 1, end);
+    for (const annotation of ['$name', '$description']) {
+      for (const locale of locales) {
+        const prefix = `  ${annotation}${locale}: `;
+        const line = block.find((entry) => entry.startsWith(prefix));
+        assert.ok(line && JSON.parse(line.slice(prefix.length)).trim(), `${group} ${prefix}`);
+      }
+    }
+    assert.deepEqual(setting(group, null), ['  $name: " "']);
   }
 });
 

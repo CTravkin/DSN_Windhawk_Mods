@@ -31,8 +31,9 @@ The switch under the section description is on by default. Turning it off
 hides the entire section and preserves its individual command settings.
 The main switch appears directly under the row's name, with any related
 shortcuts grouped below it.
-**Search**, **Desktop**, and the **Documents** and **Pictures** shortcuts under
-File Explorer start off. Items also depend on availability in Windows.
+The default selection leaves some commands off, including **Search**,
+**Desktop**, and the **Documents** and **Pictures** shortcuts under File
+Explorer. Items also depend on availability in Windows.
 
 In **General settings**, submenus open immediately on hover by default. You can
 use a delay, hover over the arrow, or click the arrow.

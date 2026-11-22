@@ -64,7 +64,8 @@
               "Leistung",
               "Desligar",
               "电源"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "storage",
@@ -92,7 +93,8 @@
               "Erweitert",
               "Avançado",
               "高级"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "about",
@@ -150,7 +152,8 @@
               "Drucker und Scanner",
               "Impressoras e scanners",
               "打印机和扫描仪"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "cameras",
@@ -164,7 +167,8 @@
               "Kameras",
               "Câmeras",
               "摄像头"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "mouse",
@@ -178,7 +182,8 @@
               "Maus",
               "Mouse",
               "鼠标"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "keyboard",
@@ -192,7 +197,8 @@
               "Tastatur",
               "Teclado",
               "键盘"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -264,7 +270,8 @@
               "VPN",
               "VPN",
               "VPN"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "proxy",
@@ -292,7 +299,8 @@
               "Erweiterte Netzwerkeinstellungen",
               "Configurações avançadas de rede",
               "高级网络设置"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -350,7 +358,8 @@
               "Designs",
               "Temas",
               "主题"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "lockScreen",
@@ -394,7 +403,8 @@
               "任务栏"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "apps",
@@ -494,7 +504,8 @@
               "Windows-Sicherung",
               "Backup do Windows",
               "Windows 备份"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "passkeys",
@@ -510,7 +521,8 @@
               "通行密钥"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "timeLanguage",
@@ -566,9 +578,11 @@
               "Eingabe",
               "Digitação",
               "输入"
-            ]
+            ],
+            "enabled": false
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "gaming",
@@ -583,7 +597,8 @@
           "Jogos",
           "游戏"
         ],
-        "children": []
+        "children": [],
+        "enabled": false
       },
       {
         "id": "accessibility",
@@ -613,7 +628,8 @@
           "Privacidade e segurança",
           "隐私和安全性"
         ],
-        "children": []
+        "children": [],
+        "enabled": false
       },
       {
         "id": "update",
@@ -677,7 +693,8 @@
               "Sicherheit und Wartung",
               "Segurança e Manutenção",
               "安全和维护"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "firewall",
@@ -749,7 +766,8 @@
               "Netzwerk- und Freigabecenter",
               "Central de Rede e Compartilhamento",
               "网络和共享中心"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "connections",
@@ -779,7 +797,8 @@
               "Internet 选项"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "hardware",
@@ -849,7 +868,8 @@
               "Tastatur",
               "Teclado",
               "键盘"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "controllers",
@@ -863,7 +883,8 @@
               "Gamecontroller",
               "Controladores de Jogo",
               "游戏控制器"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -909,7 +930,8 @@
               "启用或关闭 Windows 功能"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "userAccounts",
@@ -953,7 +975,8 @@
               "更改用户帐户控制设置"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "appearance",
@@ -1009,7 +1032,8 @@
               "Farbverwaltung",
               "Gerenciamento de Cores",
               "颜色管理"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -1055,7 +1079,8 @@
               "区域"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "accessibility",
@@ -1070,7 +1095,8 @@
           "Facilidade de Acesso",
           "轻松使用"
         ],
-        "children": []
+        "children": [],
+        "enabled": false
       }
     ],
     "descriptions": [
@@ -1150,7 +1176,8 @@
               "高级安全 Windows Defender 防火墙"
             ]
           }
-        ]
+        ],
+        "enabled": false
       },
       {
         "id": "computerManagement",
@@ -1206,7 +1233,8 @@
               "WMI-Steuerung",
               "Controle WMI",
               "WMI 控件"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -1264,7 +1292,8 @@
               "Wiederherstellungslaufwerk",
               "Unidade de Recuperação",
               "恢复驱动器"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -1366,7 +1395,8 @@
               "Zuverlässigkeitsüberwachung",
               "Monitor de Confiabilidade",
               "可靠性监视程序"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "systemInfo",
@@ -1394,7 +1424,8 @@
               "Windows-Speicherdiagnose",
               "Diagnóstico de Memória do Windows",
               "Windows 内存诊断"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -1452,7 +1483,8 @@
               "Lokale Sicherheitsrichtlinie",
               "Política de Segurança Local",
               "本地安全策略"
-            ]
+            ],
+            "enabled": false
           }
         ]
       },
@@ -1510,7 +1542,8 @@
               "Eingabeaufforderung",
               "Prompt de Comando",
               "命令提示符"
-            ]
+            ],
+            "enabled": false
           }
         ]
       }
@@ -1663,7 +1696,8 @@
               "Downloads",
               "Downloads",
               "下载"
-            ]
+            ],
+            "enabled": false
           },
           {
             "id": "recycleBin",

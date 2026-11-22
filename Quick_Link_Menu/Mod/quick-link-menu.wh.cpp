@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         0.5.1
+// @version         0.5.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 33
+// Build: 34
 
 // ==WindhawkModReadme==
 /*
@@ -216,9 +216,20 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
   $description:de-DE: "Zusätzliche Einstellungen für einzelne Befehle"
   $description:pt-BR: "Configurações adicionais para comandos específicos"
   $description:zh-CN: "特定命令的附加设置"
+- windowsSettingsEnabled: true
+  $name: "Settings"
+  $name:ru-RU: "Параметры"
+  $name:es-ES: "Configuración"
+  $name:de-DE: "Einstellungen"
+  $name:pt-BR: "Configurações"
+  $name:zh-CN: "设置"
+  $description: "Windows Settings categories and pages"
+  $description:ru-RU: "Разделы и страницы стандартного приложения «Параметры»"
+  $description:es-ES: "Categorías y páginas de Configuración de Windows"
+  $description:de-DE: "Kategorien und Seiten der Windows-Einstellungen"
+  $description:pt-BR: "Categorias e páginas das Configurações do Windows"
+  $description:zh-CN: "Windows 设置的类别和页面"
 - windowsSettings:
-  - sectionEnabled: true
-    $name: " "
   - systemVisible: true
     $name: "System"
     $name:ru-RU: "Система"
@@ -241,7 +252,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Sound"
       $name:pt-BR: "Som"
       $name:zh-CN: "声音"
-    - power: true
+    - power: false
       $name: "Power"
       $name:ru-RU: "Питание"
       $name:es-ES: "Inicio/Apagado"
@@ -255,7 +266,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Speicher"
       $name:pt-BR: "Armazenamento"
       $name:zh-CN: "存储"
-    - advanced: true
+    - advanced: false
       $name: "Advanced"
       $name:ru-RU: "Дополнительно"
       $name:es-ES: "Avanzado"
@@ -285,28 +296,28 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Geräte"
       $name:pt-BR: "Dispositivos"
       $name:zh-CN: "设备"
-    - printers: true
+    - printers: false
       $name: "Printers & scanners"
       $name:ru-RU: "Принтеры и сканеры"
       $name:es-ES: "Impresoras y escáneres"
       $name:de-DE: "Drucker und Scanner"
       $name:pt-BR: "Impressoras e scanners"
       $name:zh-CN: "打印机和扫描仪"
-    - cameras: true
+    - cameras: false
       $name: "Cameras"
       $name:ru-RU: "Камеры"
       $name:es-ES: "Cámaras"
       $name:de-DE: "Kameras"
       $name:pt-BR: "Câmeras"
       $name:zh-CN: "摄像头"
-    - mouse: true
+    - mouse: false
       $name: "Mouse"
       $name:ru-RU: "Мышь"
       $name:es-ES: "Mouse"
       $name:de-DE: "Maus"
       $name:pt-BR: "Mouse"
       $name:zh-CN: "鼠标"
-    - keyboard: true
+    - keyboard: false
       $name: "Keyboard"
       $name:ru-RU: "Клавиатура"
       $name:es-ES: "Teclado"
@@ -343,7 +354,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Mobiler Hotspot"
       $name:pt-BR: "Hotspot móvel"
       $name:zh-CN: "移动热点"
-    - vpn: true
+    - vpn: false
       $name: "VPN"
       $name:ru-RU: "VPN"
       $name:es-ES: "VPN"
@@ -357,7 +368,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Proxy"
       $name:pt-BR: "Proxy"
       $name:zh-CN: "代理"
-    - advancedNetwork: true
+    - advancedNetwork: false
       $name: "Advanced network settings"
       $name:ru-RU: "Дополнительные сетевые параметры"
       $name:es-ES: "Configuración de red avanzada"
@@ -365,7 +376,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Configurações avançadas de rede"
       $name:zh-CN: "高级网络设置"
     $name: " "
-  - personalizationVisible: true
+  - personalizationVisible: false
     $name: "Personalization"
     $name:ru-RU: "Персонализация"
     $name:es-ES: "Personalización"
@@ -387,7 +398,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Farben"
       $name:pt-BR: "Cores"
       $name:zh-CN: "颜色"
-    - themes: true
+    - themes: false
       $name: "Themes"
       $name:ru-RU: "Темы"
       $name:es-ES: "Temas"
@@ -446,7 +457,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Inicialização"
       $name:zh-CN: "启动"
     $name: " "
-  - accountsVisible: true
+  - accountsVisible: false
     $name: "Accounts"
     $name:ru-RU: "Учетные записи"
     $name:es-ES: "Cuentas"
@@ -461,7 +472,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Anmeldeoptionen"
       $name:pt-BR: "Opções de entrada"
       $name:zh-CN: "登录选项"
-    - backup: true
+    - backup: false
       $name: "Windows Backup"
       $name:ru-RU: "Архивация Windows"
       $name:es-ES: "Copias de seguridad de Windows"
@@ -476,7 +487,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Chaves de acesso"
       $name:zh-CN: "通行密钥"
     $name: " "
-  - timeLanguageVisible: true
+  - timeLanguageVisible: false
     $name: "Time & language"
     $name:ru-RU: "Время и язык"
     $name:es-ES: "Hora e idioma"
@@ -498,7 +509,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Sprache und Region"
       $name:pt-BR: "Idioma e região"
       $name:zh-CN: "语言和区域"
-    - typing: true
+    - typing: false
       $name: "Typing"
       $name:ru-RU: "Ввод"
       $name:es-ES: "Escritura"
@@ -506,7 +517,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Digitação"
       $name:zh-CN: "输入"
     $name: " "
-  - gaming: true
+  - gaming: false
     $name: "Gaming"
     $name:ru-RU: "Игры"
     $name:es-ES: "Juegos"
@@ -520,7 +531,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Barrierefreiheit"
     $name:pt-BR: "Acessibilidade"
     $name:zh-CN: "辅助功能"
-  - privacy: true
+  - privacy: false
     $name: "Privacy & security"
     $name:ru-RU: "Конфиденциальность и защита"
     $name:es-ES: "Privacidad y seguridad"
@@ -534,21 +545,21 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Windows Update"
     $name:pt-BR: "Windows Update"
     $name:zh-CN: "Windows 更新"
-  $name: "Settings"
-  $name:ru-RU: "Параметры"
-  $name:es-ES: "Configuración"
-  $name:de-DE: "Einstellungen"
-  $name:pt-BR: "Configurações"
-  $name:zh-CN: "设置"
-  $description: "Windows Settings categories and pages"
-  $description:ru-RU: "Разделы и страницы стандартного приложения «Параметры»"
-  $description:es-ES: "Categorías y páginas de Configuración de Windows"
-  $description:de-DE: "Kategorien und Seiten der Windows-Einstellungen"
-  $description:pt-BR: "Categorias e páginas das Configurações do Windows"
-  $description:zh-CN: "Windows 设置的类别和页面"
+  $name: " "
+- controlPanelEnabled: true
+  $name: "Control Panel"
+  $name:ru-RU: "Панель управления"
+  $name:es-ES: "Panel de control"
+  $name:de-DE: "Systemsteuerung"
+  $name:pt-BR: "Painel de Controle"
+  $name:zh-CN: "控制面板"
+  $description: "Classic Control Panel categories and windows"
+  $description:ru-RU: "Категории и окна классической панели управления"
+  $description:es-ES: "Categorías y ventanas clásicas del Panel de control"
+  $description:de-DE: "Kategorien und klassische Fenster der Systemsteuerung"
+  $description:pt-BR: "Categorias e janelas clássicas do Painel de Controle"
+  $description:zh-CN: "控制面板类别和经典窗口"
 - controlPanel:
-  - sectionEnabled: true
-    $name: " "
   - securityVisible: true
     $name: "System and Security"
     $name:ru-RU: "Система и безопасность"
@@ -557,7 +568,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:pt-BR: "Sistema e Segurança"
     $name:zh-CN: "系统和安全"
   - security:
-    - maintenance: true
+    - maintenance: false
       $name: "Security and Maintenance"
       $name:ru-RU: "Центр безопасности и обслуживания"
       $name:es-ES: "Seguridad y mantenimiento"
@@ -586,7 +597,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Criptografia de Unidade de Disco BitLocker"
       $name:zh-CN: "BitLocker 驱动器加密"
     $name: " "
-  - networkVisible: true
+  - networkVisible: false
     $name: "Network and Internet"
     $name:ru-RU: "Сеть и Интернет"
     $name:es-ES: "Redes e Internet"
@@ -594,7 +605,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:pt-BR: "Rede e Internet"
     $name:zh-CN: "网络和 Internet"
   - network:
-    - sharing: true
+    - sharing: false
       $name: "Network and Sharing Center"
       $name:ru-RU: "Центр управления сетями и общим доступом"
       $name:es-ES: "Centro de redes y recursos compartidos"
@@ -645,14 +656,14 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Maus"
       $name:pt-BR: "Mouse"
       $name:zh-CN: "鼠标"
-    - keyboard: true
+    - keyboard: false
       $name: "Keyboard"
       $name:ru-RU: "Клавиатура"
       $name:es-ES: "Teclado"
       $name:de-DE: "Tastatur"
       $name:pt-BR: "Teclado"
       $name:zh-CN: "键盘"
-    - controllers: true
+    - controllers: false
       $name: "Game Controllers"
       $name:ru-RU: "Игровые устройства"
       $name:es-ES: "Dispositivos de juego"
@@ -660,7 +671,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Controladores de Jogo"
       $name:zh-CN: "游戏控制器"
     $name: " "
-  - programsVisible: true
+  - programsVisible: false
     $name: "Programs"
     $name:ru-RU: "Программы"
     $name:es-ES: "Programas"
@@ -683,7 +694,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Ativar ou desativar recursos do Windows"
       $name:zh-CN: "启用或关闭 Windows 功能"
     $name: " "
-  - userAccountsVisible: true
+  - userAccountsVisible: false
     $name: "User Accounts"
     $name:ru-RU: "Учетные записи пользователей"
     $name:es-ES: "Cuentas de usuario"
@@ -728,7 +739,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Desktopsymboleinstellungen"
       $name:pt-BR: "Configurações dos Ícones da Área de Trabalho"
       $name:zh-CN: "桌面图标设置"
-    - colorManagement: true
+    - colorManagement: false
       $name: "Color Management"
       $name:ru-RU: "Управление цветом"
       $name:es-ES: "Administración del color"
@@ -736,7 +747,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Gerenciamento de Cores"
       $name:zh-CN: "颜色管理"
     $name: " "
-  - clockRegionVisible: true
+  - clockRegionVisible: false
     $name: "Clock and Region"
     $name:ru-RU: "Часы и регион"
     $name:es-ES: "Reloj y región"
@@ -759,29 +770,29 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Região"
       $name:zh-CN: "区域"
     $name: " "
-  - accessibility: true
+  - accessibility: false
     $name: "Ease of Access"
     $name:ru-RU: "Специальные возможности"
     $name:es-ES: "Accesibilidad"
     $name:de-DE: "Erleichterte Bedienung"
     $name:pt-BR: "Facilidade de Acesso"
     $name:zh-CN: "轻松使用"
-  $name: "Control Panel"
-  $name:ru-RU: "Панель управления"
-  $name:es-ES: "Panel de control"
-  $name:de-DE: "Systemsteuerung"
-  $name:pt-BR: "Painel de Controle"
-  $name:zh-CN: "控制面板"
-  $description: "Classic Control Panel categories and windows"
-  $description:ru-RU: "Категории и окна классической панели управления"
-  $description:es-ES: "Categorías y ventanas clásicas del Panel de control"
-  $description:de-DE: "Kategorien und klassische Fenster der Systemsteuerung"
-  $description:pt-BR: "Categorias e janelas clássicas do Painel de Controle"
-  $description:zh-CN: "控制面板类别和经典窗口"
+  $name: " "
+- administrationEnabled: true
+  $name: "Administration"
+  $name:ru-RU: "Администрирование"
+  $name:es-ES: "Administración"
+  $name:de-DE: "Verwaltung"
+  $name:pt-BR: "Administração"
+  $name:zh-CN: "管理"
+  $description: "System consoles, diagnostics, and terminals"
+  $description:ru-RU: "Программы для управления системой, диагностика и терминалы"
+  $description:es-ES: "Consolas del sistema, diagnóstico y terminales"
+  $description:de-DE: "Systemkonsolen, Diagnose und Terminals"
+  $description:pt-BR: "Consoles do sistema, diagnóstico e terminais"
+  $description:zh-CN: "系统控制台、诊断和终端"
 - administration:
-  - sectionEnabled: true
-    $name: " "
-  - toolsVisible: true
+  - toolsVisible: false
     $name: "Windows Tools"
     $name:ru-RU: "Инструменты Windows"
     $name:es-ES: "Herramientas de Windows"
@@ -833,7 +844,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Lokale Benutzer und Gruppen"
       $name:pt-BR: "Usuários e Grupos Locais"
       $name:zh-CN: "本地用户和组"
-    - wmi: true
+    - wmi: false
       $name: "WMI Control"
       $name:ru-RU: "Управляющий элемент WMI"
       $name:es-ES: "Control WMI"
@@ -863,7 +874,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Datenträgerbereinigung"
       $name:pt-BR: "Limpeza de Disco"
       $name:zh-CN: "磁盘清理"
-    - recoveryDrive: true
+    - recoveryDrive: false
       $name: "Recovery Drive"
       $name:ru-RU: "Диск восстановления"
       $name:es-ES: "Unidad de recuperación"
@@ -916,7 +927,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Ressourcenmonitor"
       $name:pt-BR: "Monitor de Recursos"
       $name:zh-CN: "资源监视器"
-    - reliability: true
+    - reliability: false
       $name: "Reliability Monitor"
       $name:ru-RU: "Монитор стабильности системы"
       $name:es-ES: "Monitor de confiabilidad"
@@ -930,7 +941,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Systeminformationen"
       $name:pt-BR: "Informações do sistema"
       $name:zh-CN: "系统信息"
-    - memoryDiagnostic: true
+    - memoryDiagnostic: false
       $name: "Windows Memory Diagnostic"
       $name:ru-RU: "Средство проверки памяти Windows"
       $name:es-ES: "Diagnóstico de memoria de Windows"
@@ -960,7 +971,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Editor für lokale Gruppenrichtlinien"
       $name:pt-BR: "Editor de Política de Grupo Local"
       $name:zh-CN: "本地组策略编辑器"
-    - localSecurity: true
+    - localSecurity: false
       $name: "Local Security Policy"
       $name:ru-RU: "Локальная политика безопасности"
       $name:es-ES: "Directiva de seguridad local"
@@ -990,7 +1001,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Windows PowerShell"
       $name:pt-BR: "Windows PowerShell"
       $name:zh-CN: "Windows PowerShell"
-    - commandPrompt: true
+    - commandPrompt: false
       $name: "Command Prompt"
       $name:ru-RU: "Командная строка"
       $name:es-ES: "Símbolo del sistema"
@@ -998,21 +1009,21 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Prompt de Comando"
       $name:zh-CN: "命令提示符"
     $name: " "
-  $name: "Administration"
-  $name:ru-RU: "Администрирование"
-  $name:es-ES: "Administración"
-  $name:de-DE: "Verwaltung"
-  $name:pt-BR: "Administração"
-  $name:zh-CN: "管理"
-  $description: "System consoles, diagnostics, and terminals"
-  $description:ru-RU: "Программы для управления системой, диагностика и терминалы"
-  $description:es-ES: "Consolas del sistema, diagnóstico y terminales"
-  $description:de-DE: "Systemkonsolen, Diagnose und Terminals"
-  $description:pt-BR: "Consoles do sistema, diagnóstico e terminais"
-  $description:zh-CN: "系统控制台、诊断和终端"
+  $name: " "
+- commandsEnabled: true
+  $name: "Basic commands"
+  $name:ru-RU: "Основные команды"
+  $name:es-ES: "Comandos básicos"
+  $name:de-DE: "Grundbefehle"
+  $name:pt-BR: "Comandos básicos"
+  $name:zh-CN: "基本命令"
+  $description: "File Explorer, system actions, and power"
+  $description:ru-RU: "Проводник, системные действия и питание"
+  $description:es-ES: "Explorador de archivos, acciones del sistema y energía"
+  $description:de-DE: "Datei-Explorer, Systemaktionen und Energie"
+  $description:pt-BR: "Explorador de Arquivos, ações do sistema e energia"
+  $description:zh-CN: "文件资源管理器、系统操作和电源"
 - commands:
-  - sectionEnabled: true
-    $name: " "
   - run: true
     $name: "Run"
     $name:ru-RU: "Выполнить"
@@ -1070,7 +1081,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:de-DE: "Bilder"
       $name:pt-BR: "Imagens"
       $name:zh-CN: "图片"
-    - downloads: true
+    - downloads: false
       $name: "Downloads"
       $name:ru-RU: "Загрузки"
       $name:es-ES: "Descargas"
@@ -1150,18 +1161,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Reiniciar"
       $name:zh-CN: "重启"
     $name: " "
-  $name: "Basic commands"
-  $name:ru-RU: "Основные команды"
-  $name:es-ES: "Comandos básicos"
-  $name:de-DE: "Grundbefehle"
-  $name:pt-BR: "Comandos básicos"
-  $name:zh-CN: "基本命令"
-  $description: "File Explorer, system actions, and power"
-  $description:ru-RU: "Проводник, системные действия и питание"
-  $description:es-ES: "Explorador de archivos, acciones del sistema y energía"
-  $description:de-DE: "Datei-Explorer, Systemaktionen und Energie"
-  $description:pt-BR: "Explorador de Arquivos, ações do sistema e energia"
-  $description:zh-CN: "文件资源管理器、系统操作和电源"
+  $name: " "
 */
 // ==/WindhawkModSettings==
 
@@ -1221,10 +1221,10 @@ struct CatalogItem {
 };
 
 constexpr PCWSTR sectionEnabledKeys[] = {
-    L"windowsSettings.sectionEnabled",
-    L"controlPanel.sectionEnabled",
-    L"administration.sectionEnabled",
-    L"commands.sectionEnabled",
+    L"windowsSettingsEnabled",
+    L"controlPanelEnabled",
+    L"administrationEnabled",
+    L"commandsEnabled",
 };
 
 constexpr CatalogItem catalog[] = {
@@ -1234,11 +1234,11 @@ constexpr CatalogItem catalog[] = {
      {L"Display", L"Дисплей", L"Pantalla", L"Bildschirm", L"Tela", L"屏幕"}},
     {L"windowsSettings.system.sound", 0, 0, true, 0xe767, L"uri:sound", L"settings:SettingsPageAudio",
      {L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"}},
-    {L"windowsSettings.system.power", 0, 0, true, 0xe7e8, L"uri:powersleep", L"settings:SettingsPagePowerAndBattery",
+    {L"windowsSettings.system.power", 0, 0, false, 0xe7e8, L"uri:powersleep", L"settings:SettingsPagePowerAndBattery",
      {L"Power", L"Питание", L"Inicio/Apagado", L"Leistung", L"Desligar", L"电源"}},
     {L"windowsSettings.system.storage", 0, 0, true, 0xeda2, L"uri:storagesense", L"settings:SettingsPageStorageSenseStorageOverview",
      {L"Storage", L"Память", L"Almacenamiento", L"Speicher", L"Armazenamento", L"存储"}},
-    {L"windowsSettings.system.advanced", 0, 0, true, 0xec7a, L"uri:developers", L"settings:SettingsPageAdvancedSystemSettings",
+    {L"windowsSettings.system.advanced", 0, 0, false, 0xec7a, L"uri:developers", L"settings:SettingsPageAdvancedSystemSettings",
      {L"Advanced", L"Дополнительно", L"Avanzado", L"Erweitert", L"Avançado", L"高级"}},
     {L"windowsSettings.system.about", 0, 0, true, 0xe946, L"uri:about", L"settings:SettingsPageAbout",
      {L"About", L"О системе", L"Información", L"Info", L"Sobre", L"系统信息"}},
@@ -1246,13 +1246,13 @@ constexpr CatalogItem catalog[] = {
      {L"Bluetooth & devices", L"Bluetooth и устройства", L"Bluetooth y dispositivos", L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和其他设备"}},
     {L"windowsSettings.devices.devices", 0, 7, true, 0xe772, L"uri:connecteddevices", L"settings:SettingsPageDevices",
      {L"Devices", L"Устройства", L"Dispositivos", L"Geräte", L"Dispositivos", L"设备"}},
-    {L"windowsSettings.devices.printers", 0, 7, true, 0xe749, L"uri:printers", L"settings:SettingsPageDevicesPrinters",
+    {L"windowsSettings.devices.printers", 0, 7, false, 0xe749, L"uri:printers", L"settings:SettingsPageDevicesPrinters",
      {L"Printers & scanners", L"Принтеры и сканеры", L"Impresoras y escáneres", L"Drucker und Scanner", L"Impressoras e scanners", L"打印机和扫描仪"}},
-    {L"windowsSettings.devices.cameras", 0, 7, true, 0xe722, L"uri:camera", L"settings:SettingsPageDevicesCameras",
+    {L"windowsSettings.devices.cameras", 0, 7, false, 0xe722, L"uri:camera", L"settings:SettingsPageDevicesCameras",
      {L"Cameras", L"Камеры", L"Cámaras", L"Kameras", L"Câmeras", L"摄像头"}},
-    {L"windowsSettings.devices.mouse", 0, 7, true, 0xe962, L"uri:mousetouchpad", L"settings:SettingsPagePCSystemDeviceSettings",
+    {L"windowsSettings.devices.mouse", 0, 7, false, 0xe962, L"uri:mousetouchpad", L"settings:SettingsPagePCSystemDeviceSettings",
      {L"Mouse", L"Мышь", L"Mouse", L"Maus", L"Mouse", L"鼠标"}},
-    {L"windowsSettings.devices.keyboard", 0, 7, true, 0xe765, L"uri:devices-keyboard", L"settings:SettingsPageDevicesKeyboard",
+    {L"windowsSettings.devices.keyboard", 0, 7, false, 0xe765, L"uri:devices-keyboard", L"settings:SettingsPageDevicesKeyboard",
      {L"Keyboard", L"Клавиатура", L"Teclado", L"Tastatur", L"Teclado", L"键盘"}},
     {L"windowsSettings.networkVisible", 0, -1, true, 0xe701, L"uri:network-status", L"settings:SettingsPageGroupNetwork",
      {L"Network & internet", L"Сеть и Интернет", L"Red e Internet", L"Netzwerk und Internet", L"Rede e Internet", L"网络和 Internet"}},
@@ -1262,19 +1262,19 @@ constexpr CatalogItem catalog[] = {
      {L"Wi-Fi", L"Wi-Fi", L"Wi-Fi", L"WLAN", L"Wi-Fi", L"WLAN"}},
     {L"windowsSettings.network.hotspot", 0, 13, true, 0xe704, L"uri:network-mobilehotspot", L"settings:SettingsPageNetworkMobileHotspot",
      {L"Mobile hotspot", L"Мобильный хот-спот", L"Zona con cobertura inalámbrica móvil", L"Mobiler Hotspot", L"Hotspot móvel", L"移动热点"}},
-    {L"windowsSettings.network.vpn", 0, 13, true, 0xe705, L"uri:network-vpn", L"settings:SettingsPageNetworkVPN",
+    {L"windowsSettings.network.vpn", 0, 13, false, 0xe705, L"uri:network-vpn", L"settings:SettingsPageNetworkVPN",
      {L"VPN", L"VPN", L"VPN", L"VPN", L"VPN", L"VPN"}},
     {L"windowsSettings.network.proxy", 0, 13, true, 0xe968, L"uri:network-proxy", L"settings:SettingsPageNetworkProxy",
      {L"Proxy", L"Прокси-сервер", L"Proxy", L"Proxy", L"Proxy", L"代理"}},
-    {L"windowsSettings.network.advancedNetwork", 0, 13, true, 0xeda3, L"uri:network-advancedsettings", L"settings:SettingsPageNetworkManageAdapterOptions",
+    {L"windowsSettings.network.advancedNetwork", 0, 13, false, 0xeda3, L"uri:network-advancedsettings", L"settings:SettingsPageNetworkManageAdapterOptions",
      {L"Advanced network settings", L"Дополнительные сетевые параметры", L"Configuración de red avanzada", L"Erweiterte Netzwerkeinstellungen", L"Configurações avançadas de rede", L"高级网络设置"}},
-    {L"windowsSettings.personalizationVisible", 0, -1, true, 0xe771, L"uri:personalization", L"settings:SettingsPageGroupPersonalization",
+    {L"windowsSettings.personalizationVisible", 0, -1, false, 0xe771, L"uri:personalization", L"settings:SettingsPageGroupPersonalization",
      {L"Personalization", L"Персонализация", L"Personalización", L"Personalisierung", L"Personalização", L"个性化"}},
     {L"windowsSettings.personalization.background", 0, 20, true, 0xeb9f, L"uri:personalization-background", L"settings:SettingsPageBackground",
      {L"Background", L"Фон", L"Fondo", L"Hintergrund", L"Tela de fundo", L"背景"}},
     {L"windowsSettings.personalization.colors", 0, 20, true, 0xe2b1, L"uri:personalization-colors", L"settings:SettingsPageColors",
      {L"Colors", L"Цвета", L"Colores", L"Farben", L"Cores", L"颜色"}},
-    {L"windowsSettings.personalization.themes", 0, 20, true, 0xe771, L"uri:themes", L"settings:SettingsPageThemes",
+    {L"windowsSettings.personalization.themes", 0, 20, false, 0xe771, L"uri:themes", L"settings:SettingsPageThemes",
      {L"Themes", L"Темы", L"Temas", L"Designs", L"Temas", L"主题"}},
     {L"windowsSettings.personalization.lockScreen", 0, 20, true, 0xee3f, L"uri:lockscreen", L"settings:SettingsPageLockScreen",
      {L"Lock screen", L"Экран блокировки", L"Pantalla de bloqueo", L"Sperrbildschirm", L"Tela de bloqueio", L"锁屏界面"}},
@@ -1290,33 +1290,33 @@ constexpr CatalogItem catalog[] = {
      {L"Default apps", L"Приложения по умолчанию", L"Aplicaciones predeterminadas", L"Standard-Apps", L"Aplicativos padrão", L"默认应用"}},
     {L"windowsSettings.apps.startup", 0, 27, true, 0xe7b5, L"uri:startupapps", L"settings:SettingsPageStartup",
      {L"Startup", L"Автозагрузка", L"Inicio", L"Autostart", L"Inicialização", L"启动"}},
-    {L"windowsSettings.accountsVisible", 0, -1, true, 0xe77b, L"uri:accounts", L"settings:SettingsPageGroupAccounts",
+    {L"windowsSettings.accountsVisible", 0, -1, false, 0xe77b, L"uri:accounts", L"settings:SettingsPageGroupAccounts",
      {L"Accounts", L"Учетные записи", L"Cuentas", L"Konten", L"Contas", L"帐户"}},
     {L"windowsSettings.accounts.signIn", 0, 31, true, 0xe8d7, L"uri:signinoptions", L"settings:SettingsPageSignInOptions",
      {L"Sign-in options", L"Варианты входа", L"Opciones de inicio de sesión", L"Anmeldeoptionen", L"Opções de entrada", L"登录选项"}},
-    {L"windowsSettings.accounts.backup", 0, 31, true, 0xe78c, L"uri:backup", L"app:MicrosoftWindows.Client.CBS_cw5n1h2txyewy!WindowsBackup",
+    {L"windowsSettings.accounts.backup", 0, 31, false, 0xe78c, L"uri:backup", L"app:MicrosoftWindows.Client.CBS_cw5n1h2txyewy!WindowsBackup",
      {L"Windows Backup", L"Архивация Windows", L"Copias de seguridad de Windows", L"Windows-Sicherung", L"Backup do Windows", L"Windows 备份"}},
     {L"windowsSettings.accounts.passkeys", 0, 31, true, 0xee7e, L"uri:savedpasskeys", L"settings:SettingsPagePasskeysManagement",
      {L"Passkeys", L"Ключи доступа", L"Claves de acceso", L"Hauptschlüssel", L"Chaves de acesso", L"通行密钥"}},
-    {L"windowsSettings.timeLanguageVisible", 0, -1, true, 0xe775, L"category:dateandtime;SystemSettings_DateTime_IsTimeSetAutomaticallyEnabled_ToggleSwitch", L"settings:SettingsPageGroupTimeRegion",
+    {L"windowsSettings.timeLanguageVisible", 0, -1, false, 0xe775, L"category:dateandtime;SystemSettings_DateTime_IsTimeSetAutomaticallyEnabled_ToggleSwitch", L"settings:SettingsPageGroupTimeRegion",
      {L"Time & language", L"Время и язык", L"Hora e idioma", L"Zeit und Sprache", L"Hora e idioma", L"时间和语言"}},
     {L"windowsSettings.timeLanguage.dateTime", 0, 35, true, 0xec92, L"uri:dateandtime", L"settings:SettingsPageTimeRegionDateTime",
      {L"Date & time", L"Дата и время", L"Fecha y hora", L"Datum und Zeit", L"Data e hora", L"日期和时间"}},
     {L"windowsSettings.timeLanguage.language", 0, 35, true, 0xf2b7, L"uri:regionlanguage", L"settings:SettingsPageTimeRegionLanguage",
      {L"Language & region", L"Язык и регион", L"Idioma y región", L"Sprache und Region", L"Idioma e região", L"语言和区域"}},
-    {L"windowsSettings.timeLanguage.typing", 0, 35, true, 0xe765, L"uri:typing", L"settings:SettingsPageTimeRegionSpelling",
+    {L"windowsSettings.timeLanguage.typing", 0, 35, false, 0xe765, L"uri:typing", L"settings:SettingsPageTimeRegionSpelling",
      {L"Typing", L"Ввод", L"Escritura", L"Eingabe", L"Digitação", L"输入"}},
-    {L"windowsSettings.gaming", 0, -1, true, 0xe7fc, L"category:gaming-gamemode;SystemSettings_Gaming_GameMode_Toggle_ToggleSwitch", L"settings:SettingsPageGroupGaming2",
+    {L"windowsSettings.gaming", 0, -1, false, 0xe7fc, L"category:gaming-gamemode;SystemSettings_Gaming_GameMode_Toggle_ToggleSwitch", L"settings:SettingsPageGroupGaming2",
      {L"Gaming", L"Игры", L"Juegos", L"Spielen", L"Jogos", L"游戏"}},
     {L"windowsSettings.accessibility", 0, -1, true, 0xe776, L"uri:easeofaccess", L"settings:SettingsPageGroupEaseOfAccess",
      {L"Accessibility", L"Специальные возможности", L"Accesibilidad", L"Barrierefreiheit", L"Acessibilidade", L"辅助功能"}},
-    {L"windowsSettings.privacy", 0, -1, true, 0xea18, L"uri:privacy", L"settings:SettingsPageGroupPrivacy",
+    {L"windowsSettings.privacy", 0, -1, false, 0xea18, L"uri:privacy", L"settings:SettingsPageGroupPrivacy",
      {L"Privacy & security", L"Конфиденциальность и защита", L"Privacidad y seguridad", L"Datenschutz und Sicherheit", L"Privacidade e segurança", L"隐私和安全性"}},
     {L"windowsSettings.update", 0, -1, true, 0xe895, L"uri:windowsupdate", L"settings:SettingsPageGroupRestore",
      {L"Windows Update", L"Центр обновления Windows", L"Windows Update", L"Windows Update", L"Windows Update", L"Windows 更新"}},
     {L"controlPanel.securityVisible", 1, -1, true, 0xf760, L"panel:5", L"shell32.dll,-32014",
      {L"System and Security", L"Система и безопасность", L"Sistema y seguridad", L"System und Sicherheit", L"Sistema e Segurança", L"系统和安全"}},
-    {L"controlPanel.security.maintenance", 1, 43, true, 0xe7c1, L"control:Microsoft.ActionCenter", L"shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
+    {L"controlPanel.security.maintenance", 1, 43, false, 0xe7c1, L"control:Microsoft.ActionCenter", L"shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
      {L"Security and Maintenance", L"Центр безопасности и обслуживания", L"Seguridad y mantenimiento", L"Sicherheit und Wartung", L"Segurança e Manutenção", L"安全和维护"}},
     {L"controlPanel.security.firewall", 1, 43, true, 0xf5b4, L"exe:Firewall.cpl", L"shell:{4026492F-2F69-46B8-B9BF-5654FC07E423}",
      {L"Windows Defender Firewall", L"Брандмауэр Защитника Windows", L"Firewall de Windows Defender", L"Windows Defender Firewall", L"Windows Defender Firewall", L"Windows Defender 防火墙"}},
@@ -1324,9 +1324,9 @@ constexpr CatalogItem catalog[] = {
      {L"Power Options", L"Электропитание", L"Opciones de energía", L"Energieoptionen", L"Opções de Energia", L"电源选项"}},
     {L"controlPanel.security.bitlocker", 1, 43, true, 0xe72e, L"control:Microsoft.BitLockerDriveEncryption", L"shell:{D9EF8727-CAC2-4E60-809E-86F80A666C91}",
      {L"BitLocker Drive Encryption", L"Шифрование диска BitLocker", L"Cifrado de unidad BitLocker", L"BitLocker-Laufwerkverschlüsselung", L"Criptografia de Unidade de Disco BitLocker", L"BitLocker 驱动器加密"}},
-    {L"controlPanel.networkVisible", 1, -1, true, 0xee77, L"panel:3", L"shell32.dll,-32010",
+    {L"controlPanel.networkVisible", 1, -1, false, 0xee77, L"panel:3", L"shell32.dll,-32010",
      {L"Network and Internet", L"Сеть и Интернет", L"Redes e Internet", L"Netzwerk und Internet", L"Rede e Internet", L"网络和 Internet"}},
-    {L"controlPanel.network.sharing", 1, 48, true, 0xec27, L"control:Microsoft.NetworkAndSharingCenter", L"shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
+    {L"controlPanel.network.sharing", 1, 48, false, 0xec27, L"control:Microsoft.NetworkAndSharingCenter", L"shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
      {L"Network and Sharing Center", L"Центр управления сетями и общим доступом", L"Centro de redes y recursos compartidos", L"Netzwerk- und Freigabecenter", L"Central de Rede e Compartilhamento", L"网络和共享中心"}},
     {L"controlPanel.network.connections", 1, 48, true, 0xeda3, L"exe:ncpa.cpl", L"twinui.pcshell.dll,-10912",
      {L"Network Connections", L"Сетевые подключения", L"Conexiones de red", L"Netzwerkverbindungen", L"Conexões de Rede", L"网络连接"}},
@@ -1340,17 +1340,17 @@ constexpr CatalogItem catalog[] = {
      {L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"}},
     {L"controlPanel.hardware.mouse", 1, 52, true, 0xe962, L"exe:main.cpl", L"shell:{6C8EEC18-8D75-41B2-A177-8831D59D2D50}",
      {L"Mouse", L"Мышь", L"Mouse", L"Maus", L"Mouse", L"鼠标"}},
-    {L"controlPanel.hardware.keyboard", 1, 52, true, 0xe765, L"control:keyboard", L"shell:{725BE8F7-668E-4C7B-8F90-46BDB0936430}",
+    {L"controlPanel.hardware.keyboard", 1, 52, false, 0xe765, L"control:keyboard", L"shell:{725BE8F7-668E-4C7B-8F90-46BDB0936430}",
      {L"Keyboard", L"Клавиатура", L"Teclado", L"Tastatur", L"Teclado", L"键盘"}},
-    {L"controlPanel.hardware.controllers", 1, 52, true, 0xe7fc, L"exe:joy.cpl", L"joy.cpl,-1076",
+    {L"controlPanel.hardware.controllers", 1, 52, false, 0xe7fc, L"exe:joy.cpl", L"joy.cpl,-1076",
      {L"Game Controllers", L"Игровые устройства", L"Dispositivos de juego", L"Gamecontroller", L"Controladores de Jogo", L"游戏控制器"}},
-    {L"controlPanel.programsVisible", 1, -1, true, 0xe71d, L"panel:8", L"shell32.dll,-32006",
+    {L"controlPanel.programsVisible", 1, -1, false, 0xe71d, L"panel:8", L"shell32.dll,-32006",
      {L"Programs", L"Программы", L"Programas", L"Programme", L"Programas", L"程序"}},
     {L"controlPanel.programs.programsFeatures", 1, 58, true, 0xe71d, L"exe:appwiz.cpl", L"shell:{7B81BE6A-CE2B-4676-A29E-EB907A5126C5}",
      {L"Programs and Features", L"Программы и компоненты", L"Programas y características", L"Programme und Features", L"Programas e Recursos", L"程序和功能"}},
     {L"controlPanel.programs.windowsFeatures", 1, 58, true, 0xe7b8, L"exe:OptionalFeatures.exe", L"appwiz.cpl,-188",
      {L"Turn Windows features on or off", L"Включение или отключение компонентов Windows", L"Activar o desactivar las características de Windows", L"Windows-Features aktivieren oder deaktivieren", L"Ativar ou desativar recursos do Windows", L"启用或关闭 Windows 功能"}},
-    {L"controlPanel.userAccountsVisible", 1, -1, true, 0xe716, L"panel:9", L"shell32.dll,-32002",
+    {L"controlPanel.userAccountsVisible", 1, -1, false, 0xe716, L"panel:9", L"shell32.dll,-32002",
      {L"User Accounts", L"Учетные записи пользователей", L"Cuentas de usuario", L"Benutzerkonten", L"Contas de Usuário", L"用户帐户"}},
     {L"controlPanel.userAccounts.credentials", 1, 61, true, 0xf540, L"control:Microsoft.CredentialManager", L"shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
      {L"Credential Manager", L"Диспетчер учетных данных", L"Administrador de credenciales", L"Anmeldeinformationsverwaltung", L"Gerenciador de Credenciais", L"凭据管理器"}},
@@ -1362,17 +1362,17 @@ constexpr CatalogItem catalog[] = {
      {L"File Explorer Options", L"Параметры Проводника", L"Opciones del Explorador de archivos", L"Explorer-Optionen", L"Opções do Explorador de Arquivos", L"文件资源管理器选项"}},
     {L"controlPanel.appearance.desktopIcons", 1, 64, true, 0xe7fb, L"exe:rundll32.exe;shell32.dll,Control_RunDLL desk.cpl,,0", L"desk.cpl,-112",
      {L"Desktop Icon Settings", L"Параметры значков рабочего стола", L"Configuración de iconos de escritorio", L"Desktopsymboleinstellungen", L"Configurações dos Ícones da Área de Trabalho", L"桌面图标设置"}},
-    {L"controlPanel.appearance.colorManagement", 1, 64, true, 0xe790, L"exe:colorcpl.exe", L"shell:{B2C761C6-29BC-4F19-9251-E6195265BAF1}",
+    {L"controlPanel.appearance.colorManagement", 1, 64, false, 0xe790, L"exe:colorcpl.exe", L"shell:{B2C761C6-29BC-4F19-9251-E6195265BAF1}",
      {L"Color Management", L"Управление цветом", L"Administración del color", L"Farbverwaltung", L"Gerenciamento de Cores", L"颜色管理"}},
-    {L"controlPanel.clockRegionVisible", 1, -1, true, 0xe917, L"panel:6", L"shell32.dll,-32026",
+    {L"controlPanel.clockRegionVisible", 1, -1, false, 0xe917, L"panel:6", L"shell32.dll,-32026",
      {L"Clock and Region", L"Часы и регион", L"Reloj y región", L"Zeit und Region", L"Relógio e Região", L"时钟和区域"}},
     {L"controlPanel.clockRegion.dateTime", 1, 68, true, 0xe823, L"exe:timedate.cpl", L"shell:{E2E7934B-DCE5-43C4-9576-7FE4F75E7480}",
      {L"Date and Time", L"Дата и время", L"Fecha y hora", L"Datum und Uhrzeit", L"Data e Hora", L"日期和时间"}},
     {L"controlPanel.clockRegion.region", 1, 68, true, 0xe774, L"exe:intl.cpl", L"shell:{62D8ED13-C9D0-4CE8-A914-47DD628FB1B0}",
      {L"Region", L"Региональные стандарты", L"Región", L"Region", L"Região", L"区域"}},
-    {L"controlPanel.accessibility", 1, -1, true, 0xe776, L"panel:7", L"shell32.dll,-32000",
+    {L"controlPanel.accessibility", 1, -1, false, 0xe776, L"panel:7", L"shell32.dll,-32000",
      {L"Ease of Access", L"Специальные возможности", L"Accesibilidad", L"Erleichterte Bedienung", L"Facilidade de Acesso", L"轻松使用"}},
-    {L"administration.toolsVisible", 2, -1, true, 0xe90f, L"control:Microsoft.AdministrativeTools", L"tools:Windows Tools",
+    {L"administration.toolsVisible", 2, -1, false, 0xe90f, L"control:Microsoft.AdministrativeTools", L"tools:Windows Tools",
      {L"Windows Tools", L"Инструменты Windows", L"Herramientas de Windows", L"Windows-Tools", L"Ferramentas do Windows", L"Windows 工具"}},
     {L"administration.tools.userCertificates", 2, 72, true, 0xeb95, L"exe:mmc.exe;certmgr.msc", L"certmgr.dll,-246",
      {L"Certificates - Current User", L"Сертификаты - текущий пользователь", L"Certificados: usuario actual", L"Zertifikate - Aktueller Benutzer", L"Certificados - Usuário Atual", L"证书 - 当前用户"}},
@@ -1386,7 +1386,7 @@ constexpr CatalogItem catalog[] = {
      {L"Shared Folders", L"Общие папки", L"Carpetas compartidas", L"Freigegebene Ordner", L"Pastas compartilhadas", L"共享文件夹"}},
     {L"administration.computerManagement.localUsers", 2, 76, true, 0xe716, L"exe:mmc.exe;lusrmgr.msc", L"localsec.dll,-5026",
      {L"Local Users and Groups", L"Локальные пользователи и группы", L"Usuarios y grupos locales", L"Lokale Benutzer und Gruppen", L"Usuários e Grupos Locais", L"本地用户和组"}},
-    {L"administration.computerManagement.wmi", 2, 76, true, 0xec7a, L"exe:mmc.exe;WmiMgmt.msc", L"wbem\\wbemcntl.dll,-143",
+    {L"administration.computerManagement.wmi", 2, 76, false, 0xec7a, L"exe:mmc.exe;WmiMgmt.msc", L"wbem\\wbemcntl.dll,-143",
      {L"WMI Control", L"Управляющий элемент WMI", L"Control WMI", L"WMI-Steuerung", L"Controle WMI", L"WMI 控件"}},
     {L"administration.diskManagementVisible", 2, -1, true, 0xeda2, L"native:10917", L"twinui.pcshell.dll,-10917",
      {L"Disk Management", L"Управление дисками", L"Administración de discos", L"Datenträgerverwaltung", L"Gerenciamento de Disco", L"磁盘管理"}},
@@ -1394,7 +1394,7 @@ constexpr CatalogItem catalog[] = {
      {L"Defragment and Optimize Drives", L"Оптимизация дисков", L"Desfragmentar y optimizar unidades", L"Laufwerke defragmentieren und optimieren", L"Desfragmentar e Otimizar Unidades", L"碎片整理和优化驱动器"}},
     {L"administration.diskManagement.cleanup", 2, 80, true, 0xea99, L"exe:cleanmgr.exe", L"tools:Disk Cleanup",
      {L"Disk Cleanup", L"Очистка диска", L"Liberador de espacio en disco", L"Datenträgerbereinigung", L"Limpeza de Disco", L"磁盘清理"}},
-    {L"administration.diskManagement.recoveryDrive", 2, 80, true, 0xebc4, L"exe:RecoveryDrive.exe", L"tools:RecoveryDrive",
+    {L"administration.diskManagement.recoveryDrive", 2, 80, false, 0xebc4, L"exe:RecoveryDrive.exe", L"tools:RecoveryDrive",
      {L"Recovery Drive", L"Диск восстановления", L"Unidad de recuperación", L"Wiederherstellungslaufwerk", L"Unidade de Recuperação", L"恢复驱动器"}},
     {L"administration.servicesVisible", 2, -1, true, 0xe9f5, L"exe:mmc.exe;services.msc", L"tools:services",
      {L"Services", L"Службы", L"Servicios", L"Dienste", L"Serviços", L"服务"}},
@@ -1408,11 +1408,11 @@ constexpr CatalogItem catalog[] = {
      {L"Performance Monitor", L"Системный монитор", L"Monitor de rendimiento", L"Leistungsüberwachung", L"Monitor de Desempenho", L"性能监视器"}},
     {L"administration.eventViewer.resources", 2, 87, true, 0xec49, L"exe:resmon.exe", L"tools:Resource Monitor",
      {L"Resource Monitor", L"Монитор ресурсов", L"Monitor de recursos", L"Ressourcenmonitor", L"Monitor de Recursos", L"资源监视器"}},
-    {L"administration.eventViewer.reliability", 2, 87, true, 0xe9d9, L"exe:perfmon.exe;/rel", L"werconcpl.dll,-408",
+    {L"administration.eventViewer.reliability", 2, 87, false, 0xe9d9, L"exe:perfmon.exe;/rel", L"werconcpl.dll,-408",
      {L"Reliability Monitor", L"Монитор стабильности системы", L"Monitor de confiabilidad", L"Zuverlässigkeitsüberwachung", L"Monitor de Confiabilidade", L"可靠性监视程序"}},
     {L"administration.eventViewer.systemInfo", 2, 87, true, 0xe946, L"exe:msinfo32.exe", L"tools:System Information",
      {L"System Information", L"Сведения о системе", L"Información del sistema", L"Systeminformationen", L"Informações do sistema", L"系统信息"}},
-    {L"administration.eventViewer.memoryDiagnostic", 2, 87, true, 0xeea0, L"exe:MdSched.exe", L"tools:Memory Diagnostics Tool",
+    {L"administration.eventViewer.memoryDiagnostic", 2, 87, false, 0xeea0, L"exe:MdSched.exe", L"tools:Memory Diagnostics Tool",
      {L"Windows Memory Diagnostic", L"Средство проверки памяти Windows", L"Diagnóstico de memoria de Windows", L"Windows-Speicherdiagnose", L"Diagnóstico de Memória do Windows", L"Windows 内存诊断"}},
     {L"administration.registryVisible", 2, -1, true, 0xeca5, L"exe:regedit.exe", L"tools:Registry Editor",
      {L"Registry Editor", L"Редактор реестра", L"Editor del Registro", L"Registrierungs-Editor", L"Editor do Registro", L"注册表编辑器"}},
@@ -1420,7 +1420,7 @@ constexpr CatalogItem catalog[] = {
      {L"System Configuration", L"Конфигурация системы", L"Configuración del sistema", L"Systemkonfiguration", L"Configuração do Sistema", L"系统配置"}},
     {L"administration.registry.groupPolicy", 2, 93, true, 0xe8a6, L"exe:mmc.exe;gpedit.msc", L"gpedit.dll,-337",
      {L"Local Group Policy Editor", L"Редактор локальной групповой политики", L"Editor de directivas de grupo local", L"Editor für lokale Gruppenrichtlinien", L"Editor de Política de Grupo Local", L"本地组策略编辑器"}},
-    {L"administration.registry.localSecurity", 2, 93, true, 0xe72e, L"exe:mmc.exe;secpol.msc", L"tools:Security Configuration Management",
+    {L"administration.registry.localSecurity", 2, 93, false, 0xe72e, L"exe:mmc.exe;secpol.msc", L"tools:Security Configuration Management",
      {L"Local Security Policy", L"Локальная политика безопасности", L"Directiva de seguridad local", L"Lokale Sicherheitsrichtlinie", L"Política de Segurança Local", L"本地安全策略"}},
     {L"administration.terminalVisible", 2, -1, true, 0xe756, L"native:10960", L"",
      {L"Terminal", L"Терминал", L"Terminal", L"Terminal", L"Terminal", L"终端"}},
@@ -1428,7 +1428,7 @@ constexpr CatalogItem catalog[] = {
      {L"Terminal (Admin)", L"Терминал (Администратор)", L"Terminal (Administrador)", L"Terminal (Administrator)", L"Terminal (Administrador)", L"终端管理员"}},
     {L"administration.terminal.powershell", 2, 97, true, 0xe943, L"exe:WindowsPowerShell/v1.0/powershell.exe", L"twinui.pcshell.dll,-10928",
      {L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell"}},
-    {L"administration.terminal.commandPrompt", 2, 97, true, 0xe756, L"exe:cmd.exe", L"twinui.pcshell.dll,-10919",
+    {L"administration.terminal.commandPrompt", 2, 97, false, 0xe756, L"exe:cmd.exe", L"twinui.pcshell.dll,-10919",
      {L"Command Prompt", L"Командная строка", L"Símbolo del sistema", L"Eingabeaufforderung", L"Prompt de Comando", L"命令提示符"}},
     {L"commands.run", 3, -1, true, 0xe8ad, L"native:10925", L"",
      {L"Run", L"Выполнить", L"Ejecutar", L"Ausführen", L"Executar", L"运行"}},
@@ -1446,7 +1446,7 @@ constexpr CatalogItem catalog[] = {
      {L"Documents", L"Документы", L"Documentos", L"Dokumente", L"Documentos", L"文档"}},
     {L"commands.explorer.pictures", 3, 103, false, 0xe91b, L"folder:33E28130-4E1E-4676-835A-98395C3BC3BB", L"windows.storage.dll,-21779",
      {L"Pictures", L"Изображения", L"Imágenes", L"Bilder", L"Imagens", L"图片"}},
-    {L"commands.explorer.downloads", 3, 103, true, 0xe896, L"folder:374DE290-123F-4565-9164-39C4925E467B", L"windows.storage.dll,-21798",
+    {L"commands.explorer.downloads", 3, 103, false, 0xe896, L"folder:374DE290-123F-4565-9164-39C4925E467B", L"windows.storage.dll,-21798",
      {L"Downloads", L"Загрузки", L"Descargas", L"Downloads", L"Downloads", L"下载"}},
     {L"commands.explorer.recycleBin", 3, 103, true, 0xe74d, L"folder:B7534046-3ECB-4C18-BE4E-64CD4CB7D6AC", L"shell32.dll,-8964",
      {L"Recycle Bin", L"Корзина", L"Papelera de reciclaje", L"Papierkorb", L"Lixeira", L"回收站"}},
