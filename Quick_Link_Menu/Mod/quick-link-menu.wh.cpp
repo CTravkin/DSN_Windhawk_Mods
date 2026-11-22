@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.3.2
+// @version         0.3.4
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 22
+// Build: 24
 
 // ==WindhawkModReadme==
 /*
@@ -1409,9 +1409,14 @@ Settings settings;
 std::atomic<bool> unloading;
 std::atomic<unsigned> settingsNavigation;
 HWND trayWindow;
-DWORD trayThread;
+std::atomic<DWORD> trayThread;
 UINT setupMessage;
 bool subclassPresent;
+constexpr DWORD taskbarRetryInterval = 250;
+constexpr ULONGLONG taskbarStartupTimeout = 60'000;
+PTP_TIMER taskbarStartupTimer;
+ULONGLONG taskbarStartupDeadline;
+SRWLOCK taskbarStartupLock = SRWLOCK_INIT;
 
 using ShowAt = HRESULT(WINAPI*)(void*, void*);
 using ShowAtOptions = HRESULT(WINAPI*)(void*, void*, void*);
@@ -2596,24 +2601,36 @@ HRESULT WINAPI HookShowAtOptions(void* self, void* target, void* options) {
     return result;
 }
 
-bool InstallHooks() {
-    C::MenuFlyout sample;
-    const auto base = sample.as<P::IFlyoutBase>();
-    const auto options = sample.as<P::IFlyoutBase5>();
-    // The slots are the two ShowAt signatures in the Windows Runtime interfaces.
-    void* show = (*reinterpret_cast<void***>(winrt::get_abi(base)))[14];
-    void* showOptions = (*reinterpret_cast<void***>(winrt::get_abi(options)))[12];
-    return show != showOptions &&
+enum class TaskbarSetup : LRESULT { Failed, Ready, WaitForXaml };
+
+TaskbarSetup InstallHooks() {
+    void* show;
+    void* showOptions;
+    try {
+        C::MenuFlyout sample;
+        const auto base = sample.as<P::IFlyoutBase>();
+        const auto options = sample.as<P::IFlyoutBase5>();
+        // The slots are the two ShowAt signatures in the Windows Runtime interfaces.
+        show = (*reinterpret_cast<void***>(winrt::get_abi(base)))[14];
+        showOptions = (*reinterpret_cast<void***>(winrt::get_abi(options)))[12];
+    } catch (winrt::hresult_error const& error) {
+        if (error.code() == RPC_E_WRONG_THREAD || error.code() == CO_E_NOTINITIALIZED)
+            return TaskbarSetup::WaitForXaml;
+        throw;
+    }
+
+    const bool installed = show != showOptions &&
         Wh_SetFunctionHook(show, reinterpret_cast<void*>(HookShowAt), reinterpret_cast<void**>(&originalShowAt)) &&
         Wh_SetFunctionHook(showOptions, reinterpret_cast<void*>(HookShowAtOptions),
                            reinterpret_cast<void**>(&originalShowAtOptions)) &&
         Wh_ApplyHookOperations();
+    return installed ? TaskbarSetup::Ready : TaskbarSetup::Failed;
 }
 
 LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM data, DWORD_PTR) {
     if (message == setupMessage) {
         try {
-            if (action) return InstallHooks();
+            if (action) return unloading ? 0 : static_cast<LRESULT>(InstallHooks());
             opening.revoke();
             observedMenu = {};
             if (session) {
@@ -2629,25 +2646,70 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
     return DefSubclassProc(window, message, action, data);
 }
 
+bool FinishTaskbarStartup() noexcept {
+    const HWND window = FindWindowW(L"Shell_TrayWnd", nullptr);
+    DWORD pid{};
+    const DWORD thread = window ? GetWindowThreadProcessId(window, &pid) : 0;
+    if (!thread) return false;
+    // A separate Explorer window process has no Win+X menu to customize.
+    if (pid != GetCurrentProcessId() || unloading) return true;
+    if (!GetModuleHandleW(L"Windows.UI.Xaml.dll")) return false;
+
+    trayWindow = window;
+    trayThread = thread;
+    subclassPresent = WindhawkUtils::SetWindowSubclassFromAnyThread(trayWindow, TraySubclass, 0);
+    const auto result = subclassPresent ? static_cast<TaskbarSetup>(SendMessageW(trayWindow, setupMessage, 1, 0))
+                                        : TaskbarSetup::Failed;
+    if (result == TaskbarSetup::WaitForXaml) {
+        WindhawkUtils::RemoveWindowSubclassFromAnyThread(trayWindow, TraySubclass);
+        subclassPresent = false;
+        return false;
+    }
+    if (result == TaskbarSetup::Ready) {
+        RefreshAvailability();
+    } else {
+        Wh_Log(L"Could not initialize the Quick Link menu hooks");
+    }
+    return true;
+}
+
+void CALLBACK WaitForTaskbar(PTP_CALLBACK_INSTANCE, PVOID, PTP_TIMER timer) noexcept {
+    if (!TryAcquireSRWLockExclusive(&taskbarStartupLock)) return;
+    if (!unloading && IsThreadpoolTimerSet(timer)) {
+        const bool finished = FinishTaskbarStartup();
+        if (finished || GetTickCount64() >= taskbarStartupDeadline) {
+            SetThreadpoolTimer(timer, nullptr, 0, 0);
+            if (!finished) Wh_Log(L"Timed out waiting for the taskbar and XAML to initialize the Quick Link menu");
+        }
+    }
+    ReleaseSRWLockExclusive(&taskbarStartupLock);
+}
+
 }  // namespace
 
 BOOL Wh_ModInit() {
-    trayWindow = FindWindowW(L"Shell_TrayWnd", nullptr);
-    DWORD pid = 0;
-    trayThread = GetWindowThreadProcessId(trayWindow, &pid);
-    if (!trayThread || pid != GetCurrentProcessId()) return FALSE;
+    const HWND window = FindWindowW(L"Shell_TrayWnd", nullptr);
+    DWORD pid{};
+    if (window && GetWindowThreadProcessId(window, &pid) && pid != GetCurrentProcessId()) return FALSE;
     setupMessage = RegisterWindowMessageW(L"Windhawk.QuickLinkMenu.Setup");
     LoadSettings();
     return setupMessage != 0;
 }
 
 void Wh_ModAfterInit() {
-    subclassPresent = WindhawkUtils::SetWindowSubclassFromAnyThread(trayWindow, TraySubclass, 0);
-    if (!subclassPresent || !SendMessageW(trayWindow, setupMessage, 1, 0)) {
-        Wh_Log(L"Could not initialize the Quick Link menu hooks");
+    if (FinishTaskbarStartup()) return;
+
+    // At sign-in Windhawk can initialize this mod before Explorer creates the taskbar.
+    taskbarStartupTimer = CreateThreadpoolTimer(WaitForTaskbar, nullptr, nullptr);
+    if (!taskbarStartupTimer) {
+        Wh_Log(L"Could not schedule Quick Link menu initialization");
         return;
     }
-    RefreshAvailability();
+    taskbarStartupDeadline = GetTickCount64() + taskbarStartupTimeout;
+    LARGE_INTEGER delay;
+    delay.QuadPart = -static_cast<LONGLONG>(taskbarRetryInterval) * 10'000;
+    FILETIME due{delay.LowPart, static_cast<DWORD>(delay.HighPart)};
+    SetThreadpoolTimer(taskbarStartupTimer, &due, taskbarRetryInterval, 50);
 }
 
 void Wh_ModSettingsChanged() {
@@ -2657,6 +2719,12 @@ void Wh_ModSettingsChanged() {
 
 void Wh_ModBeforeUninit() {
     unloading = true;
+    if (taskbarStartupTimer) {
+        SetThreadpoolTimer(taskbarStartupTimer, nullptr, 0, 0);
+        WaitForThreadpoolTimerCallbacks(taskbarStartupTimer, TRUE);
+        CloseThreadpoolTimer(taskbarStartupTimer);
+        taskbarStartupTimer = nullptr;
+    }
     if (subclassPresent && IsWindow(trayWindow)) {
         SendMessageW(trayWindow, setupMessage, 0, 0);
         WindhawkUtils::RemoveWindowSubclassFromAnyThread(trayWindow, TraySubclass);
