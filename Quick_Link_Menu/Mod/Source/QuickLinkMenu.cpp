@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.3.7
+// @version         0.4.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 27
+// Build: 29
 
 // ==WindhawkModReadme==
 /*
@@ -28,15 +28,17 @@ the Start button.
 Quick Link Menu organizes shortcuts into Windows Settings, Control Panel,
 Administration, and Basic commands. The row opens its main destination.
 A submenu offers related shortcuts and can be opened with the arrow or **Right**.
-**Enter** runs the main action. The power row opens the Windows power submenu,
-with **Lock** as its first command.
+**Enter** runs the main action. The power row defaults to **Shut down** and
+offers the other power commands in its submenu.
 
 In the mod settings, the related shortcuts are listed with their main row.
 Choose which rows and submenu items appear, and change how
-submenus open on hover at the top of the settings page. A hand cursor marks
-areas that run a command. The optional administrator filter hides commands
-that require credentials or are blocked from elevation. Disabling all entries
-restores the stock Win+X menu.
+submenus open in **General settings**. A hand cursor marks areas that run a
+command. The optional administrator filter hides commands that require
+credentials or are blocked from elevation. **Command settings** can move
+administrator Terminal or a power action to the main menu, and switch **Run**
+to a task dialog with an administrator option. Disabling all entries restores
+the stock Win+X menu.
 
 Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
 
@@ -103,13 +105,16 @@ struct CatalogItem {
 
 // GENERATED_CATALOG
 
-enum class HoverMode { Immediate, Delayed, Arrow };
+enum class HoverMode { Immediate, Delayed, Arrow, ArrowClick };
 enum class HoverZone { Outside, Body, Arrow };
 
 struct Settings {
     HoverMode mode{};
     bool hideAdminCommands{};
     bool showHandCursor{};
+    bool terminalAsAdmin{};
+    bool createTask{};
+    std::wstring primaryPowerAction;
     std::array<bool, std::size(catalog)> enabled{};
 };
 
@@ -135,6 +140,7 @@ struct RowInteraction {
     HoverZone zone{HoverZone::Outside};
     bool openOnUpdate{};
     std::optional<uint32_t> pressedPointer;
+    HoverZone pressedZone{HoverZone::Outside};
     X::UIElement::PreviewKeyDown_revoker keyDown;
     X::UIElement::PointerPressed_revoker pointerPressed;
     X::UIElement::PointerReleased_revoker pointerReleased;
@@ -161,6 +167,7 @@ struct MenuSession {
     bool powerChanged{};
     bool menuChanged{};
     bool closing{};
+    bool createTask{};
     HCURSOR commandCursor{};
     HCURSOR previousCursor{};
     X::UIElement cursorElement{nullptr};
@@ -178,6 +185,9 @@ std::mutex settingsLock;
 Settings settings;
 std::atomic<bool> unloading;
 std::atomic<unsigned> settingsNavigation;
+std::atomic<bool> taskDialogOpen;
+std::atomic<HWND> taskDialogWindow;
+UINT taskDialogCloseMessage;
 HWND trayWindow;
 std::atomic<DWORD> trayThread;
 UINT setupMessage;
@@ -205,17 +215,30 @@ void OnRow(RowInteraction* row, Function&& function) noexcept {
 
 void LoadSettings() {
     Settings next;
-    const auto value = Wh_GetStringSetting(L"submenuHover");
+    auto value = Wh_GetStringSetting(L"general.submenuHover");
+    const bool legacy = !value || !*value;
+    if (legacy) {
+        Wh_FreeStringSetting(value);
+        value = Wh_GetStringSetting(L"submenuHover");
+    }
     const std::wstring_view option = value ? value : L"";
     next.mode = option == L"delayed" ? HoverMode::Delayed :
-                option == L"arrow" ? HoverMode::Arrow : HoverMode::Immediate;
+                option == L"arrow" ? HoverMode::Arrow :
+                option == L"click" ? HoverMode::ArrowClick : HoverMode::Immediate;
     Wh_FreeStringSetting(value);
-    next.hideAdminCommands = Wh_GetIntSetting(L"hideAdminCommands") != 0;
-    next.showHandCursor = Wh_GetIntSetting(L"showHandCursor") != 0;
+    next.hideAdminCommands = Wh_GetIntSetting(legacy ? L"hideAdminCommands" : L"general.hideAdminCommands") != 0;
+    next.showHandCursor = Wh_GetIntSetting(legacy ? L"showHandCursor" : L"general.showHandCursor") != 0;
+    next.terminalAsAdmin = Wh_GetIntSetting(L"commandOptions.terminalAsAdmin") != 0;
+    next.createTask = Wh_GetIntSetting(L"commandOptions.createTask") != 0;
+    const auto power = Wh_GetStringSetting(L"commandOptions.primaryPowerAction");
+    if (!power || !*power) next.primaryPowerAction = L"power:shutdown";
+    else if (std::wstring_view(power) == L"lock") next.primaryPowerAction = L"lock:session";
+    else if (std::wstring_view(power) != L"none") next.primaryPowerAction = L"power:" + std::wstring(power);
+    Wh_FreeStringSetting(power);
     for (size_t i = 0; i < std::size(catalog); ++i)
         next.enabled[i] = Wh_GetIntSetting(catalog[i].key) != 0;
     std::lock_guard guard(settingsLock);
-    settings = next;
+    settings = std::move(next);
 }
 
 Settings ReadSettings() {
@@ -430,6 +453,181 @@ DWORD LaunchPidl(Pidl const& target) {
     return LaunchWithShell(info);
 }
 
+struct TaskDialogLabels {
+    PCWSTR title, command, administrator, browse, launch, cancel, error;
+};
+
+constexpr TaskDialogLabels taskDialogLabels[] = {
+    {L"Create new task", L"Command or path", L"Run as administrator", L"Browse…", L"Run", L"Cancel", L"Could not start the task"},
+    {L"Создание задачи", L"Команда или путь", L"Запустить от имени администратора", L"Обзор…", L"Запустить", L"Отмена", L"Не удалось запустить задачу"},
+    {L"Crear nueva tarea", L"Comando o ruta", L"Ejecutar como administrador", L"Examinar…", L"Ejecutar", L"Cancelar", L"No se pudo iniciar la tarea"},
+    {L"Neuen Task erstellen", L"Befehl oder Pfad", L"Als Administrator ausführen", L"Durchsuchen…", L"Ausführen", L"Abbrechen", L"Der Task konnte nicht gestartet werden"},
+    {L"Criar nova tarefa", L"Comando ou caminho", L"Executar como administrador", L"Procurar…", L"Executar", L"Cancelar", L"Não foi possível iniciar a tarefa"},
+    {L"创建新任务", L"命令或路径", L"以管理员身份运行", L"浏览…", L"运行", L"取消", L"无法启动任务"},
+};
+
+enum TaskDialogControl : WORD { TaskCommand = 100, TaskAdministrator, TaskBrowse };
+
+std::vector<WORD> TaskDialogTemplate(TaskDialogLabels const& labels) {
+    // Standard Win32 dialog template, with each control aligned to a DWORD.
+    std::vector<WORD> data;
+    const auto dword = [&](DWORD value) { data.insert(data.end(), {LOWORD(value), HIWORD(value)}); };
+    const auto text = [&](std::wstring_view value) {
+        data.insert(data.end(), value.begin(), value.end());
+        data.push_back(0);
+    };
+    const auto control = [&](DWORD style, WORD x, WORD y, WORD width, WORD height,
+                             WORD id, WORD windowClass, std::wstring_view title) {
+        if (data.size() % 2) data.push_back(0);
+        dword(WS_CHILD | WS_VISIBLE | style);
+        dword(0);
+        data.insert(data.end(), {x, y, width, height, id, 0xffff, windowClass});
+        text(title);
+        data.push_back(0);
+    };
+
+    dword(WS_POPUP | WS_CAPTION | WS_SYSMENU | DS_MODALFRAME | DS_CENTER | DS_SHELLFONT);
+    dword(0);
+    data.insert(data.end(), {6, 0, 0, 280, 95, 0, 0});
+    text(labels.title);
+    data.push_back(9);
+    text(L"MS Shell Dlg 2");
+    constexpr WORD buttonClass = 0x80, editClass = 0x81, staticClass = 0x82;
+    control(SS_LEFT, 12, 12, 256, 10, 0xffff, staticClass, labels.command);
+    control(WS_TABSTOP | WS_BORDER | ES_AUTOHSCROLL, 12, 25, 188, 14, TaskCommand, editClass, L"");
+    control(WS_TABSTOP | BS_PUSHBUTTON, 206, 24, 62, 16, TaskBrowse, buttonClass, labels.browse);
+    control(WS_TABSTOP | BS_AUTOCHECKBOX, 12, 48, 256, 13, TaskAdministrator, buttonClass, labels.administrator);
+    control(WS_TABSTOP | BS_DEFPUSHBUTTON, 134, 70, 64, 16, IDOK, buttonClass, labels.launch);
+    control(WS_TABSTOP | BS_PUSHBUTTON, 204, 70, 64, 16, IDCANCEL, buttonClass, labels.cancel);
+    return data;
+}
+
+void BrowseTaskFile(HWND window) {
+    winrt::com_ptr<IFileOpenDialog> dialog;
+    if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER,
+                                __uuidof(IFileOpenDialog), dialog.put_void()))) return;
+    FILEOPENDIALOGOPTIONS options{};
+    if (FAILED(dialog->GetOptions(&options)) || FAILED(dialog->SetOptions(options | FOS_FORCEFILESYSTEM)) ||
+        FAILED(dialog->Show(window))) return;
+    winrt::com_ptr<IShellItem> selected;
+    PWSTR path{};
+    if (SUCCEEDED(dialog->GetResult(selected.put())) && SUCCEEDED(selected->GetDisplayName(SIGDN_FILESYSPATH, &path))) {
+        std::unique_ptr<wchar_t, CoTaskMemory> name(path);
+        const auto command = L"\"" + std::wstring(name.get()) + L"\"";
+        SetDlgItemTextW(window, TaskCommand, command.c_str());
+    }
+}
+
+DWORD LaunchTaskFromDialog(HWND window) {
+    const auto edit = GetDlgItem(window, TaskCommand);
+    std::wstring input(GetWindowTextLengthW(edit) + 1, L'\0');
+    input.resize(GetWindowTextW(edit, input.data(), static_cast<int>(input.size())));
+    const auto first = input.find_first_not_of(L" \t");
+    if (first == input.npos) return ERROR_CANCELLED;
+    input = input.substr(first, input.find_last_not_of(L" \t") - first + 1);
+
+    const DWORD expandedSize = ExpandEnvironmentStringsW(input.c_str(), nullptr, 0);
+    if (!expandedSize) return GetLastError();
+    std::wstring expanded(expandedSize, L'\0');
+    const DWORD expandedLength = ExpandEnvironmentStringsW(input.c_str(), expanded.data(), expandedSize);
+    if (!expandedLength || expandedLength > expandedSize) return ERROR_INVALID_PARAMETER;
+    expanded.resize(expandedLength - 1);
+
+    std::wstring file = expanded;
+    std::wstring arguments;
+    if (expanded.starts_with(L'"')) {
+        const auto lastQuote = expanded.find(L'"', 1);
+        if (lastQuote == expanded.npos || lastQuote == 1) return ERROR_INVALID_PARAMETER;
+        file = expanded.substr(1, lastQuote - 1);
+        arguments = expanded.substr(lastQuote + 1);
+    } else if (const auto space = expanded.find_first_of(L" \t"); space != expanded.npos &&
+               GetFileAttributesW(expanded.c_str()) == INVALID_FILE_ATTRIBUTES) {
+        file = expanded.substr(0, space);
+        arguments = expanded.substr(space);
+    }
+    if (const auto start = arguments.find_first_not_of(L" \t"); start != arguments.npos) arguments.erase(0, start);
+    else arguments.clear();
+
+    SHELLEXECUTEINFOW info{};
+    info.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOASYNC;
+    info.hwnd = window;
+    info.lpVerb = IsDlgButtonChecked(window, TaskAdministrator) == BST_CHECKED ? L"runas" : nullptr;
+    info.lpFile = file.c_str();
+    info.lpParameters = arguments.empty() ? nullptr : arguments.c_str();
+    return LaunchWithShell(info);
+}
+
+INT_PTR CALLBACK TaskDialogProc(HWND window, UINT message, WPARAM command, LPARAM data) {
+    if (message == WM_INITDIALOG) {
+        taskDialogWindow = window;
+        if (unloading) EndDialog(window, IDCANCEL);
+        else {
+            SetWindowLongPtrW(window, DWLP_USER, data);
+            SendDlgItemMessageW(window, TaskCommand, EM_SETLIMITTEXT, 32766, 0);
+        }
+        return TRUE;
+    }
+    if (message == WM_NCDESTROY) taskDialogWindow = nullptr;
+    if (message == taskDialogCloseMessage || message == WM_CLOSE || (message == WM_COMMAND && LOWORD(command) == IDCANCEL)) {
+        EndDialog(window, IDCANCEL);
+        return TRUE;
+    }
+    if (message != WM_COMMAND || unloading) return FALSE;
+    try {
+        if (LOWORD(command) == TaskBrowse) {
+            BrowseTaskFile(window);
+            return TRUE;
+        }
+        if (LOWORD(command) != IDOK) return FALSE;
+        const auto error = LaunchTaskFromDialog(window);
+        if (error == ERROR_SUCCESS) EndDialog(window, IDOK);
+        else if (error != ERROR_CANCELLED && !unloading) {
+            const auto labels = reinterpret_cast<TaskDialogLabels const*>(GetWindowLongPtrW(window, DWLP_USER));
+            wchar_t messageText[512]{};
+            FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error, 0,
+                           messageText, ARRAYSIZE(messageText), nullptr);
+            MessageBoxW(window, *messageText ? messageText : labels->error, labels->title, MB_OK | MB_ICONWARNING);
+        }
+    } catch (...) { Wh_Log(L"Could not use the Win+X task dialog"); }
+    return TRUE;
+}
+
+DWORD WINAPI ShowTaskDialogThread(void* parameter) {
+    const auto module = static_cast<HMODULE>(parameter);
+    const bool initialized = SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE));
+    try {
+        if (!unloading) {
+            const auto& labels = taskDialogLabels[DisplayLanguage()];
+            const auto dialog = TaskDialogTemplate(labels);
+            if (DialogBoxIndirectParamW(module, reinterpret_cast<LPCDLGTEMPLATEW>(dialog.data()), nullptr,
+                                        TaskDialogProc, reinterpret_cast<LPARAM>(&labels)) == -1)
+                Wh_Log(L"Could not open the Win+X task dialog");
+        }
+    } catch (...) { Wh_Log(L"Could not create the Win+X task dialog"); }
+    if (initialized) CoUninitialize();
+    taskDialogOpen = false;
+    FreeLibraryAndExitThread(module, 0);
+}
+
+bool ShowTaskDialog() {
+    if (!taskDialogCloseMessage) return false;
+    if (taskDialogOpen.exchange(true)) {
+        if (const auto window = taskDialogWindow.load()) SetForegroundWindow(window);
+        return true;
+    }
+    HMODULE module{};
+    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+                           reinterpret_cast<PCWSTR>(&ShowTaskDialogThread), &module)) {
+        if (const HANDLE thread = CreateThread(nullptr, 0, ShowTaskDialogThread, module, 0, nullptr)) {
+            CloseHandle(thread);
+            return true;
+        }
+        FreeLibrary(module);
+    }
+    taskDialogOpen = false;
+    return false;
+}
+
 struct SettingsRoute {
     HMODULE module{};
     unsigned serial;
@@ -503,6 +701,14 @@ void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data)
 
 void RunDestination(MenuSession& active, Destination destination) {
     ++settingsNavigation;
+    if (active.createTask && std::wstring_view(destination.item->action) == L"native:10925") {
+        const auto menu = active.menu;
+        menu.Hide();
+        if (ShowTaskDialog()) return;
+        if (const auto invoke = GetProvider<AV::IInvokeProvider>(destination.original, AP::PatternInterface::Invoke))
+            invoke.Invoke();
+        return;
+    }
     if (destination.original) {
         if (auto invoke = GetProvider<AV::IInvokeProvider>(destination.original, AP::PatternInterface::Invoke)) {
             auto menu = active.menu;
@@ -690,6 +896,7 @@ bool AttachPointerEvents(RowInteraction& active) {
     active.chevron = FindNamed(active.split, L"SubItemChevron");
     if (!active.layout || !active.chevron) return false;
     active.expand = GetProvider<AV::IExpandCollapseProvider>(active.split, AP::PatternInterface::ExpandCollapse);
+    if (active.mode == HoverMode::ArrowClick && !active.expand) return false;
     if (active.mode != HoverMode::Delayed && active.expand) {
         // Let XAML finish routing the enter event before opening its submenu.
         active.hoverUpdate = X::DispatcherTimer();
@@ -707,16 +914,17 @@ bool AttachPointerEvents(RowInteraction& active) {
                     provider.Expand();
             });
         });
-        if (active.mode == HoverMode::Arrow) AddArrowBackground(active);
+        if (active.mode == HoverMode::Arrow || active.mode == HoverMode::ArrowClick) AddArrowBackground(active);
     }
 
     active.pointerEntered = active.layout.PointerEntered(winrt::auto_revoke,
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
-                if (args.Pointer().PointerDeviceType() == PointerType::Touch) return;
                 // In arrow-only mode we drive the native PointerOver state explicitly
                 // because the XAML handler pairs it with starting the submenu timer.
-                if (active.mode == HoverMode::Arrow && active.expand) args.Handled(true);
+                if (active.mode == HoverMode::ArrowClick || (active.mode == HoverMode::Arrow && active.expand))
+                    args.Handled(true);
+                if (args.Pointer().PointerDeviceType() == PointerType::Touch) return;
                 UpdatePointerZone(active, args);
             });
         });
@@ -735,15 +943,17 @@ bool AttachPointerEvents(RowInteraction& active) {
                 SetHoverZone(active, HoverZone::Outside);
             });
         });
-    if (!active.destination.item) return true;
+    if (!active.destination.item && active.mode != HoverMode::ArrowClick) return true;
 
     active.pointerPressed = active.layout.PointerPressed(winrt::auto_revoke,
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
-                if (PointerZone(active, args) == HoverZone::Body &&
+                const auto zone = PointerZone(active, args);
+                if ((zone == HoverZone::Body || active.mode == HoverMode::ArrowClick) &&
                     (args.Pointer().PointerDeviceType() == PointerType::Touch ||
                      args.GetCurrentPoint(active.layout).Properties().IsLeftButtonPressed())) {
                     active.pressedPointer = args.Pointer().PointerId();
+                    active.pressedZone = zone;
                     args.Handled(true);
                 }
             });
@@ -752,9 +962,17 @@ bool AttachPointerEvents(RowInteraction& active) {
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
                 const bool pressedHere = std::exchange(active.pressedPointer, std::nullopt) == args.Pointer().PointerId();
-                const bool body = PointerZone(active, args) == HoverZone::Body;
-                if (pressedHere || body) args.Handled(true);
-                if (pressedHere && body) RunDestination(*active.owner, active.destination);
+                const auto zone = PointerZone(active, args);
+                const bool clickOnly = active.mode == HoverMode::ArrowClick;
+                if (pressedHere || (!clickOnly && zone == HoverZone::Body)) args.Handled(true);
+                if (!pressedHere || active.owner->closing) return;
+                if (zone == HoverZone::Arrow && clickOnly && active.pressedZone == zone) {
+                    auto provider = active.expand;
+                    if (provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
+                        provider.Expand();
+                } else if (zone == HoverZone::Body && active.destination.item && (!clickOnly || active.pressedZone == zone)) {
+                    RunDestination(*active.owner, active.destination);
+                }
             });
         });
     active.pointerCanceled = active.layout.PointerCanceled(winrt::auto_revoke,
@@ -1048,6 +1266,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
 
     auto pending = std::make_unique<MenuSession>();
     pending->menu = menu;
+    pending->createTask = snapshot.createTask;
     pending->original = stock.rows;
     if (snapshot.showHandCursor) pending->commandCursor = LoadCursorW(nullptr, IDC_HAND);
     pending->power = stock.power;
@@ -1061,20 +1280,32 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     for (size_t index = 0; index < std::size(catalog); ++index) {
         const auto& item = catalog[index];
         if (item.parent >= 0 || !snapshot.enabled[index]) continue;
-        const bool power = std::wstring_view(item.action) == L"power:menu";
-        const auto destination = power ? std::optional<Destination>{} :
+        const std::wstring_view action(item.action);
+        const bool power = action == L"power:menu";
+        const bool elevateTerminal = snapshot.terminalAsAdmin && action == L"native:10960";
+        auto destination = power ? std::optional<Destination>{} :
             Resolve(item, stock, availability, snapshot.hideAdminCommands);
 
         std::vector<C::MenuFlyoutItem> children;
         for (size_t child = index + 1; child < std::size(catalog) && catalog[child].parent == static_cast<int>(index); ++child) {
-            if (!snapshot.enabled[child]) continue;
-            if (const auto resolved = Resolve(catalog[child], stock, availability, snapshot.hideAdminCommands)) {
+            const auto& command = catalog[child];
+            const bool elevatedTerminal = elevateTerminal && std::wstring_view(command.action) == L"native:10961";
+            const bool primaryPower = power && snapshot.primaryPowerAction == command.action;
+            if (!snapshot.enabled[child] && !elevatedTerminal && !primaryPower) continue;
+            auto resolved = Resolve(command, stock, availability, snapshot.hideAdminCommands);
+            if (primaryPower) {
+                destination = std::move(resolved);
+                continue;
+            }
+            if (!resolved) continue;
+            if (elevatedTerminal) std::swap(resolved, destination);
+            if (snapshot.enabled[child] && resolved) {
                 if (auto leaf = CreateLeaf(*pending, *resolved)) children.push_back(leaf);
             }
         }
 
         C::MenuFlyoutItemBase entry{nullptr};
-        if (power) {
+        if (power && !destination) {
             if (children.empty()) continue;
             powerChildren.assign(children.begin(), children.end());
             powerGlyph = item.glyph;
@@ -1088,7 +1319,8 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             if (caption.empty()) continue;
             C::MenuFlyoutSubItem split;
             split.Text(caption);
-            if (item.glyph) split.Icon(MakeIcon(item.glyph));
+            const auto glyph = destination ? destination->item->glyph : item.glyph;
+            if (glyph) split.Icon(MakeIcon(glyph));
             for (auto const& child : children) split.Items().Append(child);
             AddInteraction(*pending, split, destination.value_or(Destination{}), snapshot.mode);
             entry = split;
@@ -1267,6 +1499,7 @@ BOOL Wh_ModInit() {
     DWORD pid{};
     if (window && GetWindowThreadProcessId(window, &pid) && pid != GetCurrentProcessId()) return FALSE;
     setupMessage = RegisterWindowMessageW(L"Windhawk.QuickLinkMenu.Setup");
+    taskDialogCloseMessage = RegisterWindowMessageW(L"Windhawk.QuickLinkMenu.CloseTaskDialog");
     LoadSettings();
     return setupMessage != 0;
 }
@@ -1294,6 +1527,7 @@ void Wh_ModSettingsChanged() {
 
 void Wh_ModBeforeUninit() {
     unloading = true;
+    if (const auto window = taskDialogWindow.load()) PostMessageW(window, taskDialogCloseMessage, 0, 0);
     if (taskbarStartupTimer) {
         SetThreadpoolTimer(taskbarStartupTimer, nullptr, 0, 0);
         WaitForThreadpoolTimerCallbacks(taskbarStartupTimer, TRUE);

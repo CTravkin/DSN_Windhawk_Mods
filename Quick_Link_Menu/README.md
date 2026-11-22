@@ -9,8 +9,7 @@ Panel, administration tools, and basic commands in four groups.
 ## Features
 
 - Click a row or press **Enter** for its main action. Click the arrow or press
-  **Right** for related shortcuts. The power row opens the native power submenu
-  with **Lock** first.
+  **Right** for related shortcuts.
 - File Explorer opens its configured start page. Its submenu offers shortcuts
   to the current user's folders and other shell locations.
 - Menu items use Segoe Fluent Icons in the native icon slots. Settings shortcuts
@@ -33,21 +32,26 @@ shortcuts grouped below it.
 **Search**, **Desktop**, and the **Documents** and **Pictures** shortcuts under
 File Explorer start off. Items also depend on availability in Windows.
 
-**Open submenus on hover** defaults to immediate opening from the row. You can
-use the Windows delay or open immediately over the arrow. In the latter mode,
-the arrow has a separate hover background and the row retains its native hover.
+In **General settings**, submenus open immediately on hover by default. You can
+use a delay, hover over the arrow, or click the arrow.
 
 **Hide administrator commands** is off by default. When enabled, it hides
 known administrator commands if the current session needs credentials or policy
 prevents elevation. Commands that only need UAC consent are still shown.
 
-**Show hand cursor over commands** is on by default. The hand marks areas
+**Command indication** is on by default. The hand marks areas
 that run a command. If a main destination is unavailable, its available
 shortcuts stay in a submenu. A row with a main action and no available shortcuts
 has no submenu arrow.
 
-Turning off all power commands hides the power row. With all menu rows
-disabled, the stock Win+X menu opens.
+In **Command settings**, you can make administrator Terminal the main Terminal
+action and select a main power command. The default is **Shut down**. Choosing
+**None** keeps the general power submenu. **Create new task** opens a dialog
+from the **Run** row and can request elevation through UAC. **Win+R** opens the
+Windows Run dialog.
+
+Turning off the power row hides it with its submenu. With all menu rows disabled,
+the stock Win+X menu opens.
 
 [Windhawk mod source](Mod/quick-link-menu.wh.cpp) ·
 [DSN Windhawk Mods](../README.md)

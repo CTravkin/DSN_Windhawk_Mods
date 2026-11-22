@@ -23,6 +23,7 @@ editing an input. Add `--check` to verify that the standalone source matches
 the inputs.
 
 Run `node --test Quick_Link_Menu/Tests/menu-settings.test.mjs` to verify the
-two global switches in the packaged source. Build `Tests/availability-tests.cpp`
+general and command settings, defaults, and localization in the packaged
+source. Build `Tests/availability-tests.cpp`
 with Windhawk clang++ for Windows x64 and link `advapi32` to test the availability
 rules and background refresh.

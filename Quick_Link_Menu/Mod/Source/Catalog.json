@@ -633,7 +633,7 @@
     ],
     "descriptions": [
       "Windows Settings categories and pages",
-      "Разделы и страницы приложения «Параметры»",
+      "Разделы и страницы стандартного приложения «Параметры»",
       "Categorías y páginas de Configuración de Windows",
       "Kategorien und Seiten der Windows-Einstellungen",
       "Categorias e páginas das Configurações do Windows",
@@ -1075,7 +1075,7 @@
     ],
     "descriptions": [
       "Classic Control Panel categories and windows",
-      "Категории и классические окна Панели управления",
+      "Категории и окна классической панели управления",
       "Categorías y ventanas clásicas del Panel de control",
       "Kategorien und klassische Fenster der Systemsteuerung",
       "Categorias e janelas clássicas do Painel de Controle",
@@ -1517,7 +1517,7 @@
     ],
     "descriptions": [
       "System consoles, diagnostics, and terminals",
-      "Системные оснастки, диагностика и терминалы",
+      "Программы для управления системой, диагностика и терминалы",
       "Consolas del sistema, diagnóstico y terminales",
       "Systemkonsolen, Diagnose und Terminals",
       "Consoles do sistema, diagnóstico e terminais",
