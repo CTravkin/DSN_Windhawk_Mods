@@ -1,13 +1,13 @@
 // ==WindhawkMod==
 // @id              quick-link-menu
 // @name            Quick Link Menu
-// @description     Customize and extend the Win+X menu (right-click the Start button)
-// @description:ru-RU Настройка и расширение меню Win+X (правый клик по кнопке «Пуск»)
-// @description:es-ES Personaliza y amplía el menú Win+X (clic derecho en el botón Inicio)
-// @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
-// @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
-// @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.4.3
+// @description     Customize the Win+X menu and add more commands (right-click the Start button)
+// @description:ru-RU Кастомизация и расширение возможностей меню Win+X (правый клик по кнопке «Пуск»)
+// @description:es-ES Personaliza el menú Win+X y añade más comandos (clic derecho en el botón Inicio)
+// @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
+// @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
+// @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
+// @version         0.5.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 31
+// Build: 33
 
 // ==WindhawkModReadme==
 /*
@@ -32,7 +32,7 @@ A submenu offers related shortcuts and can be opened with the arrow or **Right**
 offers the other power commands in its submenu.
 
 In the mod settings, the related shortcuts are listed with their main row.
-Choose which rows and submenu items appear, and change how
+Hide whole sections or choose which rows and submenu items appear, and change how
 submenus open in **General settings**. A hand cursor marks areas that run a
 command. The optional administrator filter hides commands that require
 credentials or are blocked from elevation. **Command settings** can move
@@ -113,6 +113,7 @@ struct Settings {
     bool showHandCursor{};
     bool terminalAsAdmin{};
     std::wstring primaryPowerAction;
+    std::array<bool, std::size(sectionEnabledKeys)> enabledSections{};
     std::array<bool, std::size(catalog)> enabled{};
 };
 
@@ -228,6 +229,8 @@ void LoadSettings() {
     else if (std::wstring_view(power) == L"lock") next.primaryPowerAction = L"lock:session";
     else if (std::wstring_view(power) != L"none") next.primaryPowerAction = L"power:" + std::wstring(power);
     Wh_FreeStringSetting(power);
+    for (size_t group = 0; group < std::size(sectionEnabledKeys); ++group)
+        next.enabledSections[group] = Wh_GetIntSetting(sectionEnabledKeys[group]) != 0;
     for (size_t i = 0; i < std::size(catalog); ++i)
         next.enabled[i] = Wh_GetIntSetting(catalog[i].key) != 0;
     std::lock_guard guard(settingsLock);
@@ -1088,7 +1091,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     int previousGroup = -1;
     for (size_t index = 0; index < std::size(catalog); ++index) {
         const auto& item = catalog[index];
-        if (item.parent >= 0 || !snapshot.enabled[index]) continue;
+        if (item.parent >= 0 || !snapshot.enabledSections[item.group] || !snapshot.enabled[index]) continue;
         const std::wstring_view action(item.action);
         const bool power = action == L"power:menu";
         const bool elevateTerminal = snapshot.terminalAsAdmin && action == L"native:10960";

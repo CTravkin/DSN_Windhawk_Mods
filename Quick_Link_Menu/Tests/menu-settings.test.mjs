@@ -18,14 +18,14 @@ function setting(group, key, value) {
   return block.slice(start + 1, next >= 0 ? next : undefined);
 }
 
-for (const [group, key, value, title] of [
-  ['general', null, null, 'Общие настройки'],
-  ['general', 'submenuHover', 'immediate', 'Раскрытие подменю'],
-  ['general', 'hideAdminCommands', false, 'Скрытие команд администратора'],
-  ['general', 'showHandCursor', true, 'Индикация активных команд'],
-  ['commandOptions', null, null, 'Настройки команд'],
-  ['commandOptions', 'terminalAsAdmin', false, 'Терминал от имени администратора'],
-  ['commandOptions', 'primaryPowerAction', 'shutdown', 'Завершение работы'],
+for (const [group, key, value, title, hint] of [
+  ['general', null, null, 'Общие настройки', 'Глобальные параметры меню и команд'],
+  ['general', 'submenuHover', 'immediate', 'Раскрытие подменю', 'Определяет, как открывается список дополнительных команд из основного меню'],
+  ['general', 'hideAdminCommands', false, 'Скрытие команд администратора', 'Если выполнение команды запрещено текущему пользователю или повышение прав запрещено, она скрывается'],
+  ['general', 'showHandCursor', true, 'Индикация активных команд', 'При наведении на область, нажатие в которой выполняет команду, указатель принимает форму руки'],
+  ['commandOptions', null, null, 'Настройки команд', 'Дополнительные параметры конкретных команд'],
+  ['commandOptions', 'terminalAsAdmin', false, 'Терминал от имени администратора', 'Открытие терминала из основного меню запускает его от имени администратора'],
+  ['commandOptions', 'primaryPowerAction', 'shutdown', 'Завершение работы', 'Нажатие на список способов завершения работы выполняет выбранное действие'],
 ]) {
   test(`${[group, key].filter(Boolean).join('.')} has a label and hint in six languages`, () => {
     const block = setting(group, key, value);
@@ -36,11 +36,30 @@ for (const [group, key, value, title] of [
         assert.ok(entry, `Missing ${annotation}${locale}`);
         const text = JSON.parse(entry.slice(prefix.length));
         assert.ok(text.trim());
-        if (annotation === '$name' && locale === ':ru-RU') assert.equal(text, title);
+        if (locale === ':ru-RU') assert.equal(text, annotation === '$name' ? title : hint);
       }
     }
   });
 }
+
+test('every command section starts with an unlabeled switch enabled by default', () => {
+  for (const group of ['windowsSettings', 'controlPanel', 'administration', 'commands']) {
+    assert.equal(lines[lines.indexOf(`- ${group}:`) + 1], '  - sectionEnabled: true', group);
+    assert.deepEqual(setting(group, 'sectionEnabled', true), ['    $name: " "']);
+  }
+});
+
+test('the mod description is present in six languages and uses the approved Russian text', () => {
+  const metadata = source.split('// ==/WindhawkMod==')[0].split(/\r?\n/);
+  for (const locale of locales) {
+    const prefix = `// @description${locale} `;
+    const entry = metadata.find((line) => line.startsWith(prefix));
+    assert.ok(entry?.slice(prefix.length).trim());
+    if (locale === ':ru-RU') {
+      assert.equal(entry.slice(prefix.length).trim(), 'Кастомизация и расширение возможностей меню Win+X (правый клик по кнопке «Пуск»)');
+    }
+  }
+});
 
 test('command settings omit the removed task dialog', () => {
   assert.ok(!lines.some((line) => /^\s*- createTask:/.test(line)));

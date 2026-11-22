@@ -1,13 +1,13 @@
 // ==WindhawkMod==
 // @id              quick-link-menu
 // @name            Quick Link Menu
-// @description     Customize and extend the Win+X menu (right-click the Start button)
-// @description:ru-RU Настройка и расширение меню Win+X (правый клик по кнопке «Пуск»)
-// @description:es-ES Personaliza y amplía el menú Win+X (clic derecho en el botón Inicio)
-// @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
-// @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
-// @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.4.3
+// @description     Customize the Win+X menu and add more commands (right-click the Start button)
+// @description:ru-RU Кастомизация и расширение возможностей меню Win+X (правый клик по кнопке «Пуск»)
+// @description:es-ES Personaliza el menú Win+X y añade más comandos (clic derecho en el botón Inicio)
+// @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
+// @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
+// @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
+// @version         0.5.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 31
+// Build: 33
 
 // ==WindhawkModReadme==
 /*
@@ -32,7 +32,7 @@ A submenu offers related shortcuts and can be opened with the arrow or **Right**
 offers the other power commands in its submenu.
 
 In the mod settings, the related shortcuts are listed with their main row.
-Choose which rows and submenu items appear, and change how
+Hide whole sections or choose which rows and submenu items appear, and change how
 submenus open in **General settings**. A hand cursor marks areas that run a
 command. The optional administrator filter hides commands that require
 credentials or are blocked from elevation. **Command settings** can move
@@ -55,12 +55,12 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Untermenüs öffnen"
     $name:pt-BR: "Abrir submenus"
     $name:zh-CN: "打开子菜单"
-    $description: "Choose how to open the additional commands for a menu item"
-    $description:ru-RU: "Определяет, как открывается список дополнительных команд пункта меню"
-    $description:es-ES: "Elige cómo abrir los comandos adicionales de un elemento del menú"
-    $description:de-DE: "Legt fest, wie die zusätzlichen Befehle eines Menüeintrags geöffnet werden"
-    $description:pt-BR: "Define como abrir os comandos adicionais de um item do menu"
-    $description:zh-CN: "选择如何打开菜单项的其他命令"
+    $description: "Controls how to open additional commands from the main menu"
+    $description:ru-RU: "Определяет, как открывается список дополнительных команд из основного меню"
+    $description:es-ES: "Determina cómo se abre la lista de comandos adicionales desde el menú principal"
+    $description:de-DE: "Legt fest, wie sich die Liste zusätzlicher Befehle aus dem Hauptmenü öffnen lässt"
+    $description:pt-BR: "Define como a lista de comandos adicionais é aberta a partir do menu principal"
+    $description:zh-CN: "设置如何从主菜单打开附加命令列表"
     $options:
       - immediate: "Immediately"
       - delayed: "With a delay"
@@ -98,12 +98,12 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Administratorbefehle ausblenden"
     $name:pt-BR: "Ocultar comandos de administrador"
     $name:zh-CN: "隐藏管理员命令"
-    $description: "Hide commands the current user cannot run or for which elevation is blocked"
-    $description:ru-RU: "Скрывать команды, выполнение которых недоступно текущему пользователю, или повышение прав запрещено"
-    $description:es-ES: "Oculta los comandos que el usuario actual no puede ejecutar o cuya elevación está bloqueada"
-    $description:de-DE: "Blendet Befehle aus, die der aktuelle Benutzer nicht ausführen kann oder deren Rechteerhöhung gesperrt ist"
-    $description:pt-BR: "Oculta comandos que o usuário atual não pode executar ou cuja elevação está bloqueada"
-    $description:zh-CN: "隐藏当前用户无法运行或禁止提升权限的命令"
+    $description: "A command is hidden if the current user lacks permission to run it or if elevation is blocked"
+    $description:ru-RU: "Если выполнение команды запрещено текущему пользователю или повышение прав запрещено, она скрывается"
+    $description:es-ES: "Se oculta el comando si el usuario actual no tiene permiso para ejecutarlo o si se bloquea la elevación de privilegios"
+    $description:de-DE: "Ein Befehl wird ausgeblendet, wenn dem aktuellen Benutzer die Berechtigung zur Ausführung fehlt oder die Rechteerhöhung gesperrt ist"
+    $description:pt-BR: "O comando é ocultado se o usuário atual não tiver permissão para executá-lo ou se a elevação de privilégios estiver bloqueada"
+    $description:zh-CN: "如果当前用户无权执行某条命令，或系统禁止提升权限，该命令将被隐藏"
   - showHandCursor: true
     $name: "Command indication"
     $name:ru-RU: "Индикация активных команд"
@@ -111,24 +111,24 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Aktive Befehle kennzeichnen"
     $name:pt-BR: "Indicação de comandos ativos"
     $name:zh-CN: "指示可执行命令"
-    $description: "Show a hand pointer over areas that run a command when clicked"
-    $description:ru-RU: "При наведении на область, где нажатие выполняет команду, указатель принимает форму руки"
-    $description:es-ES: "Muestra un puntero de mano sobre las áreas que ejecutan un comando al hacer clic"
-    $description:de-DE: "Zeigt einen Handzeiger über Bereichen an, die beim Anklicken einen Befehl ausführen"
-    $description:pt-BR: "Mostra um ponteiro em forma de mão sobre as áreas que executam um comando ao clicar"
-    $description:zh-CN: "将鼠标悬停在单击即可执行命令的区域时显示手形指针"
+    $description: "The pointer becomes a hand over an area where clicking runs a command"
+    $description:ru-RU: "При наведении на область, нажатие в которой выполняет команду, указатель принимает форму руки"
+    $description:es-ES: "El puntero toma la forma de una mano al pasar por un área donde un clic ejecuta un comando"
+    $description:de-DE: "Der Mauszeiger wird zur Hand, sobald er sich über einem Bereich befindet, in dem ein Klick einen Befehl ausführt"
+    $description:pt-BR: "O ponteiro assume a forma de uma mão ao passar sobre uma área em que um clique executa um comando"
+    $description:zh-CN: "将指针移到单击即可执行命令的区域时，指针会变成手形"
   $name: "General settings"
   $name:ru-RU: "Общие настройки"
   $name:es-ES: "Configuración general"
   $name:de-DE: "Allgemeine Einstellungen"
   $name:pt-BR: "Configurações gerais"
   $name:zh-CN: "常规设置"
-  $description: "These settings apply to the entire command list"
-  $description:ru-RU: "Эти настройки действуют на весь список команд"
-  $description:es-ES: "Estos ajustes se aplican a toda la lista de comandos"
-  $description:de-DE: "Diese Einstellungen gelten für die gesamte Befehlsliste"
-  $description:pt-BR: "Estas configurações se aplicam à lista inteira de comandos"
-  $description:zh-CN: "这些设置适用于整个命令列表"
+  $description: "Global settings for the menu and its commands"
+  $description:ru-RU: "Глобальные параметры меню и команд"
+  $description:es-ES: "Opciones globales del menú y sus comandos"
+  $description:de-DE: "Globale Einstellungen für das Menü und seine Befehle"
+  $description:pt-BR: "Configurações globais do menu e de seus comandos"
+  $description:zh-CN: "菜单及其命令的全局设置"
 - commandOptions:
   - terminalAsAdmin: false
     $name: "Terminal as administrator"
@@ -137,12 +137,12 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Terminal als Administrator"
     $name:pt-BR: "Terminal como administrador"
     $name:zh-CN: "以管理员身份运行终端"
-    $description: "Run Terminal as administrator from the main row and move the standard Terminal to the submenu when the separate administrator command is enabled"
-    $description:ru-RU: "Запускать Терминал от имени администратора из главного меню. Если отдельная команда администратора включена, обычный Терминал появится в подменю"
-    $description:es-ES: "Ejecuta Terminal como administrador desde el menú principal. Si el comando de administrador está activado, Terminal normal aparece en el submenú"
-    $description:de-DE: "Startet Terminal über das Hauptmenü als Administrator. Ist der separate Administratorbefehl aktiviert, erscheint das normale Terminal im Untermenü"
-    $description:pt-BR: "Executa o Terminal como administrador no menu principal. Se o comando de administrador estiver ativado, o Terminal padrão aparece no submenu"
-    $description:zh-CN: "从主菜单以管理员身份运行终端。如果启用了单独的管理员命令，则在子菜单中显示普通终端"
+    $description: "Opening Terminal from the main menu runs it as administrator"
+    $description:ru-RU: "Открытие терминала из основного меню запускает его от имени администратора"
+    $description:es-ES: "Al abrir Terminal desde el menú principal, se ejecuta como administrador"
+    $description:de-DE: "Beim Öffnen über das Hauptmenü wird das Terminal als Administrator gestartet"
+    $description:pt-BR: "Ao abrir o Terminal pelo menu principal, ele é executado como administrador"
+    $description:zh-CN: "从主菜单打开终端时，将以管理员身份运行"
   - primaryPowerAction: shutdown
     $name: "Power action"
     $name:ru-RU: "Завершение работы"
@@ -150,12 +150,12 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:de-DE: "Aktion beim Herunterfahren"
     $name:pt-BR: "Ação de energia"
     $name:zh-CN: "电源操作"
-    $description: "Replace the main power menu item with the selected command. Choose None to keep the general item"
-    $description:ru-RU: "Заменяет общий пункт завершения работы выбранной командой. Вариант «Нет» оставляет общий пункт"
-    $description:es-ES: "Sustituye el elemento principal de apagado por el comando elegido. Selecciona Ninguna para conservar el elemento general"
-    $description:de-DE: "Ersetzt den Haupteintrag für Energieoptionen durch den ausgewählten Befehl. Mit „Keine“ bleibt der allgemeine Eintrag erhalten"
-    $description:pt-BR: "Substitui o item principal de energia pelo comando selecionado. Escolha Nenhuma para manter o item geral"
-    $description:zh-CN: "用所选命令替换主电源菜单项。选择“无”可保留原有菜单项"
+    $description: "Clicking the power menu item runs the selected action"
+    $description:ru-RU: "Нажатие на список способов завершения работы выполняет выбранное действие"
+    $description:es-ES: "Al hacer clic en la opción de apagado del menú, se ejecuta la acción seleccionada"
+    $description:de-DE: "Ein Klick auf den Eintrag für Energieoptionen führt die ausgewählte Aktion aus"
+    $description:pt-BR: "Um clique no item de energia do menu executa a ação selecionada"
+    $description:zh-CN: "单击电源菜单项即可执行所选操作"
     $options:
       - none: "None"
       - lock: "Lock"
@@ -210,13 +210,15 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
   $name:de-DE: "Befehlseinstellungen"
   $name:pt-BR: "Configurações de comandos"
   $name:zh-CN: "命令设置"
-  $description: "Choose how individual commands work"
-  $description:ru-RU: "Эти настройки меняют действие отдельных команд"
-  $description:es-ES: "Elige cómo funcionan los comandos individuales"
-  $description:de-DE: "Legt fest, wie einzelne Befehle ausgeführt werden"
-  $description:pt-BR: "Define como comandos individuais funcionam"
-  $description:zh-CN: "选择各个命令的运行方式"
+  $description: "Additional settings for individual commands"
+  $description:ru-RU: "Дополнительные параметры конкретных команд"
+  $description:es-ES: "Opciones adicionales para comandos específicos"
+  $description:de-DE: "Zusätzliche Einstellungen für einzelne Befehle"
+  $description:pt-BR: "Configurações adicionais para comandos específicos"
+  $description:zh-CN: "特定命令的附加设置"
 - windowsSettings:
+  - sectionEnabled: true
+    $name: " "
   - systemVisible: true
     $name: "System"
     $name:ru-RU: "Система"
@@ -545,6 +547,8 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
   $description:pt-BR: "Categorias e páginas das Configurações do Windows"
   $description:zh-CN: "Windows 设置的类别和页面"
 - controlPanel:
+  - sectionEnabled: true
+    $name: " "
   - securityVisible: true
     $name: "System and Security"
     $name:ru-RU: "Система и безопасность"
@@ -775,6 +779,8 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
   $description:pt-BR: "Categorias e janelas clássicas do Painel de Controle"
   $description:zh-CN: "控制面板类别和经典窗口"
 - administration:
+  - sectionEnabled: true
+    $name: " "
   - toolsVisible: true
     $name: "Windows Tools"
     $name:ru-RU: "Инструменты Windows"
@@ -1005,6 +1011,8 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
   $description:pt-BR: "Consoles do sistema, diagnóstico e terminais"
   $description:zh-CN: "系统控制台、诊断和终端"
 - commands:
+  - sectionEnabled: true
+    $name: " "
   - run: true
     $name: "Run"
     $name:ru-RU: "Выполнить"
@@ -1210,6 +1218,13 @@ struct CatalogItem {
     PCWSTR action;
     PCWSTR resource;
     std::array<PCWSTR, 6> names;
+};
+
+constexpr PCWSTR sectionEnabledKeys[] = {
+    L"windowsSettings.sectionEnabled",
+    L"controlPanel.sectionEnabled",
+    L"administration.sectionEnabled",
+    L"commands.sectionEnabled",
 };
 
 constexpr CatalogItem catalog[] = {
@@ -1464,6 +1479,7 @@ struct Settings {
     bool showHandCursor{};
     bool terminalAsAdmin{};
     std::wstring primaryPowerAction;
+    std::array<bool, std::size(sectionEnabledKeys)> enabledSections{};
     std::array<bool, std::size(catalog)> enabled{};
 };
 
@@ -1579,6 +1595,8 @@ void LoadSettings() {
     else if (std::wstring_view(power) == L"lock") next.primaryPowerAction = L"lock:session";
     else if (std::wstring_view(power) != L"none") next.primaryPowerAction = L"power:" + std::wstring(power);
     Wh_FreeStringSetting(power);
+    for (size_t group = 0; group < std::size(sectionEnabledKeys); ++group)
+        next.enabledSections[group] = Wh_GetIntSetting(sectionEnabledKeys[group]) != 0;
     for (size_t i = 0; i < std::size(catalog); ++i)
         next.enabled[i] = Wh_GetIntSetting(catalog[i].key) != 0;
     std::lock_guard guard(settingsLock);
@@ -2718,7 +2736,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     int previousGroup = -1;
     for (size_t index = 0; index < std::size(catalog); ++index) {
         const auto& item = catalog[index];
-        if (item.parent >= 0 || !snapshot.enabled[index]) continue;
+        if (item.parent >= 0 || !snapshot.enabledSections[item.group] || !snapshot.enabled[index]) continue;
         const std::wstring_view action(item.action);
         const bool power = action == L"power:menu";
         const bool elevateTerminal = snapshot.terminalAsAdmin && action == L"native:10960";

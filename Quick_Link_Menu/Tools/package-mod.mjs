@@ -11,6 +11,7 @@ const wide = (value) => `L${JSON.stringify(value)}`;
 const settings = [];
 const definitions = [];
 const keys = new Set();
+const sectionSwitch = 'sectionEnabled';
 
 function labels(target, indent, key, names) {
   if (names.length !== locales.length || names.some((name) => !name)) {
@@ -67,7 +68,7 @@ function addOption(id, initial, names, descriptions, options) {
 settings.push('- general:');
 addOption('submenuHover', 'immediate',
   ['Open submenus', 'Раскрытие подменю', 'Apertura de submenús', 'Untermenüs öffnen', 'Abrir submenus', '打开子菜单'],
-  ['Choose how to open the additional commands for a menu item', 'Определяет, как открывается список дополнительных команд пункта меню', 'Elige cómo abrir los comandos adicionales de un elemento del menú', 'Legt fest, wie die zusätzlichen Befehle eines Menüeintrags geöffnet werden', 'Define como abrir os comandos adicionais de um item do menu', '选择如何打开菜单项的其他命令'], [
+  ['Controls how to open additional commands from the main menu', 'Определяет, как открывается список дополнительных команд из основного меню', 'Determina cómo se abre la lista de comandos adicionales desde el menú principal', 'Legt fest, wie sich die Liste zusätzlicher Befehle aus dem Hauptmenü öffnen lässt', 'Define como a lista de comandos adicionais é aberta a partir do menu principal', '设置如何从主菜单打开附加命令列表'], [
     ['immediate', ['Immediately', 'Сразу', 'Inmediatamente', 'Sofort', 'Imediatamente', '立即打开']],
     ['delayed', ['With a delay', 'С задержкой', 'Con retardo', 'Mit Verzögerung', 'Com atraso', '延迟打开']],
     ['arrow', ['On arrow hover', 'При наведении на стрелку', 'Al pasar el puntero sobre la flecha', 'Beim Darüberfahren über den Pfeil', 'Ao passar o ponteiro sobre a seta', '悬停在箭头上时打开']],
@@ -75,28 +76,32 @@ addOption('submenuHover', 'immediate',
   ]);
 addOption('hideAdminCommands', false,
   ['Hide administrator commands', 'Скрытие команд администратора', 'Ocultar comandos de administrador', 'Administratorbefehle ausblenden', 'Ocultar comandos de administrador', '隐藏管理员命令'],
-  ['Hide commands the current user cannot run or for which elevation is blocked', 'Скрывать команды, выполнение которых недоступно текущему пользователю, или повышение прав запрещено', 'Oculta los comandos que el usuario actual no puede ejecutar o cuya elevación está bloqueada', 'Blendet Befehle aus, die der aktuelle Benutzer nicht ausführen kann oder deren Rechteerhöhung gesperrt ist', 'Oculta comandos que o usuário atual não pode executar ou cuja elevação está bloqueada', '隐藏当前用户无法运行或禁止提升权限的命令']);
+  ['A command is hidden if the current user lacks permission to run it or if elevation is blocked', 'Если выполнение команды запрещено текущему пользователю или повышение прав запрещено, она скрывается', 'Se oculta el comando si el usuario actual no tiene permiso para ejecutarlo o si se bloquea la elevación de privilegios', 'Ein Befehl wird ausgeblendet, wenn dem aktuellen Benutzer die Berechtigung zur Ausführung fehlt oder die Rechteerhöhung gesperrt ist', 'O comando é ocultado se o usuário atual não tiver permissão para executá-lo ou se a elevação de privilégios estiver bloqueada', '如果当前用户无权执行某条命令，或系统禁止提升权限，该命令将被隐藏']);
 addOption('showHandCursor', true,
   ['Command indication', 'Индикация активных команд', 'Indicación de comandos activos', 'Aktive Befehle kennzeichnen', 'Indicação de comandos ativos', '指示可执行命令'],
-  ['Show a hand pointer over areas that run a command when clicked', 'При наведении на область, где нажатие выполняет команду, указатель принимает форму руки', 'Muestra un puntero de mano sobre las áreas que ejecutan un comando al hacer clic', 'Zeigt einen Handzeiger über Bereichen an, die beim Anklicken einen Befehl ausführen', 'Mostra um ponteiro em forma de mão sobre as áreas que executam um comando ao clicar', '将鼠标悬停在单击即可执行命令的区域时显示手形指针']);
+  ['The pointer becomes a hand over an area where clicking runs a command', 'При наведении на область, нажатие в которой выполняет команду, указатель принимает форму руки', 'El puntero toma la forma de una mano al pasar por un área donde un clic ejecuta un comando', 'Der Mauszeiger wird zur Hand, sobald er sich über einem Bereich befindet, in dem ein Klick einen Befehl ausführt', 'O ponteiro assume a forma de uma mão ao passar sobre uma área em que um clique executa um comando', '将指针移到单击即可执行命令的区域时，指针会变成手形']);
 labels(settings, '  ', '$name', ['General settings', 'Общие настройки', 'Configuración general', 'Allgemeine Einstellungen', 'Configurações gerais', '常规设置']);
-labels(settings, '  ', '$description', ['These settings apply to the entire command list', 'Эти настройки действуют на весь список команд', 'Estos ajustes se aplican a toda la lista de comandos', 'Diese Einstellungen gelten für die gesamte Befehlsliste', 'Estas configurações se aplicam à lista inteira de comandos', '这些设置适用于整个命令列表']);
+labels(settings, '  ', '$description', ['Global settings for the menu and its commands', 'Глобальные параметры меню и команд', 'Opciones globales del menú y sus comandos', 'Globale Einstellungen für das Menü und seine Befehle', 'Configurações globais do menu e de seus comandos', '菜单及其命令的全局设置']);
 
 settings.push('- commandOptions:');
 addOption('terminalAsAdmin', false,
   ['Terminal as administrator', 'Терминал от имени администратора', 'Terminal como administrador', 'Terminal als Administrator', 'Terminal como administrador', '以管理员身份运行终端'],
-  ['Run Terminal as administrator from the main row and move the standard Terminal to the submenu when the separate administrator command is enabled', 'Запускать Терминал от имени администратора из главного меню. Если отдельная команда администратора включена, обычный Терминал появится в подменю', 'Ejecuta Terminal como administrador desde el menú principal. Si el comando de administrador está activado, Terminal normal aparece en el submenú', 'Startet Terminal über das Hauptmenü als Administrator. Ist der separate Administratorbefehl aktiviert, erscheint das normale Terminal im Untermenü', 'Executa o Terminal como administrador no menu principal. Se o comando de administrador estiver ativado, o Terminal padrão aparece no submenu', '从主菜单以管理员身份运行终端。如果启用了单独的管理员命令，则在子菜单中显示普通终端']);
+  ['Opening Terminal from the main menu runs it as administrator', 'Открытие терминала из основного меню запускает его от имени администратора', 'Al abrir Terminal desde el menú principal, se ejecuta como administrador', 'Beim Öffnen über das Hauptmenü wird das Terminal als Administrator gestartet', 'Ao abrir o Terminal pelo menu principal, ele é executado como administrador', '从主菜单打开终端时，将以管理员身份运行']);
 const power = blocks.find((group) => group.id === 'commands').rows.find((row) => row.action === 'power:menu');
 addOption('primaryPowerAction', 'shutdown',
   ['Power action', 'Завершение работы', 'Acción de apagado', 'Aktion beim Herunterfahren', 'Ação de energia', '电源操作'],
-  ['Replace the main power menu item with the selected command. Choose None to keep the general item', 'Заменяет общий пункт завершения работы выбранной командой. Вариант «Нет» оставляет общий пункт', 'Sustituye el elemento principal de apagado por el comando elegido. Selecciona Ninguna para conservar el elemento general', 'Ersetzt den Haupteintrag für Energieoptionen durch den ausgewählten Befehl. Mit „Keine“ bleibt der allgemeine Eintrag erhalten', 'Substitui o item principal de energia pelo comando selecionado. Escolha Nenhuma para manter o item geral', '用所选命令替换主电源菜单项。选择“无”可保留原有菜单项'],
+  ['Clicking the power menu item runs the selected action', 'Нажатие на список способов завершения работы выполняет выбранное действие', 'Al hacer clic en la opción de apagado del menú, se ejecuta la acción seleccionada', 'Ein Klick auf den Eintrag für Energieoptionen führt die ausgewählte Aktion aus', 'Um clique no item de energia do menu executa a ação selecionada', '单击电源菜单项即可执行所选操作'],
   [['none', ['None', 'Нет', 'Ninguna', 'Keine', 'Nenhuma', '无']], ...power.children.map(({ id, names }) => [id, names])]);
 labels(settings, '  ', '$name', ['Command settings', 'Настройки команд', 'Configuración de comandos', 'Befehlseinstellungen', 'Configurações de comandos', '命令设置']);
-labels(settings, '  ', '$description', ['Choose how individual commands work', 'Эти настройки меняют действие отдельных команд', 'Elige cómo funcionan los comandos individuales', 'Legt fest, wie einzelne Befehle ausgeführt werden', 'Define como comandos individuais funcionam', '选择各个命令的运行方式']);
+labels(settings, '  ', '$description', ['Additional settings for individual commands', 'Дополнительные параметры конкретных команд', 'Opciones adicionales para comandos específicos', 'Zusätzliche Einstellungen für einzelne Befehle', 'Configurações adicionais para comandos específicos', '特定命令的附加设置']);
 
 checkGlyphs(blocks.flatMap((block) => block.rows), 'main menu', true);
 blocks.forEach((block, group) => {
   settings.push(`- ${block.id}:`);
+  settings.push(`  - ${sectionSwitch}: true`);
+  // Windhawk uses the internal key as the title when the name is empty or missing.
+  settings.push('    $name: " "');
+  keys.add(`${block.id}.${sectionSwitch}`);
   for (const row of block.rows) {
     const hasChildren = row.children.length > 0;
     const rowKey = `${block.id}.${row.id}`;
@@ -123,7 +128,10 @@ for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERA
 }
 const packed = source
   .replace('// GENERATED_SETTINGS', () => `// ==WindhawkModSettings==\n/*\n${settings.join('\n')}\n*/\n// ==/WindhawkModSettings==`)
-  .replace('// GENERATED_CATALOG', () => `constexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`)
+  .replace('// GENERATED_CATALOG', () => {
+    const sectionKeys = blocks.map(({ id }) => `    ${wide(`${id}.${sectionSwitch}`)},`);
+    return `constexpr PCWSTR sectionEnabledKeys[] = {\n${sectionKeys.join('\n')}\n};\n\nconstexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`;
+  })
   .replace('// GENERATED_AVAILABILITY', () => availability);
 
 if (process.argv.includes('--check')) {

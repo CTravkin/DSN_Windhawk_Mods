@@ -27,6 +27,8 @@ incompatible with Windows 10 Win+X Restorer.
 ## Usage
 
 The switches in each Windhawk settings group follow the menu order.
+The switch under the section description is on by default. Turning it off
+hides the entire section and preserves its individual command settings.
 The main switch appears directly under the row's name, with any related
 shortcuts grouped below it.
 **Search**, **Desktop**, and the **Documents** and **Pictures** shortcuts under
@@ -48,8 +50,8 @@ In **Command settings**, you can make administrator Terminal the main Terminal
 action and select a main power command. The default is **Shut down**. Choosing
 **None** keeps the general power submenu.
 
-Turning off the power row hides it with its submenu. With all menu rows disabled,
-the stock Win+X menu opens.
+Turning off the power row hides it with its submenu. If the settings leave the
+menu empty, the stock Win+X menu opens.
 
 [Windhawk mod source](Mod/quick-link-menu.wh.cpp) ·
 [DSN Windhawk Mods](../README.md)
