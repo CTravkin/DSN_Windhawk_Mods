@@ -112,7 +112,7 @@
       },
       {
         "id": "devices",
-        "glyph": "e772",
+        "glyph": "e702",
         "action": "uri:devices",
         "resource": "settings:SettingsPageGroupDevices",
         "names": [
@@ -426,7 +426,7 @@
           },
           {
             "id": "defaults",
-            "glyph": "e73a",
+            "glyph": "ec74",
             "action": "uri:defaultapps",
             "resource": "settings:SettingsPageAppsDefaults",
             "names": [
@@ -484,7 +484,7 @@
           },
           {
             "id": "backup",
-            "glyph": "e777",
+            "glyph": "e78c",
             "action": "uri:backup",
             "resource": "settings:SettingsPageAccountsSync",
             "names": [
@@ -667,7 +667,7 @@
         "children": [
           {
             "id": "maintenance",
-            "glyph": "f760",
+            "glyph": "e7c1",
             "action": "control:Microsoft.ActionCenter",
             "resource": "shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
             "names": [
@@ -681,7 +681,7 @@
           },
           {
             "id": "firewall",
-            "glyph": "e83d",
+            "glyph": "f5b4",
             "action": "exe:Firewall.cpl",
             "resource": "shell:{4026492F-2F69-46B8-B9BF-5654FC07E423}",
             "names": [
@@ -695,7 +695,7 @@
           },
           {
             "id": "powerOptions",
-            "glyph": "e7e8",
+            "glyph": "ee63",
             "action": "exe:powercfg.cpl",
             "resource": "shell:{025A5937-A6BE-4686-A844-36FE4BEC8B6D}",
             "names": [
@@ -797,7 +797,7 @@
         "children": [
           {
             "id": "deviceManager",
-            "glyph": "e772",
+            "glyph": "e912",
             "action": "exe:mmc.exe;devmgmt.msc",
             "resource": "twinui.pcshell.dll,-10916",
             "names": [
@@ -897,7 +897,7 @@
           },
           {
             "id": "windowsFeatures",
-            "glyph": "e950",
+            "glyph": "e7b8",
             "action": "exe:OptionalFeatures.exe",
             "resource": "appwiz.cpl,-188",
             "names": [
@@ -927,7 +927,7 @@
         "children": [
           {
             "id": "credentials",
-            "glyph": "e8d7",
+            "glyph": "f540",
             "action": "control:Microsoft.CredentialManager",
             "resource": "shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
             "names": [
@@ -957,7 +957,7 @@
       },
       {
         "id": "appearance",
-        "glyph": "e771",
+        "glyph": "e7f9",
         "action": "panel:1",
         "resource": "shell32.dll,-32018",
         "names": [
@@ -1096,7 +1096,7 @@
       {
         "id": "tools",
         "glyph": "e90f",
-        "action": "shell:{D20EA4E1-3957-11d2-A40B-0C5020524153}",
+        "action": "control:Microsoft.AdministrativeTools",
         "resource": "tools:Windows Tools",
         "names": [
           "Windows Tools",
@@ -1123,7 +1123,7 @@
           },
           {
             "id": "machineCertificates",
-            "glyph": "0",
+            "glyph": "eb95",
             "action": "exe:mmc.exe;certlm.msc",
             "resource": "certmgr.dll,-193",
             "names": [
@@ -1133,11 +1133,12 @@
               "Zertifikate (Lokaler Computer)",
               "Certificados (computador local)",
               "证书(本地计算机)"
-            ]
+            ],
+            "sameGlyphAs": "userCertificates"
           },
           {
             "id": "firewallAdvanced",
-            "glyph": "e83d",
+            "glyph": "f5b4",
             "action": "exe:mmc.exe;WF.msc",
             "resource": "tools:Windows Defender Firewall with Advanced Security",
             "names": [
@@ -1195,7 +1196,7 @@
           },
           {
             "id": "wmi",
-            "glyph": "0",
+            "glyph": "ec7a",
             "action": "exe:mmc.exe;WmiMgmt.msc",
             "resource": "wbem\\wbemcntl.dll,-143",
             "names": [
@@ -1225,7 +1226,7 @@
         "children": [
           {
             "id": "optimize",
-            "glyph": "eda2",
+            "glyph": "f0e2",
             "action": "exe:dfrgui.exe",
             "resource": "tools:dfrgui",
             "names": [
@@ -1239,7 +1240,7 @@
           },
           {
             "id": "cleanup",
-            "glyph": "e74d",
+            "glyph": "ea99",
             "action": "exe:cleanmgr.exe",
             "resource": "tools:Disk Cleanup",
             "names": [
@@ -1253,7 +1254,7 @@
           },
           {
             "id": "recoveryDrive",
-            "glyph": "e88e",
+            "glyph": "ebc4",
             "action": "exe:RecoveryDrive.exe",
             "resource": "tools:RecoveryDrive",
             "names": [
@@ -1327,7 +1328,7 @@
         "children": [
           {
             "id": "performance",
-            "glyph": "e9d9",
+            "glyph": "f42f",
             "action": "exe:perfmon.exe",
             "resource": "tools:Performance Monitor",
             "names": [
@@ -1355,7 +1356,7 @@
           },
           {
             "id": "reliability",
-            "glyph": "e81c",
+            "glyph": "e9d9",
             "action": "exe:perfmon.exe;/rel",
             "resource": "werconcpl.dll,-408",
             "names": [
@@ -1399,7 +1400,7 @@
       },
       {
         "id": "registry",
-        "glyph": "0",
+        "glyph": "eca5",
         "action": "exe:regedit.exe",
         "resource": "tools:Registry Editor",
         "names": [
@@ -1413,7 +1414,7 @@
         "children": [
           {
             "id": "systemConfiguration",
-            "glyph": "ec7a",
+            "glyph": "e912",
             "action": "exe:msconfig.exe",
             "resource": "tools:System Configuration",
             "names": [
@@ -1485,7 +1486,7 @@
           },
           {
             "id": "powershell",
-            "glyph": "0",
+            "glyph": "e943",
             "action": "exe:WindowsPowerShell/v1.0/powershell.exe",
             "resource": "twinui.pcshell.dll,-10928",
             "names": [
@@ -1580,7 +1581,7 @@
         "children": [
           {
             "id": "desktop",
-            "glyph": "e7f4",
+            "glyph": "e7fb",
             "action": "folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641",
             "resource": "shell32.dll,-21769",
             "names": [

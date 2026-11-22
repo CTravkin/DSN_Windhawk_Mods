@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.9
+// @version         0.2.10
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 15
+// Build: 16
 
 // ==WindhawkModReadme==
 /*
@@ -1085,7 +1085,7 @@ constexpr CatalogItem catalog[] = {
      {L"Advanced", L"Дополнительно", L"Avanzado", L"Erweitert", L"Avançado", L"高级"}},
     {L"windowsSettings.system.about", 0, 0, true, 0xe946, L"uri:about", L"settings:SettingsPageAbout",
      {L"About", L"О системе", L"Información", L"Info", L"Sobre", L"系统信息"}},
-    {L"windowsSettings.devicesVisible", 0, -1, true, 0xe772, L"uri:devices", L"settings:SettingsPageGroupDevices",
+    {L"windowsSettings.devicesVisible", 0, -1, true, 0xe702, L"uri:devices", L"settings:SettingsPageGroupDevices",
      {L"Bluetooth & devices", L"Bluetooth и устройства", L"Bluetooth y dispositivos", L"Bluetooth und Geräte", L"Bluetooth e dispositivos", L"蓝牙和其他设备"}},
     {L"windowsSettings.devices.devices", 0, 7, true, 0xe772, L"uri:connecteddevices", L"settings:SettingsPageDevices",
      {L"Devices", L"Устройства", L"Dispositivos", L"Geräte", L"Dispositivos", L"设备"}},
@@ -1129,7 +1129,7 @@ constexpr CatalogItem catalog[] = {
      {L"Apps", L"Приложения", L"Aplicaciones", L"Apps", L"Aplicativos", L"应用"}},
     {L"windowsSettings.apps.installed", 0, 27, true, 0xe71d, L"uri:installed-apps", L"settings:SettingsPageInstalledApps",
      {L"Installed apps", L"Установленные приложения", L"Aplicaciones instaladas", L"Installierte Apps", L"Aplicativos instalados", L"安装的应用"}},
-    {L"windowsSettings.apps.defaults", 0, 27, true, 0xe73a, L"uri:defaultapps", L"settings:SettingsPageAppsDefaults",
+    {L"windowsSettings.apps.defaults", 0, 27, true, 0xec74, L"uri:defaultapps", L"settings:SettingsPageAppsDefaults",
      {L"Default apps", L"Приложения по умолчанию", L"Aplicaciones predeterminadas", L"Standard-Apps", L"Aplicativos padrão", L"默认应用"}},
     {L"windowsSettings.apps.startup", 0, 27, true, 0xe7b5, L"uri:startupapps", L"settings:SettingsPageStartup",
      {L"Startup", L"Автозагрузка", L"Inicio", L"Autostart", L"Inicialização", L"启动"}},
@@ -1137,7 +1137,7 @@ constexpr CatalogItem catalog[] = {
      {L"Accounts", L"Учетные записи", L"Cuentas", L"Konten", L"Contas", L"帐户"}},
     {L"windowsSettings.accounts.signIn", 0, 31, true, 0xe8d7, L"uri:signinoptions", L"settings:SettingsPageSignInOptions",
      {L"Sign-in options", L"Варианты входа", L"Opciones de inicio de sesión", L"Anmeldeoptionen", L"Opções de entrada", L"登录选项"}},
-    {L"windowsSettings.accounts.backup", 0, 31, true, 0xe777, L"uri:backup", L"settings:SettingsPageAccountsSync",
+    {L"windowsSettings.accounts.backup", 0, 31, true, 0xe78c, L"uri:backup", L"settings:SettingsPageAccountsSync",
      {L"Windows backup", L"Резервное копирование Windows", L"Copia de seguridad en Windows", L"Windows-Sicherung", L"Backup do Windows", L"Windows 备份"}},
     {L"windowsSettings.accounts.passkeys", 0, 31, true, 0xee7e, L"uri:savedpasskeys", L"settings:SettingsPagePasskeysManagement",
      {L"Passkeys", L"Ключи доступа", L"Claves de acceso", L"Hauptschlüssel", L"Chaves de acesso", L"通行密钥"}},
@@ -1159,11 +1159,11 @@ constexpr CatalogItem catalog[] = {
      {L"Windows Update", L"Центр обновления Windows", L"Windows Update", L"Windows Update", L"Windows Update", L"Windows 更新"}},
     {L"controlPanel.securityVisible", 1, -1, true, 0xea18, L"panel:5", L"shell32.dll,-32014",
      {L"System and Security", L"Система и безопасность", L"Sistema y seguridad", L"System und Sicherheit", L"Sistema e Segurança", L"系统和安全"}},
-    {L"controlPanel.security.maintenance", 1, 43, true, 0xf760, L"control:Microsoft.ActionCenter", L"shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
+    {L"controlPanel.security.maintenance", 1, 43, true, 0xe7c1, L"control:Microsoft.ActionCenter", L"shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
      {L"Security and Maintenance", L"Центр безопасности и обслуживания", L"Seguridad y mantenimiento", L"Sicherheit und Wartung", L"Segurança e Manutenção", L"安全和维护"}},
-    {L"controlPanel.security.firewall", 1, 43, true, 0xe83d, L"exe:Firewall.cpl", L"shell:{4026492F-2F69-46B8-B9BF-5654FC07E423}",
+    {L"controlPanel.security.firewall", 1, 43, true, 0xf5b4, L"exe:Firewall.cpl", L"shell:{4026492F-2F69-46B8-B9BF-5654FC07E423}",
      {L"Windows Defender Firewall", L"Брандмауэр Защитника Windows", L"Firewall de Windows Defender", L"Windows Defender Firewall", L"Windows Defender Firewall", L"Windows Defender 防火墙"}},
-    {L"controlPanel.security.powerOptions", 1, 43, true, 0xe7e8, L"exe:powercfg.cpl", L"shell:{025A5937-A6BE-4686-A844-36FE4BEC8B6D}",
+    {L"controlPanel.security.powerOptions", 1, 43, true, 0xee63, L"exe:powercfg.cpl", L"shell:{025A5937-A6BE-4686-A844-36FE4BEC8B6D}",
      {L"Power Options", L"Электропитание", L"Opciones de energía", L"Energieoptionen", L"Opções de Energia", L"电源选项"}},
     {L"controlPanel.security.bitlocker", 1, 43, true, 0xe72e, L"control:Microsoft.BitLockerDriveEncryption", L"shell:{D9EF8727-CAC2-4E60-809E-86F80A666C91}",
      {L"BitLocker Drive Encryption", L"Шифрование диска BitLocker", L"Cifrado de unidad BitLocker", L"BitLocker-Laufwerkverschlüsselung", L"Criptografia de Unidade de Disco BitLocker", L"BitLocker 驱动器加密"}},
@@ -1177,7 +1177,7 @@ constexpr CatalogItem catalog[] = {
      {L"Internet Options", L"Свойства браузера", L"Opciones de Internet", L"Internetoptionen", L"Opções da Internet", L"Internet 选项"}},
     {L"controlPanel.hardwareVisible", 1, -1, true, 0xe7f3, L"panel:2", L"shell32.dll,-32008",
      {L"Hardware and Sound", L"Оборудование и звук", L"Hardware y sonido", L"Hardware und Sound", L"Hardware e Sons", L"硬件和声音"}},
-    {L"controlPanel.hardware.deviceManager", 1, 52, true, 0xe772, L"exe:mmc.exe;devmgmt.msc", L"twinui.pcshell.dll,-10916",
+    {L"controlPanel.hardware.deviceManager", 1, 52, true, 0xe912, L"exe:mmc.exe;devmgmt.msc", L"twinui.pcshell.dll,-10916",
      {L"Device Manager", L"Диспетчер устройств", L"Administrador de dispositivos", L"Geräte-Manager", L"Gerenciador de Dispositivos", L"设备管理器"}},
     {L"controlPanel.hardware.sound", 1, 52, true, 0xe767, L"exe:mmsys.cpl", L"shell:{F2DDFC82-8F12-4CDD-B7DC-D4FE1425AA4D}",
      {L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"}},
@@ -1191,15 +1191,15 @@ constexpr CatalogItem catalog[] = {
      {L"Programs", L"Программы", L"Programas", L"Programme", L"Programas", L"程序"}},
     {L"controlPanel.programs.programsFeatures", 1, 58, true, 0xe71d, L"exe:appwiz.cpl", L"shell:{7B81BE6A-CE2B-4676-A29E-EB907A5126C5}",
      {L"Programs and Features", L"Программы и компоненты", L"Programas y características", L"Programme und Features", L"Programas e Recursos", L"程序和功能"}},
-    {L"controlPanel.programs.windowsFeatures", 1, 58, true, 0xe950, L"exe:OptionalFeatures.exe", L"appwiz.cpl,-188",
+    {L"controlPanel.programs.windowsFeatures", 1, 58, true, 0xe7b8, L"exe:OptionalFeatures.exe", L"appwiz.cpl,-188",
      {L"Turn Windows features on or off", L"Включение или отключение компонентов Windows", L"Activar o desactivar las características de Windows", L"Windows-Features aktivieren oder deaktivieren", L"Ativar ou desativar recursos do Windows", L"启用或关闭 Windows 功能"}},
     {L"controlPanel.userAccountsVisible", 1, -1, true, 0xe716, L"panel:9", L"shell32.dll,-32002",
      {L"User Accounts", L"Учетные записи пользователей", L"Cuentas de usuario", L"Benutzerkonten", L"Contas de Usuário", L"用户帐户"}},
-    {L"controlPanel.userAccounts.credentials", 1, 61, true, 0xe8d7, L"control:Microsoft.CredentialManager", L"shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
+    {L"controlPanel.userAccounts.credentials", 1, 61, true, 0xf540, L"control:Microsoft.CredentialManager", L"shell:{1206F5F1-0569-412C-8FEC-3204630DFB70}",
      {L"Credential Manager", L"Диспетчер учетных данных", L"Administrador de credenciales", L"Anmeldeinformationsverwaltung", L"Gerenciador de Credenciais", L"凭据管理器"}},
     {L"controlPanel.userAccounts.uac", 1, 61, true, 0xe7ef, L"exe:UserAccountControlSettings.exe", L"shell32.dll,-24317",
      {L"Change User Account Control settings", L"Изменение параметров контроля учетных записей", L"Cambiar configuración de Control de cuentas de usuario", L"Einstellungen der Benutzerkontensteuerung ändern", L"Alterar configurações de Controle de Conta de Usuário", L"更改用户帐户控制设置"}},
-    {L"controlPanel.appearanceVisible", 1, -1, true, 0xe771, L"panel:1", L"shell32.dll,-32018",
+    {L"controlPanel.appearanceVisible", 1, -1, true, 0xe7f9, L"panel:1", L"shell32.dll,-32018",
      {L"Appearance and Personalization", L"Оформление и персонализация", L"Apariencia y personalización", L"Darstellung und Anpassung", L"Aparência e Personalização", L"外观和个性化"}},
     {L"controlPanel.appearance.explorerOptions", 1, 64, true, 0xe8b7, L"control:folders", L"shell:{6DFD7C5C-2451-11D3-A299-00C04F8EF6AF}",
      {L"File Explorer Options", L"Параметры Проводника", L"Opciones del Explorador de archivos", L"Explorer-Optionen", L"Opções do Explorador de Arquivos", L"文件资源管理器选项"}},
@@ -1215,13 +1215,13 @@ constexpr CatalogItem catalog[] = {
      {L"Region", L"Региональные стандарты", L"Región", L"Region", L"Região", L"区域"}},
     {L"controlPanel.accessibility", 1, -1, true, 0xe776, L"panel:7", L"shell32.dll,-32000",
      {L"Ease of Access", L"Специальные возможности", L"Accesibilidad", L"Erleichterte Bedienung", L"Facilidade de Acesso", L"轻松使用"}},
-    {L"administration.toolsVisible", 2, -1, true, 0xe90f, L"shell:{D20EA4E1-3957-11d2-A40B-0C5020524153}", L"tools:Windows Tools",
+    {L"administration.toolsVisible", 2, -1, true, 0xe90f, L"control:Microsoft.AdministrativeTools", L"tools:Windows Tools",
      {L"Windows Tools", L"Инструменты Windows", L"Herramientas de Windows", L"Windows-Tools", L"Ferramentas do Windows", L"Windows 工具"}},
     {L"administration.tools.userCertificates", 2, 72, true, 0xeb95, L"exe:mmc.exe;certmgr.msc", L"certmgr.dll,-246",
      {L"Certificates - Current User", L"Сертификаты - текущий пользователь", L"Certificados: usuario actual", L"Zertifikate - Aktueller Benutzer", L"Certificados - Usuário Atual", L"证书 - 当前用户"}},
-    {L"administration.tools.machineCertificates", 2, 72, true, 0x0, L"exe:mmc.exe;certlm.msc", L"certmgr.dll,-193",
+    {L"administration.tools.machineCertificates", 2, 72, true, 0xeb95, L"exe:mmc.exe;certlm.msc", L"certmgr.dll,-193",
      {L"Certificates (Local Computer)", L"Сертификаты (локальный компьютер)", L"Certificados (equipo local)", L"Zertifikate (Lokaler Computer)", L"Certificados (computador local)", L"证书(本地计算机)"}},
-    {L"administration.tools.firewallAdvanced", 2, 72, true, 0xe83d, L"exe:mmc.exe;WF.msc", L"tools:Windows Defender Firewall with Advanced Security",
+    {L"administration.tools.firewallAdvanced", 2, 72, true, 0xf5b4, L"exe:mmc.exe;WF.msc", L"tools:Windows Defender Firewall with Advanced Security",
      {L"Windows Defender Firewall with Advanced Security", L"Монитор брандмауэра Защитника Windows в режиме повышенной безопасности", L"Windows Defender Firewall con seguridad avanzada", L"Windows Defender Firewall mit erweiterter Sicherheit", L"Windows Defender Firewall com Segurança Avançada", L"高级安全 Windows Defender 防火墙"}},
     {L"administration.computerManagementVisible", 2, -1, true, 0xe770, L"native:10918", L"twinui.pcshell.dll,-10918",
      {L"Computer Management", L"Управление компьютером", L"Administración de equipos", L"Computerverwaltung", L"Gerenciamento do Computador", L"计算机管理"}},
@@ -1229,15 +1229,15 @@ constexpr CatalogItem catalog[] = {
      {L"Shared Folders", L"Общие папки", L"Carpetas compartidas", L"Freigegebene Ordner", L"Pastas compartilhadas", L"共享文件夹"}},
     {L"administration.computerManagement.localUsers", 2, 76, true, 0xe716, L"exe:mmc.exe;lusrmgr.msc", L"localsec.dll,-5026",
      {L"Local Users and Groups", L"Локальные пользователи и группы", L"Usuarios y grupos locales", L"Lokale Benutzer und Gruppen", L"Usuários e Grupos Locais", L"本地用户和组"}},
-    {L"administration.computerManagement.wmi", 2, 76, true, 0x0, L"exe:mmc.exe;WmiMgmt.msc", L"wbem\\wbemcntl.dll,-143",
+    {L"administration.computerManagement.wmi", 2, 76, true, 0xec7a, L"exe:mmc.exe;WmiMgmt.msc", L"wbem\\wbemcntl.dll,-143",
      {L"WMI Control", L"Управляющий элемент WMI", L"Control WMI", L"WMI-Steuerung", L"Controle WMI", L"WMI 控件"}},
     {L"administration.diskManagementVisible", 2, -1, true, 0xeda2, L"native:10917", L"twinui.pcshell.dll,-10917",
      {L"Disk Management", L"Управление дисками", L"Administración de discos", L"Datenträgerverwaltung", L"Gerenciamento de Disco", L"磁盘管理"}},
-    {L"administration.diskManagement.optimize", 2, 80, true, 0xeda2, L"exe:dfrgui.exe", L"tools:dfrgui",
+    {L"administration.diskManagement.optimize", 2, 80, true, 0xf0e2, L"exe:dfrgui.exe", L"tools:dfrgui",
      {L"Defragment and Optimize Drives", L"Оптимизация дисков", L"Desfragmentar y optimizar unidades", L"Laufwerke defragmentieren und optimieren", L"Desfragmentar e Otimizar Unidades", L"碎片整理和优化驱动器"}},
-    {L"administration.diskManagement.cleanup", 2, 80, true, 0xe74d, L"exe:cleanmgr.exe", L"tools:Disk Cleanup",
+    {L"administration.diskManagement.cleanup", 2, 80, true, 0xea99, L"exe:cleanmgr.exe", L"tools:Disk Cleanup",
      {L"Disk Cleanup", L"Очистка диска", L"Liberador de espacio en disco", L"Datenträgerbereinigung", L"Limpeza de Disco", L"磁盘清理"}},
-    {L"administration.diskManagement.recoveryDrive", 2, 80, true, 0xe88e, L"exe:RecoveryDrive.exe", L"tools:RecoveryDrive",
+    {L"administration.diskManagement.recoveryDrive", 2, 80, true, 0xebc4, L"exe:RecoveryDrive.exe", L"tools:RecoveryDrive",
      {L"Recovery Drive", L"Диск восстановления", L"Unidad de recuperación", L"Wiederherstellungslaufwerk", L"Unidade de Recuperação", L"恢复驱动器"}},
     {L"administration.servicesVisible", 2, -1, true, 0xe713, L"exe:mmc.exe;services.msc", L"tools:services",
      {L"Services", L"Службы", L"Servicios", L"Dienste", L"Serviços", L"服务"}},
@@ -1247,19 +1247,19 @@ constexpr CatalogItem catalog[] = {
      {L"Component Services", L"Службы компонентов", L"Servicios de componentes", L"Komponentendienste", L"Serviços de Componentes", L"组件服务"}},
     {L"administration.eventViewerVisible", 2, -1, true, 0xf0e3, L"native:10914", L"twinui.pcshell.dll,-10914",
      {L"Event Viewer", L"Просмотр событий", L"Visor de eventos", L"Ereignisanzeige", L"Visualizador de Eventos", L"事件查看器"}},
-    {L"administration.eventViewer.performance", 2, 87, true, 0xe9d9, L"exe:perfmon.exe", L"tools:Performance Monitor",
+    {L"administration.eventViewer.performance", 2, 87, true, 0xf42f, L"exe:perfmon.exe", L"tools:Performance Monitor",
      {L"Performance Monitor", L"Системный монитор", L"Monitor de rendimiento", L"Leistungsüberwachung", L"Monitor de Desempenho", L"性能监视器"}},
     {L"administration.eventViewer.resources", 2, 87, true, 0xec49, L"exe:resmon.exe", L"tools:Resource Monitor",
      {L"Resource Monitor", L"Монитор ресурсов", L"Monitor de recursos", L"Ressourcenmonitor", L"Monitor de Recursos", L"资源监视器"}},
-    {L"administration.eventViewer.reliability", 2, 87, true, 0xe81c, L"exe:perfmon.exe;/rel", L"werconcpl.dll,-408",
+    {L"administration.eventViewer.reliability", 2, 87, true, 0xe9d9, L"exe:perfmon.exe;/rel", L"werconcpl.dll,-408",
      {L"Reliability Monitor", L"Монитор стабильности системы", L"Monitor de confiabilidad", L"Zuverlässigkeitsüberwachung", L"Monitor de Confiabilidade", L"可靠性监视程序"}},
     {L"administration.eventViewer.systemInfo", 2, 87, true, 0xe946, L"exe:msinfo32.exe", L"tools:System Information",
      {L"System Information", L"Сведения о системе", L"Información del sistema", L"Systeminformationen", L"Informações do sistema", L"系统信息"}},
     {L"administration.eventViewer.memoryDiagnostic", 2, 87, true, 0xeea0, L"exe:MdSched.exe", L"tools:Memory Diagnostics Tool",
      {L"Windows Memory Diagnostic", L"Средство проверки памяти Windows", L"Diagnóstico de memoria de Windows", L"Windows-Speicherdiagnose", L"Diagnóstico de Memória do Windows", L"Windows 内存诊断"}},
-    {L"administration.registryVisible", 2, -1, true, 0x0, L"exe:regedit.exe", L"tools:Registry Editor",
+    {L"administration.registryVisible", 2, -1, true, 0xeca5, L"exe:regedit.exe", L"tools:Registry Editor",
      {L"Registry Editor", L"Редактор реестра", L"Editor del Registro", L"Registrierungs-Editor", L"Editor do Registro", L"注册表编辑器"}},
-    {L"administration.registry.systemConfiguration", 2, 93, true, 0xec7a, L"exe:msconfig.exe", L"tools:System Configuration",
+    {L"administration.registry.systemConfiguration", 2, 93, true, 0xe912, L"exe:msconfig.exe", L"tools:System Configuration",
      {L"System Configuration", L"Конфигурация системы", L"Configuración del sistema", L"Systemkonfiguration", L"Configuração do Sistema", L"系统配置"}},
     {L"administration.registry.groupPolicy", 2, 93, true, 0xe8a6, L"exe:mmc.exe;gpedit.msc", L"gpedit.dll,-337",
      {L"Local Group Policy Editor", L"Редактор локальной групповой политики", L"Editor de directivas de grupo local", L"Editor für lokale Gruppenrichtlinien", L"Editor de Política de Grupo Local", L"本地组策略编辑器"}},
@@ -1269,7 +1269,7 @@ constexpr CatalogItem catalog[] = {
      {L"Terminal", L"Терминал", L"Terminal", L"Terminal", L"Terminal", L"终端"}},
     {L"administration.terminal.terminalAdmin", 2, 97, true, 0xe7ef, L"native:10961", L"",
      {L"Terminal (Admin)", L"Терминал (Администратор)", L"Terminal (Administrador)", L"Terminal (Administrator)", L"Terminal (Administrador)", L"终端管理员"}},
-    {L"administration.terminal.powershell", 2, 97, true, 0x0, L"exe:WindowsPowerShell/v1.0/powershell.exe", L"twinui.pcshell.dll,-10928",
+    {L"administration.terminal.powershell", 2, 97, true, 0xe943, L"exe:WindowsPowerShell/v1.0/powershell.exe", L"twinui.pcshell.dll,-10928",
      {L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell"}},
     {L"administration.terminal.commandPrompt", 2, 97, true, 0xe756, L"exe:cmd.exe", L"twinui.pcshell.dll,-10919",
      {L"Command Prompt", L"Командная строка", L"Símbolo del sistema", L"Eingabeaufforderung", L"Prompt de Comando", L"命令提示符"}},
@@ -1279,7 +1279,7 @@ constexpr CatalogItem catalog[] = {
      {L"Task Manager", L"Диспетчер задач", L"Administrador de tareas", L"Task-Manager", L"Gerenciador de Tarefas", L"任务管理器"}},
     {L"commands.explorerVisible", 3, -1, true, 0xec51, L"native:10923", L"",
      {L"File Explorer", L"Проводник", L"Explorador de archivos", L"Explorer", L"Explorador de Arquivos", L"文件资源管理器"}},
-    {L"commands.explorer.desktop", 3, 103, true, 0xe7f4, L"folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641", L"shell32.dll,-21769",
+    {L"commands.explorer.desktop", 3, 103, true, 0xe7fb, L"folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641", L"shell32.dll,-21769",
      {L"Desktop", L"Рабочий стол", L"Escritorio", L"Desktop", L"Área de Trabalho", L"桌面"}},
     {L"commands.explorer.computer", 3, 103, true, 0xe770, L"folder:0AC0837C-BBF8-452A-850D-79D08E667CA7", L"windows.storage.dll,-9216",
      {L"This PC", L"Этот компьютер", L"Este equipo", L"Dieser PC", L"Este Computador", L"此电脑"}},
@@ -1706,9 +1706,8 @@ void RunDestination(MenuSession& active, Destination destination) {
         }
     } else if (kind == L"folder") {
         opened = LaunchPidl(FolderId(target));
-    } else if (kind == L"panel" || kind == L"shell") {
-        const auto path = kind == L"panel" ? ControlPath(target) : L"::" + std::wstring(target);
-        opened = LaunchPidl(ShellId(path));
+    } else if (kind == L"panel") {
+        opened = LaunchPidl(ShellId(ControlPath(target)));
     } else if (kind == L"lock") {
         opened = LockWorkStation() != FALSE;
     } else if (kind == L"control") {

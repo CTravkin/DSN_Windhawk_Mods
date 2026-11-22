@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.9
+// @version         0.2.10
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 15
+// Build: 16
 
 // ==WindhawkModReadme==
 /*
@@ -493,9 +493,8 @@ void RunDestination(MenuSession& active, Destination destination) {
         }
     } else if (kind == L"folder") {
         opened = LaunchPidl(FolderId(target));
-    } else if (kind == L"panel" || kind == L"shell") {
-        const auto path = kind == L"panel" ? ControlPath(target) : L"::" + std::wstring(target);
-        opened = LaunchPidl(ShellId(path));
+    } else if (kind == L"panel") {
+        opened = LaunchPidl(ShellId(ControlPath(target)));
     } else if (kind == L"lock") {
         opened = LockWorkStation() != FALSE;
     } else if (kind == L"control") {

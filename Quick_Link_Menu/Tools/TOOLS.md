@@ -9,6 +9,8 @@ The `settings:` references point to page titles in the Settings PRI.
 For icons, match the glyphs in the installed Settings view model against
 Segoe Fluent Icons. Main rows can reuse a glyph when Windows uses it for
 the same concept. Within each submenu, the packager checks glyph uniqueness.
+For two entries that intentionally share an icon, the later entry can declare
+`sameGlyphAs` with the ID of the earlier entry that uses the same glyph.
 
 Each main row has a labeled visibility switch. Related shortcuts are grouped
 immediately below that switch. A single space as the group name keeps the

@@ -28,12 +28,16 @@ function labels(target, indent, key, names) {
 }
 
 function checkGlyphs(items, path, allowRepeats = false) {
-  const used = new Set();
-  for (const { glyph, id } of items) {
+  const used = new Map();
+  for (const { glyph, id, sameGlyphAs } of items) {
     if (!/^(0|[a-f0-9]{4})$/.test(glyph)) throw new Error(`Invalid glyph at ${path}.${id}`);
-    if (glyph === '0') continue;
-    if (!allowRepeats && used.has(glyph)) throw new Error(`Repeated glyph ${glyph} in ${path}`);
-    used.add(glyph);
+    const original = used.get(glyph);
+    if (sameGlyphAs !== undefined && (allowRepeats || glyph === '0' || original !== sameGlyphAs)) {
+      throw new Error(`Invalid shared glyph at ${path}.${id}`);
+    }
+    if (allowRepeats || glyph === '0') continue;
+    if (original && sameGlyphAs === undefined) throw new Error(`Repeated glyph ${glyph} in ${path}`);
+    if (!original) used.set(glyph, id);
   }
 }
 
