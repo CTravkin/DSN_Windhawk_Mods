@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.11
+// @version         0.2.12
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 17
+// Build: 18
 
 // ==WindhawkModReadme==
 /*
@@ -319,9 +319,9 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:pt-BR: "Opções de entrada"
       $name:zh-CN: "登录选项"
     - backup: true
-      $name: "Windows backup"
-      $name:ru-RU: "Резервное копирование Windows"
-      $name:es-ES: "Copia de seguridad en Windows"
+      $name: "Windows Backup"
+      $name:ru-RU: "Архивация Windows"
+      $name:es-ES: "Copias de seguridad de Windows"
       $name:de-DE: "Windows-Sicherung"
       $name:pt-BR: "Backup do Windows"
       $name:zh-CN: "Windows 备份"
@@ -1137,8 +1137,8 @@ constexpr CatalogItem catalog[] = {
      {L"Accounts", L"Учетные записи", L"Cuentas", L"Konten", L"Contas", L"帐户"}},
     {L"windowsSettings.accounts.signIn", 0, 31, true, 0xe8d7, L"uri:signinoptions", L"settings:SettingsPageSignInOptions",
      {L"Sign-in options", L"Варианты входа", L"Opciones de inicio de sesión", L"Anmeldeoptionen", L"Opções de entrada", L"登录选项"}},
-    {L"windowsSettings.accounts.backup", 0, 31, true, 0xe78c, L"uri:backup", L"settings:SettingsPageAccountsSync",
-     {L"Windows backup", L"Резервное копирование Windows", L"Copia de seguridad en Windows", L"Windows-Sicherung", L"Backup do Windows", L"Windows 备份"}},
+    {L"windowsSettings.accounts.backup", 0, 31, true, 0xe78c, L"uri:backup", L"app:MicrosoftWindows.Client.CBS_cw5n1h2txyewy!WindowsBackup",
+     {L"Windows Backup", L"Архивация Windows", L"Copias de seguridad de Windows", L"Windows-Sicherung", L"Backup do Windows", L"Windows 备份"}},
     {L"windowsSettings.accounts.passkeys", 0, 31, true, 0xee7e, L"uri:savedpasskeys", L"settings:SettingsPagePasskeysManagement",
      {L"Passkeys", L"Ключи доступа", L"Claves de acceso", L"Hauptschlüssel", L"Chaves de acesso", L"通行密钥"}},
     {L"windowsSettings.timeLanguageVisible", 0, -1, true, 0xe775, L"category:dateandtime;SystemSettings_DateTime_IsTimeSetAutomaticallyEnabled_ToggleSwitch", L"settings:SettingsPageGroupTimeRegion",
@@ -1566,6 +1566,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
     const auto [kind, target] = Split(item.action, L':');
     const auto [resourceKind, resource] = Split(item.resource, L':');
     if (resourceKind == L"shell") return RegistryShellName(resource);
+    if (resourceKind == L"app") return ShellName(ShellId(L"shell:AppsFolder\\" + std::wstring(resource)));
     if (resourceKind == L"tools") {
         if (resource == L"Windows Tools") return RegistryShellName(L"{D20EA4E1-3957-11D2-A40B-0C5020524153}");
         return ToolsName(resource);

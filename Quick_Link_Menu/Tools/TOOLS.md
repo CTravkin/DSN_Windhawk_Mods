@@ -6,6 +6,7 @@ order, action targets, display names for Windhawk, default visibility, and glyph
 assignments.
 
 The `settings:` references point to page titles in the Settings PRI.
+The `app:` references use the registered app's localized shell display name.
 For icons, match the glyphs in the installed Settings view model against
 Segoe Fluent Icons. Main rows can reuse a glyph when Windows uses it for
 the same concept. Within each submenu, the packager checks glyph uniqueness.

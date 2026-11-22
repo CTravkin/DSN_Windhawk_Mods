@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.11
+// @version         0.2.12
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 17
+// Build: 18
 
 // ==WindhawkModReadme==
 /*
@@ -353,6 +353,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
     const auto [kind, target] = Split(item.action, L':');
     const auto [resourceKind, resource] = Split(item.resource, L':');
     if (resourceKind == L"shell") return RegistryShellName(resource);
+    if (resourceKind == L"app") return ShellName(ShellId(L"shell:AppsFolder\\" + std::wstring(resource)));
     if (resourceKind == L"tools") {
         if (resource == L"Windows Tools") return RegistryShellName(L"{D20EA4E1-3957-11D2-A40B-0C5020524153}");
         return ToolsName(resource);

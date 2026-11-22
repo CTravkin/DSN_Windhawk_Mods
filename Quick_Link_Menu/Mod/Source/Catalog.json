@@ -486,11 +486,11 @@
             "id": "backup",
             "glyph": "e78c",
             "action": "uri:backup",
-            "resource": "settings:SettingsPageAccountsSync",
+            "resource": "app:MicrosoftWindows.Client.CBS_cw5n1h2txyewy!WindowsBackup",
             "names": [
-              "Windows backup",
-              "Резервное копирование Windows",
-              "Copia de seguridad en Windows",
+              "Windows Backup",
+              "Архивация Windows",
+              "Copias de seguridad de Windows",
               "Windows-Sicherung",
               "Backup do Windows",
               "Windows 备份"
