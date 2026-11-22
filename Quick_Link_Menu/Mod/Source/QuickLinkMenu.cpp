@@ -7,16 +7,16 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.3.4
+// @version         0.3.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
 // @license         MIT
 // @include         explorer.exe
 // @architecture    x86-64
-// @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
+// @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 24
+// Build: 27
 
 // ==WindhawkModReadme==
 /*
@@ -47,6 +47,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
 // GENERATED_SETTINGS
 
 #include <winsock2.h>
+#include <dwrite.h>
 #include <shellapi.h>
 #include <ipifcons.h>
 #include <shlobj.h>
@@ -159,6 +160,7 @@ struct MenuSession {
     winrt::Windows::Foundation::IInspectable oldPowerIcon{nullptr};
     bool powerChanged{};
     bool menuChanged{};
+    bool closing{};
     HCURSOR commandCursor{};
     HCURSOR previousCursor{};
     X::UIElement cursorElement{nullptr};
@@ -166,6 +168,7 @@ struct MenuSession {
     std::vector<C::MenuFlyoutItem::Click_revoker> clicks;
     std::vector<CursorEvents> cursorEvents;
     P::FlyoutBase::Opened_revoker opened;
+    P::FlyoutBase::Closing_revoker closingEvent;
     P::FlyoutBase::Closed_revoker closed;
 };
 
@@ -632,6 +635,7 @@ void UpdateHoverVisual(RowInteraction const& active) {
 }
 
 void SetHoverZone(RowInteraction& active, HoverZone zone) {
+    if (active.owner->closing) return;
     if (std::exchange(active.zone, zone) == zone) return;
     active.openOnUpdate = active.expand &&
         ((active.mode == HoverMode::Immediate && zone != HoverZone::Outside) ||
@@ -673,7 +677,7 @@ void AddArrowBackground(RowInteraction& active) {
     active.visualStateChanged = active.commonStates.CurrentStateChanged(winrt::auto_revoke,
         [row = &active](auto const&, X::VisualStateChangedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
-                if (active.zone == HoverZone::Arrow && args.NewState() &&
+                if (!active.owner->closing && active.zone == HoverZone::Arrow && args.NewState() &&
                     args.NewState().Name() != L"Normal")
                     active.hoverUpdate.Start();
             });
@@ -693,10 +697,14 @@ bool AttachPointerEvents(RowInteraction& active) {
         active.tick = active.hoverUpdate.Tick(winrt::auto_revoke, [row = &active](auto const&, auto const&) {
             OnRow(row, [](auto& active) {
                 active.hoverUpdate.Stop();
-                if (std::exchange(active.openOnUpdate, false) &&
-                    active.expand.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
-                    active.expand.Expand();
+                if (active.owner->closing) return;
+                const bool open = std::exchange(active.openOnUpdate, false);
+                const auto provider = active.expand;
+                const auto owner = active.owner;
                 UpdateHoverVisual(active);
+                if (open && session.get() == owner && !owner->closing && owner->menu.IsOpen() &&
+                    provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
+                    provider.Expand();
             });
         });
         if (active.mode == HoverMode::Arrow) AddArrowBackground(active);
@@ -759,9 +767,33 @@ bool AttachPointerEvents(RowInteraction& active) {
     return true;
 }
 
+constexpr wchar_t iconFont[] = L"Segoe Fluent Icons";
+constexpr wchar_t shieldTaskGlyph = L'\uf760';
+
+bool IconFontHasGlyph(wchar_t glyph) noexcept {
+    winrt::com_ptr<IDWriteFactory> factory;
+    winrt::com_ptr<IDWriteFontCollection> fonts;
+    winrt::com_ptr<IDWriteFontFamily> family;
+    winrt::com_ptr<IDWriteFont> font;
+    UINT32 index{};
+    BOOL found{}, hasGlyph{};
+    return SUCCEEDED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                                         reinterpret_cast<IUnknown**>(factory.put()))) &&
+           SUCCEEDED(factory->GetSystemFontCollection(fonts.put(), FALSE)) &&
+           SUCCEEDED(fonts->FindFamilyName(iconFont, &index, &found)) && found &&
+           SUCCEEDED(fonts->GetFontFamily(index, family.put())) &&
+           SUCCEEDED(family->GetFirstMatchingFont(DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+                                                  DWRITE_FONT_STYLE_NORMAL, font.put())) &&
+           SUCCEEDED(font->HasCharacter(glyph, &hasGlyph)) && hasGlyph;
+}
+
 C::FontIcon MakeIcon(wchar_t glyph) {
+    if (glyph == shieldTaskGlyph) {
+        static const bool hasShieldTask = IconFontHasGlyph(shieldTaskGlyph);
+        if (!hasShieldTask) glyph = L'\uea18';
+    }
     C::FontIcon icon;
-    icon.FontFamily(X::Media::FontFamily(L"Segoe Fluent Icons"));
+    icon.FontFamily(X::Media::FontFamily(iconFont));
     icon.FontSize(16);
     icon.Glyph(winrt::hstring(std::wstring_view(&glyph, 1)));
     return icon;
@@ -844,8 +876,59 @@ std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& sto
     return destination;
 }
 
+std::vector<P::Popup> FindSubmenuPopups(MenuSession const& active) {
+    std::vector<P::Popup> owned;
+    if (active.rows.empty()) return owned;
+    const auto root = active.rows.front()->split.XamlRoot();
+    if (!root) return owned;
+    for (auto const& popup : X::Media::VisualTreeHelper::GetOpenPopupsForXamlRoot(root)) {
+        const auto presenter = popup.Child().try_as<C::MenuFlyoutPresenter>();
+        if (!presenter || presenter.Items().Size() == 0) continue;
+        const auto first = presenter.Items().GetAt(0).try_as<C::MenuFlyoutItemBase>();
+        if (!first) continue;
+        // The root lists rows, while a submenu lists the children of one row.
+        uint32_t index;
+        if (std::any_of(active.rows.begin(), active.rows.end(), [&](auto const& row) {
+                return row->split.Items().IndexOf(first, index);
+            })) owned.push_back(popup);
+    }
+    return owned;
+}
+
+void CloseSubmenus(MenuSession& active) noexcept {
+    const bool firstClose = !std::exchange(active.closing, true);
+    std::vector<P::Popup> popups;
+    try { popups = FindSubmenuPopups(active); }
+    catch (...) { Wh_Log(L"Could not identify the open Win+X submenu popups"); }
+
+    std::vector<AV::IExpandCollapseProvider> expanded;
+    if (firstClose) {
+        for (auto const& row : active.rows) {
+            row->openOnUpdate = false;
+            try {
+                if (row->hoverUpdate) row->hoverUpdate.Stop();
+                if (row->expand && row->expand.ExpandCollapseState() == X::Automation::ExpandCollapseState::Expanded)
+                    expanded.push_back(row->expand);
+            } catch (...) {
+                Wh_Log(L"Could not prepare the Win+X submenu to close");
+            }
+        }
+    }
+    // Closing can synchronously raise Closed on the parent. Use the references
+    // captured above once XAML can dispatch events.
+    for (auto const& provider : expanded) {
+        try { provider.Collapse(); }
+        catch (...) { Wh_Log(L"Could not close the Win+X submenu"); }
+    }
+    // XAML can hide the submenu HWND and report Collapsed while its Popup is
+    // still open. Close that popup before restoring the original menu rows.
+    for (auto const& popup : popups) {
+        try { if (popup.IsOpen()) popup.IsOpen(false); }
+        catch (...) { Wh_Log(L"Could not close the Win+X submenu popup"); }
+    }
+}
+
 void RemoveRowVisual(RowInteraction& row) {
-    if (row.hoverUpdate) row.hoverUpdate.Stop();
     if (row.arrowLayer && row.layout) {
         uint32_t index{};
         auto children = row.layout.Children();
@@ -856,6 +939,7 @@ void RemoveRowVisual(RowInteraction& row) {
 void Restore() noexcept {
     auto old = std::move(session);
     if (!old) return;
+    CloseSubmenus(*old);
     ClearCommandCursor(*old);
     for (auto const& row : old->rows) {
         try { RemoveRowVisual(*row); } catch (...) {}
@@ -1030,6 +1114,9 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             Wh_Log(L"Could not initialize Win+X submenu interactions; restoring the Windows menu");
             Restore();
         }
+    });
+    pending->closingEvent = menu.Closing(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
+        if (session.get() == owner && !owner->closing) CloseSubmenus(*owner);
     });
     pending->closed = menu.Closed(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
         if (session.get() == owner) Restore();

@@ -398,7 +398,7 @@
       },
       {
         "id": "apps",
-        "glyph": "e71d",
+        "glyph": "e8a9",
         "action": "category:installed-apps;SystemSettings_StorageSense_AppSizesListFilter_DisplayStringValue",
         "resource": "settings:SettingsPageGroupApps",
         "names": [
@@ -653,7 +653,7 @@
     "rows": [
       {
         "id": "security",
-        "glyph": "ea18",
+        "glyph": "f760",
         "action": "panel:5",
         "resource": "shell32.dll,-32014",
         "names": [
@@ -1154,7 +1154,7 @@
       },
       {
         "id": "computerManagement",
-        "glyph": "e770",
+        "glyph": "e977",
         "action": "native:10918",
         "resource": "twinui.pcshell.dll,-10918",
         "names": [
@@ -1270,7 +1270,7 @@
       },
       {
         "id": "services",
-        "glyph": "e713",
+        "glyph": "e9f5",
         "action": "exe:mmc.exe;services.msc",
         "resource": "tools:services",
         "names": [

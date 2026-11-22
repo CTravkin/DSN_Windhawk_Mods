@@ -7,16 +7,16 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.3.4
+// @version         0.3.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
 // @license         MIT
 // @include         explorer.exe
 // @architecture    x86-64
-// @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
+// @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 24
+// Build: 27
 
 // ==WindhawkModReadme==
 /*
@@ -1039,6 +1039,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
 // ==/WindhawkModSettings==
 
 #include <winsock2.h>
+#include <dwrite.h>
 #include <shellapi.h>
 #include <ipifcons.h>
 #include <shlobj.h>
@@ -1147,7 +1148,7 @@ constexpr CatalogItem catalog[] = {
      {L"Start", L"Пуск", L"Inicio", L"Start", L"Iniciar", L"开始"}},
     {L"windowsSettings.personalization.taskbar", 0, 20, true, 0xe90e, L"uri:taskbar", L"settings:SettingsPageTaskbar",
      {L"Taskbar", L"Панель задач", L"Barra de tareas", L"Taskleiste", L"Barra de Tarefas", L"任务栏"}},
-    {L"windowsSettings.appsVisible", 0, -1, true, 0xe71d, L"category:installed-apps;SystemSettings_StorageSense_AppSizesListFilter_DisplayStringValue", L"settings:SettingsPageGroupApps",
+    {L"windowsSettings.appsVisible", 0, -1, true, 0xe8a9, L"category:installed-apps;SystemSettings_StorageSense_AppSizesListFilter_DisplayStringValue", L"settings:SettingsPageGroupApps",
      {L"Apps", L"Приложения", L"Aplicaciones", L"Apps", L"Aplicativos", L"应用"}},
     {L"windowsSettings.apps.installed", 0, 27, true, 0xe71d, L"uri:installed-apps", L"settings:SettingsPageInstalledApps",
      {L"Installed apps", L"Установленные приложения", L"Aplicaciones instaladas", L"Installierte Apps", L"Aplicativos instalados", L"安装的应用"}},
@@ -1179,7 +1180,7 @@ constexpr CatalogItem catalog[] = {
      {L"Privacy & security", L"Конфиденциальность и защита", L"Privacidad y seguridad", L"Datenschutz und Sicherheit", L"Privacidade e segurança", L"隐私和安全性"}},
     {L"windowsSettings.update", 0, -1, true, 0xe895, L"uri:windowsupdate", L"settings:SettingsPageGroupRestore",
      {L"Windows Update", L"Центр обновления Windows", L"Windows Update", L"Windows Update", L"Windows Update", L"Windows 更新"}},
-    {L"controlPanel.securityVisible", 1, -1, true, 0xea18, L"panel:5", L"shell32.dll,-32014",
+    {L"controlPanel.securityVisible", 1, -1, true, 0xf760, L"panel:5", L"shell32.dll,-32014",
      {L"System and Security", L"Система и безопасность", L"Sistema y seguridad", L"System und Sicherheit", L"Sistema e Segurança", L"系统和安全"}},
     {L"controlPanel.security.maintenance", 1, 43, true, 0xe7c1, L"control:Microsoft.ActionCenter", L"shell:{BB64F8A7-BEE7-4E1A-AB8D-7D8273F7FDB6}",
      {L"Security and Maintenance", L"Центр безопасности и обслуживания", L"Seguridad y mantenimiento", L"Sicherheit und Wartung", L"Segurança e Manutenção", L"安全和维护"}},
@@ -1245,7 +1246,7 @@ constexpr CatalogItem catalog[] = {
      {L"Certificates (Local Computer)", L"Сертификаты (локальный компьютер)", L"Certificados (equipo local)", L"Zertifikate (Lokaler Computer)", L"Certificados (computador local)", L"证书(本地计算机)"}},
     {L"administration.tools.firewallAdvanced", 2, 72, true, 0xf5b4, L"exe:mmc.exe;WF.msc", L"tools:Windows Defender Firewall with Advanced Security",
      {L"Windows Defender Firewall with Advanced Security", L"Монитор брандмауэра Защитника Windows в режиме повышенной безопасности", L"Windows Defender Firewall con seguridad avanzada", L"Windows Defender Firewall mit erweiterter Sicherheit", L"Windows Defender Firewall com Segurança Avançada", L"高级安全 Windows Defender 防火墙"}},
-    {L"administration.computerManagementVisible", 2, -1, true, 0xe770, L"native:10918", L"twinui.pcshell.dll,-10918",
+    {L"administration.computerManagementVisible", 2, -1, true, 0xe977, L"native:10918", L"twinui.pcshell.dll,-10918",
      {L"Computer Management", L"Управление компьютером", L"Administración de equipos", L"Computerverwaltung", L"Gerenciamento do Computador", L"计算机管理"}},
     {L"administration.computerManagement.sharedFolders", 2, 76, true, 0xe8b7, L"exe:mmc.exe;fsmgmt.msc", L"filemgmt.dll,-3500",
      {L"Shared Folders", L"Общие папки", L"Carpetas compartidas", L"Freigegebene Ordner", L"Pastas compartilhadas", L"共享文件夹"}},
@@ -1261,7 +1262,7 @@ constexpr CatalogItem catalog[] = {
      {L"Disk Cleanup", L"Очистка диска", L"Liberador de espacio en disco", L"Datenträgerbereinigung", L"Limpeza de Disco", L"磁盘清理"}},
     {L"administration.diskManagement.recoveryDrive", 2, 80, true, 0xebc4, L"exe:RecoveryDrive.exe", L"tools:RecoveryDrive",
      {L"Recovery Drive", L"Диск восстановления", L"Unidad de recuperación", L"Wiederherstellungslaufwerk", L"Unidade de Recuperação", L"恢复驱动器"}},
-    {L"administration.servicesVisible", 2, -1, true, 0xe713, L"exe:mmc.exe;services.msc", L"tools:services",
+    {L"administration.servicesVisible", 2, -1, true, 0xe9f5, L"exe:mmc.exe;services.msc", L"tools:services",
      {L"Services", L"Службы", L"Servicios", L"Dienste", L"Serviços", L"服务"}},
     {L"administration.services.taskScheduler", 2, 84, true, 0xe787, L"exe:mmc.exe;taskschd.msc", L"tools:Task Scheduler",
      {L"Task Scheduler", L"Планировщик задач", L"Programador de tareas", L"Aufgabenplanung", L"Agendador de Tarefas", L"任务计划程序"}},
@@ -1392,6 +1393,7 @@ struct MenuSession {
     winrt::Windows::Foundation::IInspectable oldPowerIcon{nullptr};
     bool powerChanged{};
     bool menuChanged{};
+    bool closing{};
     HCURSOR commandCursor{};
     HCURSOR previousCursor{};
     X::UIElement cursorElement{nullptr};
@@ -1399,6 +1401,7 @@ struct MenuSession {
     std::vector<C::MenuFlyoutItem::Click_revoker> clicks;
     std::vector<CursorEvents> cursorEvents;
     P::FlyoutBase::Opened_revoker opened;
+    P::FlyoutBase::Closing_revoker closingEvent;
     P::FlyoutBase::Closed_revoker closed;
 };
 
@@ -1865,6 +1868,7 @@ void UpdateHoverVisual(RowInteraction const& active) {
 }
 
 void SetHoverZone(RowInteraction& active, HoverZone zone) {
+    if (active.owner->closing) return;
     if (std::exchange(active.zone, zone) == zone) return;
     active.openOnUpdate = active.expand &&
         ((active.mode == HoverMode::Immediate && zone != HoverZone::Outside) ||
@@ -1906,7 +1910,7 @@ void AddArrowBackground(RowInteraction& active) {
     active.visualStateChanged = active.commonStates.CurrentStateChanged(winrt::auto_revoke,
         [row = &active](auto const&, X::VisualStateChangedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
-                if (active.zone == HoverZone::Arrow && args.NewState() &&
+                if (!active.owner->closing && active.zone == HoverZone::Arrow && args.NewState() &&
                     args.NewState().Name() != L"Normal")
                     active.hoverUpdate.Start();
             });
@@ -1926,10 +1930,14 @@ bool AttachPointerEvents(RowInteraction& active) {
         active.tick = active.hoverUpdate.Tick(winrt::auto_revoke, [row = &active](auto const&, auto const&) {
             OnRow(row, [](auto& active) {
                 active.hoverUpdate.Stop();
-                if (std::exchange(active.openOnUpdate, false) &&
-                    active.expand.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
-                    active.expand.Expand();
+                if (active.owner->closing) return;
+                const bool open = std::exchange(active.openOnUpdate, false);
+                const auto provider = active.expand;
+                const auto owner = active.owner;
                 UpdateHoverVisual(active);
+                if (open && session.get() == owner && !owner->closing && owner->menu.IsOpen() &&
+                    provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
+                    provider.Expand();
             });
         });
         if (active.mode == HoverMode::Arrow) AddArrowBackground(active);
@@ -1992,9 +2000,33 @@ bool AttachPointerEvents(RowInteraction& active) {
     return true;
 }
 
+constexpr wchar_t iconFont[] = L"Segoe Fluent Icons";
+constexpr wchar_t shieldTaskGlyph = L'\uf760';
+
+bool IconFontHasGlyph(wchar_t glyph) noexcept {
+    winrt::com_ptr<IDWriteFactory> factory;
+    winrt::com_ptr<IDWriteFontCollection> fonts;
+    winrt::com_ptr<IDWriteFontFamily> family;
+    winrt::com_ptr<IDWriteFont> font;
+    UINT32 index{};
+    BOOL found{}, hasGlyph{};
+    return SUCCEEDED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                                         reinterpret_cast<IUnknown**>(factory.put()))) &&
+           SUCCEEDED(factory->GetSystemFontCollection(fonts.put(), FALSE)) &&
+           SUCCEEDED(fonts->FindFamilyName(iconFont, &index, &found)) && found &&
+           SUCCEEDED(fonts->GetFontFamily(index, family.put())) &&
+           SUCCEEDED(family->GetFirstMatchingFont(DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+                                                  DWRITE_FONT_STYLE_NORMAL, font.put())) &&
+           SUCCEEDED(font->HasCharacter(glyph, &hasGlyph)) && hasGlyph;
+}
+
 C::FontIcon MakeIcon(wchar_t glyph) {
+    if (glyph == shieldTaskGlyph) {
+        static const bool hasShieldTask = IconFontHasGlyph(shieldTaskGlyph);
+        if (!hasShieldTask) glyph = L'\uea18';
+    }
     C::FontIcon icon;
-    icon.FontFamily(X::Media::FontFamily(L"Segoe Fluent Icons"));
+    icon.FontFamily(X::Media::FontFamily(iconFont));
     icon.FontSize(16);
     icon.Glyph(winrt::hstring(std::wstring_view(&glyph, 1)));
     return icon;
@@ -2356,8 +2388,59 @@ std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& sto
     return destination;
 }
 
+std::vector<P::Popup> FindSubmenuPopups(MenuSession const& active) {
+    std::vector<P::Popup> owned;
+    if (active.rows.empty()) return owned;
+    const auto root = active.rows.front()->split.XamlRoot();
+    if (!root) return owned;
+    for (auto const& popup : X::Media::VisualTreeHelper::GetOpenPopupsForXamlRoot(root)) {
+        const auto presenter = popup.Child().try_as<C::MenuFlyoutPresenter>();
+        if (!presenter || presenter.Items().Size() == 0) continue;
+        const auto first = presenter.Items().GetAt(0).try_as<C::MenuFlyoutItemBase>();
+        if (!first) continue;
+        // The root lists rows, while a submenu lists the children of one row.
+        uint32_t index;
+        if (std::any_of(active.rows.begin(), active.rows.end(), [&](auto const& row) {
+                return row->split.Items().IndexOf(first, index);
+            })) owned.push_back(popup);
+    }
+    return owned;
+}
+
+void CloseSubmenus(MenuSession& active) noexcept {
+    const bool firstClose = !std::exchange(active.closing, true);
+    std::vector<P::Popup> popups;
+    try { popups = FindSubmenuPopups(active); }
+    catch (...) { Wh_Log(L"Could not identify the open Win+X submenu popups"); }
+
+    std::vector<AV::IExpandCollapseProvider> expanded;
+    if (firstClose) {
+        for (auto const& row : active.rows) {
+            row->openOnUpdate = false;
+            try {
+                if (row->hoverUpdate) row->hoverUpdate.Stop();
+                if (row->expand && row->expand.ExpandCollapseState() == X::Automation::ExpandCollapseState::Expanded)
+                    expanded.push_back(row->expand);
+            } catch (...) {
+                Wh_Log(L"Could not prepare the Win+X submenu to close");
+            }
+        }
+    }
+    // Closing can synchronously raise Closed on the parent. Use the references
+    // captured above once XAML can dispatch events.
+    for (auto const& provider : expanded) {
+        try { provider.Collapse(); }
+        catch (...) { Wh_Log(L"Could not close the Win+X submenu"); }
+    }
+    // XAML can hide the submenu HWND and report Collapsed while its Popup is
+    // still open. Close that popup before restoring the original menu rows.
+    for (auto const& popup : popups) {
+        try { if (popup.IsOpen()) popup.IsOpen(false); }
+        catch (...) { Wh_Log(L"Could not close the Win+X submenu popup"); }
+    }
+}
+
 void RemoveRowVisual(RowInteraction& row) {
-    if (row.hoverUpdate) row.hoverUpdate.Stop();
     if (row.arrowLayer && row.layout) {
         uint32_t index{};
         auto children = row.layout.Children();
@@ -2368,6 +2451,7 @@ void RemoveRowVisual(RowInteraction& row) {
 void Restore() noexcept {
     auto old = std::move(session);
     if (!old) return;
+    CloseSubmenus(*old);
     ClearCommandCursor(*old);
     for (auto const& row : old->rows) {
         try { RemoveRowVisual(*row); } catch (...) {}
@@ -2542,6 +2626,9 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             Wh_Log(L"Could not initialize Win+X submenu interactions; restoring the Windows menu");
             Restore();
         }
+    });
+    pending->closingEvent = menu.Closing(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
+        if (session.get() == owner && !owner->closing) CloseSubmenus(*owner);
     });
     pending->closed = menu.Closed(winrt::auto_revoke, [owner = pending.get()](auto const&, auto const&) {
         if (session.get() == owner) Restore();
