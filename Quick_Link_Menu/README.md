@@ -21,8 +21,9 @@ Panel, administration tools, and basic commands in four groups.
 
 ## Platforms
 
-The mod targets Windows 11 x64. Native testing was performed on Windows 11
-26H2, build 26300.10075. It is incompatible with Windows 10 Win+X Restorer.
+The mod targets Windows 11 x64. Win+X was verified on Windows 11 24H2 Home and
+Pro (build 26100.4349) and Windows 11 26H2 (build 26300.10075). The mod is
+incompatible with Windows 10 Win+X Restorer.
 
 ## Usage
 

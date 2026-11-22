@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.3.1
+// @version         0.3.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 21
+// Build: 22
 
 // ==WindhawkModReadme==
 /*
@@ -926,25 +926,33 @@ void AddInteraction(MenuSession& pending, C::MenuFlyoutSubItem const& split,
     pending.rows.push_back(std::move(row));
 }
 
-void TryPatchMenu(C::MenuFlyout const& menu) {
+std::optional<StockMenu> ReadStockMenu(C::MenuFlyout const& menu) {
     const auto items = menu.Items();
-    if (items.Size() < 10) return;
-    const auto snapshot = ReadSettings();
+    if (items.Size() < 10) return std::nullopt;
 
     StockMenu stock;
     const auto powerTitle = Normalize(Twinui(L"10930"));
-    if (powerTitle.empty()) return;
+    if (powerTitle.empty()) return std::nullopt;
     for (auto const& item : items) {
         stock.rows.push_back(item);
         if (auto sub = item.try_as<C::MenuFlyoutSubItem>(); sub && Normalize(sub.Text()) == powerTitle)
             stock.power = sub;
     }
     if (!stock.power || !StockAction(stock, L"10921") || !StockAction(stock, L"10923") ||
-        !StockAction(stock, L"10925")) return;
+        !StockAction(stock, L"10925")) return std::nullopt;
     for (auto const& item : stock.power.Items()) {
         if (item.try_as<C::MenuFlyoutItem>()) stock.powerRows.push_back(item);
     }
-    if (stock.powerRows.size() < 3 || stock.powerRows.size() > 5) return;
+    if (stock.powerRows.size() < 3 || stock.powerRows.size() > 5) return std::nullopt;
+    return stock;
+}
+
+void TryPatchMenu(C::MenuFlyout const& menu) {
+    const auto nativeMenu = ReadStockMenu(menu);
+    if (!nativeMenu) return;
+    const auto& stock = *nativeMenu;
+    const auto items = menu.Items();
+    const auto snapshot = ReadSettings();
 
     RefreshAvailability();
     const auto availability = ReadAvailability();
@@ -1031,13 +1039,31 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     items.ReplaceAll(visible);
 }
 
+winrt::weak_ref<C::MenuFlyout> observedMenu;
+P::FlyoutBase::Opening_revoker opening;
+
 template<typename Interface>
 void Inspect(void* abi) {
     if (unloading || GetCurrentThreadId() != trayThread || session) return;
     try {
         Interface flyout{nullptr};
         winrt::copy_from_abi(flyout, abi);
-        if (auto menu = flyout.template try_as<C::MenuFlyout>()) TryPatchMenu(menu);
+        auto menu = flyout.template try_as<C::MenuFlyout>();
+        if (!menu || menu.IsOpen() || menu == observedMenu.get() || !ReadStockMenu(menu)) return;
+
+        // XAML can close and reopen the flyout internally while positioning it.
+        // Customize each Opening so a positioning pass can't leave the stock items behind.
+        auto weak = winrt::make_weak(menu);
+        opening = menu.Opening(winrt::auto_revoke, [weak](auto const&, auto const&) {
+            if (unloading || session) return;
+            try {
+                if (auto menu = weak.get()) TryPatchMenu(menu);
+            } catch (...) {
+                Restore();
+                Wh_Log(L"Could not customize the Quick Link menu");
+            }
+        });
+        observedMenu = std::move(weak);
     } catch (...) {
         Restore();
         Wh_Log(L"Could not customize the Quick Link menu");
@@ -1076,6 +1102,8 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
     if (message == setupMessage) {
         try {
             if (action) return InstallHooks();
+            opening.revoke();
+            observedMenu = {};
             if (session) {
                 auto menu = session->menu;
                 menu.Hide();
