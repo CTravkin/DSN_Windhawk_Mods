@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.8
+// @version         0.2.9
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 14
+// Build: 15
 
 // ==WindhawkModReadme==
 /*
@@ -199,12 +199,25 @@ Settings ReadSettings() {
     return settings;
 }
 
-std::wstring Normalize(std::wstring_view text) {
-    std::wstring normalized;
-    for (wchar_t ch : text) {
-        if (ch != L'&' && ch != L'\u200e' && ch != L'\u200f')
-            normalized.push_back(ch);
+std::wstring MenuCaption(std::wstring_view text) {
+    // Chinese Win+X resources put the access key at the end, for example (&R).
+    auto suffix = text.rfind(L'(');
+    if (suffix != text.npos && text.ends_with(L')')) {
+        auto key = text.substr(suffix + 1, text.size() - suffix - 2);
+        if (key.starts_with(L'&')) key.remove_prefix(1);
+        if (key.size() == 1 && key.front() >= L'A' && key.front() <= L'Z') {
+            while (suffix && text[suffix - 1] == L' ') --suffix;
+            text = text.substr(0, suffix);
+        }
     }
+    std::wstring caption(text);
+    std::erase(caption, L'&');
+    return caption;
+}
+
+std::wstring Normalize(std::wstring_view text) {
+    auto normalized = MenuCaption(text);
+    std::erase_if(normalized, [](wchar_t ch) { return ch == L'\u200e' || ch == L'\u200f'; });
     CharLowerBuffW(normalized.data(), static_cast<DWORD>(normalized.size()));
     return normalized;
 }
@@ -228,8 +241,7 @@ std::wstring Indirect(PCWSTR token) {
 std::wstring SystemString(std::wstring_view reference) {
     const auto token = L"@%SystemRoot%\\System32\\" + std::wstring(reference);
     auto result = Indirect(token.c_str());
-    if (reference.starts_with(L"twinui.pcshell.dll,"))
-        std::erase(result, L'&');
+    if (reference.starts_with(L"twinui.pcshell.dll,")) return MenuCaption(result);
     return result;
 }
 
@@ -320,16 +332,21 @@ std::wstring ToolsName(std::wstring_view shortcut) {
 }
 
 std::wstring SettingsCaption(std::wstring_view id) {
-    const auto base = L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
-                      std::wstring(id);
+    const auto titleFor = [](std::wstring_view page, std::wstring_view field) {
+        return Indirect((L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
+                         std::wstring(page) + L"/" + std::wstring(field) + L"}").c_str());
+    };
     // Windows uses the short title on systems without a battery.
     if (id == L"SettingsPagePowerAndBattery") {
         SYSTEM_POWER_STATUS status{};
         if (GetSystemPowerStatus(&status) && status.BatteryFlag == 128) {
-            if (auto title = Indirect((base + L"/AlternateDisplayName}").c_str()); !title.empty()) return title;
+            if (auto title = titleFor(id, L"AlternateDisplayName"); !title.empty()) return title;
         }
     }
-    return Indirect((base + L"/DisplayName}").c_str());
+    auto title = titleFor(id, L"DisplayName");
+    if (title.empty() && id == L"SettingsPageAdvancedSystemSettings")
+        return titleFor(L"SettingsPageRestoreDeveloperOptions", L"DisplayName");
+    return title;
 }
 
 std::wstring SystemCaption(CatalogItem const& item) {
@@ -351,7 +368,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
 }
 
 std::wstring Caption(Destination const& destination) {
-    if (destination.original) return std::wstring(destination.original.Text());
+    if (destination.original) return MenuCaption(destination.original.Text());
     const auto& item = *destination.item;
     auto& cached = captionCache[&item - catalog];
     if (!cached) {

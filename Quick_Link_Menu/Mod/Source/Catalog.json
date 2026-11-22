@@ -62,7 +62,7 @@
               "Питание",
               "Inicio/Apagado",
               "Leistung",
-              "Desligar ",
+              "Desligar",
               "电源"
             ]
           },
@@ -762,7 +762,7 @@
               "Conexiones de red",
               "Netzwerkverbindungen",
               "Conexões de Rede",
-              "网络连接(W)"
+              "网络连接"
             ]
           },
           {
@@ -806,7 +806,7 @@
               "Administrador de dispositivos",
               "Geräte-Manager",
               "Gerenciador de Dispositivos",
-              "设备管理器(M)"
+              "设备管理器"
             ]
           },
           {
@@ -1162,7 +1162,7 @@
           "Administración de equipos",
           "Computerverwaltung",
           "Gerenciamento do Computador",
-          "计算机管理(G)"
+          "计算机管理"
         ],
         "children": [
           {
@@ -1220,7 +1220,7 @@
           "Administración de discos",
           "Datenträgerverwaltung",
           "Gerenciamento de Disco",
-          "磁盘管理(K)"
+          "磁盘管理"
         ],
         "children": [
           {
@@ -1322,7 +1322,7 @@
           "Visor de eventos",
           "Ereignisanzeige",
           "Visualizador de Eventos",
-          "事件查看器(V)"
+          "事件查看器"
         ],
         "children": [
           {
@@ -1466,7 +1466,7 @@
           "Terminal",
           "Terminal",
           "Terminal",
-          "终端(I)"
+          "终端"
         ],
         "children": [
           {
@@ -1480,7 +1480,7 @@
               "Terminal (Administrador)",
               "Terminal (Administrator)",
               "Terminal (Administrador)",
-              "终端管理员(A)"
+              "终端管理员"
             ]
           },
           {
@@ -1494,7 +1494,7 @@
               "Windows PowerShell",
               "Windows PowerShell",
               "Windows PowerShell",
-              "Windows PowerShell(I)"
+              "Windows PowerShell"
             ]
           },
           {
@@ -1508,7 +1508,7 @@
               "Símbolo del sistema",
               "Eingabeaufforderung",
               "Prompt de Comando",
-              "命令提示符(C)"
+              "命令提示符"
             ]
           }
         ]
@@ -1545,7 +1545,7 @@
           "Ejecutar",
           "Ausführen",
           "Executar",
-          "运行(R)"
+          "运行"
         ],
         "children": []
       },
@@ -1560,7 +1560,7 @@
           "Administrador de tareas",
           "Task-Manager",
           "Gerenciador de Tarefas",
-          "任务管理器(T)"
+          "任务管理器"
         ],
         "children": []
       },
@@ -1575,7 +1575,7 @@
           "Explorador de archivos",
           "Explorer",
           "Explorador de Arquivos",
-          "文件资源管理器(E)"
+          "文件资源管理器"
         ],
         "children": [
           {
@@ -1691,7 +1691,7 @@
           "Buscar",
           "Suchen",
           "Pesquisar",
-          "搜索(S)"
+          "搜索"
         ],
         "enabled": false,
         "children": []
@@ -1707,7 +1707,7 @@
           "Escritorio",
           "Desktop",
           "Área de Trabalho",
-          "桌面(D)"
+          "桌面"
         ],
         "enabled": false,
         "children": []
@@ -1723,7 +1723,7 @@
           "Apagar o cerrar sesión",
           "Herunterfahren oder abmelden",
           "Desligar ou sair",
-          "关机或注销(U)"
+          "关机或注销"
         ],
         "children": [
           {

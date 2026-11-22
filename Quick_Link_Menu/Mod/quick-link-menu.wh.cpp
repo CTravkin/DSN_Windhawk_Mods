@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und erweitern (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize e amplie o menu Win+X (clique direito no botão Iniciar)
 // @description:zh-CN 自定义并扩展 Win+X 菜单（右键单击“开始”按钮）
-// @version         0.2.8
+// @version         0.2.9
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid
 // ==/WindhawkMod==
-// Build: 14
+// Build: 15
 
 // ==WindhawkModReadme==
 /*
@@ -103,7 +103,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:ru-RU: "Питание"
       $name:es-ES: "Inicio/Apagado"
       $name:de-DE: "Leistung"
-      $name:pt-BR: "Desligar "
+      $name:pt-BR: "Desligar"
       $name:zh-CN: "电源"
     - storage: true
       $name: "Storage"
@@ -462,7 +462,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:es-ES: "Conexiones de red"
       $name:de-DE: "Netzwerkverbindungen"
       $name:pt-BR: "Conexões de Rede"
-      $name:zh-CN: "网络连接(W)"
+      $name:zh-CN: "网络连接"
     - internetOptions: true
       $name: "Internet Options"
       $name:ru-RU: "Свойства браузера"
@@ -485,7 +485,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:es-ES: "Administrador de dispositivos"
       $name:de-DE: "Geräte-Manager"
       $name:pt-BR: "Gerenciador de Dispositivos"
-      $name:zh-CN: "设备管理器(M)"
+      $name:zh-CN: "设备管理器"
     - sound: true
       $name: "Sound"
       $name:ru-RU: "Звук"
@@ -670,7 +670,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Administración de equipos"
     $name:de-DE: "Computerverwaltung"
     $name:pt-BR: "Gerenciamento do Computador"
-    $name:zh-CN: "计算机管理(G)"
+    $name:zh-CN: "计算机管理"
   - computerManagement:
     - sharedFolders: true
       $name: "Shared Folders"
@@ -700,7 +700,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Administración de discos"
     $name:de-DE: "Datenträgerverwaltung"
     $name:pt-BR: "Gerenciamento de Disco"
-    $name:zh-CN: "磁盘管理(K)"
+    $name:zh-CN: "磁盘管理"
   - diskManagement:
     - optimize: true
       $name: "Defragment and Optimize Drives"
@@ -753,7 +753,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Visor de eventos"
     $name:de-DE: "Ereignisanzeige"
     $name:pt-BR: "Visualizador de Eventos"
-    $name:zh-CN: "事件查看器(V)"
+    $name:zh-CN: "事件查看器"
   - eventViewer:
     - performance: true
       $name: "Performance Monitor"
@@ -827,7 +827,7 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Terminal"
     $name:de-DE: "Terminal"
     $name:pt-BR: "Terminal"
-    $name:zh-CN: "终端(I)"
+    $name:zh-CN: "终端"
   - terminal:
     - terminalAdmin: true
       $name: "Terminal (Admin)"
@@ -835,21 +835,21 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
       $name:es-ES: "Terminal (Administrador)"
       $name:de-DE: "Terminal (Administrator)"
       $name:pt-BR: "Terminal (Administrador)"
-      $name:zh-CN: "终端管理员(A)"
+      $name:zh-CN: "终端管理员"
     - powershell: true
       $name: "Windows PowerShell"
       $name:ru-RU: "Windows PowerShell"
       $name:es-ES: "Windows PowerShell"
       $name:de-DE: "Windows PowerShell"
       $name:pt-BR: "Windows PowerShell"
-      $name:zh-CN: "Windows PowerShell(I)"
+      $name:zh-CN: "Windows PowerShell"
     - commandPrompt: true
       $name: "Command Prompt"
       $name:ru-RU: "Командная строка"
       $name:es-ES: "Símbolo del sistema"
       $name:de-DE: "Eingabeaufforderung"
       $name:pt-BR: "Prompt de Comando"
-      $name:zh-CN: "命令提示符(C)"
+      $name:zh-CN: "命令提示符"
     $name: " "
   $name: "Administration"
   $name:ru-RU: "Администрирование"
@@ -870,21 +870,21 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Ejecutar"
     $name:de-DE: "Ausführen"
     $name:pt-BR: "Executar"
-    $name:zh-CN: "运行(R)"
+    $name:zh-CN: "运行"
   - taskManager: true
     $name: "Task Manager"
     $name:ru-RU: "Диспетчер задач"
     $name:es-ES: "Administrador de tareas"
     $name:de-DE: "Task-Manager"
     $name:pt-BR: "Gerenciador de Tarefas"
-    $name:zh-CN: "任务管理器(T)"
+    $name:zh-CN: "任务管理器"
   - explorerVisible: true
     $name: "File Explorer"
     $name:ru-RU: "Проводник"
     $name:es-ES: "Explorador de archivos"
     $name:de-DE: "Explorer"
     $name:pt-BR: "Explorador de Arquivos"
-    $name:zh-CN: "文件资源管理器(E)"
+    $name:zh-CN: "文件资源管理器"
   - explorer:
     - desktop: true
       $name: "Desktop"
@@ -942,21 +942,21 @@ Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
     $name:es-ES: "Buscar"
     $name:de-DE: "Suchen"
     $name:pt-BR: "Pesquisar"
-    $name:zh-CN: "搜索(S)"
+    $name:zh-CN: "搜索"
   - desktop: false
     $name: "Desktop"
     $name:ru-RU: "Рабочий стол"
     $name:es-ES: "Escritorio"
     $name:de-DE: "Desktop"
     $name:pt-BR: "Área de Trabalho"
-    $name:zh-CN: "桌面(D)"
+    $name:zh-CN: "桌面"
   - powerVisible: true
     $name: "Shut down or sign out"
     $name:ru-RU: "Завершение работы или выход из системы"
     $name:es-ES: "Apagar o cerrar sesión"
     $name:de-DE: "Herunterfahren oder abmelden"
     $name:pt-BR: "Desligar ou sair"
-    $name:zh-CN: "关机或注销(U)"
+    $name:zh-CN: "关机或注销"
   - power:
     - lock: true
       $name: "Lock"
@@ -1078,7 +1078,7 @@ constexpr CatalogItem catalog[] = {
     {L"windowsSettings.system.sound", 0, 0, true, 0xe767, L"uri:sound", L"settings:SettingsPageAudio",
      {L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"}},
     {L"windowsSettings.system.power", 0, 0, true, 0xe7e8, L"uri:powersleep", L"settings:SettingsPagePowerAndBattery",
-     {L"Power", L"Питание", L"Inicio/Apagado", L"Leistung", L"Desligar ", L"电源"}},
+     {L"Power", L"Питание", L"Inicio/Apagado", L"Leistung", L"Desligar", L"电源"}},
     {L"windowsSettings.system.storage", 0, 0, true, 0xeda2, L"uri:storagesense", L"settings:SettingsPageStorageSenseStorageOverview",
      {L"Storage", L"Память", L"Almacenamiento", L"Speicher", L"Armazenamento", L"存储"}},
     {L"windowsSettings.system.advanced", 0, 0, true, 0xec7a, L"uri:developers", L"settings:SettingsPageAdvancedSystemSettings",
@@ -1172,13 +1172,13 @@ constexpr CatalogItem catalog[] = {
     {L"controlPanel.network.sharing", 1, 48, true, 0xf193, L"control:Microsoft.NetworkAndSharingCenter", L"shell:{8E908FC9-BECC-40F6-915B-F4CA0E70D03D}",
      {L"Network and Sharing Center", L"Центр управления сетями и общим доступом", L"Centro de redes y recursos compartidos", L"Netzwerk- und Freigabecenter", L"Central de Rede e Compartilhamento", L"网络和共享中心"}},
     {L"controlPanel.network.connections", 1, 48, true, 0xe839, L"exe:ncpa.cpl", L"twinui.pcshell.dll,-10912",
-     {L"Network Connections", L"Сетевые подключения", L"Conexiones de red", L"Netzwerkverbindungen", L"Conexões de Rede", L"网络连接(W)"}},
+     {L"Network Connections", L"Сетевые подключения", L"Conexiones de red", L"Netzwerkverbindungen", L"Conexões de Rede", L"网络连接"}},
     {L"controlPanel.network.internetOptions", 1, 48, true, 0xe774, L"exe:inetcpl.cpl", L"shell:{A3DD4F92-658A-410F-84FD-6FBBBEF2FFFE}",
      {L"Internet Options", L"Свойства браузера", L"Opciones de Internet", L"Internetoptionen", L"Opções da Internet", L"Internet 选项"}},
     {L"controlPanel.hardwareVisible", 1, -1, true, 0xe7f3, L"panel:2", L"shell32.dll,-32008",
      {L"Hardware and Sound", L"Оборудование и звук", L"Hardware y sonido", L"Hardware und Sound", L"Hardware e Sons", L"硬件和声音"}},
     {L"controlPanel.hardware.deviceManager", 1, 52, true, 0xe772, L"exe:mmc.exe;devmgmt.msc", L"twinui.pcshell.dll,-10916",
-     {L"Device Manager", L"Диспетчер устройств", L"Administrador de dispositivos", L"Geräte-Manager", L"Gerenciador de Dispositivos", L"设备管理器(M)"}},
+     {L"Device Manager", L"Диспетчер устройств", L"Administrador de dispositivos", L"Geräte-Manager", L"Gerenciador de Dispositivos", L"设备管理器"}},
     {L"controlPanel.hardware.sound", 1, 52, true, 0xe767, L"exe:mmsys.cpl", L"shell:{F2DDFC82-8F12-4CDD-B7DC-D4FE1425AA4D}",
      {L"Sound", L"Звук", L"Sonido", L"Sound", L"Som", L"声音"}},
     {L"controlPanel.hardware.mouse", 1, 52, true, 0xe962, L"exe:main.cpl", L"shell:{6C8EEC18-8D75-41B2-A177-8831D59D2D50}",
@@ -1224,7 +1224,7 @@ constexpr CatalogItem catalog[] = {
     {L"administration.tools.firewallAdvanced", 2, 72, true, 0xe83d, L"exe:mmc.exe;WF.msc", L"tools:Windows Defender Firewall with Advanced Security",
      {L"Windows Defender Firewall with Advanced Security", L"Монитор брандмауэра Защитника Windows в режиме повышенной безопасности", L"Windows Defender Firewall con seguridad avanzada", L"Windows Defender Firewall mit erweiterter Sicherheit", L"Windows Defender Firewall com Segurança Avançada", L"高级安全 Windows Defender 防火墙"}},
     {L"administration.computerManagementVisible", 2, -1, true, 0xe770, L"native:10918", L"twinui.pcshell.dll,-10918",
-     {L"Computer Management", L"Управление компьютером", L"Administración de equipos", L"Computerverwaltung", L"Gerenciamento do Computador", L"计算机管理(G)"}},
+     {L"Computer Management", L"Управление компьютером", L"Administración de equipos", L"Computerverwaltung", L"Gerenciamento do Computador", L"计算机管理"}},
     {L"administration.computerManagement.sharedFolders", 2, 76, true, 0xe8b7, L"exe:mmc.exe;fsmgmt.msc", L"filemgmt.dll,-3500",
      {L"Shared Folders", L"Общие папки", L"Carpetas compartidas", L"Freigegebene Ordner", L"Pastas compartilhadas", L"共享文件夹"}},
     {L"administration.computerManagement.localUsers", 2, 76, true, 0xe716, L"exe:mmc.exe;lusrmgr.msc", L"localsec.dll,-5026",
@@ -1232,7 +1232,7 @@ constexpr CatalogItem catalog[] = {
     {L"administration.computerManagement.wmi", 2, 76, true, 0x0, L"exe:mmc.exe;WmiMgmt.msc", L"wbem\\wbemcntl.dll,-143",
      {L"WMI Control", L"Управляющий элемент WMI", L"Control WMI", L"WMI-Steuerung", L"Controle WMI", L"WMI 控件"}},
     {L"administration.diskManagementVisible", 2, -1, true, 0xeda2, L"native:10917", L"twinui.pcshell.dll,-10917",
-     {L"Disk Management", L"Управление дисками", L"Administración de discos", L"Datenträgerverwaltung", L"Gerenciamento de Disco", L"磁盘管理(K)"}},
+     {L"Disk Management", L"Управление дисками", L"Administración de discos", L"Datenträgerverwaltung", L"Gerenciamento de Disco", L"磁盘管理"}},
     {L"administration.diskManagement.optimize", 2, 80, true, 0xeda2, L"exe:dfrgui.exe", L"tools:dfrgui",
      {L"Defragment and Optimize Drives", L"Оптимизация дисков", L"Desfragmentar y optimizar unidades", L"Laufwerke defragmentieren und optimieren", L"Desfragmentar e Otimizar Unidades", L"碎片整理和优化驱动器"}},
     {L"administration.diskManagement.cleanup", 2, 80, true, 0xe74d, L"exe:cleanmgr.exe", L"tools:Disk Cleanup",
@@ -1246,7 +1246,7 @@ constexpr CatalogItem catalog[] = {
     {L"administration.services.componentServices", 2, 84, true, 0xe950, L"exe:mmc.exe;comexp.msc", L"tools:Component Services",
      {L"Component Services", L"Службы компонентов", L"Servicios de componentes", L"Komponentendienste", L"Serviços de Componentes", L"组件服务"}},
     {L"administration.eventViewerVisible", 2, -1, true, 0xf0e3, L"native:10914", L"twinui.pcshell.dll,-10914",
-     {L"Event Viewer", L"Просмотр событий", L"Visor de eventos", L"Ereignisanzeige", L"Visualizador de Eventos", L"事件查看器(V)"}},
+     {L"Event Viewer", L"Просмотр событий", L"Visor de eventos", L"Ereignisanzeige", L"Visualizador de Eventos", L"事件查看器"}},
     {L"administration.eventViewer.performance", 2, 87, true, 0xe9d9, L"exe:perfmon.exe", L"tools:Performance Monitor",
      {L"Performance Monitor", L"Системный монитор", L"Monitor de rendimiento", L"Leistungsüberwachung", L"Monitor de Desempenho", L"性能监视器"}},
     {L"administration.eventViewer.resources", 2, 87, true, 0xec49, L"exe:resmon.exe", L"tools:Resource Monitor",
@@ -1266,19 +1266,19 @@ constexpr CatalogItem catalog[] = {
     {L"administration.registry.localSecurity", 2, 93, true, 0xe72e, L"exe:mmc.exe;secpol.msc", L"tools:Security Configuration Management",
      {L"Local Security Policy", L"Локальная политика безопасности", L"Directiva de seguridad local", L"Lokale Sicherheitsrichtlinie", L"Política de Segurança Local", L"本地安全策略"}},
     {L"administration.terminalVisible", 2, -1, true, 0xe756, L"native:10960", L"",
-     {L"Terminal", L"Терминал", L"Terminal", L"Terminal", L"Terminal", L"终端(I)"}},
+     {L"Terminal", L"Терминал", L"Terminal", L"Terminal", L"Terminal", L"终端"}},
     {L"administration.terminal.terminalAdmin", 2, 97, true, 0xe7ef, L"native:10961", L"",
-     {L"Terminal (Admin)", L"Терминал (Администратор)", L"Terminal (Administrador)", L"Terminal (Administrator)", L"Terminal (Administrador)", L"终端管理员(A)"}},
+     {L"Terminal (Admin)", L"Терминал (Администратор)", L"Terminal (Administrador)", L"Terminal (Administrator)", L"Terminal (Administrador)", L"终端管理员"}},
     {L"administration.terminal.powershell", 2, 97, true, 0x0, L"exe:WindowsPowerShell/v1.0/powershell.exe", L"twinui.pcshell.dll,-10928",
-     {L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell(I)"}},
+     {L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell", L"Windows PowerShell"}},
     {L"administration.terminal.commandPrompt", 2, 97, true, 0xe756, L"exe:cmd.exe", L"twinui.pcshell.dll,-10919",
-     {L"Command Prompt", L"Командная строка", L"Símbolo del sistema", L"Eingabeaufforderung", L"Prompt de Comando", L"命令提示符(C)"}},
+     {L"Command Prompt", L"Командная строка", L"Símbolo del sistema", L"Eingabeaufforderung", L"Prompt de Comando", L"命令提示符"}},
     {L"commands.run", 3, -1, true, 0xe8ad, L"native:10925", L"",
-     {L"Run", L"Выполнить", L"Ejecutar", L"Ausführen", L"Executar", L"运行(R)"}},
+     {L"Run", L"Выполнить", L"Ejecutar", L"Ausführen", L"Executar", L"运行"}},
     {L"commands.taskManager", 3, -1, true, 0xf120, L"native:10921", L"",
-     {L"Task Manager", L"Диспетчер задач", L"Administrador de tareas", L"Task-Manager", L"Gerenciador de Tarefas", L"任务管理器(T)"}},
+     {L"Task Manager", L"Диспетчер задач", L"Administrador de tareas", L"Task-Manager", L"Gerenciador de Tarefas", L"任务管理器"}},
     {L"commands.explorerVisible", 3, -1, true, 0xec51, L"native:10923", L"",
-     {L"File Explorer", L"Проводник", L"Explorador de archivos", L"Explorer", L"Explorador de Arquivos", L"文件资源管理器(E)"}},
+     {L"File Explorer", L"Проводник", L"Explorador de archivos", L"Explorer", L"Explorador de Arquivos", L"文件资源管理器"}},
     {L"commands.explorer.desktop", 3, 103, true, 0xe7f4, L"folder:B4BFCC3A-DB2C-424C-B029-7FE99A87C641", L"shell32.dll,-21769",
      {L"Desktop", L"Рабочий стол", L"Escritorio", L"Desktop", L"Área de Trabalho", L"桌面"}},
     {L"commands.explorer.computer", 3, 103, true, 0xe770, L"folder:0AC0837C-BBF8-452A-850D-79D08E667CA7", L"windows.storage.dll,-9216",
@@ -1294,11 +1294,11 @@ constexpr CatalogItem catalog[] = {
     {L"commands.explorer.recycleBin", 3, 103, true, 0xe74d, L"folder:B7534046-3ECB-4C18-BE4E-64CD4CB7D6AC", L"shell32.dll,-8964",
      {L"Recycle Bin", L"Корзина", L"Papelera de reciclaje", L"Papierkorb", L"Lixeira", L"回收站"}},
     {L"commands.find", 3, -1, false, 0xe721, L"native:10924", L"",
-     {L"Search", L"Найти", L"Buscar", L"Suchen", L"Pesquisar", L"搜索(S)"}},
+     {L"Search", L"Найти", L"Buscar", L"Suchen", L"Pesquisar", L"搜索"}},
     {L"commands.desktop", 3, -1, false, 0xe7fb, L"native:10926", L"",
-     {L"Desktop", L"Рабочий стол", L"Escritorio", L"Desktop", L"Área de Trabalho", L"桌面(D)"}},
+     {L"Desktop", L"Рабочий стол", L"Escritorio", L"Desktop", L"Área de Trabalho", L"桌面"}},
     {L"commands.powerVisible", 3, -1, true, 0xe7e8, L"power:menu", L"",
-     {L"Shut down or sign out", L"Завершение работы или выход из системы", L"Apagar o cerrar sesión", L"Herunterfahren oder abmelden", L"Desligar ou sair", L"关机或注销(U)"}},
+     {L"Shut down or sign out", L"Завершение работы или выход из системы", L"Apagar o cerrar sesión", L"Herunterfahren oder abmelden", L"Desligar ou sair", L"关机或注销"}},
     {L"commands.power.lock", 3, 113, true, 0xe72e, L"lock:session", L"pri:windows.ui.logon/resources/Lock/Text",
      {L"Lock", L"Заблокировать", L"Bloquear", L"Sperren", L"Bloquear", L"锁定"}},
     {L"commands.power.signOut", 3, 113, true, 0xf3b1, L"power:signOut", L"",
@@ -1412,12 +1412,25 @@ Settings ReadSettings() {
     return settings;
 }
 
-std::wstring Normalize(std::wstring_view text) {
-    std::wstring normalized;
-    for (wchar_t ch : text) {
-        if (ch != L'&' && ch != L'\u200e' && ch != L'\u200f')
-            normalized.push_back(ch);
+std::wstring MenuCaption(std::wstring_view text) {
+    // Chinese Win+X resources put the access key at the end, for example (&R).
+    auto suffix = text.rfind(L'(');
+    if (suffix != text.npos && text.ends_with(L')')) {
+        auto key = text.substr(suffix + 1, text.size() - suffix - 2);
+        if (key.starts_with(L'&')) key.remove_prefix(1);
+        if (key.size() == 1 && key.front() >= L'A' && key.front() <= L'Z') {
+            while (suffix && text[suffix - 1] == L' ') --suffix;
+            text = text.substr(0, suffix);
+        }
     }
+    std::wstring caption(text);
+    std::erase(caption, L'&');
+    return caption;
+}
+
+std::wstring Normalize(std::wstring_view text) {
+    auto normalized = MenuCaption(text);
+    std::erase_if(normalized, [](wchar_t ch) { return ch == L'\u200e' || ch == L'\u200f'; });
     CharLowerBuffW(normalized.data(), static_cast<DWORD>(normalized.size()));
     return normalized;
 }
@@ -1441,8 +1454,7 @@ std::wstring Indirect(PCWSTR token) {
 std::wstring SystemString(std::wstring_view reference) {
     const auto token = L"@%SystemRoot%\\System32\\" + std::wstring(reference);
     auto result = Indirect(token.c_str());
-    if (reference.starts_with(L"twinui.pcshell.dll,"))
-        std::erase(result, L'&');
+    if (reference.starts_with(L"twinui.pcshell.dll,")) return MenuCaption(result);
     return result;
 }
 
@@ -1533,16 +1545,21 @@ std::wstring ToolsName(std::wstring_view shortcut) {
 }
 
 std::wstring SettingsCaption(std::wstring_view id) {
-    const auto base = L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
-                      std::wstring(id);
+    const auto titleFor = [](std::wstring_view page, std::wstring_view field) {
+        return Indirect((L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
+                         std::wstring(page) + L"/" + std::wstring(field) + L"}").c_str());
+    };
     // Windows uses the short title on systems without a battery.
     if (id == L"SettingsPagePowerAndBattery") {
         SYSTEM_POWER_STATUS status{};
         if (GetSystemPowerStatus(&status) && status.BatteryFlag == 128) {
-            if (auto title = Indirect((base + L"/AlternateDisplayName}").c_str()); !title.empty()) return title;
+            if (auto title = titleFor(id, L"AlternateDisplayName"); !title.empty()) return title;
         }
     }
-    return Indirect((base + L"/DisplayName}").c_str());
+    auto title = titleFor(id, L"DisplayName");
+    if (title.empty() && id == L"SettingsPageAdvancedSystemSettings")
+        return titleFor(L"SettingsPageRestoreDeveloperOptions", L"DisplayName");
+    return title;
 }
 
 std::wstring SystemCaption(CatalogItem const& item) {
@@ -1564,7 +1581,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
 }
 
 std::wstring Caption(Destination const& destination) {
-    if (destination.original) return std::wstring(destination.original.Text());
+    if (destination.original) return MenuCaption(destination.original.Text());
     const auto& item = *destination.item;
     auto& cached = captionCache[&item - catalog];
     if (!cached) {
