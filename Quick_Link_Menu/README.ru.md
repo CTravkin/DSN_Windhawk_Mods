@@ -66,8 +66,7 @@ Quick Link Menu настраивает штатное меню Windows 11, ко�
 ### Совместимость
 
 Quick Link Menu работает со штатным Win+X Windows 11 и несовместим с модами,
-которые его подменяют. Например, меню в стиле Windows 10 открывает
-[Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
+которые его подменяют. Например, [Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
 
 ## Эксплуатация
 

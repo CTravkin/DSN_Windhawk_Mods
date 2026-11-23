@@ -78,8 +78,7 @@ tested on x64.
 ### Compatibility
 
 Quick Link Menu works with the standard Windows 11 Win+X menu. Mods that replace
-it are incompatible. For example, a Windows 10-style menu is provided by
-[Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
+it are incompatible. One example is [Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
 
 ## Usage
 
