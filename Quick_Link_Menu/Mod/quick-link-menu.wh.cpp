@@ -22,26 +22,55 @@
 /*
 # Quick Link Menu
 
-Customize the native Windows 11 menu opened by **Win+X** or by right-clicking
-the Start button.
+**English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Quick_Link_Menu/README.ru.md)
 
-Quick Link Menu organizes shortcuts into Windows Settings, Control Panel,
-Administration, and Basic commands. The row opens its main destination.
-A submenu offers related shortcuts and can be opened with the arrow or **Right**.
-**Enter** runs the main action. The power row defaults to **Shut down** and
-offers the other power commands in its submenu.
+Quick Link Menu customizes the native Windows 11 menu opened by **Win+X** or by
+right-clicking the Start button. It adds shortcuts to system settings and tools
+and lets you choose which commands appear.
 
-In the mod settings, the related shortcuts are listed with their main row.
-Hide whole sections or choose which rows and submenu items appear, and change how
-submenus open in **General settings**. A hand cursor marks areas that run a
-command. The optional administrator filter hides commands that require
-credentials or are blocked from elevation. **Command settings** can move
-administrator Terminal or a power action to the main menu. Disabling all
-entries restores the stock Win+X menu.
+## Features
 
-Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
+- **Settings.** Open Windows Settings categories and pages such as Display,
+  Sound, VPN, Default apps, and Windows Update.
+- **Control Panel.** Open classic tools such as Device Manager, Network
+  Connections, Power Options, and Programs and Features.
+- **Administration.** Open Computer Management, Services, Event Viewer,
+  Registry Editor, Terminal, and related tools such as Task Scheduler and
+  Command Prompt.
+- **Basic commands.** Open Run, Task Manager, Search, and File Explorer, show
+  the desktop, or access power and sign-in options. File Explorer opens its
+  configured start page, with a submenu for locations such as This PC,
+  Downloads, and the Recycle Bin.
+- **Windows labels and icons.** Menu labels follow the Windows display language
+  and entries use Segoe Fluent Icons. Windhawk settings are available in English,
+  Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
 
-[Project documentation](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Quick_Link_Menu)
+## Platforms
+
+Requires Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
+
+## Usage
+
+Click a row's label or press **Enter** to run its main action. Click the arrow
+or press **→** to open the submenu. A row with only a submenu opens it when
+you click the label.
+
+- **Menu contents.** Use the switches in the mod's **Settings** to choose
+  which sections, rows, and submenu commands appear. Turning off a row hides
+  its submenu. If no commands remain, Windows opens its standard Win+X menu.
+- **General settings.** Choose immediate hover, a delay, arrow hover, or arrow
+  click to open a submenu. The hand cursor marks areas that run a command.
+  The optional administrator filter hides known commands that require
+  administrator credentials or whose elevation is blocked. Commands that only
+  need UAC consent stay visible.
+- **Command settings.** The main Terminal action can run as administrator.
+  Choose a main power action or leave only the power submenu. The default
+  main action is **Shut down**.
+
+## Links
+
+- [Quick Link Menu on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Quick_Link_Menu)
+- [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
 
