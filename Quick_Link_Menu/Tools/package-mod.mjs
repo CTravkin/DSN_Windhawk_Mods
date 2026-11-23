@@ -46,7 +46,7 @@ function addDefinition(entry, group, key, parent) {
   keys.add(key);
   const index = definitions.length;
   definitions.push(
-    `    {${wide(key)}, ${group}, ${parent}, ${entry.enabled !== false}, 0x${entry.glyph},`
+    `    {${wide(key)}, ${group}, ${parent}, 0x${entry.glyph},`
       + ` ${wide(entry.action)}, ${wide(entry.resource)},\n`
       + `     {${entry.names.map(wide).join(', ')}}},`,
   );

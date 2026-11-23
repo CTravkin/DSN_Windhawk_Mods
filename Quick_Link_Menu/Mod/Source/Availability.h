@@ -107,19 +107,84 @@ constexpr bool SavedPasskeysAbsent(DWORD build, std::optional<DWORD> revision) {
     return build < 22621 || (build == 22621 && revision && *revision < 2361);
 }
 
-bool SavedPasskeysAbsent() {
+DWORD ReadWindowsBuild() {
     using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOW*);
     const auto module = GetModuleHandleW(L"ntdll.dll");
-    if (!module) return false;
+    if (!module) return 0;
     const auto getVersion = reinterpret_cast<RtlGetVersionFn>(GetProcAddress(module, "RtlGetVersion"));
     OSVERSIONINFOW version{};
     version.dwOSVersionInfoSize = sizeof(version);
-    if (!getVersion || getVersion(&version) != 0 || !version.dwBuildNumber) return false;
-    std::optional<DWORD> revision;
-    if (version.dwBuildNumber == 22621) {
-        revision = ReadMachineDword(L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", L"UBR");
+    return getVersion && getVersion(&version) == 0 ? version.dwBuildNumber : 0;
+}
+
+std::optional<DWORD> ReadWindowsRevision() {
+    return ReadMachineDword(L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", L"UBR");
+}
+
+constexpr bool PreferLegacyDeveloperTitle(DWORD build, std::optional<DWORD> revision) {
+    // The Advanced page began rolling out with KB5065789 (26100.6725).
+    return build && (build < 26100 || (build == 26100 && revision && *revision < 6725));
+}
+
+struct NetworkInterfaces {
+    bool ethernet{};
+    bool wifi{};
+    bool cellular{};
+};
+
+bool IsActiveSoftwareEthernet(MIB_IF_ROW2 const& row) {
+    const auto& flags = row.InterfaceAndOperStatusFlags;
+    return row.Type == IF_TYPE_ETHERNET_CSMACD && row.OperStatus == IfOperStatusUp &&
+           !flags.HardwareInterface && !flags.FilterInterface;
+}
+
+bool IsAddressedSoftwareEthernet(MIB_IF_ROW2 const& row, MIB_UNICASTIPADDRESS_TABLE const& addresses) {
+    return IsActiveSoftwareEthernet(row) &&
+           std::any_of(addresses.Table, addresses.Table + addresses.NumEntries, [&](auto const& address) {
+               return address.InterfaceLuid.Value == row.InterfaceLuid.Value;
+           });
+}
+
+NetworkInterfaces ReadNetworkInterfaces() {
+    MIB_IF_TABLE2* table{};
+    if (GetIfTable2(&table) != NO_ERROR) return {true, true, true};
+    NetworkInterfaces interfaces;
+    for (DWORD i = 0; i < table->NumEntries; ++i) {
+        auto const& entry = table->Table[i];
+        interfaces.ethernet |= entry.Type == IF_TYPE_ETHERNET_CSMACD &&
+                               entry.InterfaceAndOperStatusFlags.HardwareInterface;
+        interfaces.wifi |= entry.Type == IF_TYPE_IEEE80211;
+        interfaces.cellular |= entry.Type == IF_TYPE_WWANPP || entry.Type == IF_TYPE_WWANPP2;
     }
-    return SavedPasskeysAbsent(version.dwBuildNumber, revision);
+    const auto first = table->Table;
+    const auto last = first + table->NumEntries;
+    if (!interfaces.ethernet && std::any_of(first, last, IsActiveSoftwareEthernet)) {
+        // Adapter tables also report Ethernet filters and software interfaces with no IP binding.
+        MIB_UNICASTIPADDRESS_TABLE* addresses{};
+        if (GetUnicastIpAddressTable(AF_UNSPEC, &addresses) != NO_ERROR) {
+            interfaces.ethernet = true;
+        } else {
+            interfaces.ethernet = std::any_of(first, last, [&](auto const& entry) {
+                return IsAddressedSoftwareEthernet(entry, *addresses);
+            });
+            FreeMibTable(addresses);
+        }
+    }
+    FreeMibTable(table);
+    return interfaces;
+}
+
+constexpr bool KeyboardPageKnownMissing(DWORD build, HRESULT resourceStatus) {
+    return build == 26100 && resourceStatus == HRESULT_FROM_WIN32(ERROR_MRM_NAMED_RESOURCE_NOT_FOUND);
+}
+
+constexpr bool MissingDeviceSettingsPage(std::wstring_view page, NetworkInterfaces interfaces,
+                                         bool keyboardPageMissing) {
+    if (page == L"devices-keyboard") return keyboardPageMissing;
+    if (page == L"network-ethernet") return !interfaces.ethernet;
+    if (page == L"network-wifi") return !interfaces.wifi;
+    if (page == L"network-mobilehotspot") return !interfaces.ethernet && !interfaces.wifi && !interfaces.cellular;
+    return false;
 }
 
 std::optional<bool> TokenHasEnabledAdministrators(HANDLE token) {
@@ -193,9 +258,11 @@ bool RequiresAdministrator(std::wstring_view kind, std::wstring_view target) {
 AvailabilitySnapshot BuildAvailability() {
     AvailabilitySnapshot result;
     const bool home = IsHomeEdition();
-    const bool wifi = HasWirelessInterface();
+    const auto interfaces = ReadNetworkInterfaces();
+    const auto build = ReadWindowsBuild();
+    const bool keyboardPageMissing = build == 26100 && KeyboardPageKnownMissing(build, ReadDeviceKeyboardResourceStatus());
     const bool startsOnThisPc = ExplorerStartsOnThisPc();
-    const bool noPasskeys = SavedPasskeysAbsent();
+    const bool noPasskeys = build && SavedPasskeysAbsent(build, build == 22621 ? ReadWindowsRevision() : std::nullopt);
     const bool credentials = CredentialsNeeded();
     const bool missingControlHost = MissingFile(SystemPath(L"control.exe"));
     constexpr PCWSTR policyName = L"SettingsPageVisibility";
@@ -220,7 +287,8 @@ AvailabilitySnapshot BuildAvailability() {
         } else if (kind == L"uri" || kind == L"category") {
             const auto page = Split(target, L';').first;
             const bool categoryRoot = kind == L"uri" && item.parent < 0 && page != L"windowsupdate";
-            result.unavailable[i] = (page == L"network-wifi" && !wifi) || (page == L"savedpasskeys" && noPasskeys) ||
+            result.unavailable[i] = MissingDeviceSettingsPage(page, interfaces, keyboardPageMissing) ||
+                                     (page == L"savedpasskeys" && noPasskeys) ||
                                      (!home && HiddenBySettingsPolicy(page, categoryRoot, policies));
         }
     }

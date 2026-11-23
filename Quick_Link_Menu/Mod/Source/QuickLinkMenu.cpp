@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         0.5.2
+// @version         0.5.7
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 34
+// Build: 39
 
 // ==WindhawkModReadme==
 /*
@@ -95,7 +95,6 @@ struct CatalogItem {
     PCWSTR key;
     int group;
     int parent;
-    bool enabledByDefault;
     wchar_t glyph;
     PCWSTR action;
     PCWSTR resource;
@@ -178,11 +177,11 @@ struct MenuSession {
 };
 
 [[clang::no_destroy]] std::unique_ptr<MenuSession> session;
-[[clang::no_destroy]] std::array<std::optional<std::wstring>, std::size(catalog)> captionCache;
+std::array<std::optional<std::wstring>, std::size(catalog)> systemCaptionCache;
 std::mutex settingsLock;
 Settings settings;
 std::atomic<bool> unloading;
-std::atomic<unsigned> settingsNavigation;
+std::atomic<unsigned> settingsNavigationGeneration;
 HWND trayWindow;
 std::atomic<DWORD> trayThread;
 UINT setupMessage;
@@ -210,19 +209,14 @@ void OnRow(RowInteraction* row, Function&& function) noexcept {
 
 void LoadSettings() {
     Settings next;
-    auto value = Wh_GetStringSetting(L"general.submenuHover");
-    const bool legacy = !value || !*value;
-    if (legacy) {
-        Wh_FreeStringSetting(value);
-        value = Wh_GetStringSetting(L"submenuHover");
-    }
+    const auto value = Wh_GetStringSetting(L"general.submenuHover");
     const std::wstring_view option = value ? value : L"";
     next.mode = option == L"delayed" ? HoverMode::Delayed :
                 option == L"arrow" ? HoverMode::Arrow :
                 option == L"click" ? HoverMode::ArrowClick : HoverMode::Immediate;
     Wh_FreeStringSetting(value);
-    next.hideAdminCommands = Wh_GetIntSetting(legacy ? L"hideAdminCommands" : L"general.hideAdminCommands") != 0;
-    next.showHandCursor = Wh_GetIntSetting(legacy ? L"showHandCursor" : L"general.showHandCursor") != 0;
+    next.hideAdminCommands = Wh_GetIntSetting(L"general.hideAdminCommands") != 0;
+    next.showHandCursor = Wh_GetIntSetting(L"general.showHandCursor") != 0;
     next.terminalAsAdmin = Wh_GetIntSetting(L"commandOptions.terminalAsAdmin") != 0;
     const auto power = Wh_GetStringSetting(L"commandOptions.primaryPowerAction");
     if (!power || !*power) next.primaryPowerAction = L"power:shutdown";
@@ -275,9 +269,11 @@ std::wstring SystemPath(std::wstring_view name, bool windowsRoot = false) {
     return path;
 }
 
-std::wstring Indirect(PCWSTR token) {
+std::wstring Indirect(PCWSTR token, HRESULT* resultCode = nullptr) {
     wchar_t result[512]{};
-    if (FAILED(SHLoadIndirectString(token, result, ARRAYSIZE(result), nullptr))) return {};
+    const auto status = SHLoadIndirectString(token, result, ARRAYSIZE(result), nullptr);
+    if (resultCode) *resultCode = status;
+    if (FAILED(status)) return {};
     return result;
 }
 
@@ -370,22 +366,41 @@ std::wstring ToolsName(std::wstring_view shortcut) {
     return ShellName(ShellId(directory + fileName));
 }
 
+constexpr bool PreferLegacyDeveloperTitle(DWORD build, std::optional<DWORD> revision);
+DWORD ReadWindowsBuild();
+std::optional<DWORD> ReadWindowsRevision();
+
+std::wstring SettingsResource(std::wstring_view page, std::wstring_view field, HRESULT* resultCode = nullptr) {
+    const auto token = L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
+                       std::wstring(page) + L"/" + std::wstring(field) + L"}";
+    return Indirect(token.c_str(), resultCode);
+}
+
+HRESULT ReadDeviceKeyboardResourceStatus() {
+    HRESULT status;
+    SettingsResource(L"SettingsPageDevicesKeyboard", L"DisplayName", &status);
+    return status;
+}
+
 std::wstring SettingsCaption(std::wstring_view id) {
-    const auto titleFor = [](std::wstring_view page, std::wstring_view field) {
-        return Indirect((L"@{windows?ms-resource://Windows.UI.SettingsAppThreshold/SystemSettings/Resources/" +
-                         std::wstring(page) + L"/" + std::wstring(field) + L"}").c_str());
-    };
     // Windows uses the short title on systems without a battery.
     if (id == L"SettingsPagePowerAndBattery") {
         SYSTEM_POWER_STATUS status{};
         if (GetSystemPowerStatus(&status) && status.BatteryFlag == 128) {
-            if (auto title = titleFor(id, L"AlternateDisplayName"); !title.empty()) return title;
+            if (auto title = SettingsResource(id, L"AlternateDisplayName"); !title.empty()) return title;
         }
     }
-    auto title = titleFor(id, L"DisplayName");
-    if (title.empty() && id == L"SettingsPageAdvancedSystemSettings")
-        return titleFor(L"SettingsPageRestoreDeveloperOptions", L"DisplayName");
-    return title;
+    if (id == L"SettingsPageAdvancedSystemSettings") {
+        constexpr std::wstring_view legacyId = L"SettingsPageRestoreDeveloperOptions";
+        const auto build = ReadWindowsBuild();
+        const auto revision = build == 26100 ? ReadWindowsRevision() : std::nullopt;
+        if (PreferLegacyDeveloperTitle(build, revision)) {
+            if (auto title = SettingsResource(legacyId, L"DisplayName"); !title.empty()) return title;
+        }
+        if (auto title = SettingsResource(id, L"DisplayName"); !title.empty()) return title;
+        return SettingsResource(legacyId, L"DisplayName");
+    }
+    return SettingsResource(id, L"DisplayName");
 }
 
 std::wstring SystemCaption(CatalogItem const& item) {
@@ -410,7 +425,7 @@ std::wstring SystemCaption(CatalogItem const& item) {
 std::wstring Caption(Destination const& destination) {
     if (destination.original) return MenuCaption(destination.original.Text());
     const auto& item = *destination.item;
-    auto& cached = captionCache[&item - catalog];
+    auto& cached = systemCaptionCache[&item - catalog];
     if (!cached) {
         auto caption = SystemCaption(item);
         if (caption.empty()) caption = item.names[DisplayLanguage()];
@@ -451,8 +466,7 @@ DWORD LaunchPidl(Pidl const& target) {
 
 struct SettingsRoute {
     HMODULE module{};
-    unsigned serial;
-    PCWSTR itemKey;
+    unsigned generation;
     std::wstring pageElementId;
     std::wstring appName;
 };
@@ -470,11 +484,10 @@ winrt::com_ptr<IUIAutomationCondition> TextCondition(IUIAutomation& automation, 
 void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data) noexcept {
     std::unique_ptr<SettingsRoute> route(static_cast<SettingsRoute*>(data));
     FreeLibraryWhenCallbackReturns(callback, route->module);
+    // The module reference keeps the code alive, but Windhawk's mod instance may be gone.
+    if (unloading || settingsNavigationGeneration != route->generation) return;
     const HRESULT initialized = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-    if (FAILED(initialized)) {
-        Wh_Log(L"Could not initialize Settings navigation for %s (0x%08X)", route->itemKey, initialized);
-        return;
-    }
+    if (FAILED(initialized)) return;
     struct Apartment {
         ~Apartment() { CoUninitialize(); }
     } apartment;
@@ -488,15 +501,12 @@ void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data)
         const auto barId = TextCondition(*automation, UIA_AutomationIdPropertyId, L"PermanentNavigationViewBreadcrumbBar");
         const auto crumbType = TextCondition(*automation, UIA_ClassNamePropertyId,
                                             L"Microsoft.UI.Xaml.Controls.BreadcrumbBarItem");
-        if (!pageId || !barId || !crumbType) {
-            Wh_Log(L"Could not prepare Settings navigation for %s", route->itemKey);
-            return;
-        }
+        if (!pageId || !barId || !crumbType) return;
 
         // Wait for the URI's landing page, then invoke its parent breadcrumb.
         // Automation identifiers are independent of the Windows display language.
         const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(2200);
-        while (!unloading && settingsNavigation == route->serial && std::chrono::steady_clock::now() < deadline) {
+        while (!unloading && settingsNavigationGeneration == route->generation && std::chrono::steady_clock::now() < deadline) {
             const HWND hwnd = FindWindowW(L"ApplicationFrameWindow", route->appName.c_str());
             winrt::com_ptr<IUIAutomationElement> window, page, bar, parent;
             winrt::com_ptr<IUIAutomationElementArray> crumbs;
@@ -510,18 +520,17 @@ void CALLBACK SelectSettingsCategory(PTP_CALLBACK_INSTANCE callback, PVOID data)
                 SUCCEEDED(crumbs->GetElement(0, parent.put())) && parent &&
                 SUCCEEDED(parent->GetCurrentPatternAs(UIA_InvokePatternId, __uuidof(IUIAutomationInvokePattern),
                                                      invoke.put_void())) && invoke &&
-                settingsNavigation == route->serial && !unloading && std::chrono::steady_clock::now() < deadline &&
+                settingsNavigationGeneration == route->generation && !unloading &&
+                std::chrono::steady_clock::now() < deadline &&
                 SUCCEEDED(invoke->Invoke())) return;
             Sleep(90);
         }
     } catch (...) {
     }
-    if (!unloading && settingsNavigation == route->serial)
-        Wh_Log(L"Could not navigate to the Settings category for %s", route->itemKey);
 }
 
 void RunDestination(MenuSession& active, Destination destination) {
-    ++settingsNavigation;
+    const auto navigationGeneration = ++settingsNavigationGeneration;
     if (destination.original) {
         if (auto invoke = GetProvider<AV::IInvokeProvider>(destination.original, AP::PatternInterface::Invoke)) {
             auto menu = active.menu;
@@ -542,8 +551,7 @@ void RunDestination(MenuSession& active, Destination destination) {
         error = Launch(address.c_str());
         if (error == ERROR_SUCCESS && kind == L"category") {
             auto route = std::make_unique<SettingsRoute>();
-            route->serial = settingsNavigation;
-            route->itemKey = item.key;
+            route->generation = navigationGeneration;
             route->pageElementId = pageElementId;
             route->appName = Twinui(L"10922");
             if (route->appName.empty()) route->appName = L"Settings";
@@ -762,7 +770,8 @@ bool AttachPointerEvents(RowInteraction& active) {
         [row = &active](auto const&, I::PointerRoutedEventArgs const& args) {
             OnRow(row, [&](auto& active) {
                 const auto zone = PointerZone(active, args);
-                if ((zone == HoverZone::Body || active.mode == HoverMode::ArrowClick) &&
+                if ((zone == HoverZone::Body ||
+                     (zone == HoverZone::Arrow && active.mode == HoverMode::ArrowClick)) &&
                     (args.Pointer().PointerDeviceType() == PointerType::Touch ||
                      args.GetCurrentPoint(active.layout).Properties().IsLeftButtonPressed())) {
                     active.pressedPointer = args.Pointer().PointerId();
@@ -778,12 +787,13 @@ bool AttachPointerEvents(RowInteraction& active) {
                 const auto zone = PointerZone(active, args);
                 const bool clickOnly = active.mode == HoverMode::ArrowClick;
                 if (pressedHere || (!clickOnly && zone == HoverZone::Body)) args.Handled(true);
-                if (!pressedHere || active.owner->closing) return;
-                if (zone == HoverZone::Arrow && clickOnly && active.pressedZone == zone) {
+                if (!pressedHere || active.owner->closing || active.pressedZone != zone) return;
+                if (clickOnly && (zone == HoverZone::Arrow ||
+                                  (zone == HoverZone::Body && !active.destination.item))) {
                     auto provider = active.expand;
                     if (provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
                         provider.Expand();
-                } else if (zone == HoverZone::Body && active.destination.item && (!clickOnly || active.pressedZone == zone)) {
+                } else if (zone == HoverZone::Body && active.destination.item) {
                     RunDestination(*active.owner, active.destination);
                 }
             });
@@ -833,7 +843,7 @@ C::FontIcon MakeIcon(wchar_t glyph) {
 struct StockMenu {
     std::vector<C::MenuFlyoutItemBase> rows;
     C::MenuFlyoutSubItem power{nullptr};
-    std::vector<C::MenuFlyoutItemBase> powerRows;
+    std::vector<Destination> powerActions;
 };
 
 C::MenuFlyoutItem StockAction(StockMenu const& stock, std::wstring_view id) {
@@ -851,20 +861,29 @@ C::MenuFlyoutItem StockAction(StockMenu const& stock, std::wstring_view id) {
     return nullptr;
 }
 
-C::MenuFlyoutItem StockPowerAction(StockMenu const& stock, std::wstring_view action) {
-    const auto count = stock.powerRows.size();
-    if (count < 3) return nullptr;
+bool ReadStockPowerActions(StockMenu& stock) {
+    const auto language = DisplayLanguage();
+    for (auto const& row : stock.power.Items()) {
+        if (row.try_as<C::MenuFlyoutSeparator>()) continue;
+        const auto command = row.try_as<C::MenuFlyoutItem>();
+        if (!command) return false;
+        const auto caption = Normalize(command.Text());
+        if (caption.empty()) return false;
 
-    // These commands have fixed places even when the two sleep modes are omitted.
-    if (action == L"signOut") return stock.powerRows[0].try_as<C::MenuFlyoutItem>();
-    if (action == L"shutdown") return stock.powerRows[count - 2].try_as<C::MenuFlyoutItem>();
-    if (action == L"restart") return stock.powerRows[count - 1].try_as<C::MenuFlyoutItem>();
-    if (count == 5) return stock.powerRows[action == L"sleep" ? 1 : 2].try_as<C::MenuFlyoutItem>();
-    if (count != 4) return nullptr;
-
-    const auto item = stock.powerRows[1].try_as<C::MenuFlyoutItem>();
-    const auto expected = SystemString(action == L"sleep" ? L"authui.dll,-3019" : L"authui.dll,-3022");
-    return item && !expected.empty() && Normalize(item.Text()) == Normalize(expected) ? item : nullptr;
+        CatalogItem const* match{};
+        for (auto const& item : catalog) {
+            if (!std::wstring_view(item.action).starts_with(L"power:") || !*item.resource) continue;
+            // Some Win+X labels differ from the system resource, for example Russian Sign out.
+            if (caption != Normalize(Caption(Destination{&item})) && caption != Normalize(item.names[language]))
+                continue;
+            if (match) return false;
+            match = &item;
+        }
+        if (!match || std::ranges::find(stock.powerActions, match, &Destination::item) != stock.powerActions.end())
+            return false;
+        stock.powerActions.push_back({match, command});
+    }
+    return !stock.powerActions.empty();
 }
 
 bool ExplorerStartsOnThisPc() {
@@ -873,15 +892,6 @@ bool ExplorerStartsOnThisPc() {
     return RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
                         L"LaunchTo", RRF_RT_REG_DWORD, nullptr, &destination, &bytes) == ERROR_SUCCESS &&
            destination == 1;
-}
-
-bool HasWirelessInterface() {
-    MIB_IF_TABLE2* table{};
-    if (GetIfTable2(&table) != NO_ERROR) return true;
-    const bool found = std::any_of(table->Table, table->Table + table->NumEntries,
-                                  [](auto const& entry) { return entry.Type == IF_TYPE_IEEE80211; });
-    FreeMibTable(table);
-    return found;
 }
 
 bool IsHomeEdition() {
@@ -900,9 +910,13 @@ std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& sto
         return std::nullopt;
     auto [kind, target] = Split(item.action, L':');
     Destination destination{&item};
-    if (kind == L"native" || kind == L"power") {
-        destination.original = kind == L"native" ? StockAction(stock, target) : StockPowerAction(stock, target);
+    if (kind == L"native") {
+        destination.original = StockAction(stock, target);
         if (!destination.original || !destination.original.IsEnabled()) return std::nullopt;
+    } else if (kind == L"power") {
+        const auto match = std::ranges::find(stock.powerActions, &item, &Destination::item);
+        if (match == stock.powerActions.end() || !match->original.IsEnabled()) return std::nullopt;
+        destination.original = match->original;
     }
     return destination;
 }
@@ -1060,16 +1074,12 @@ std::optional<StockMenu> ReadStockMenu(C::MenuFlyout const& menu) {
     }
     if (!stock.power || !StockAction(stock, L"10921") || !StockAction(stock, L"10923") ||
         !StockAction(stock, L"10925")) return std::nullopt;
-    for (auto const& item : stock.power.Items()) {
-        if (item.try_as<C::MenuFlyoutItem>()) stock.powerRows.push_back(item);
-    }
-    if (stock.powerRows.size() < 3 || stock.powerRows.size() > 5) return std::nullopt;
     return stock;
 }
 
 void TryPatchMenu(C::MenuFlyout const& menu) {
-    const auto nativeMenu = ReadStockMenu(menu);
-    if (!nativeMenu) return;
+    auto nativeMenu = ReadStockMenu(menu);
+    if (!nativeMenu || !ReadStockPowerActions(*nativeMenu)) return;
     const auto& stock = *nativeMenu;
     const auto items = menu.Items();
     const auto snapshot = ReadSettings();
@@ -1175,8 +1185,8 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     items.ReplaceAll(visible);
 }
 
-winrt::weak_ref<C::MenuFlyout> observedMenu;
-P::FlyoutBase::Opening_revoker opening;
+[[clang::no_destroy]] winrt::weak_ref<C::MenuFlyout> observedMenu;
+[[clang::no_destroy]] P::FlyoutBase::Opening_revoker openingHandler;
 
 template<typename Interface>
 C::MenuFlyout Inspect(void* abi) noexcept {
@@ -1192,7 +1202,7 @@ C::MenuFlyout Inspect(void* abi) noexcept {
         // A new Win+X flyout can be shown before the old one has raised Closed.
         // Observe the new flyout's Opening independently of the closing session.
         auto weak = winrt::make_weak(menu);
-        opening = menu.Opening(winrt::auto_revoke, [weak](auto const&, auto const&) {
+        openingHandler = menu.Opening(winrt::auto_revoke, [weak](auto const&, auto const&) {
             if (unloading) return;
             C::MenuFlyout menu{nullptr};
             try {
@@ -1244,19 +1254,24 @@ TaskbarSetup InstallHooks() {
         throw;
     }
 
-    const bool installed = show != showOptions &&
-        Wh_SetFunctionHook(show, reinterpret_cast<void*>(HookShowAt), reinterpret_cast<void**>(&originalShowAt)) &&
-        Wh_SetFunctionHook(showOptions, reinterpret_cast<void*>(HookShowAtOptions),
-                           reinterpret_cast<void**>(&originalShowAtOptions)) &&
-        Wh_ApplyHookOperations();
-    return installed ? TaskbarSetup::Ready : TaskbarSetup::Failed;
+    if (show == showOptions ||
+        !Wh_SetFunctionHook(show, reinterpret_cast<void*>(HookShowAt), reinterpret_cast<void**>(&originalShowAt)))
+        return TaskbarSetup::Failed;
+    const bool optionsHook = Wh_SetFunctionHook(showOptions, reinterpret_cast<void*>(HookShowAtOptions),
+                                                reinterpret_cast<void**>(&originalShowAtOptions));
+    if (optionsHook && Wh_ApplyHookOperations()) return TaskbarSetup::Ready;
+
+    if (optionsHook) Wh_RemoveFunctionHook(showOptions);
+    Wh_RemoveFunctionHook(show);
+    Wh_ApplyHookOperations();
+    return TaskbarSetup::Failed;
 }
 
 LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM data, DWORD_PTR) {
     if (message == setupMessage) {
         try {
             if (action) return unloading ? 0 : static_cast<LRESULT>(InstallHooks());
-            opening.revoke();
+            openingHandler.revoke();
             observedMenu = {};
             if (session) {
                 auto menu = session->menu;
@@ -1317,8 +1332,12 @@ BOOL Wh_ModInit() {
     DWORD pid{};
     if (window && GetWindowThreadProcessId(window, &pid) && pid != GetCurrentProcessId()) return FALSE;
     setupMessage = RegisterWindowMessageW(L"Windhawk.QuickLinkMenu.Setup");
+    if (!setupMessage) return FALSE;
+    // A pending callback can keep this DLL loaded across a disable and enable.
+    ++settingsNavigationGeneration;
+    unloading = false;
     LoadSettings();
-    return setupMessage != 0;
+    return TRUE;
 }
 
 void Wh_ModAfterInit() {

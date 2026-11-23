@@ -1,4 +1,7 @@
+#include <winsock2.h>
 #include <windows.h>
+#include <ipifcons.h>
+#include <netioapi.h>
 
 #include <algorithm>
 #include <array>
@@ -17,7 +20,6 @@ struct CatalogItem {
     PCWSTR key;
     int group;
     int parent;
-    bool enabledByDefault;
     wchar_t glyph;
     PCWSTR action;
     PCWSTR resource;
@@ -25,8 +27,8 @@ struct CatalogItem {
 };
 
 constexpr CatalogItem catalog[] = {
-    {L"test.missing", 0, -1, true, 0, L"exe:quick-link-menu-test-462294e5.exe", L"", {}},
-    {L"test.exists", 0, -1, true, 0, L"exe:cmd.exe", L"", {}},
+    {L"test.missing", 0, -1, 0, L"exe:quick-link-menu-test-462294e5.exe", L"", {}},
+    {L"test.exists", 0, -1, 0, L"exe:cmd.exe", L"", {}},
 };
 std::atomic<bool> unloading;
 
@@ -44,7 +46,7 @@ std::wstring SystemPath(std::wstring_view name) {
 }
 
 std::wstring ProgramPath(std::wstring_view name) { return SystemPath(name); }
-bool HasWirelessInterface() { return true; }
+HRESULT ReadDeviceKeyboardResourceStatus() { return S_OK; }
 bool IsHomeEdition() { return false; }
 bool ExplorerStartsOnThisPc() { return false; }
 
@@ -99,6 +101,55 @@ void TestPasskeysThreshold() {
     assert(!SavedPasskeysAbsent(26100, 0));
 }
 
+void TestDeviceSettings() {
+    assert(PreferLegacyDeveloperTitle(22631, {}));
+    assert(PreferLegacyDeveloperTitle(26100, 4349));
+    assert(!PreferLegacyDeveloperTitle(26100, 6725));
+    assert(!PreferLegacyDeveloperTitle(26300, 10075));
+    assert(!PreferLegacyDeveloperTitle(0, {}));
+
+    constexpr auto missingResource = HRESULT_FROM_WIN32(ERROR_MRM_NAMED_RESOURCE_NOT_FOUND);
+    assert(KeyboardPageKnownMissing(26100, missingResource));
+    assert(!KeyboardPageKnownMissing(26100, E_ACCESSDENIED));
+    assert(!KeyboardPageKnownMissing(26100, S_OK));
+    assert(!KeyboardPageKnownMissing(26300, missingResource));
+    assert(MissingDeviceSettingsPage(L"devices-keyboard", {}, true));
+    assert(!MissingDeviceSettingsPage(L"devices-keyboard", {}, false));
+    assert(!MissingDeviceSettingsPage(L"typing", {}, true));
+    assert(MissingDeviceSettingsPage(L"network-ethernet", {}, true));
+    assert(MissingDeviceSettingsPage(L"network-wifi", {}, true));
+    assert(MissingDeviceSettingsPage(L"network-mobilehotspot", {}, true));
+    constexpr NetworkInterfaces wired{true, false, false};
+    constexpr NetworkInterfaces wireless{false, true, false};
+    constexpr NetworkInterfaces mobile{false, false, true};
+    assert(!MissingDeviceSettingsPage(L"network-ethernet", wired, true));
+    assert(!MissingDeviceSettingsPage(L"network-wifi", wireless, true));
+    assert(!MissingDeviceSettingsPage(L"network-mobilehotspot", wired, true));
+    assert(!MissingDeviceSettingsPage(L"network-mobilehotspot", wireless, true));
+    assert(!MissingDeviceSettingsPage(L"network-mobilehotspot", mobile, true));
+}
+
+void TestSoftwareEthernet() {
+    MIB_IF_ROW2 adapter{};
+    adapter.Type = IF_TYPE_ETHERNET_CSMACD;
+    adapter.OperStatus = IfOperStatusUp;
+    adapter.InterfaceLuid.Value = 4;
+
+    MIB_UNICASTIPADDRESS_TABLE addresses{};
+    assert(!IsAddressedSoftwareEthernet(adapter, addresses));
+    addresses.NumEntries = 1;
+    addresses.Table[0].InterfaceLuid.Value = 5;
+    assert(!IsAddressedSoftwareEthernet(adapter, addresses));
+    addresses.Table[0].InterfaceLuid.Value = 4;
+    assert(IsAddressedSoftwareEthernet(adapter, addresses));
+
+    adapter.InterfaceAndOperStatusFlags.FilterInterface = true;
+    assert(!IsAddressedSoftwareEthernet(adapter, addresses));
+    adapter.InterfaceAndOperStatusFlags.FilterInterface = false;
+    adapter.OperStatus = IfOperStatusDown;
+    assert(!IsAddressedSoftwareEthernet(adapter, addresses));
+}
+
 void TestSnapshot() {
     auto snapshot = ReadAvailability();
     assert(!snapshot.unavailable[0] && !snapshot.unavailable[1]);
@@ -117,5 +168,7 @@ int main() {
     TestCredentials();
     TestSettingsPolicy();
     TestPasskeysThreshold();
+    TestDeviceSettings();
+    TestSoftwareEthernet();
     TestSnapshot();
 }

@@ -25,5 +25,18 @@ the inputs.
 Run `node --test Quick_Link_Menu/Tests/menu-settings.test.mjs` to verify the
 general and command settings, defaults, and localization in the packaged
 source. Build `Tests/availability-tests.cpp`
-with Windhawk clang++ for Windows x64 and link `advapi32` to test the availability
+with Windhawk clang++ for Windows x64 and link `advapi32` and `iphlpapi` to test the availability
 rules and background refresh.
+
+`migrate-settings.mjs` moves the three flat general keys and the four nested
+section switches used by earlier development builds to their current paths.
+It uses the complete post-update settings as a base and carries over the
+pre-update preferences. A current-path value in the pre-update file takes
+precedence over its legacy equivalent.
+
+1. Save the JSON from Windhawk **Advanced** to `prior-settings.json` before
+   updating.
+2. Save the JSON from **Advanced** to `current-settings.json` immediately
+   after updating, before making new changes.
+3. Run `node Quick_Link_Menu/Tools/migrate-settings.mjs prior-settings.json current-settings.json`
+   and paste the full output into **Advanced** settings.

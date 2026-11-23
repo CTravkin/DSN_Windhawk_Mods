@@ -1779,7 +1779,7 @@
             "id": "signOut",
             "glyph": "f3b1",
             "action": "power:signOut",
-            "resource": "",
+            "resource": "shell32.dll,-51523",
             "names": [
               "Sign out",
               "Выход",
@@ -1793,7 +1793,7 @@
             "id": "sleep",
             "glyph": "e708",
             "action": "power:sleep",
-            "resource": "",
+            "resource": "authui.dll,-3019",
             "names": [
               "Sleep",
               "Спящий режим",
@@ -1807,7 +1807,7 @@
             "id": "hibernate",
             "glyph": "e823",
             "action": "power:hibernate",
-            "resource": "",
+            "resource": "authui.dll,-3022",
             "names": [
               "Hibernate",
               "Гибернация",
@@ -1821,7 +1821,7 @@
             "id": "shutdown",
             "glyph": "e7e8",
             "action": "power:shutdown",
-            "resource": "",
+            "resource": "authui.dll,-3013",
             "names": [
               "Shut down",
               "Завершение работы",
@@ -1835,7 +1835,7 @@
             "id": "restart",
             "glyph": "e777",
             "action": "power:restart",
-            "resource": "",
+            "resource": "authui.dll,-3016",
             "names": [
               "Restart",
               "Перезагрузка",
