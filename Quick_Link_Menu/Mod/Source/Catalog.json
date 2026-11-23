@@ -1822,6 +1822,7 @@
             "glyph": "e7e8",
             "action": "power:shutdown",
             "resource": "authui.dll,-3013",
+            "updateCaptions": [3026, 3150],
             "names": [
               "Shut down",
               "Завершение работы",
@@ -1836,6 +1837,7 @@
             "glyph": "e777",
             "action": "power:restart",
             "resource": "authui.dll,-3016",
+            "updateCaptions": [3030, 3152],
             "names": [
               "Restart",
               "Перезагрузка",

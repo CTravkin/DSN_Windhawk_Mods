@@ -5,6 +5,8 @@ const localFile = (name) => fileURLToPath(new URL(name, import.meta.url));
 const blocks = JSON.parse(readFileSync(localFile('../Mod/Source/Catalog.json'), 'utf8'));
 const source = readFileSync(localFile('../Mod/Source/QuickLinkMenu.cpp'), 'utf8').replace(/\r\n/g, '\n');
 const availability = readFileSync(localFile('../Mod/Source/Availability.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
+const powerActions = readFileSync(localFile('../Mod/Source/PowerActions.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
+const workQueue = readFileSync(localFile('../Mod/Source/ModuleWorkQueue.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
 const target = localFile('../Mod/quick-link-menu.wh.cpp');
 const locales = ['', ':ru-RU', ':es-ES', ':de-DE', ':pt-BR', ':zh-CN'];
 const wide = (value) => `L${JSON.stringify(value)}`;
@@ -45,10 +47,15 @@ function addDefinition(entry, group, key, parent) {
   if (keys.has(key)) throw new Error(`Repeated setting path ${key}`);
   keys.add(key);
   const index = definitions.length;
+  const updates = entry.updateCaptions;
+  if (updates && (!['power:shutdown', 'power:restart'].includes(entry.action) ||
+      updates.length !== 2 || updates.some((id) => !Number.isInteger(id) || id <= 0))) {
+    throw new Error(`Invalid update caption resources at ${key}`);
+  }
   definitions.push(
     `    {${wide(key)}, ${group}, ${parent}, 0x${entry.glyph},`
       + ` ${wide(entry.action)}, ${wide(entry.resource)},\n`
-      + `     {${entry.names.map(wide).join(', ')}}},`,
+      + `     {${entry.names.map(wide).join(', ')}${updates ? `}, {${updates.join(', ')}` : ''}}},`,
   );
   return index;
 }
@@ -122,7 +129,8 @@ blocks.forEach((block, group) => {
   settings.push('  $name: " "');
 });
 
-for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERATED_AVAILABILITY']) {
+for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERATED_AVAILABILITY',
+  '// GENERATED_POWER_ACTIONS', '// GENERATED_WORK_QUEUE']) {
   if (source.split(token).length !== 2) throw new Error(`Missing or repeated ${token}`);
 }
 const packed = source
@@ -131,7 +139,9 @@ const packed = source
     const sectionDefinitions = sectionKeys.map((key) => `    ${wide(key)},`);
     return `constexpr PCWSTR sectionEnabledKeys[] = {\n${sectionDefinitions.join('\n')}\n};\n\nconstexpr CatalogItem catalog[] = {\n${definitions.join('\n')}\n};`;
   })
-  .replace('// GENERATED_AVAILABILITY', () => availability);
+  .replace('// GENERATED_AVAILABILITY', () => availability)
+  .replace('// GENERATED_POWER_ACTIONS', () => powerActions)
+  .replace('// GENERATED_WORK_QUEUE', () => workQueue);
 
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== packed) {

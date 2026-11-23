@@ -295,7 +295,8 @@ AvailabilitySnapshot BuildAvailability() {
     return result;
 }
 
-constexpr ULONGLONG availabilityRefreshInterval = 20000;
+// Coalesce rapid reopenings without keeping hardware and policy changes stale for 20 seconds.
+constexpr ULONGLONG availabilityRefreshInterval = 1000;
 SRWLOCK availabilityLock = SRWLOCK_INIT;
 AvailabilitySnapshot availability;
 std::atomic<bool> availabilityRefreshing{};
@@ -308,8 +309,7 @@ AvailabilitySnapshot ReadAvailability() {
     return result;
 }
 
-void CALLBACK RefreshAvailabilityWorker(PTP_CALLBACK_INSTANCE callback, PVOID module) noexcept {
-    FreeLibraryWhenCallbackReturns(callback, static_cast<HMODULE>(module));
+void CALLBACK RefreshAvailabilityWorker(PTP_CALLBACK_INSTANCE, PVOID) noexcept {
     try {
         if (!unloading) {
             const auto next = BuildAvailability();
@@ -337,12 +337,7 @@ void RefreshAvailability(bool force = false) {
         return;
     }
 
-    HMODULE module{};
-    if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
-                          reinterpret_cast<PCWSTR>(&RefreshAvailabilityWorker), &module)) {
-        if (TrySubmitThreadpoolCallback(RefreshAvailabilityWorker, module, nullptr)) return;
-        FreeLibrary(module);
-    }
+    if (moduleWorkQueue.Submit(RefreshAvailabilityWorker)) return;
     availabilityLastRefresh = GetTickCount64();
     availabilityRefreshing = false;
 }

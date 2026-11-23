@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const source = readFileSync(new URL('../Mod/quick-link-menu.wh.cpp', import.meta.url), 'utf8');
+const catalog = JSON.parse(readFileSync(new URL('../Mod/Source/Catalog.json', import.meta.url), 'utf8'));
 const lines = source.split('// ==WindhawkModSettings==')[1].split('// ==/WindhawkModSettings==')[0].split(/\r?\n/);
 const locales = ['', ':ru-RU', ':es-ES', ':de-DE', ':pt-BR', ':zh-CN'];
 
@@ -98,4 +99,16 @@ test('Russian section descriptions use the approved wording', () => {
     'Разделы и страницы стандартного приложения «Параметры»',
     'Категории и окна классической панели управления',
   ]) assert.ok(lines.includes(`  $description:ru-RU: ${JSON.stringify(value)}`));
+});
+
+test('update power commands share their regular command settings', () => {
+  const power = catalog.find((group) => group.id === 'commands').rows.find((row) => row.id === 'power');
+  assert.deepEqual(power.children.filter((entry) => entry.updateCaptions).map((entry) =>
+    [entry.id, entry.updateCaptions]), [
+    ['shutdown', [3026, 3150]],
+    ['restart', [3030, 3152]],
+  ]);
+  const options = setting('commandOptions', 'primaryPowerAction', 'shutdown');
+  assert.ok(options.includes('      - none: "None"'));
+  assert.ok(!lines.some((line) => /- (updateShutdown|updateRestart):/.test(line)));
 });

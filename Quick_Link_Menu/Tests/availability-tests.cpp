@@ -8,9 +8,11 @@
 #include <atomic>
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -50,6 +52,10 @@ HRESULT ReadDeviceKeyboardResourceStatus() { return S_OK; }
 bool IsHomeEdition() { return false; }
 bool ExplorerStartsOnThisPc() { return false; }
 
+#include "../Mod/Source/ModuleWorkQueue.h"
+#include "../Mod/Source/PowerActions.h"
+
+ModuleWorkQueue moduleWorkQueue;
 #include "../Mod/Source/Availability.h"
 
 void TestCredentials() {
@@ -151,6 +157,7 @@ void TestSoftwareEthernet() {
 }
 
 void TestSnapshot() {
+    assert(moduleWorkQueue.Start());
     auto snapshot = ReadAvailability();
     assert(!snapshot.unavailable[0] && !snapshot.unavailable[1]);
     assert(!snapshot.credentialsRequired[0] && !snapshot.credentialsRequired[1]);
@@ -160,6 +167,56 @@ void TestSnapshot() {
     while (GetTickCount64() < deadline && !(snapshot = ReadAvailability()).unavailable[0]) Sleep(10);
     assert(snapshot.unavailable[0] && !snapshot.unavailable[1]);
     assert(!snapshot.credentialsRequired[0] && !snapshot.credentialsRequired[1]);
+    moduleWorkQueue.Stop();
+}
+
+void TestWorkQueueStopsWithActiveCallback() {
+    struct Work {
+        HANDLE started = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        HANDLE proceed = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        std::atomic<bool> finished{};
+    } work;
+    assert(work.started && work.proceed);
+    ModuleWorkQueue queue;
+    assert(queue.Start());
+    const auto run = [](PTP_CALLBACK_INSTANCE, void* data) {
+        auto& work = *static_cast<Work*>(data);
+        SetEvent(work.started);
+        assert(WaitForSingleObject(work.proceed, 5000) == WAIT_OBJECT_0);
+        work.finished = true;
+    };
+    assert(queue.Submit(run, &work));
+    assert(WaitForSingleObject(work.started, 5000) == WAIT_OBJECT_0);
+    std::atomic<bool> stopped{};
+    std::thread stop([&] {
+        queue.Stop();
+        assert(work.finished);
+        stopped = true;
+    });
+    const auto deadline = GetTickCount64() + 2000;
+    while (queue.Submit([](PTP_CALLBACK_INSTANCE, void*) {})) {
+        assert(GetTickCount64() < deadline);
+        Sleep(1);
+    }
+    assert(!stopped);
+    SetEvent(work.proceed);
+    stop.join();
+    assert(!queue.Submit(run, &work));
+    CloseHandle(work.proceed);
+    CloseHandle(work.started);
+}
+
+void TestPowerActions() {
+    assert(MatchesPowerCaption(L"update and restart", L"update and restart"));
+    assert(MatchesPowerCaption(L"update and shut down (estimate: 3 min)", L"update and shut down (estimate: %u min)"));
+    assert(MatchesPowerCaption(L"update and restart (estimate: 10 - 20 min)", L"update and restart (estimate: %u - %u min)"));
+    assert(!MatchesPowerCaption(L"restart", L"update and restart"));
+    assert(!MatchesPowerCaption(L"update and restart (estimate: min)", L"update and restart (estimate: %u min)"));
+    assert(!MatchesPowerCaption(L"update and restart (estimate: 7 min) extra", L"update and restart (estimate: %u min)"));
+    assert(PlacePowerAction(false, false, true) == PowerPlacement::Submenu);
+    assert(PlacePowerAction(false, true, false) == PowerPlacement::Main);
+    assert(PlacePowerAction(true, true, true) == PowerPlacement::Submenu);
+    assert(PlacePowerAction(true, true, false) == PowerPlacement::Hidden);
 }
 
 }  // namespace
@@ -171,4 +228,6 @@ int main() {
     TestDeviceSettings();
     TestSoftwareEthernet();
     TestSnapshot();
+    TestWorkQueueStopsWithActiveCallback();
+    TestPowerActions();
 }

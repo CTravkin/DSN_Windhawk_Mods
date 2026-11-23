@@ -42,7 +42,10 @@ right-clicking the Start button.
 ### Quick access to power actions
 
 The main power row shuts down Windows in one click by default. It can run another
-action, such as Restart or Lock. Choose **None** to keep the power submenu on its own.
+action, such as Restart or Lock. Choose **None** to open the power submenu without
+running a command. When Windows offers **Update and shut down** or **Update and
+restart** in Win+X, the corresponding Shut down or Restart switch also controls
+that entry.
 
 ### Labels and icons
 

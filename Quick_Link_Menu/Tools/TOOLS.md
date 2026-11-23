@@ -1,7 +1,7 @@
 # Quick Link Menu tools
 
 `package-mod.mjs` assembles the standalone Windhawk source from
-`Mod/Source/QuickLinkMenu.cpp`, `Mod/Source/Availability.h`, and
+`Mod/Source/QuickLinkMenu.cpp`, the headers in `Mod/Source/`, and
 `Mod/Source/Catalog.json`. The catalog owns menu
 order, action targets, display names for Windhawk, default visibility, and glyph
 assignments.
@@ -25,5 +25,5 @@ the inputs.
 Run `node --test Quick_Link_Menu/Tests/menu-settings.test.mjs` to verify the
 general and command settings, defaults, and localization in the packaged
 source. Build `Tests/availability-tests.cpp`
-with Windhawk clang++ for Windows x64 and link `advapi32` and `iphlpapi` to test the availability
-rules and background refresh.
+with Windhawk clang++ for Windows x64 using `-static -ladvapi32 -liphlpapi` to test
+availability, the background work queue, and power command matching.
