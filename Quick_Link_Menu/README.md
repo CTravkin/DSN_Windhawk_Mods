@@ -3,10 +3,26 @@
 **English** · [Русский](README.ru.md)
 
 Quick Link Menu customizes the native Windows 11 menu opened by **Win+X** or by
-right-clicking the Start button. It adds shortcuts to system settings and tools
-and lets you choose which commands appear.
+right-clicking the Start button.
 
 ## Features
+
+### Customization and command availability
+
+- **Menu contents.** Hide individual rows, submenu commands, or entire sections.
+  Turning off a section preserves its settings. Turning off a row hides its submenu.
+- **Automatic filtering.** The mod hides unavailable commands based on the Windows
+  edition, installed components, hardware, and system policies. If a main action is
+  unavailable, its available shortcuts remain. An empty menu falls back to standard Win+X.
+- **User permissions.** An optional filter hides administrator commands that require
+  credentials or whose elevation is blocked. Commands that only need UAC consent
+  stay visible.
+- **Submenu controls.** Submenus open immediately on hover by default. Other options
+  include delayed hover, hovering over the arrow, and clicking the arrow. A hand
+  cursor marks areas that run a command. This indicator can be turned off.
+- **Terminal.** The main Terminal action can run as administrator.
+
+### Menu sections
 
 - **Settings.** Open Windows Settings categories or go directly to pages such
   as Display, Sound, VPN, Default apps, and Windows Update.
@@ -17,12 +33,22 @@ and lets you choose which commands appear.
   Windows PowerShell, and Command Prompt.
 - **Basic commands.** Open Run, Task Manager, Search, and File Explorer, show
   the desktop, or access power and sign-in options. File Explorer opens its
-  configured start page. Its submenu can include This PC, Downloads, the Recycle
-  Bin, and other folder shortcuts.
-- **Windows labels and icons.** Menu labels follow the Windows display language.
-  Menu items use Segoe Fluent Icons, including the matching Settings icons
-  where available. Windhawk settings are available in English, Russian, Spanish,
-  German, Brazilian Portuguese, and Simplified Chinese.
+  configured start page. Its submenu includes shortcuts such as This PC, Downloads,
+  and the Recycle Bin. Search, Desktop, and the Documents and Pictures shortcuts in
+  File Explorer's submenu are off by default.
+
+### Quick access to power actions
+
+The main power row shuts down Windows in one click by default. It can run another
+action, such as Restart or Lock. Choose **None** to keep the power submenu on its own.
+
+### Labels and icons
+
+The menu uses Windows labels in the system display language and Segoe Fluent Icons.
+Settings shortcuts use the matching Windows icons where available.
+
+Windhawk settings are available in English, Russian, Spanish, German, Brazilian
+Portuguese, and Simplified Chinese.
 
 ## Platforms
 
@@ -30,8 +56,13 @@ Requires [Windhawk](https://windhawk.net/) and Windows 11 x64 or ARM64.
 Win+X interaction was tested on Windows 11 24H2 Home and Pro x64 (build
 `26100.4349`) with Windhawk 1.7.3. An earlier version was also tested on
 Windows 11 26H2 x64 (build `26300.10075`). ARM64 verification in GitHub Actions
-covers native compilation and automated command availability tests. The mod is
-incompatible with Windows 10 Win+X Restorer.
+covers native compilation and automated command availability tests.
+
+### Compatibility
+
+Quick Link Menu works with the standard Windows 11 Win+X menu. Mods that replace
+it are incompatible. For example, a Windows 10-style menu is provided by
+[Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
 
 ## Operations
 
@@ -50,29 +81,12 @@ replace its source, and compile again.
 ### Usage
 
 Click a row's label or press **Enter** to run its main action. Click the arrow
-or press **→** to open related shortcuts. A row with only a submenu opens it
-when you click the label. A row with only a main action has no arrow.
+or press **→** to open the submenu. Click the label if a row only has a submenu.
 
-Open the mod's **Settings** in Windhawk to change the menu.
-
-- **Menu contents.** The switches follow the menu order. The switch under each
-  section description hides the whole section and preserves its settings. Each
-  row has a switch below its label, followed by the switches for its submenu
-  items. Turning off a row hides it with its submenu. Search, Desktop, and
-  the Documents and Pictures shortcuts under File Explorer are off by default.
-- **General settings.** Submenus open immediately on hover by default. They
-  can also open after a delay, on arrow hover, or on arrow click. **Command
-  indication** uses a hand cursor over areas that run a command and is on by
-  default. **Hide administrator commands** is off by default. When enabled,
-  it hides known administrator commands that require credentials or whose
-  elevation is blocked. Commands that only need UAC consent stay visible.
-- **Command settings.** The main Terminal action can run as administrator.
-  The main power action defaults to **Shut down**. Select another action or
-  choose **None** to keep the power submenu with no main action.
-
-Command availability can depend on the Windows edition, installed components,
-and hardware. When a main action is unavailable, its available shortcuts stay
-in the submenu. If no commands remain, Windows opens its standard Win+X menu.
+To change the menu, open **Quick Link Menu → Settings** in Windhawk. Section
+switches are below their descriptions. Row and submenu switches follow the menu
+order. Find submenu behavior and the administrator filter under **General settings**,
+and Terminal and power actions under **Command settings**.
 
 ### Verification
 

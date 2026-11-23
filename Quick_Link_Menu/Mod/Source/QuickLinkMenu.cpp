@@ -25,10 +25,24 @@
 **English** · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Quick_Link_Menu/README.ru.md)
 
 Quick Link Menu customizes the native Windows 11 menu opened by **Win+X** or by
-right-clicking the Start button. It adds shortcuts to system settings and tools
-and lets you choose which commands appear.
+right-clicking the Start button.
 
 ## Features
+
+### Customization and command availability
+
+- **Menu contents.** Hide individual rows, submenu commands, or entire sections.
+  Turning off a section preserves its settings. Turning off a row hides its submenu.
+- **Automatic filtering.** The mod hides unavailable commands based on the Windows
+  edition, installed components, hardware, and system policies. If a main action is
+  unavailable, its available shortcuts remain. An empty menu falls back to standard Win+X.
+- **User permissions.** An optional filter hides administrator commands that require
+  credentials or whose elevation is blocked. Commands that only need UAC consent stay visible.
+- **Submenu controls.** Open submenus on hover, after a delay, on arrow hover, or by
+  clicking the arrow. A hand cursor can mark areas that run a command.
+- **Terminal.** The main Terminal action can run as administrator.
+
+### Menu sections
 
 - **Settings.** Open Windows Settings categories and pages such as Display,
   Sound, VPN, Default apps, and Windows Update.
@@ -41,33 +55,41 @@ and lets you choose which commands appear.
   the desktop, or access power and sign-in options. File Explorer opens its
   configured start page, with a submenu for locations such as This PC,
   Downloads, and the Recycle Bin.
-- **Windows labels and icons.** Menu labels follow the Windows display language
-  and entries use Segoe Fluent Icons. Windhawk settings are available in English,
-  Russian, Spanish, German, Brazilian Portuguese, and Simplified Chinese.
+
+### Quick access to power actions
+
+The main power row shuts down Windows in one click by default. It can run another
+action, such as Restart or Lock. Choose **None** to keep the power submenu on its own.
+
+### Labels and icons
+
+The menu uses Windows labels in the system display language and Segoe Fluent Icons.
+Settings shortcuts use the matching Windows icons where available.
+
+Windhawk settings are available in English, Russian, Spanish, German, Brazilian
+Portuguese, and Simplified Chinese.
 
 ## Platforms
 
 Requires Windows 11 x64 or ARM64. GitHub Actions verified native ARM64
 compilation and automated command availability tests. Win+X interaction was
-tested on x64. Incompatible with Windows 10 Win+X Restorer.
+tested on x64.
+
+### Compatibility
+
+Quick Link Menu works with the standard Windows 11 Win+X menu. Mods that replace
+it are incompatible. For example, a Windows 10-style menu is provided by
+[Windows 10 Win+X restorer on Win11 24H2](https://github.com/ramensoftware/windhawk-mods/blob/main/mods/windows-10-winx-restorer.wh.cpp).
 
 ## Usage
 
 Click a row's label or press **Enter** to run its main action. Click the arrow
-or press **→** to open the submenu. A row with only a submenu opens it when
-you click the label.
+or press **→** to open the submenu. Click the label if a row only has a submenu.
 
-- **Menu contents.** Use the switches in the mod's **Settings** to choose
-  which sections, rows, and submenu commands appear. Turning off a row hides
-  its submenu. If no commands remain, Windows opens its standard Win+X menu.
-- **General settings.** Choose immediate hover, a delay, arrow hover, or arrow
-  click to open a submenu. The hand cursor marks areas that run a command.
-  The optional administrator filter hides known commands that require
-  administrator credentials or whose elevation is blocked. Commands that only
-  need UAC consent stay visible.
-- **Command settings.** The main Terminal action can run as administrator.
-  Choose a main power action or leave only the power submenu. The default
-  main action is **Shut down**.
+To change the menu, open **Quick Link Menu → Settings** in Windhawk. Section
+switches are below their descriptions. Row and submenu switches follow the menu
+order. Find submenu behavior and the administrator filter under **General settings**,
+and Terminal and power actions under **Command settings**.
 
 ## Links
 
