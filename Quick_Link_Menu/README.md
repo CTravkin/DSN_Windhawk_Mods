@@ -26,10 +26,12 @@ and lets you choose which commands appear.
 
 ## Platforms
 
-Requires [Windhawk](https://windhawk.net/) and Windows 11 x64. Tested on
-Windows 11 24H2 Home and Pro (build `26100.4349`) with Windhawk 1.7.3. An
-earlier version was also tested on Windows 11 26H2 (build `26300.10075`). The
-mod is incompatible with Windows 10 Win+X Restorer.
+Requires [Windhawk](https://windhawk.net/) and Windows 11 x64 or ARM64.
+Win+X interaction was tested on Windows 11 24H2 Home and Pro x64 (build
+`26100.4349`) with Windhawk 1.7.3. An earlier version was also tested on
+Windows 11 26H2 x64 (build `26300.10075`). ARM64 verification in GitHub Actions
+covers native compilation and automated command availability tests. The mod is
+incompatible with Windows 10 Win+X Restorer.
 
 ## Operations
 

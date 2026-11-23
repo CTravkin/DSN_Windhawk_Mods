@@ -47,7 +47,9 @@ and lets you choose which commands appear.
 
 ## Platforms
 
-Requires Windows 11 x64. Incompatible with Windows 10 Win+X Restorer.
+Requires Windows 11 x64 or ARM64. GitHub Actions verified native ARM64
+compilation and automated command availability tests. Win+X interaction was
+tested on x64. Incompatible with Windows 10 Win+X Restorer.
 
 ## Usage
 

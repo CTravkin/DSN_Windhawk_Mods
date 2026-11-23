@@ -26,10 +26,11 @@ Quick Link Menu настраивает штатное меню Windows 11, ко�
 
 ## Платформы
 
-Нужны [Windhawk](https://windhawk.net/) и Windows 11 x64. Мод проверен на
-Windows 11 24H2 Home и Pro (сборка `26100.4349`) с Windhawk 1.7.3. Более ранняя
-версия также проверена на Windows 11 26H2 (сборка `26300.10075`). Мод несовместим
-с Windows 10 Win+X Restorer.
+Нужны [Windhawk](https://windhawk.net/) и Windows 11 x64 или ARM64. Работу меню
+проверили на Windows 11 24H2 Home и Pro x64 (сборка `26100.4349`) с Windhawk
+1.7.3. Более раннюю версию также проверили на Windows 11 26H2 x64 (сборка
+`26300.10075`). На ARM64 в GitHub Actions проверили нативную сборку и запустили
+автоматические тесты доступности команд. Мод несовместим с Windows 10 Win+X Restorer.
 
 ## Эксплуатация
 
