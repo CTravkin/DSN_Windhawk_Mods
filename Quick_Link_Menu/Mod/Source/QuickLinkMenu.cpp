@@ -97,7 +97,7 @@ and Terminal and power actions under **Command settings**.
 
 ## Links
 
-- [Quick Link Menu documentation](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Quick_Link_Menu/README.md)
+- [Quick Link Menu on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Quick_Link_Menu)
 - [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
