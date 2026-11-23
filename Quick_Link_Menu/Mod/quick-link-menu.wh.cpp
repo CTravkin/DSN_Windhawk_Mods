@@ -29,7 +29,7 @@ right-clicking the Start button.
 
 ## Features
 
-![Windows 11 Win+X and three Quick Link Menu configurations showing the System, Shut down, and Event Viewer submenus](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Quick_Link_Menu/Assets/Previews/Comparison.png)
+![Windows 11 Win+X and three Quick Link Menu configurations showing the System, Shut down, and Event Viewer submenus](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/3b4e177fc36ebff3d3904821c6b85d9e9032583d/Quick_Link_Menu/Assets/Previews/Comparison.png)
 
 ### Customization and command availability
 
@@ -94,7 +94,7 @@ and Terminal and power actions under **Command settings**.
 
 ## Links
 
-- [Quick Link Menu on GitHub](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Quick_Link_Menu)
+- [Quick Link Menu documentation](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Quick_Link_Menu/README.md)
 - [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
