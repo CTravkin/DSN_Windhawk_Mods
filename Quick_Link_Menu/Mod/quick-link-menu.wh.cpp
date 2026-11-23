@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         0.5.7
+// @version         1.0.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 39
+// Build: 40
 
 // ==WindhawkModReadme==
 /*
