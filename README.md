@@ -11,7 +11,7 @@ DSN Windhawk Mods is a collection of Windhawk mods for Windows. Each mod can be 
 | [Explorer Item Pins](Explorer_Item_Pins/README.md) | `explorer-item-pins` | Pin files and folders within their parent folder in File Explorer |
 | [Windows Border Switch](Windows_Border_Switch/README.md) | `windows-border-switch` | Hide system-drawn borders on app windows and shell elements |
 | [Cursor Scheme Extension](Cursor_Scheme_Extension/README.md) | `cursor-scheme-extension` | Replace built-in application pointers with pointers from the selected Windows scheme |
-| [Refined Quick Settings and Sound](Refined_Quick_Settings_and_Sound/README.md) | `refined-quick-settings-and-sound` | Refine the Windows 11 Quick Settings and Sound panels |
 | [Quick Link Menu](Quick_Link_Menu/README.md) | `quick-link-menu` | Customize and extend the Win+X menu |
+| [Refined Quick Settings and Sound](Refined_Quick_Settings_and_Sound/README.md) | `refined-quick-settings-and-sound` | Refine the Windows 11 Quick Settings and Sound panels |
 
 The [root MIT license](LICENSE) covers the original DSN mods. Refined Quick Settings and Sound is licensed separately under [GPL-3.0-only](Refined_Quick_Settings_and_Sound/LICENSE).
