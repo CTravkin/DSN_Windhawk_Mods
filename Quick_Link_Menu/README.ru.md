@@ -1,6 +1,6 @@
 # Quick Link Menu
 
-[English](README.md) · **Русский**
+[English](README.md) · **Русский** · [DSN Windhawk Mods](../README.ru.md)
 
 Quick Link Menu настраивает штатное меню Windows 11, которое открывается по
 **Win+X** или правым кликом по кнопке «Пуск».
@@ -107,5 +107,3 @@ node --test Quick_Link_Menu/Tests/menu-settings.test.mjs
 
 Первая команда сверяет готовый исходник с входными файлами. Тесты проверяют
 настройки меню, значения по умолчанию и локализацию.
-
-[DSN Windhawk Mods](../README.ru.md)

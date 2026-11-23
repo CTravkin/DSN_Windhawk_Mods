@@ -1,6 +1,6 @@
 # Quick Link Menu
 
-**English** · [Русский](README.ru.md)
+**English** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
 Quick Link Menu customizes the native Windows 11 menu opened by **Win+X** or by
 right-clicking the Start button.
@@ -100,5 +100,3 @@ node --test Quick_Link_Menu/Tests/menu-settings.test.mjs
 
 The first command checks that the standalone source matches its inputs. The
 tests cover menu settings, defaults, and localization.
-
-[DSN Windhawk Mods](../README.md)
