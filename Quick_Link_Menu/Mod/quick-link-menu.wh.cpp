@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         1.1.2
+// @version         1.1.3
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 44
+// Build: 45
 
 // ==WindhawkModReadme==
 /*
@@ -1635,6 +1635,11 @@ struct CursorEvents {
     X::UIElement::PointerExited_revoker exited;
 };
 
+struct SubmenuCleanup {
+    std::vector<X::XamlRoot> roots;
+    std::vector<C::MenuFlyoutItemBase> items;
+};
+
 struct MenuSession {
     C::MenuFlyout menu{nullptr};
     std::vector<C::MenuFlyoutItemBase> original;
@@ -1648,6 +1653,7 @@ struct MenuSession {
     HCURSOR previousCursor{};
     X::UIElement cursorElement{nullptr};
     std::vector<std::unique_ptr<RowInteraction>> rows;
+    SubmenuCleanup submenus;
     std::vector<C::MenuFlyoutItem::Click_revoker> clicks;
     std::vector<CursorEvents> cursorEvents;
     P::FlyoutBase::Opened_revoker opened;
@@ -1656,6 +1662,7 @@ struct MenuSession {
 };
 
 [[clang::no_destroy]] std::unique_ptr<MenuSession> session;
+[[clang::no_destroy]] std::vector<SubmenuCleanup> pendingSubmenuCleanups;
 std::mutex captionLock;
 std::array<std::wstring, std::size(catalog)> systemCaptionCache;
 std::mutex settingsLock;
@@ -1667,6 +1674,7 @@ HWND trayWindow;
 HWND subclassRetryWindow;
 std::atomic<DWORD> trayThread;
 UINT setupMessage;
+constexpr WPARAM sweepClosedSubmenus = 2;
 bool subclassPresent;
 constexpr DWORD taskbarRetryInterval = 250;
 constexpr DWORD taskbarSlowRetryInterval = 2'000;
@@ -2816,29 +2824,72 @@ std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& sto
     return destination;
 }
 
-std::vector<P::Popup> FindSubmenuPopups(MenuSession const& active) {
+void RememberSubmenuRoot(SubmenuCleanup& cleanup, X::XamlRoot const& root) {
+    if (root && std::ranges::find(cleanup.roots, root) == cleanup.roots.end()) cleanup.roots.push_back(root);
+}
+
+bool ContainsOwnedSubmenu(X::DependencyObject const& child, SubmenuCleanup const& cleanup) {
+    if (!child) return false;
+    if (const auto presenter = child.try_as<C::MenuFlyoutPresenter>()) {
+        // Match cloned submenu entries by identity. An outer menu presenter
+        // and an unrelated submenu with the same captions must stay untouched.
+        for (auto const& item : presenter.Items()) {
+            if (std::ranges::find(cleanup.items, item) != cleanup.items.end()) return true;
+        }
+        return false;
+    }
+    for (int index = 0; index < X::Media::VisualTreeHelper::GetChildrenCount(child); ++index) {
+        if (ContainsOwnedSubmenu(X::Media::VisualTreeHelper::GetChild(child, index), cleanup)) return true;
+    }
+    return false;
+}
+
+std::vector<P::Popup> FindSubmenuPopups(SubmenuCleanup& cleanup) {
     std::vector<P::Popup> owned;
-    if (active.rows.empty()) return owned;
-    const auto root = active.rows.front()->split.XamlRoot();
-    if (!root) return owned;
-    for (auto const& popup : X::Media::VisualTreeHelper::GetOpenPopupsForXamlRoot(root)) {
-        const auto presenter = popup.Child().try_as<C::MenuFlyoutPresenter>();
-        if (!presenter || presenter.Items().Size() == 0) continue;
-        const auto first = presenter.Items().GetAt(0).try_as<C::MenuFlyoutItemBase>();
-        if (!first) continue;
-        // The root lists rows, while a submenu lists the children of one row.
-        uint32_t index;
-        if (std::any_of(active.rows.begin(), active.rows.end(), [&](auto const& row) {
-                return row->split.Items().IndexOf(first, index);
-            })) owned.push_back(popup);
+    if (cleanup.items.empty()) return owned;
+    for (auto const& item : cleanup.items) RememberSubmenuRoot(cleanup, item.XamlRoot());
+    for (auto const& root : cleanup.roots) {
+        for (auto const& popup : X::Media::VisualTreeHelper::GetOpenPopupsForXamlRoot(root)) {
+            if (std::ranges::find(owned, popup) == owned.end() && ContainsOwnedSubmenu(popup.Child(), cleanup))
+                owned.push_back(popup);
+        }
     }
     return owned;
+}
+
+void ClosePopupWindows(std::vector<P::Popup> const& popups) noexcept {
+    for (auto const& popup : popups) {
+        try { if (popup.IsOpen()) popup.IsOpen(false); }
+        catch (...) { Wh_Log(L"Could not close the Win+X submenu popup"); }
+    }
+}
+
+void ClosePendingSubmenuPopups() noexcept {
+    // Closing a XAML popup may dispatch another flyout event.
+    auto pending = std::exchange(pendingSubmenuCleanups, {});
+    for (auto& cleanup : pending) {
+        try { ClosePopupWindows(FindSubmenuPopups(cleanup)); }
+        catch (...) { Wh_Log(L"Could not identify the detached Win+X submenu popups"); }
+    }
+}
+
+void QueueSubmenuCleanup(SubmenuCleanup&& cleanup) noexcept {
+    if (cleanup.items.empty()) return;
+    try {
+        pendingSubmenuCleanups.push_back(std::move(cleanup));
+        if (unloading || (pendingSubmenuCleanups.size() == 1 &&
+                         !PostMessageW(trayWindow, setupMessage, sweepClosedSubmenus, 0))) {
+            ClosePendingSubmenuPopups();
+        }
+    } catch (...) {
+        Wh_Log(L"Could not schedule closing the detached Win+X submenus");
+    }
 }
 
 void CloseSubmenus(MenuSession& active) noexcept {
     const bool firstClose = !std::exchange(active.closing, true);
     std::vector<P::Popup> popups;
-    try { popups = FindSubmenuPopups(active); }
+    try { popups = FindSubmenuPopups(active.submenus); }
     catch (...) { Wh_Log(L"Could not identify the open Win+X submenu popups"); }
 
     std::vector<AV::IExpandCollapseProvider> expanded;
@@ -2862,10 +2913,7 @@ void CloseSubmenus(MenuSession& active) noexcept {
     }
     // XAML can hide the submenu HWND and report Collapsed while its Popup is
     // still open. Close that popup before restoring the original menu rows.
-    for (auto const& popup : popups) {
-        try { if (popup.IsOpen()) popup.IsOpen(false); }
-        catch (...) { Wh_Log(L"Could not close the Win+X submenu popup"); }
-    }
+    ClosePopupWindows(popups);
 }
 
 void RemoveRowVisual(RowInteraction& row) {
@@ -2900,6 +2948,8 @@ void Restore() noexcept {
     } catch (...) {
         Wh_Log(L"Could not restore the original Win+X menu");
     }
+    // Sweep once more after XAML finishes dispatching the closing event.
+    QueueSubmenuCleanup(std::move(old->submenus));
 }
 
 C::MenuFlyoutItem CreateLeaf(MenuSession& pending, Destination const& destination) {
@@ -3060,6 +3110,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             entry = split;
         }
         if (!entry) continue;
+        pending->submenus.items.insert(pending->submenus.items.end(), children.begin(), children.end());
         if (previousGroup >= 0 && previousGroup != item.group) visible.push_back(C::MenuFlyoutSeparator());
         visible.push_back(entry);
         previousGroup = item.group;
@@ -3070,6 +3121,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
         if (unloading || session.get() != owner) return;
         try {
             for (auto const& row : owner->rows) {
+                RememberSubmenuRoot(owner->submenus, row->split.XamlRoot());
                 if (!AttachPointerEvents(*row)) {
                     Wh_Log(L"Incompatible Win+X submenu template; restoring the Windows menu");
                     Restore();
@@ -3189,6 +3241,10 @@ TaskbarSetup InstallHooks() {
 
 LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM data, DWORD_PTR) {
     if (message == setupMessage) {
+        if (action == sweepClosedSubmenus) {
+            ClosePendingSubmenuPopups();
+            return 0;
+        }
         if (action) {
             try {
                 return static_cast<LRESULT>(unloading ? TaskbarSetup::Failed : InstallHooks());
@@ -3212,8 +3268,10 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
             Wh_Log(L"Quick Link Menu taskbar cleanup failed");
         }
         Restore();
+        ClosePendingSubmenuPopups();
         return 0;
     }
+    if (message == WM_NCDESTROY && window == trayWindow) pendingSubmenuCleanups.clear();
     return DefSubclassProc(window, message, action, data);
 }
 
