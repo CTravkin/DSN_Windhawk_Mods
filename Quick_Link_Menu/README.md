@@ -7,6 +7,8 @@ right-clicking the Start button.
 
 ## Features
 
+![Windows 11 Win+X and three Quick Link Menu configurations showing the System, Shut down, and Event Viewer submenus](Assets/Previews/Comparison.png)
+
 ### Customization and command availability
 
 - **Menu contents.** Hide individual rows, submenu commands, or entire sections.

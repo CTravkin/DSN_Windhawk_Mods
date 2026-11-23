@@ -29,6 +29,8 @@ right-clicking the Start button.
 
 ## Features
 
+![Windows 11 Win+X and three Quick Link Menu configurations showing the System, Shut down, and Event Viewer submenus](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Quick_Link_Menu/Assets/Previews/Comparison.png)
+
 ### Customization and command availability
 
 - **Menu contents.** Hide individual rows, submenu commands, or entire sections.
