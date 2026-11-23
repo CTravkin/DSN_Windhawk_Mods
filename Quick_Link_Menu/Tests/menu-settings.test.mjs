@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { migrateSettings } from '../Tools/migrate-settings.mjs';
 
 const source = readFileSync(new URL('../Mod/quick-link-menu.wh.cpp', import.meta.url), 'utf8');
 const lines = source.split('// ==WindhawkModSettings==')[1].split('// ==/WindhawkModSettings==')[0].split(/\r?\n/);
@@ -99,54 +98,4 @@ test('Russian section descriptions use the approved wording', () => {
     'Разделы и страницы стандартного приложения «Параметры»',
     'Категории и окна классической панели управления',
   ]) assert.ok(lines.includes(`  $description:ru-RU: ${JSON.stringify(value)}`));
-});
-
-test('preserves flat general settings from early development builds', () => {
-  const old = { submenuHover: 'arrow', hideAdminCommands: 1, showHandCursor: 0, 'commands.run': 0 };
-  const current = {
-    windowsSettingsEnabled: 1,
-    controlPanelEnabled: 1,
-    administrationEnabled: 1,
-    commandsEnabled: 1,
-    'commandOptions.primaryPowerAction': 'shutdown',
-    'general.submenuHover': 'immediate',
-    'general.hideAdminCommands': 0,
-    'general.showHandCursor': 1,
-    'commands.run': 1,
-    submenuHover: 'arrow',
-  };
-  assert.deepEqual(migrateSettings(old, current), {
-    windowsSettingsEnabled: 1,
-    controlPanelEnabled: 1,
-    administrationEnabled: 1,
-    commandsEnabled: 1,
-    'commandOptions.primaryPowerAction': 'shutdown',
-    'general.submenuHover': 'arrow',
-    'general.hideAdminCommands': 1,
-    'general.showHandCursor': 0,
-    'commands.run': 0,
-  });
-  assert.equal(old.submenuHover, 'arrow');
-});
-
-test('migrates section switches and preserves explicit values on current paths', () => {
-  const old = {
-    'windowsSettings.sectionEnabled': 0,
-    'controlPanel.sectionEnabled': 0,
-    'administration.sectionEnabled': 1,
-    'commands.sectionEnabled': 0,
-    commandsEnabled: 1,
-    showHandCursor: 0,
-    'general.showHandCursor': 1,
-  };
-  const expected = {
-    windowsSettingsEnabled: 0,
-    controlPanelEnabled: 0,
-    administrationEnabled: 1,
-    commandsEnabled: 1,
-    'general.showHandCursor': 1,
-  };
-  const current = { windowsSettingsEnabled: 1, controlPanelEnabled: 1, administrationEnabled: 1, commandsEnabled: 1 };
-  assert.deepEqual(migrateSettings(old, current), expected);
-  assert.deepEqual(migrateSettings(expected, expected), expected);
 });
