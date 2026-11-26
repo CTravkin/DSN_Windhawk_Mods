@@ -192,7 +192,20 @@ test('history with one row has the same height as the input panel across scales'
     `, true);
 });
 
-test('the four window border modes resolve to the expected outline', () => {
+test('a saved explicit accent becomes the Windows border mode', () => {
+    const normalize = source.match(/constexpr std::wstring_view NormalizeBorderMode\([\s\S]*?\n\}/)?.[0];
+    assert.ok(normalize);
+    compileChecks(`
+        #include <string_view>
+        ${normalize}
+        static_assert(NormalizeBorderMode(L"accent") == L"windows");
+        static_assert(NormalizeBorderMode(L"windows") == L"windows");
+        static_assert(NormalizeBorderMode(L"off") == L"off");
+        static_assert(NormalizeBorderMode(L"own") == L"own");
+    `);
+});
+
+test('window border preferences respect high contrast', () => {
     const mode = source.match(/enum class WindowBorderMode[^\n]*;/)?.[0];
     const resolve = source.match(/constexpr WindowBorderMode ResolveWindowBorderMode\([\s\S]*?\n\}/)?.[0];
     assert.ok(mode && resolve, 'The window border policy is present');
@@ -200,39 +213,43 @@ test('the four window border modes resolve to the expected outline', () => {
         ${mode}
         ${resolve}
         using enum WindowBorderMode;
-        static_assert(ResolveWindowBorderMode(Mod, false, true, true) == Mod);
-        static_assert(ResolveWindowBorderMode(Windows, false, false, true) == Windows);
-        static_assert(ResolveWindowBorderMode(Windows, false, true, false) == Windows);
-        static_assert(ResolveWindowBorderMode(Windows, false, true, true) == Accent);
-        static_assert(ResolveWindowBorderMode(Accent, false, false, true) == Accent);
-        static_assert(ResolveWindowBorderMode(Accent, true, true, true) == Windows);
-        static_assert(ResolveWindowBorderMode(Off, true, true, true) == Off);
+        static_assert(ResolveWindowBorderMode(Mod, false) == Mod);
+        static_assert(ResolveWindowBorderMode(Mod, true) == Off);
+        static_assert(ResolveWindowBorderMode(Windows, false) == Windows);
+        static_assert(ResolveWindowBorderMode(Windows, true) == Windows);
+        static_assert(ResolveWindowBorderMode(Off, false) == Off);
+        static_assert(ResolveWindowBorderMode(Off, true) == Off);
     `);
 });
 
-test('Windows borders use the Fluent surface and flyout colors', () => {
-    const mode = source.match(/enum class WindowBorderMode[^\n]*;/)?.[0];
+test('Fluent surface and flyout outlines take the accent only for active windows with the Windows setting enabled', () => {
     const color = source.match(/D2D1_COLOR_F GetWindowsBorderColor\([\s\S]*?\n\}/)?.[0];
-    assert.ok(mode && color);
+    assert.ok(color);
     compileChecks(`
         #include <windows.h>
         #include <d2d1.h>
         #include <cassert>
-        ${mode}
+        #include <initializer_list>
         static D2D1_COLOR_F GetSystemAccentColorF() { return D2D1::ColorF(0x123456); }
+        static bool accentEnabled = false;
+        static bool WindowsUsesAccentBorder() { return accentEnabled; }
         ${color}
         int main() {
-            using enum WindowBorderMode;
-            const auto panel = GetWindowsBorderColor(Windows, false, false, false);
+            const auto panel = GetWindowsBorderColor(false, true, false, false);
             assert(panel.r == 117.0f / 255 && panel.g == panel.r && panel.b == panel.r);
             assert(panel.a == 102.0f / 255);
-            const auto darkFlyout = GetWindowsBorderColor(Windows, false, false, true);
-            const auto lightFlyout = GetWindowsBorderColor(Windows, false, true, true);
+            const auto darkFlyout = GetWindowsBorderColor(false, true, false, true);
+            const auto lightFlyout = GetWindowsBorderColor(false, true, true, true);
             assert(darkFlyout.r == 0 && darkFlyout.a == 51.0f / 255);
             assert(lightFlyout.r == 0 && lightFlyout.a == 15.0f / 255);
-            const auto accent = GetWindowsBorderColor(Accent, false, true, true);
-            assert(accent.r == GetSystemAccentColorF().r && accent.a == 1.0f);
-            const auto contrast = GetWindowsBorderColor(Windows, true, true, false);
+            accentEnabled = true;
+            for (const bool flyout : {false, true}) {
+                const auto accent = GetWindowsBorderColor(false, true, true, flyout);
+                assert(accent.r == GetSystemAccentColorF().r && accent.a == 1.0f);
+                const auto inactive = GetWindowsBorderColor(false, false, true, flyout);
+                assert(inactive.a == (flyout ? lightFlyout.a : panel.a));
+            }
+            const auto contrast = GetWindowsBorderColor(true, true, true, false);
             assert(contrast.r == GetRValue(GetSysColor(COLOR_WINDOWTEXT)) / 255.0f && contrast.a == 1.0f);
         }
     `, true);
@@ -243,6 +260,22 @@ test('the border settings are grouped in color, window, and context menu order',
     assert.ok(group, 'The window borders group is present');
     const keys = Array.from(group.matchAll(/^  - (\w+):/gm), match => match[1]);
     assert.deepEqual(keys, ['customBorderColor', 'windowBorderMode', 'contextMenuBorderMode']);
+});
+
+test('all localized border lists omit the explicit accent and preserve the option order', () => {
+    const group = source.match(/^\- windowBordersGroup:[\s\S]*?(?=^\- layoutGroup:)/m)?.[0];
+    const windowOptions = group.slice(group.indexOf('  - windowBorderMode:'), group.indexOf('  - contextMenuBorderMode:'));
+    const menuOptions = group.slice(group.indexOf('  - contextMenuBorderMode:'));
+    for (const [entry, keys] of [
+        [windowOptions, ['mod', 'windows', 'off']],
+        [menuOptions, ['own', 'window', 'windows', 'off']],
+    ]) {
+        const localizedLists = entry.split(/^    \$options[^\n]*\n/m).slice(1);
+        assert.equal(localizedLists.length, 21);
+        for (const list of localizedLists) {
+            assert.deepEqual(Array.from(list.matchAll(/^    - (\w+):/gm), match => match[1]), keys);
+        }
+    }
 });
 
 test('context menus can keep their own border or override the window border policy', () => {
@@ -260,8 +293,7 @@ test('context menus can keep their own border or override the window border poli
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Mod) == Window::Mod);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Off) == Window::Off);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Windows, Window::Off) == Window::Windows);
-        static_assert(ResolveContextMenuWindowBorderMode(Menu::Accent, Window::Off) == Window::Accent);
-        static_assert(ResolveContextMenuWindowBorderMode(Menu::Off, Window::Accent) == Window::Off);
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Off, Window::Windows) == Window::Off);
     `);
 });
 

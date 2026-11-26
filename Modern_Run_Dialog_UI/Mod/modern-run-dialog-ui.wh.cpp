@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.2
+// @version         6.6.3
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 25
+// Build: 26
 
 // ==WindhawkModReadme==
 /*
@@ -327,147 +327,126 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $options:
     - mod: Mod-defined
     - windows: Windows-defined
-    - accent: Windows accent
     - off: Off
     $name:vi-VN: Chế độ viền
     $description:vi-VN: Màu sắc và hiển thị viền các bảng
     $options:vi-VN:
     - mod: Theo mod
     - windows: Theo Windows
-    - accent: Màu nhấn Windows
     - off: Tắt
     $name:th-TH: โหมดขอบ
     $description:th-TH: สีและการแสดงขอบแผง
     $options:th-TH:
     - mod: ตามม็อด
     - windows: ตาม Windows
-    - accent: สีเน้น Windows
     - off: ปิด
     $name:id-ID: Mode Bingkai
     $description:id-ID: Warna dan visibilitas garis luar panel
     $options:id-ID:
     - mod: Sesuai mod
     - windows: Sesuai Windows
-    - accent: Aksen Windows
     - off: Nonaktif
     $name:ms-MY: Mod Sempadan
     $description:ms-MY: Warna dan keterlihatan sempadan panel
     $options:ms-MY:
     - mod: Mengikut mod
     - windows: Mengikut Windows
-    - accent: Aksen Windows
     - off: Dimatikan
     $name:ja-JP: 境界線モード
     $description:ja-JP: パネルの境界線の色と表示
     $options:ja-JP:
     - mod: Mod に従う
     - windows: Windows に従う
-    - accent: Windows のアクセント
     - off: 表示しない
     $name:zh-CN: 边框模式
     $description:zh-CN: 面板边框的颜色和可见性
     $options:zh-CN:
     - mod: 由模组决定
     - windows: 由 Windows 决定
-    - accent: Windows 强调色
     - off: 关闭
     $name:zh-TW: 邊框模式
     $description:zh-TW: 面板邊框的色彩和顯示
     $options:zh-TW:
     - mod: 由模組決定
     - windows: 由 Windows 決定
-    - accent: Windows 輔色
     - off: 關閉
     $name:ko-KR: 테두리 모드
     $description:ko-KR: 패널 테두리의 색상과 표시 여부
     $options:ko-KR:
     - mod: 모드 설정
     - windows: Windows 설정
-    - accent: Windows 강조색
     - off: 끔
     $name:fr-FR: Mode des bordures
     $description:fr-FR: Couleur et visibilité du contour des panneaux
     $options:fr-FR:
     - mod: Selon le mod
     - windows: Selon Windows
-    - accent: Accentuation Windows
     - off: Désactivées
     $name:de-DE: Rahmenmodus
     $description:de-DE: Farbe und Sichtbarkeit der Panelrahmen
     $options:de-DE:
     - mod: Vom Mod festgelegt
     - windows: Von Windows festgelegt
-    - accent: Windows-Akzentfarbe
     - off: Aus
     $name:es-ES: Modo de borde
     $description:es-ES: Color y visibilidad del contorno de los paneles
     $options:es-ES:
     - mod: Según el mod
     - windows: Según Windows
-    - accent: Acento de Windows
     - off: Desactivados
     $name:pt-BR: Modo das bordas
     $description:pt-BR: Cor e visibilidade do contorno dos painéis
     $options:pt-BR:
     - mod: Definido pelo mod
     - windows: Definido pelo Windows
-    - accent: Destaque do Windows
     - off: Desativadas
     $name:it-IT: Modalità dei bordi
     $description:it-IT: Colore e visibilità del contorno dei riquadri
     $options:it-IT:
     - mod: Secondo la mod
     - windows: Secondo Windows
-    - accent: Colore principale di Windows
     - off: Disattivati
     $name:ru-RU: Режим рамок
     $description:ru-RU: Цвет и видимость внешних контуров панелей
     $options:ru-RU:
     - mod: Определено модом
     - windows: Определено Windows
-    - accent: Акцентный Windows
     - off: Отключены
     $name:uk-UA: Режим рамок
     $description:uk-UA: Колір і видимість зовнішніх контурів панелей
     $options:uk-UA:
     - mod: Визначено модом
     - windows: Визначено Windows
-    - accent: Акцент Windows
     - off: Вимкнено
     $name:pl-PL: Tryb obramowania
     $description:pl-PL: Kolor i widoczność obramowań paneli
     $options:pl-PL:
     - mod: Według moda
     - windows: Według systemu Windows
-    - accent: Akcent systemu Windows
     - off: Wyłączone
     $name:nl-NL: Randmodus
     $description:nl-NL: Kleur en zichtbaarheid van paneelranden
     $options:nl-NL:
     - mod: Volgens de mod
     - windows: Volgens Windows
-    - accent: Windows-accentkleur
     - off: Uit
     $name:tr-TR: Kenarlık Modu
     $description:tr-TR: Panel kenarlıklarının rengi ve görünürlüğü
     $options:tr-TR:
     - mod: Moda göre
     - windows: Windows’a göre
-    - accent: Windows vurgu rengi
     - off: Kapalı
     $name:hi-IN: सीमा मोड
     $description:hi-IN: पैनल की बाहरी सीमाओं का रंग और दृश्यता
     $options:hi-IN:
     - mod: मॉड के अनुसार
     - windows: Windows के अनुसार
-    - accent: Windows का एक्सेंट रंग
     - off: बंद
     $name:ar: وضع الحدود
     $description:ar: لون وحدود ظهور الحواف الخارجية للوحات
     $options:ar:
     - mod: حسب التعديل
     - windows: حسب Windows
-    - accent: لون تمييز Windows
     - off: معطلة
   - contextMenuBorderMode: own
     $name: Context Menu Borders
@@ -476,7 +455,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Own border
     - window: Defined by window settings
     - windows: Windows-defined
-    - accent: Windows accent
     - off: Off
     $name:vi-VN: Viền menu ngữ cảnh
     $description:vi-VN: Viền ngoài của menu kiểu mod
@@ -484,7 +462,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Viền riêng
     - window: Theo cài đặt cửa sổ
     - windows: Theo Windows
-    - accent: Màu nhấn Windows
     - off: Tắt
     $name:th-TH: ขอบเมนูบริบท
     $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
@@ -492,7 +469,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: ขอบของเมนู
     - window: ตามการตั้งค่าหน้าต่าง
     - windows: ตาม Windows
-    - accent: สีเน้น Windows
     - off: ปิด
     $name:id-ID: Bingkai Menu Konteks
     $description:id-ID: Garis luar menu bergaya mod
@@ -500,7 +476,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Bingkai menu
     - window: Sesuai pengaturan jendela
     - windows: Sesuai Windows
-    - accent: Aksen Windows
     - off: Nonaktif
     $name:ms-MY: Sempadan Menu Konteks
     $description:ms-MY: Sempadan luar menu gaya mod
@@ -508,7 +483,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Sempadan menu
     - window: Mengikut tetapan tetingkap
     - windows: Mengikut Windows
-    - accent: Aksen Windows
     - off: Dimatikan
     $name:ja-JP: コンテキスト メニューの境界線
     $description:ja-JP: Mod スタイルのメニューの外枠
@@ -516,7 +490,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: メニュー独自の境界線
     - window: ウィンドウの設定に従う
     - windows: Windows に従う
-    - accent: Windows のアクセント
     - off: 表示しない
     $name:zh-CN: 右键菜单边框
     $description:zh-CN: 模组样式菜单的外边框
@@ -524,7 +497,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: 菜单自带边框
     - window: 由窗口设置决定
     - windows: 由 Windows 决定
-    - accent: Windows 强调色
     - off: 关闭
     $name:zh-TW: 快顯選單邊框
     $description:zh-TW: 模組樣式選單的外邊框
@@ -532,7 +504,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: 選單自帶邊框
     - window: 由視窗設定決定
     - windows: 由 Windows 決定
-    - accent: Windows 輔色
     - off: 關閉
     $name:ko-KR: 상황에 맞는 메뉴 테두리
     $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
@@ -540,7 +511,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: 메뉴 고유 테두리
     - window: 창 설정에 따름
     - windows: Windows 설정
-    - accent: Windows 강조색
     - off: 끔
     $name:fr-FR: Bordures du menu contextuel
     $description:fr-FR: Contour du menu dans le style du mod
@@ -548,7 +518,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Bordure propre au menu
     - window: Selon les paramètres de fenêtre
     - windows: Selon Windows
-    - accent: Accentuation Windows
     - off: Désactivées
     $name:de-DE: Kontextmenürahmen
     $description:de-DE: Außenrahmen des Menüs im Mod-Stil
@@ -556,7 +525,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Eigener Rahmen
     - window: Nach Fenstereinstellungen
     - windows: Von Windows festgelegt
-    - accent: Windows-Akzentfarbe
     - off: Aus
     $name:es-ES: Bordes del menú contextual
     $description:es-ES: Contorno del menú con estilo del mod
@@ -564,7 +532,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Borde propio del menú
     - window: Según los ajustes de ventana
     - windows: Según Windows
-    - accent: Acento de Windows
     - off: Desactivados
     $name:pt-BR: Bordas do menu de contexto
     $description:pt-BR: Contorno externo do menu no estilo do mod
@@ -572,7 +539,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Borda própria do menu
     - window: Conforme as configurações das janelas
     - windows: Definido pelo Windows
-    - accent: Destaque do Windows
     - off: Desativadas
     $name:it-IT: Bordi del menu contestuale
     $description:it-IT: Contorno esterno del menu in stile mod
@@ -580,7 +546,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Bordo proprio del menu
     - window: Secondo le impostazioni delle finestre
     - windows: Secondo Windows
-    - accent: Colore principale di Windows
     - off: Disattivati
     $name:ru-RU: Рамки контекстного меню
     $description:ru-RU: Внешний контур меню «Стиль мода»
@@ -588,7 +553,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Собственная рамка
     - window: Определено настройками окон
     - windows: Определено Windows
-    - accent: Акцентный Windows
     - off: Отключены
     $name:uk-UA: Рамки контекстного меню
     $description:uk-UA: Зовнішній контур меню в стилі мода
@@ -596,7 +560,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Власна рамка
     - window: Визначено параметрами вікон
     - windows: Визначено Windows
-    - accent: Акцент Windows
     - off: Вимкнено
     $name:pl-PL: Obramowanie menu kontekstowego
     $description:pl-PL: Zewnętrzna ramka menu w stylu moda
@@ -604,7 +567,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Własne obramowanie
     - window: Według ustawień okien
     - windows: Według systemu Windows
-    - accent: Akcent systemu Windows
     - off: Wyłączone
     $name:nl-NL: Randen van het snelmenu
     $description:nl-NL: Buitenrand van het menu in de modstijl
@@ -612,7 +574,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Eigen rand
     - window: Volgens de vensterinstellingen
     - windows: Volgens Windows
-    - accent: Windows-accentkleur
     - off: Uit
     $name:tr-TR: Bağlam Menüsü Kenarlıkları
     $description:tr-TR: Mod stilindeki menünün dış kenarlığı
@@ -620,7 +581,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: Menüye özel kenarlık
     - window: Pencere ayarlarına göre
     - windows: Windows’a göre
-    - accent: Windows vurgu rengi
     - off: Kapalı
     $name:hi-IN: संदर्भ मेनू की सीमाएँ
     $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
@@ -628,7 +588,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: मेनू की अपनी सीमा
     - window: विंडो सेटिंग के अनुसार
     - windows: Windows के अनुसार
-    - accent: Windows का एक्सेंट रंग
     - off: बंद
     $name:ar: حدود قائمة السياق
     $description:ar: الحد الخارجي للقائمة بنمط التعديل
@@ -636,7 +595,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - own: حد خاص بالقائمة
     - window: حسب إعدادات النوافذ
     - windows: حسب Windows
-    - accent: لون تمييز Windows
     - off: معطلة
   $name: Window Borders
   $name:vi-VN: Viền cửa sổ
@@ -1388,33 +1346,31 @@ struct CommandAlias {
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
 enum class ContextMenuStyle { Mod, WindowsFluent };
-enum class WindowBorderMode { Mod, Windows, Accent, Off };
-enum class ContextMenuBorderMode { Own, Window, Windows, Accent, Off };
+enum class WindowBorderMode { Mod, Windows, Off };
+enum class ContextMenuBorderMode { Own, Window, Windows, Off };
 
-constexpr std::array<const wchar_t*, 5> kContextMenuBorderModeValues{
-    L"own", L"window", L"windows", L"accent", L"off"
+constexpr std::array<const wchar_t*, 3> kWindowBorderModeValues{L"mod", L"windows", L"off"};
+constexpr std::array<const wchar_t*, 4> kContextMenuBorderModeValues{
+    L"own", L"window", L"windows", L"off"
 };
+
+constexpr std::wstring_view NormalizeBorderMode(std::wstring_view value) {
+    return value == L"accent" ? L"windows" : value;
+}
 
 constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode(
     ContextMenuBorderMode mode, WindowBorderMode windowMode) {
     switch (mode) {
         case ContextMenuBorderMode::Window: return windowMode;
         case ContextMenuBorderMode::Windows: return WindowBorderMode::Windows;
-        case ContextMenuBorderMode::Accent: return WindowBorderMode::Accent;
         case ContextMenuBorderMode::Off: return WindowBorderMode::Off;
         case ContextMenuBorderMode::Own: return std::nullopt;
     }
     return std::nullopt;
 }
 
-constexpr WindowBorderMode ResolveWindowBorderMode(WindowBorderMode mode, bool highContrast,
-                                                    bool windowsUsesAccent, bool active) {
-    if (highContrast) {
-        return mode == WindowBorderMode::Mod || mode == WindowBorderMode::Off
-            ? WindowBorderMode::Off : WindowBorderMode::Windows;
-    }
-    return mode == WindowBorderMode::Windows && windowsUsesAccent && active
-        ? WindowBorderMode::Accent : mode;
+constexpr WindowBorderMode ResolveWindowBorderMode(WindowBorderMode mode, bool highContrast) {
+    return highContrast && mode == WindowBorderMode::Mod ? WindowBorderMode::Off : mode;
 }
 
 enum class RunAction : size_t { Browse, Run, Close, Settings, Count };
@@ -1752,12 +1708,12 @@ bool WindowsUsesAccentBorder() {
                         &size) == ERROR_SUCCESS && value != 0;
 }
 
-D2D1_COLOR_F GetWindowsBorderColor(WindowBorderMode mode, bool highContrast, bool isLight, bool isFlyout) {
-    if (mode == WindowBorderMode::Accent) return GetSystemAccentColorF();
+D2D1_COLOR_F GetWindowsBorderColor(bool highContrast, bool active, bool isLight, bool isFlyout) {
     if (highContrast) {
         const COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
         return D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f, GetBValue(color) / 255.0f);
     }
+    if (active && WindowsUsesAccentBorder()) return GetSystemAccentColorF();
 
     // Match WinUI's SurfaceStrokeColorFlyout and SurfaceStrokeColorDefault resources.
     if (isFlyout) return D2D1::ColorF(0x000000, (isLight ? 15.0f : 51.0f) / 255.0f);
@@ -5613,10 +5569,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
     wchar_t borderModeOverride[24]{};
     Wh_GetStringValue(GetUserOverrideKey(L"windowBorderMode").c_str(),
                       borderModeOverride, ARRAYSIZE(borderModeOverride));
-    const std::wstring_view borderMode = borderModeOverride[0]
-        ? std::wstring_view(borderModeOverride) : std::wstring_view(curWh.windowBorderMode);
+    const auto borderMode = NormalizeBorderMode(borderModeOverride[0]
+        ? std::wstring_view(borderModeOverride) : std::wstring_view(curWh.windowBorderMode));
     if (borderMode == L"windows") newSettings.windowBorderMode = WindowBorderMode::Windows;
-    else if (borderMode == L"accent") newSettings.windowBorderMode = WindowBorderMode::Accent;
     else if (borderMode == L"off") newSettings.windowBorderMode = WindowBorderMode::Off;
 
     int crSetting = Wh_GetIntSetting(L"appearanceGroup.customCornerRadius");
@@ -5697,7 +5652,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     std::wstring_view menuBorder = menuBorderOverride[0]
         ? std::wstring_view(menuBorderOverride) : std::wstring_view(curWh.contextMenuBorderMode);
     const auto previousMenuBorder = WindhawkUtils::StringSetting::make(L"layoutGroup.contextMenuBorderMode");
-    const std::wstring_view previousMode = previousMenuBorder.get() ? previousMenuBorder.get() : L"";
+    const auto previousMode = NormalizeBorderMode(previousMenuBorder.get() ? previousMenuBorder.get() : L"");
     if (std::find(kContextMenuBorderModeValues.begin() + 1, kContextMenuBorderModeValues.end(), previousMode)
         != kContextMenuBorderModeValues.end()) {
         const auto movedKey = GetUserOverrideKey(L"contextMenuBorderModeMoved");
@@ -5705,7 +5660,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             // Windhawk adds the new key with its default when merging an update.
             if (!menuBorderOverride[0] && menuBorder == L"own") {
                 menuBorder = previousMode;
-                if (Wh_SetStringValue(menuBorderKey.c_str(), previousMenuBorder.get())) {
+                if (Wh_SetStringValue(menuBorderKey.c_str(), previousMode.data())) {
                     Wh_SetIntValue(movedKey.c_str(), 1);
                 }
             } else {
@@ -5713,7 +5668,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
             }
         }
     }
-    const auto menuBorderSetting = std::find(kContextMenuBorderModeValues.begin(), kContextMenuBorderModeValues.end(), menuBorder);
+    const auto menuBorderSetting = std::find(kContextMenuBorderModeValues.begin(), kContextMenuBorderModeValues.end(),
+                                                 NormalizeBorderMode(menuBorder));
     if (menuBorderSetting != kContextMenuBorderModeValues.end()) {
         newSettings.contextMenuBorderMode = static_cast<ContextMenuBorderMode>(
             menuBorderSetting - kContextMenuBorderModeValues.begin());
@@ -12008,9 +11964,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 const auto preferredBorder = settings.contextMenuStyle == ContextMenuStyle::Mod
                     ? ResolveContextMenuWindowBorderMode(settings.contextMenuBorderMode, settings.windowBorderMode)
                     : std::nullopt;
-                const bool windowsAccent = preferredBorder == WindowBorderMode::Windows && WindowsUsesAccentBorder();
-                const auto borderMode = ResolveWindowBorderMode(preferredBorder.value_or(WindowBorderMode::Mod),
-                                                                 highContrast, windowsAccent, s->wasForeground);
+                const auto borderMode = ResolveWindowBorderMode(preferredBorder.value_or(WindowBorderMode::Mod), highContrast);
                 const bool glassEdgeHighlight = borderMode == WindowBorderMode::Mod;
                 const float menuRadiusPx = settings.customCornerRadius >= 0
                     ? DpiScaleF(static_cast<float>(settings.customCornerRadius), dpi) : -1.0f;
@@ -12323,7 +12277,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         DrawD2DGlassRim(pRT, rcMenuCard, menuCornerR, dpi, isLight, preferredBorder ? 1.25f : 1.35f);
                     } else {
                         const auto outline = borderMode == WindowBorderMode::Mod ? visuals.borderColor
-                            : GetWindowsBorderColor(borderMode, highContrast, isLight, /*isFlyout=*/true);
+                            : GetWindowsBorderColor(highContrast, s->wasForeground, isLight, /*isFlyout=*/true);
                         ID2D1SolidColorBrush* brush = nullptr;
                         if (SUCCEEDED(pRT->CreateSolidColorBrush(outline, &brush))) {
                             const float width = borderMode == WindowBorderMode::Mod ? 1.25f : 1.0f;
@@ -13378,68 +13332,66 @@ ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) 
 struct ContextMenuBorderStrings {
     const wchar_t* title;
     const wchar_t* description;
-    const wchar_t* labels[5];
+    const wchar_t* labels[kContextMenuBorderModeValues.size()];
 };
 
 ContextMenuBorderStrings GetContextMenuBorderStrings(const std::wstring& rawLang) {
     const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Viền menu ngữ cảnh", L"Viền ngoài của menu kiểu mod", { L"Viền riêng", L"Theo cài đặt cửa sổ", L"Theo Windows", L"Màu nhấn Windows", L"Tắt" } };
-    if (lang == L"th") return { L"ขอบเมนูบริบท", L"ขอบด้านนอกของเมนูแบบม็อด", { L"ขอบของเมนู", L"ตามการตั้งค่าหน้าต่าง", L"ตาม Windows", L"สีเน้น Windows", L"ปิด" } };
-    if (lang == L"id") return { L"Bingkai Menu Konteks", L"Garis luar menu bergaya mod", { L"Bingkai menu", L"Sesuai pengaturan jendela", L"Sesuai Windows", L"Aksen Windows", L"Nonaktif" } };
-    if (lang == L"ms") return { L"Sempadan Menu Konteks", L"Sempadan luar menu gaya mod", { L"Sempadan menu", L"Mengikut tetapan tetingkap", L"Mengikut Windows", L"Aksen Windows", L"Dimatikan" } };
-    if (lang == L"ja") return { L"コンテキスト メニューの境界線", L"Mod スタイルのメニューの外枠", { L"メニュー独自の境界線", L"ウィンドウの設定に従う", L"Windows に従う", L"Windows のアクセント", L"表示しない" } };
-    if (lang == L"zh_cn") return { L"右键菜单边框", L"模组样式菜单的外边框", { L"菜单自带边框", L"由窗口设置决定", L"由 Windows 决定", L"Windows 强调色", L"关闭" } };
-    if (lang == L"zh_tw") return { L"快顯選單邊框", L"模組樣式選單的外邊框", { L"選單自帶邊框", L"由視窗設定決定", L"由 Windows 決定", L"Windows 輔色", L"關閉" } };
-    if (lang == L"ko") return { L"상황에 맞는 메뉴 테두리", L"모드 스타일 메뉴의 바깥 테두리", { L"메뉴 고유 테두리", L"창 설정에 따름", L"Windows 설정", L"Windows 강조색", L"끔" } };
-    if (lang == L"fr") return { L"Bordures du menu contextuel", L"Contour du menu dans le style du mod", { L"Bordure propre au menu", L"Selon les paramètres de fenêtre", L"Selon Windows", L"Accentuation Windows", L"Désactivées" } };
-    if (lang == L"de") return { L"Kontextmenürahmen", L"Außenrahmen des Menüs im Mod-Stil", { L"Eigener Rahmen", L"Nach Fenstereinstellungen", L"Von Windows festgelegt", L"Windows-Akzentfarbe", L"Aus" } };
-    if (lang == L"es") return { L"Bordes del menú contextual", L"Contorno del menú con estilo del mod", { L"Borde propio del menú", L"Según los ajustes de ventana", L"Según Windows", L"Acento de Windows", L"Desactivados" } };
-    if (lang == L"pt") return { L"Bordas do menu de contexto", L"Contorno externo do menu no estilo do mod", { L"Borda própria do menu", L"Conforme as configurações das janelas", L"Definido pelo Windows", L"Destaque do Windows", L"Desativadas" } };
-    if (lang == L"it") return { L"Bordi del menu contestuale", L"Contorno esterno del menu in stile mod", { L"Bordo proprio del menu", L"Secondo le impostazioni delle finestre", L"Secondo Windows", L"Colore principale di Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки контекстного меню", L"Внешний контур меню «Стиль мода»", { L"Собственная рамка", L"Определено настройками окон", L"Определено Windows", L"Акцентный Windows", L"Отключены" } };
-    if (lang == L"uk") return { L"Рамки контекстного меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Акцент Windows", L"Вимкнено" } };
-    if (lang == L"pl") return { L"Obramowanie menu kontekstowego", L"Zewnętrzna ramka menu w stylu moda", { L"Własne obramowanie", L"Według ustawień okien", L"Według systemu Windows", L"Akcent systemu Windows", L"Wyłączone" } };
-    if (lang == L"nl") return { L"Randen van het snelmenu", L"Buitenrand van het menu in de modstijl", { L"Eigen rand", L"Volgens de vensterinstellingen", L"Volgens Windows", L"Windows-accentkleur", L"Uit" } };
-    if (lang == L"tr") return { L"Bağlam Menüsü Kenarlıkları", L"Mod stilindeki menünün dış kenarlığı", { L"Menüye özel kenarlık", L"Pencere ayarlarına göre", L"Windows’a göre", L"Windows vurgu rengi", L"Kapalı" } };
-    if (lang == L"hi") return { L"संदर्भ मेनू की सीमाएँ", L"मॉड शैली के मेनू की बाहरी सीमा", { L"मेनू की अपनी सीमा", L"विंडो सेटिंग के अनुसार", L"Windows के अनुसार", L"Windows का एक्सेंट रंग", L"बंद" } };
-    if (lang == L"ar") return { L"حدود قائمة السياق", L"الحد الخارجي للقائمة بنمط التعديل", { L"حد خاص بالقائمة", L"حسب إعدادات النوافذ", L"حسب Windows", L"لون تمييز Windows", L"معطلة" } };
+    if (lang == L"vi") return { L"Viền menu ngữ cảnh", L"Viền ngoài của menu kiểu mod", { L"Viền riêng", L"Theo cài đặt cửa sổ", L"Theo Windows", L"Tắt" } };
+    if (lang == L"th") return { L"ขอบเมนูบริบท", L"ขอบด้านนอกของเมนูแบบม็อด", { L"ขอบของเมนู", L"ตามการตั้งค่าหน้าต่าง", L"ตาม Windows", L"ปิด" } };
+    if (lang == L"id") return { L"Bingkai Menu Konteks", L"Garis luar menu bergaya mod", { L"Bingkai menu", L"Sesuai pengaturan jendela", L"Sesuai Windows", L"Nonaktif" } };
+    if (lang == L"ms") return { L"Sempadan Menu Konteks", L"Sempadan luar menu gaya mod", { L"Sempadan menu", L"Mengikut tetapan tetingkap", L"Mengikut Windows", L"Dimatikan" } };
+    if (lang == L"ja") return { L"コンテキスト メニューの境界線", L"Mod スタイルのメニューの外枠", { L"メニュー独自の境界線", L"ウィンドウの設定に従う", L"Windows に従う", L"表示しない" } };
+    if (lang == L"zh_cn") return { L"右键菜单边框", L"模组样式菜单的外边框", { L"菜单自带边框", L"由窗口设置决定", L"由 Windows 决定", L"关闭" } };
+    if (lang == L"zh_tw") return { L"快顯選單邊框", L"模組樣式選單的外邊框", { L"選單自帶邊框", L"由視窗設定決定", L"由 Windows 決定", L"關閉" } };
+    if (lang == L"ko") return { L"상황에 맞는 메뉴 테두리", L"모드 스타일 메뉴의 바깥 테두리", { L"메뉴 고유 테두리", L"창 설정에 따름", L"Windows 설정", L"끔" } };
+    if (lang == L"fr") return { L"Bordures du menu contextuel", L"Contour du menu dans le style du mod", { L"Bordure propre au menu", L"Selon les paramètres de fenêtre", L"Selon Windows", L"Désactivées" } };
+    if (lang == L"de") return { L"Kontextmenürahmen", L"Außenrahmen des Menüs im Mod-Stil", { L"Eigener Rahmen", L"Nach Fenstereinstellungen", L"Von Windows festgelegt", L"Aus" } };
+    if (lang == L"es") return { L"Bordes del menú contextual", L"Contorno del menú con estilo del mod", { L"Borde propio del menú", L"Según los ajustes de ventana", L"Según Windows", L"Desactivados" } };
+    if (lang == L"pt") return { L"Bordas do menu de contexto", L"Contorno externo do menu no estilo do mod", { L"Borda própria do menu", L"Conforme as configurações das janelas", L"Definido pelo Windows", L"Desativadas" } };
+    if (lang == L"it") return { L"Bordi del menu contestuale", L"Contorno esterno del menu in stile mod", { L"Bordo proprio del menu", L"Secondo le impostazioni delle finestre", L"Secondo Windows", L"Disattivati" } };
+    if (lang == L"ru") return { L"Рамки контекстного меню", L"Внешний контур меню «Стиль мода»", { L"Собственная рамка", L"Определено настройками окон", L"Определено Windows", L"Отключены" } };
+    if (lang == L"uk") return { L"Рамки контекстного меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Вимкнено" } };
+    if (lang == L"pl") return { L"Obramowanie menu kontekstowego", L"Zewnętrzna ramka menu w stylu moda", { L"Własne obramowanie", L"Według ustawień okien", L"Według systemu Windows", L"Wyłączone" } };
+    if (lang == L"nl") return { L"Randen van het snelmenu", L"Buitenrand van het menu in de modstijl", { L"Eigen rand", L"Volgens de vensterinstellingen", L"Volgens Windows", L"Uit" } };
+    if (lang == L"tr") return { L"Bağlam Menüsü Kenarlıkları", L"Mod stilindeki menünün dış kenarlığı", { L"Menüye özel kenarlık", L"Pencere ayarlarına göre", L"Windows’a göre", L"Kapalı" } };
+    if (lang == L"hi") return { L"संदर्भ मेनू की सीमाएँ", L"मॉड शैली के मेनू की बाहरी सीमा", { L"मेनू की अपनी सीमा", L"विंडो सेटिंग के अनुसार", L"Windows के अनुसार", L"बंद" } };
+    if (lang == L"ar") return { L"حدود قائمة السياق", L"الحد الخارجي للقائمة بنمط التعديل", { L"حد خاص بالقائمة", L"حسب إعدادات النوافذ", L"حسب Windows", L"معطلة" } };
     return { L"Context Menu Borders", L"Outer border of the mod-style menu",
-             { L"Own border", L"Defined by window settings", L"Windows-defined", L"Windows accent", L"Off" } };
+             { L"Own border", L"Defined by window settings", L"Windows-defined", L"Off" } };
 }
 
 struct WindowBorderStrings {
     const wchar_t* groupTitle;
     const wchar_t* modeTitle;
     const wchar_t* description;
-    const wchar_t* labels[4];
+    const wchar_t* labels[kWindowBorderModeValues.size()];
 };
-
-constexpr std::array<const wchar_t*, 4> kWindowBorderModeValues{L"mod", L"windows", L"accent", L"off"};
 
 WindowBorderStrings GetWindowBorderStrings(const std::wstring& rawLang) {
     const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Viền cửa sổ", L"Chế độ viền", L"Màu sắc và hiển thị viền các bảng", { L"Theo mod", L"Theo Windows", L"Màu nhấn Windows", L"Tắt" } };
-    if (lang == L"th") return { L"ขอบหน้าต่าง", L"โหมดขอบ", L"สีและการแสดงขอบแผง", { L"ตามม็อด", L"ตาม Windows", L"สีเน้น Windows", L"ปิด" } };
-    if (lang == L"id") return { L"Bingkai Jendela", L"Mode Bingkai", L"Warna dan visibilitas garis luar panel", { L"Sesuai mod", L"Sesuai Windows", L"Aksen Windows", L"Nonaktif" } };
-    if (lang == L"ms") return { L"Sempadan Tetingkap", L"Mod Sempadan", L"Warna dan keterlihatan sempadan panel", { L"Mengikut mod", L"Mengikut Windows", L"Aksen Windows", L"Dimatikan" } };
-    if (lang == L"ja") return { L"ウィンドウの境界線", L"境界線モード", L"パネルの境界線の色と表示", { L"Mod に従う", L"Windows に従う", L"Windows のアクセント", L"表示しない" } };
-    if (lang == L"zh_cn") return { L"窗口边框", L"边框模式", L"面板边框的颜色和可见性", { L"由模组决定", L"由 Windows 决定", L"Windows 强调色", L"关闭" } };
-    if (lang == L"zh_tw") return { L"視窗邊框", L"邊框模式", L"面板邊框的色彩和顯示", { L"由模組決定", L"由 Windows 決定", L"Windows 輔色", L"關閉" } };
-    if (lang == L"ko") return { L"창 테두리", L"테두리 모드", L"패널 테두리의 색상과 표시 여부", { L"모드 설정", L"Windows 설정", L"Windows 강조색", L"끔" } };
-    if (lang == L"fr") return { L"Bordures des fenêtres", L"Mode des bordures", L"Couleur et visibilité du contour des panneaux", { L"Selon le mod", L"Selon Windows", L"Accentuation Windows", L"Désactivées" } };
-    if (lang == L"de") return { L"Fensterrahmen", L"Rahmenmodus", L"Farbe und Sichtbarkeit der Panelrahmen", { L"Vom Mod festgelegt", L"Von Windows festgelegt", L"Windows-Akzentfarbe", L"Aus" } };
-    if (lang == L"es") return { L"Bordes de las ventanas", L"Modo de borde", L"Color y visibilidad del contorno de los paneles", { L"Según el mod", L"Según Windows", L"Acento de Windows", L"Desactivados" } };
-    if (lang == L"pt") return { L"Bordas das janelas", L"Modo das bordas", L"Cor e visibilidade do contorno dos painéis", { L"Definido pelo mod", L"Definido pelo Windows", L"Destaque do Windows", L"Desativadas" } };
-    if (lang == L"it") return { L"Bordi delle finestre", L"Modalità dei bordi", L"Colore e visibilità del contorno dei riquadri", { L"Secondo la mod", L"Secondo Windows", L"Colore principale di Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки окон", L"Режим рамок", L"Цвет и видимость внешних контуров панелей", { L"Определено модом", L"Определено Windows", L"Акцентный Windows", L"Отключены" } };
-    if (lang == L"uk") return { L"Рамки вікон", L"Режим рамок", L"Колір і видимість зовнішніх контурів панелей", { L"Визначено модом", L"Визначено Windows", L"Акцент Windows", L"Вимкнено" } };
-    if (lang == L"pl") return { L"Obramowania okien", L"Tryb obramowania", L"Kolor i widoczność obramowań paneli", { L"Według moda", L"Według systemu Windows", L"Akcent systemu Windows", L"Wyłączone" } };
-    if (lang == L"nl") return { L"Vensterranden", L"Randmodus", L"Kleur en zichtbaarheid van paneelranden", { L"Volgens de mod", L"Volgens Windows", L"Windows-accentkleur", L"Uit" } };
-    if (lang == L"tr") return { L"Pencere Kenarlıkları", L"Kenarlık Modu", L"Panel kenarlıklarının rengi ve görünürlüğü", { L"Moda göre", L"Windows’a göre", L"Windows vurgu rengi", L"Kapalı" } };
-    if (lang == L"hi") return { L"विंडो की सीमाएँ", L"सीमा मोड", L"पैनल की बाहरी सीमाओं का रंग और दृश्यता", { L"मॉड के अनुसार", L"Windows के अनुसार", L"Windows का एक्सेंट रंग", L"बंद" } };
-    if (lang == L"ar") return { L"حدود النوافذ", L"وضع الحدود", L"لون وحدود ظهور الحواف الخارجية للوحات", { L"حسب التعديل", L"حسب Windows", L"لون تمييز Windows", L"معطلة" } };
+    if (lang == L"vi") return { L"Viền cửa sổ", L"Chế độ viền", L"Màu sắc và hiển thị viền các bảng", { L"Theo mod", L"Theo Windows", L"Tắt" } };
+    if (lang == L"th") return { L"ขอบหน้าต่าง", L"โหมดขอบ", L"สีและการแสดงขอบแผง", { L"ตามม็อด", L"ตาม Windows", L"ปิด" } };
+    if (lang == L"id") return { L"Bingkai Jendela", L"Mode Bingkai", L"Warna dan visibilitas garis luar panel", { L"Sesuai mod", L"Sesuai Windows", L"Nonaktif" } };
+    if (lang == L"ms") return { L"Sempadan Tetingkap", L"Mod Sempadan", L"Warna dan keterlihatan sempadan panel", { L"Mengikut mod", L"Mengikut Windows", L"Dimatikan" } };
+    if (lang == L"ja") return { L"ウィンドウの境界線", L"境界線モード", L"パネルの境界線の色と表示", { L"Mod に従う", L"Windows に従う", L"表示しない" } };
+    if (lang == L"zh_cn") return { L"窗口边框", L"边框模式", L"面板边框的颜色和可见性", { L"由模组决定", L"由 Windows 决定", L"关闭" } };
+    if (lang == L"zh_tw") return { L"視窗邊框", L"邊框模式", L"面板邊框的色彩和顯示", { L"由模組決定", L"由 Windows 決定", L"關閉" } };
+    if (lang == L"ko") return { L"창 테두리", L"테두리 모드", L"패널 테두리의 색상과 표시 여부", { L"모드 설정", L"Windows 설정", L"끔" } };
+    if (lang == L"fr") return { L"Bordures des fenêtres", L"Mode des bordures", L"Couleur et visibilité du contour des panneaux", { L"Selon le mod", L"Selon Windows", L"Désactivées" } };
+    if (lang == L"de") return { L"Fensterrahmen", L"Rahmenmodus", L"Farbe und Sichtbarkeit der Panelrahmen", { L"Vom Mod festgelegt", L"Von Windows festgelegt", L"Aus" } };
+    if (lang == L"es") return { L"Bordes de las ventanas", L"Modo de borde", L"Color y visibilidad del contorno de los paneles", { L"Según el mod", L"Según Windows", L"Desactivados" } };
+    if (lang == L"pt") return { L"Bordas das janelas", L"Modo das bordas", L"Cor e visibilidade do contorno dos painéis", { L"Definido pelo mod", L"Definido pelo Windows", L"Desativadas" } };
+    if (lang == L"it") return { L"Bordi delle finestre", L"Modalità dei bordi", L"Colore e visibilità del contorno dei riquadri", { L"Secondo la mod", L"Secondo Windows", L"Disattivati" } };
+    if (lang == L"ru") return { L"Рамки окон", L"Режим рамок", L"Цвет и видимость внешних контуров панелей", { L"Определено модом", L"Определено Windows", L"Отключены" } };
+    if (lang == L"uk") return { L"Рамки вікон", L"Режим рамок", L"Колір і видимість зовнішніх контурів панелей", { L"Визначено модом", L"Визначено Windows", L"Вимкнено" } };
+    if (lang == L"pl") return { L"Obramowania okien", L"Tryb obramowania", L"Kolor i widoczność obramowań paneli", { L"Według moda", L"Według systemu Windows", L"Wyłączone" } };
+    if (lang == L"nl") return { L"Vensterranden", L"Randmodus", L"Kleur en zichtbaarheid van paneelranden", { L"Volgens de mod", L"Volgens Windows", L"Uit" } };
+    if (lang == L"tr") return { L"Pencere Kenarlıkları", L"Kenarlık Modu", L"Panel kenarlıklarının rengi ve görünürlüğü", { L"Moda göre", L"Windows’a göre", L"Kapalı" } };
+    if (lang == L"hi") return { L"विंडो की सीमाएँ", L"सीमा मोड", L"पैनल की बाहरी सीमाओं का रंग और दृश्यता", { L"मॉड के अनुसार", L"Windows के अनुसार", L"बंद" } };
+    if (lang == L"ar") return { L"حدود النوافذ", L"وضع الحدود", L"لون وحدود ظهور الحواف الخارجية للوحات", { L"حسب التعديل", L"حسب Windows", L"معطلة" } };
     return { L"Window Borders", L"Border Mode", L"Color and visibility of the panel outlines",
-             { L"Mod-defined", L"Windows-defined", L"Windows accent", L"Off" } };
+             { L"Mod-defined", L"Windows-defined", L"Off" } };
 }
 
 struct CornerRadiusStrings {
@@ -17246,10 +17198,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             }
                         }
 
-                        const auto preferredBorder = state->settings.windowBorderMode;
-                        const bool windowsAccent = preferredBorder == WindowBorderMode::Windows && WindowsUsesAccentBorder();
-                        const bool active = GetForegroundWindow() == hWnd;
-                        const auto borderMode = ResolveWindowBorderMode(preferredBorder, highContrast, windowsAccent, active);
+                        const auto borderMode = ResolveWindowBorderMode(state->settings.windowBorderMode, highContrast);
                         if (borderMode != WindowBorderMode::Off) {
                             auto drawSurfaceBorder = [&](const D2D1_RECT_F& rc, float cr, float thick, const D2D1_COLOR_F* color) {
                                 if (color) {
@@ -17269,7 +17218,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.15f, &adminColor);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.25f, custom);
                             } else {
-                                const D2D1_COLOR_F outline = GetWindowsBorderColor(borderMode, highContrast, isLight, /*isFlyout=*/false);
+                                const D2D1_COLOR_F outline = GetWindowsBorderColor(highContrast, GetForegroundWindow() == hWnd,
+                                                                                   isLight, /*isFlyout=*/false);
                                 if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.0f, &outline);
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.0f, &outline);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.0f, &outline);
