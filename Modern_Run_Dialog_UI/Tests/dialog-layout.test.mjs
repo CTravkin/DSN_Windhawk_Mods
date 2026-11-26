@@ -519,6 +519,96 @@ test('history actions keep delete in the same group', () => {
     assert.doesNotMatch(deleteItem, /isSeparator/);
 });
 
+test('layered icon rendering preserves transparent and translucent pixels', () => {
+    const drawIcon = source.match(/void DrawLayeredRunIcon\([\s\S]*?\n\}/)?.[0];
+    assert.ok(drawIcon, 'The Run dialog uses an alpha-aware icon renderer');
+    compileChecks(`
+        #include <windows.h>
+        #include <d2d1.h>
+        #include <wincodec.h>
+        #include <winrt/base.h>
+        #include <cassert>
+        #include <cstdlib>
+        #include <cstdint>
+
+        ${drawIcon}
+
+        int main() {
+            assert(SUCCEEDED(CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED)));
+            winrt::com_ptr<IWICImagingFactory> wic;
+            assert(SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                IID_PPV_ARGS(wic.put()))));
+            const auto dc = CreateCompatibleDC(nullptr);
+            assert(dc);
+            BITMAPINFO format{};
+            format.bmiHeader = {sizeof(BITMAPINFOHEADER), 8, -8, 1, 32, BI_RGB};
+            void* iconBits = nullptr;
+            const auto color = CreateDIBSection(dc, &format, DIB_RGB_COLORS, &iconBits, nullptr, 0);
+            const auto mask = CreateBitmap(8, 8, 1, 1, nullptr);
+            assert(color && iconBits && mask);
+            auto pixels = static_cast<uint32_t*>(iconBits);
+            for (int y = 0; y < 8; ++y) {
+                for (int x = 0; x < 8; ++x) {
+                    pixels[y * 8 + x] = x < 2 ? 0 : x < 5 ? 0x8000FF00 : 0xFFFF0000;
+                }
+            }
+            ICONINFO info{TRUE, 0, 0, mask, color};
+            const auto icon = CreateIconIndirect(&info);
+            assert(icon);
+            DeleteObject(color);
+            DeleteObject(mask);
+
+            BYTE andBits[16]{}, xorBits[16]{};
+            for (int y = 0; y < 8; ++y) {
+                andBits[y * 2] = 0xF0;
+                xorBits[y * 2] = 0x0F;
+            }
+            const auto legacy = CreateIcon(nullptr, 8, 8, 1, 1, andBits, xorBits);
+            assert(legacy);
+
+            constexpr int width = 48, height = 16;
+            format.bmiHeader.biWidth = width;
+            format.bmiHeader.biHeight = -height;
+            void* surfaceBits = nullptr;
+            const auto bitmap = CreateDIBSection(dc, &format, DIB_RGB_COLORS, &surfaceBits, nullptr, 0);
+            assert(bitmap && surfaceBits);
+            const auto previous = SelectObject(dc, bitmap);
+            winrt::com_ptr<ID2D1Factory> factory;
+            assert(SUCCEEDED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, factory.put())));
+            const auto properties = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_SOFTWARE,
+                D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96, 96);
+            winrt::com_ptr<ID2D1DCRenderTarget> target;
+            assert(SUCCEEDED(factory->CreateDCRenderTarget(&properties, target.put())));
+            const RECT client{0, 0, width, height};
+            assert(SUCCEEDED(target->BindDC(dc, &client)));
+
+            target->BeginDraw();
+            target->Clear(D2D1::ColorF(0.25f, 0.5f, 0.75f, 0.4f));
+            DrawLayeredRunIcon(target.get(), wic.get(), icon, D2D1::RectF(8, 0, 24, 16));
+            DrawLayeredRunIcon(target.get(), wic.get(), legacy, D2D1::RectF(24, 0, 40, 16));
+            assert(SUCCEEDED(target->EndDraw()));
+            GdiFlush();
+            const auto row = static_cast<const uint32_t*>(surfaceBits) + width * 8;
+            assert((row[4] >> 24) == 102);
+            assert(row[9] == row[4]);
+            assert(row[28] == row[4]);
+            assert(row[22] == 0xFFFF0000);
+            assert(row[38] == 0xFFFFFFFF);
+            assert(std::abs(static_cast<int>(row[14] >> 24) - 179) <= 1);
+            assert(std::abs(static_cast<int>((row[14] >> 8) & 255) - 153) <= 1);
+
+            target = nullptr;
+            wic = nullptr;
+            SelectObject(dc, previous);
+            DeleteObject(bitmap);
+            DeleteDC(dc);
+            DestroyIcon(icon);
+            DestroyIcon(legacy);
+            CoUninitialize();
+        }
+    `, true, ['-ld2d1', '-lwindowscodecs', '-lgdi32', '-luser32', '-lole32']);
+});
+
 function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });

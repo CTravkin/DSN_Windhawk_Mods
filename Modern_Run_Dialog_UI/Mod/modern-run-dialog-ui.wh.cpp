@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.6
+// @version         6.6.7
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 29
+// Build: 30
 
 // ==WindhawkModReadme==
 /*
@@ -16521,6 +16521,74 @@ void PerformDialogUninit(HWND hWnd, RunDialogState* state) {
     }
 }
 
+void DrawLayeredRunIcon(ID2D1RenderTarget* target, IWICImagingFactory* imaging, HICON icon,
+                        const D2D1_RECT_F& bounds) {
+    if (!icon) return;
+    winrt::com_ptr<IWICBitmap> source;
+    if (FAILED(imaging->CreateBitmapFromHICON(icon, source.put()))) return;
+
+    winrt::com_ptr<IWICFormatConverter> pixels;
+    if (FAILED(imaging->CreateFormatConverter(pixels.put())) ||
+        FAILED(pixels->Initialize(source.get(), GUID_WICPixelFormat32bppPBGRA,
+                                  WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom))) return;
+
+    winrt::com_ptr<ID2D1Bitmap> bitmap;
+    const auto properties = D2D1::BitmapProperties(
+        D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96, 96);
+    if (SUCCEEDED(target->CreateBitmapFromWicBitmap(pixels.get(), properties, bitmap.put()))) {
+        target->DrawBitmap(bitmap.get(), bounds);
+    }
+}
+
+void DrawRunDialogIcons(ID2D1RenderTarget* target, RunDialogState* state, int visibleRows,
+                        int cardTop, int barTop, int barHeight) {
+    if (visibleRows == 0 && !state->hRunIcon) return;
+    const HRESULT apartment = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    {
+        winrt::com_ptr<IWICImagingFactory> imaging;
+        if (SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory, nullptr, CLSCTX_INPROC_SERVER,
+                                       IID_PPV_ARGS(imaging.put())))) {
+            const auto drawIcon = [&](int x, int y, HICON icon, int size) {
+                DrawLayeredRunIcon(target, imaging.get(), icon,
+                    D2D1::RectF(static_cast<float>(x), static_cast<float>(y),
+                                static_cast<float>(x + size), static_cast<float>(y + size)));
+            };
+
+            const auto& rows = GetActiveRowItems(state);
+            const int iconSize = DpiScaleS(18, state);
+            const int iconX = DpiScaleS(22, state);
+            const int rowHeight = GetRowHeight(state);
+            const int rowsTop = cardTop + GetListPadding(state);
+            for (int visibleIndex = 0; visibleIndex < visibleRows; ++visibleIndex) {
+                const int index = state->scrollOffset + visibleIndex;
+                if (index < 0 || index >= static_cast<int>(rows.size())) continue;
+                if (!rows[index].hIcon && rows[index].isSuggestion && state->showingSuggestions) {
+                    std::lock_guard<std::mutex> lock(g_catalogMutex);
+                    const auto key = ToLowerString(rows[index].cmd);
+                    for (auto& candidate : g_appCatalog) {
+                        if (candidate.cmdLower == key) {
+                            LazilyResolveCandidateMetadata(candidate, state->i18n.appTag);
+                            state->suggestions[index].hIcon = candidate.cachedIcon;
+                            state->suggestions[index].ownsIcon = false;
+                            break;
+                        }
+                    }
+                }
+                const int iconY = rowsTop + visibleIndex * rowHeight + (rowHeight - iconSize) / 2;
+                drawIcon(iconX, iconY, rows[index].hIcon, iconSize);
+            }
+
+            if (state->hRunIcon) {
+                const int size = state->runIconLoadedSize > 0 ? state->runIconLoadedSize : DpiScaleS(20, state);
+                const int x = (DpiScaleS(kBaseInputBarHeight, state) - size) / 2 + DpiScaleS(4, state);
+                const int y = barTop + (barHeight - size) / 2;
+                drawIcon(x, y, state->hRunIcon, size);
+            }
+        }
+    }
+    if (SUCCEEDED(apartment)) CoUninitialize();
+}
+
 bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) {
             if (!hWnd || !state || !g_pD2DFactory || !g_pDWriteFactory || w <= 0 || h <= 0) {
                 return false;
@@ -17362,6 +17430,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             }
                         }
 
+                        DrawRunDialogIcons(pRT, state, visRows, cardTop, barTop, barH);
                         pRT->EndDraw();
 
                         if (pFmtBtn)   pFmtBtn->Release();
@@ -17373,63 +17442,6 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         if (pBrTime)      pBrTime->Release();
                         if (pBrSecondary) pBrSecondary->Release();
                         if (pBrPrimary)   pBrPrimary->Release();
-                    }
-
-                    // 8. Draw Native App Icons onto the premultiplied DIB and preserve opaque destination alpha
-                    auto drawIconPreservingDestAlpha = [&](int ix, int iy, HICON hIco, int sz) {
-                        if (!hIco || sz <= 0) return;
-                        DrawIconEx(hMemDC, ix, iy, hIco, sz, sz, 0, nullptr, DI_NORMAL);
-                        GdiFlush();
-                        int x0 = std::clamp(ix, 0, w);
-                        int y0 = std::clamp(iy, 0, h);
-                        int x1 = std::clamp(ix + sz, 0, w);
-                        int y1 = std::clamp(iy + sz, 0, h);
-                        for (int py = y0; py < y1; ++py) {
-                            DWORD* row = &state->cachedDibPixels[(size_t)py * w];
-                            for (int px = x0; px < x1; ++px) {
-                                row[px] |= 0xFF000000u;
-                            }
-                        }
-                    };
-
-                    int iconSize = DpiScaleS(18, state);
-                    int iconX    = DpiScaleS(22, state);
-                    int cardTop  = GetDetachedCardTopY(state);
-                    int barTop   = GetInputBarTopY(state);
-                    int padTop   = GetListPadding(state);
-                    int rowHInt  = GetRowHeight(state);
-                    int barH     = GetInputBarHeight(state);
-
-                    {
-                        for (int visIdx = 0; visIdx < visRows; ++visIdx) {
-                            int i = state->scrollOffset + visIdx;
-                            if (i >= 0 && i < (int)activeRows.size()) {
-                                if (!activeRows[i].hIcon && activeRows[i].isSuggestion && state->showingSuggestions) {
-                                    std::lock_guard<std::mutex> lock(g_catalogMutex);
-                                    std::wstring keyL = ToLowerString(activeRows[i].cmd);
-                                    for (auto& cand : g_appCatalog) {
-                                        if (cand.cmdLower == keyL) {
-                                            LazilyResolveCandidateMetadata(cand, state->i18n.appTag);
-                                            state->suggestions[i].hIcon = cand.cachedIcon;
-                                            state->suggestions[i].ownsIcon = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (activeRows[i].hIcon) {
-                                    int iconY = cardTop + padTop + visIdx * rowHInt + (rowHInt - iconSize) / 2;
-                                    drawIconPreservingDestAlpha(iconX, iconY, activeRows[i].hIcon, iconSize);
-                                }
-                            }
-                        }
-                    }
-
-                    if (state->hRunIcon) {
-                        int runIconSz = state->runIconLoadedSize > 0 ? state->runIconLoadedSize : DpiScaleS(20, state);
-                        int singleBarH = DpiScaleS(kBaseInputBarHeight, state);
-                        int runIconX  = (singleBarH - runIconSz) / 2 + DpiScaleS(4, state);
-                        int runIconY  = barTop + (barH - runIconSz) / 2;
-                        drawIconPreservingDestAlpha(runIconX, runIconY, state->hRunIcon, runIconSz);
                     }
 
                     return true;
