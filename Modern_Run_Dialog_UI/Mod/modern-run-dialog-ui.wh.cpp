@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.4
+// @version         6.6.5
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 27
+// Build: 28
 
 // ==WindhawkModReadme==
 /*
@@ -7376,12 +7376,60 @@ D2D1_RECT_F CenterVertically(D2D1_RECT_F rect, float contentHeight) {
     return rect;
 }
 
-float GetCenteredInkTop(IDWriteTextLayout* layout, float top, float height) {
+float GetCenteredInkTop(IDWriteTextLayout* layout, float centerY) {
+    const float height = layout->GetMaxHeight();
     DWRITE_OVERHANG_METRICS ink{};
-    if (SUCCEEDED(layout->GetOverhangMetrics(&ink)) && height + ink.top + ink.bottom > 0.0f) {
-        return top + (ink.top - ink.bottom) * 0.5f;
+    if (SUCCEEDED(layout->GetOverhangMetrics(&ink))) {
+        const float inkHeight = height + ink.top + ink.bottom;
+        if (inkHeight > 0.0f) {
+            return centerY + ink.top - (inkHeight < height ? inkHeight : height) * 0.5f;
+        }
     }
-    return top;
+    return centerY - height * 0.5f;
+}
+
+void DrawCenteredTextLayout(ID2D1RenderTarget* target, IDWriteTextLayout* layout,
+                            const D2D1_RECT_F& bounds, ID2D1Brush* brush,
+                            std::optional<float> lineOffset = std::nullopt) {
+    if (!brush || bounds.right <= bounds.left || bounds.bottom <= bounds.top) return;
+    const float centerY = (bounds.top + bounds.bottom) * 0.5f;
+    const float y = lineOffset ? centerY - layout->GetMaxHeight() * 0.5f + *lineOffset
+                               : GetCenteredInkTop(layout, centerY);
+    target->PushAxisAlignedClip(bounds, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+    // Preserve the measured fractional position through Direct2D rasterization.
+    target->DrawTextLayout(D2D1::Point2F(bounds.left, y), layout, brush, D2D1_DRAW_TEXT_OPTIONS_NO_SNAP);
+    target->PopAxisAlignedClip();
+}
+
+void DrawCenteredText(ID2D1RenderTarget* target, const wchar_t* text, UINT32 length, IDWriteTextFormat* format,
+                      const D2D1_RECT_F& bounds, ID2D1Brush* brush,
+                      std::optional<float> lineOffset = std::nullopt) {
+    if (!length || !format || !brush || bounds.right <= bounds.left || bounds.bottom <= bounds.top ||
+        bounds.bottom <= 0.0f || bounds.top >= target->GetSize().height) return;
+    IDWriteTextLayout* layout = nullptr;
+    if (SUCCEEDED(g_pDWriteFactory->CreateTextLayout(text, length, format,
+            bounds.right - bounds.left, bounds.bottom - bounds.top, &layout))) {
+        DrawCenteredTextLayout(target, layout, bounds, brush, lineOffset);
+        layout->Release();
+    }
+}
+
+struct TextLineMetrics {
+    float offset;
+    float height;
+};
+
+TextLineMetrics MeasureTextLine(IDWriteTextFormat* format) {
+    if (!format) return {};
+    const float height = format->GetFontSize() * 3.0f;
+    IDWriteTextLayout* layout = nullptr;
+    // A reference line keeps the baseline stable as the contents or placeholder change.
+    if (FAILED(g_pDWriteFactory->CreateTextLayout(L"Hg", 2, format, height * 2.0f, height, &layout))) return {};
+    const float offset = GetCenteredInkTop(layout, height * 0.5f);
+    DWRITE_TEXT_METRICS metrics{};
+    layout->GetMetrics(&metrics);
+    layout->Release();
+    return {offset, metrics.height};
 }
 
 int GetListPadding(const RunDialogState* state, bool bottom = false) {
@@ -12065,6 +12113,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     pFmtItem->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
                     pFmtItem->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
                 }
+                const float menuTextOffset = MeasureTextLine(pFmtItem).offset;
 
                 int padY = GetMenuPadY(s);
                 int rowH = GetMenuRowHeight(s);
@@ -12151,8 +12200,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         const auto hintRect = D2D1::RectF(hintRight - shortcutWidth, curY,
                                                         hintRight, curY + rowH);
                         pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
-                        pRT->DrawText(item.shortcut, static_cast<UINT32>(wcslen(item.shortcut)),
-                                      pFmtItem, hintRect, pBrSub, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                        DrawCenteredText(pRT, item.shortcut, static_cast<UINT32>(wcslen(item.shortcut)),
+                                      pFmtItem, hintRect, pBrSub, menuTextOffset);
                         pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
                     }
                     if (item.icon != FluentMenuIcon::None && pItemIconBr && pRoundStroke) {
@@ -12169,8 +12218,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                 curY,
                                 rcMinus.left - DpiScaleF(6.0f, dpi),
                                 curY + rowH);
-                            pRT->DrawText(item.label.c_str(), (UINT32)item.label.size(),
-                                          pFmtItem, rcText, pItemTextBr, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                            DrawCenteredText(pRT, item.label.c_str(), (UINT32)item.label.size(),
+                                          pFmtItem, rcText, pItemTextBr, menuTextOffset);
                         }
 
                         bool isEditingThis = (s->editingInlineKind == item.inlineEditKind);
@@ -12225,8 +12274,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                             pFmtCtl->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
 
                             if (pBrText) {
-                                pRT->DrawText(L"−", 1, pFmtCtl, rcMinus, pBrText);
-                                pRT->DrawText(L"+", 1, pFmtCtl, rcPlus,  pBrText);
+                                DrawCenteredText(pRT, L"−", 1, pFmtCtl, rcMinus, pBrText);
+                                DrawCenteredText(pRT, L"+", 1, pFmtCtl, rcPlus,  pBrText);
 
                                 wchar_t valStr[32] = {};
                                 if (isEditingThis) {
@@ -12235,7 +12284,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                     int curVal = GetInlineMenuFieldValue(s->dlgState, item.inlineEditKind);
                                     swprintf_s(valStr, L"%d", curVal);
                                 }
-                                pRT->DrawText(valStr, (UINT32)wcslen(valStr), pFmtCtl, rcBox,
+                                DrawCenteredText(pRT, valStr, (UINT32)wcslen(valStr), pFmtCtl, rcBox,
                                               isEditingThis && pBrAccent ? pBrAccent : pBrText);
                             }
                             pFmtCtl->Release();
@@ -12255,8 +12304,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                 curY,
                                 right - rightReserve,
                                 curY + rowH);
-                            pRT->DrawText(item.label.c_str(), (UINT32)item.label.size(),
-                                          pFmtItem, rcText, pItemTextBr, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                            DrawCenteredText(pRT, item.label.c_str(), (UINT32)item.label.size(),
+                                          pFmtItem, rcText, pItemTextBr, menuTextOffset);
                         }
 
                         if (!item.subItems.empty() && pBrSub && pRoundStroke) {
@@ -13938,15 +13987,15 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     wchar_t rgbInfo[64] = {};
     swprintf_s(rgbInfo, L"R %u  •  G %u  •  B %u", (unsigned)GetRValue(curRgb), (unsigned)GetGValue(curRgb), (unsigned)GetBValue(curRgb));
     const float readoutCenter = (rPrevCard.top + rPrevCard.bottom) * 0.5f;
-    if (pFmtHex) pRT->DrawText(hexStr.c_str(), (UINT32)hexStr.size(), pFmtHex,
+    if (pFmtHex) DrawCenteredText(pRT, hexStr.c_str(), (UINT32)hexStr.size(), pFmtHex,
         D2D1::RectF(rSwatch.right + S(12), rSwatch.top, rPrevCard.right - S(10), readoutCenter), pBrText);
-    if (pFmtLabel) pRT->DrawText(rgbInfo, (UINT32)wcslen(rgbInfo), pFmtLabel,
+    if (pFmtLabel) DrawCenteredText(pRT, rgbInfo, (UINT32)wcslen(rgbInfo), pFmtLabel,
         D2D1::RectF(rSwatch.right + S(12), readoutCenter, rPrevCard.right - S(10), rSwatch.bottom), pBrSub);
 
     // Quick Swatches (2 rows x 8)
     const float swTop = rPrevCard.bottom + sectionGap;
     const wchar_t* swHdr = s->ls.cpSwatches;
-    if (pFmtLabel) pRT->DrawText(swHdr, (UINT32)wcslen(swHdr), pFmtLabel,
+    if (pFmtLabel) DrawCenteredText(pRT, swHdr, (UINT32)wcslen(swHdr), pFmtLabel,
         D2D1::RectF(pad, swTop, (float)w - pad, swTop + S(20)), pBrSub);
     const float gridTop = swTop + S(kColorPickerPaletteHeader);
     const float gap = S(kColorPickerSwatchGap);
@@ -13980,13 +14029,13 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     pRT->FillRoundedRectangle(D2D1::RoundedRect(rApply, S(5), S(5)), pBrAccent);
     if (pFmtBtn) {
         const wchar_t* okTxt = s->ls.cpApply;
-        pRT->DrawText(okTxt, (UINT32)wcslen(okTxt), pFmtBtn, rApply, isLight ? pBrWhite : pBrBlack);
+        DrawCenteredText(pRT, okTxt, (UINT32)wcslen(okTxt), pFmtBtn, rApply, isLight ? pBrWhite : pBrBlack);
     }
     pRT->FillRoundedRectangle(D2D1::RoundedRect(rCancel, S(5), S(5)), pBrCard);
     pRT->DrawRoundedRectangle(D2D1::RoundedRect(rCancel, S(5), S(5)), (s->hoveredId == 2) ? pBrAccent : pBrBorder, 1.0f);
     if (pFmtBtn) {
         const wchar_t* cancelTxt = s->ls.cpCancel;
-        pRT->DrawText(cancelTxt, (UINT32)wcslen(cancelTxt), pFmtBtn, rCancel, pBrText);
+        DrawCenteredText(pRT, cancelTxt, (UINT32)wcslen(cancelTxt), pFmtBtn, rCancel, pBrText);
     }
 
     HRESULT hrEnd = pRT->EndDraw();
@@ -14342,12 +14391,9 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         pRT->CreateSolidColorBrush(colChipSel, &pBrChipSel);
 
         const wchar_t* fontName = GetPreferredFluentFontFamily();
-        IDWriteTextFormat *pFmtCrumb = nullptr, *pFmtHeader = nullptr, *pFmtTitle = nullptr, *pFmtSub = nullptr;
+        IDWriteTextFormat* pFmtHeader = nullptr;
         IDWriteTextFormat *pFmtNav = nullptr, *pFmtCtl = nullptr, *pFmtRight = nullptr, *pFmtGlyph = nullptr;
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_SEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(24.0f), L"", &pFmtHeader);
-        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(24.0f), L"", &pFmtCrumb);
-        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.5f), L"", &pFmtTitle);
-        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(11.5f), L"", &pFmtSub);
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.5f), L"", &pFmtNav);
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(12.5f), L"", &pFmtCtl);
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.0f), L"", &pFmtRight);
@@ -14363,6 +14409,27 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             st->hits.push_back({ id, ri, sv, iv });
         };
 
+        auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description) {
+            if (!pFmtNav || bounds.right <= bounds.left || bounds.bottom <= bounds.top ||
+                bounds.bottom <= 0.0f || bounds.top >= static_cast<float>(h)) return;
+            std::wstring text(title);
+            if (!description.empty()) {
+                text += L'\n';
+                text += description;
+            }
+            IDWriteTextLayout* layout = nullptr;
+            if (FAILED(g_pDWriteFactory->CreateTextLayout(text.c_str(), static_cast<UINT32>(text.size()), pFmtNav,
+                    bounds.right - bounds.left, bounds.bottom - bounds.top, &layout))) return;
+
+            if (!description.empty()) {
+                const DWRITE_TEXT_RANGE range{static_cast<UINT32>(title.size() + 1), static_cast<UINT32>(description.size())};
+                layout->SetFontSize(S(11.5f), range);
+                layout->SetDrawingEffect(pBrSub, range);
+            }
+            DrawCenteredTextLayout(pRT, layout, bounds, pBrText);
+            layout->Release();
+        };
+
         // 1. Left Navigation Sidebar (Win11 Settings style)
         float sideW = S(238.0f);
         pRT->FillRectangle(D2D1::RectF(0, 0, sideW, (float)h), pBrSide);
@@ -14371,10 +14438,9 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         {
             D2D1_RECT_F rBadge = D2D1::RectF(S(16), S(16), S(54), S(54));
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rBadge, S(19), S(19)), pBrChipSel);
-            if (pFmtGlyph) pRT->DrawText(L"\uE756", 1, pFmtGlyph, rBadge, pBrAccent);
-            if (pFmtTitle) pRT->DrawText(L"Modern Run", 10, pFmtTitle, D2D1::RectF(S(64), S(18), sideW - S(10), S(38)), pBrText);
-            const wchar_t* subVer = ls.version;
-            if (pFmtSub)   pRT->DrawText(subVer, (UINT32)wcslen(subVer), pFmtSub, D2D1::RectF(S(64), S(37), sideW - S(10), S(55)), pBrSub);
+            if (pFmtGlyph) DrawCenteredText(pRT, L"\uE756", 1, pFmtGlyph, rBadge, pBrAccent);
+            drawCardText(D2D1::RectF(S(64), rBadge.top, sideW - S(10), rBadge.bottom),
+                         L"Modern Run", ls.version);
         }
 
         struct NavDef { int tab; const wchar_t* glyph; const wchar_t* label; };
@@ -14399,11 +14465,11 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(D2D1::RectF(rNav.left + S(1), rNav.top + S(10), rNav.left + S(4), rNav.bottom - S(10)), S(1.5f), S(1.5f)), pBrAccent);
             }
             if (pFmtGlyph) {
-                pRT->DrawText(nv.glyph, (UINT32)wcslen(nv.glyph), pFmtGlyph, D2D1::RectF(rNav.left + S(10), rNav.top, rNav.left + S(38), rNav.bottom), sel ? pBrAccent : pBrSub);
+                DrawCenteredText(pRT, nv.glyph, (UINT32)wcslen(nv.glyph), pFmtGlyph, D2D1::RectF(rNav.left + S(10), rNav.top, rNav.left + S(38), rNav.bottom), sel ? pBrAccent : pBrSub);
             }
             const wchar_t* lbl = nv.label;
             if (pFmtNav) {
-                pRT->DrawText(lbl, (UINT32)wcslen(lbl), pFmtNav, D2D1::RectF(rNav.left + S(44), rNav.top, rNav.right - S(8), rNav.bottom), pBrText);
+                DrawCenteredText(pRT, lbl, (UINT32)wcslen(lbl), pFmtNav, D2D1::RectF(rNav.left + S(44), rNav.top, rNav.right - S(8), rNav.bottom), pBrText);
             }
             addHit(navId, rNav, L"", nv.tab);
             navY += S(42.0f);
@@ -14418,7 +14484,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         // Breadcrumb title: "Modern Run  >  Cá nhân hoá"
         std::wstring fullHeader = std::wstring(L"Modern Run  ›  ") + kNavs[st->activeTab].label;
         if (pFmtHeader && pBrText) {
-            pRT->DrawText(fullHeader.c_str(), (UINT32)fullHeader.size(), pFmtHeader,
+            DrawCenteredText(pRT, fullHeader.c_str(), (UINT32)fullHeader.size(), pFmtHeader,
                           D2D1::RectF(contentX, curY, contentX + contentW, curY + S(38)), pBrText);
         }
         curY += S(52.0f);
@@ -14426,26 +14492,6 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         const float rowHeight = S(68.0f);
         const float cardInset = S(kSettingsCardInset);
         const float controlHeight = S(kSettingsControlHeight);
-        auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description) {
-            if (!pFmtNav || bounds.right <= bounds.left || bounds.bottom <= bounds.top) return;
-            std::wstring text(title);
-            if (!description.empty()) {
-                text += L'\n';
-                text += description;
-            }
-            IDWriteTextLayout* layout = nullptr;
-            if (FAILED(g_pDWriteFactory->CreateTextLayout(text.c_str(), static_cast<UINT32>(text.size()), pFmtNav,
-                    bounds.right - bounds.left, bounds.bottom - bounds.top, &layout))) return;
-
-            if (!description.empty()) {
-                const DWRITE_TEXT_RANGE range{static_cast<UINT32>(title.size() + 1), static_cast<UINT32>(description.size())};
-                layout->SetFontSize(S(11.5f), range);
-                layout->SetDrawingEffect(pBrSub, range);
-            }
-            pRT->DrawTextLayout(D2D1::Point2F(bounds.left, bounds.top), layout, pBrText, D2D1_DRAW_TEXT_OPTIONS_CLIP);
-            layout->Release();
-        };
-
         auto controlRect = [&](float left, float right, float top, float height) {
             return CenterVertically(D2D1::RectF(left, top, right, top + height), controlHeight);
         };
@@ -14455,7 +14501,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                                         ID2D1Brush* iconBrush) {
             pRT->DrawLine(D2D1::Point2F(card.left + 1.0f, top), D2D1::Point2F(card.right - 1.0f, top), pBrDiv, 1.0f);
             if (pFmtGlyph) {
-                pRT->DrawText(glyph, static_cast<UINT32>(wcslen(glyph)), pFmtGlyph,
+                DrawCenteredText(pRT, glyph, static_cast<UINT32>(wcslen(glyph)), pFmtGlyph,
                     D2D1::RectF(card.left + S(26), top, card.left + S(56), top + height), iconBrush);
             }
             drawCardText(D2D1::RectF(card.left + S(64), top + S(6), textRight, top + height - S(6)),
@@ -14471,7 +14517,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             drawCardText(D2D1::RectF(rc.left + cardInset, rc.top + S(6), rc.right - S(42), rc.top + headerH - S(6)),
                          groupTitle, groupSub);
             // Subtle chevron-up indicator on the right (matching Win11 SettingsExpander in Image 2)
-            if (pFmtGlyph) pRT->DrawText(L"\uE70E", 1, pFmtGlyph, D2D1::RectF(rc.right - S(40), rc.top, rc.right - S(14), rc.top + headerH), pBrSub);
+            if (pFmtGlyph) DrawCenteredText(pRT, L"\uE70E", 1, pFmtGlyph, D2D1::RectF(rc.right - S(40), rc.top, rc.right - S(14), rc.top + headerH), pBrSub);
             curY += totalH + S(12.0f);
             return { rc, rc.top + headerH };
         };
@@ -14489,7 +14535,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(124), glyph, title, desc, pBrSub);
             const wchar_t* stateTxt = checked ? ls.on : ls.off;
             if (pFmtRight) {
-                pRT->DrawText(stateTxt, (UINT32)wcslen(stateTxt), pFmtRight,
+                DrawCenteredText(pRT, stateTxt, (UINT32)wcslen(stateTxt), pFmtRight,
                               D2D1::RectF(grpRc.right - S(118), rowTop, grpRc.right - S(68), rowTop + rowH), pBrText);
             }
             DrawWin11NativeToggle(pRT, grpRc.right - cardInset, cy, dpi, checked, isLight, hov, colAccent, amber);
@@ -14507,11 +14553,11 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), hov ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), pBrBorder, 1.0f);
             if (pFmtNav) {
-                pRT->DrawText(curValueLabel.c_str(), (UINT32)curValueLabel.size(), pFmtNav,
+                DrawCenteredText(pRT, curValueLabel.c_str(), (UINT32)curValueLabel.size(), pFmtNav,
                               D2D1::RectF(rcCombo.left + S(12), rcCombo.top, rcCombo.right - S(28), rcCombo.bottom), pBrText);
             }
             if (pFmtGlyph) {
-                pRT->DrawText(L"\uE70D", 1, pFmtGlyph, D2D1::RectF(rcCombo.right - S(26), rcCombo.top, rcCombo.right - S(6), rcCombo.bottom), pBrSub);
+                DrawCenteredText(pRT, L"\uE70D", 1, pFmtGlyph, D2D1::RectF(rcCombo.right - S(26), rcCombo.top, rcCombo.right - S(6), rcCombo.bottom), pBrSub);
             }
             addHit(id, rcCombo);
         };
@@ -14524,7 +14570,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
             const wchar_t* rstTxt = ls.defBtn;
-            if (pFmtCtl) pRT->DrawText(rstTxt, (UINT32)wcslen(rstTxt), pFmtCtl, rcReset, pBrText);
+            if (pFmtCtl) DrawCenteredText(pRT, rstTxt, (UINT32)wcslen(rstTxt), pFmtCtl, rcReset, pBrText);
             addHit(resetId, rcReset);
 
             const auto rcPick = controlRect(rcReset.left - S(106), rcReset.left - S(8), rowTop, rowH);
@@ -14540,10 +14586,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcSw, S(3), S(3)), pBrBorder, 1.0f);
                     pSw->Release();
                 }
-                if (pFmtCtl) pRT->DrawText(hexVal.c_str(), (UINT32)hexVal.size(), pFmtCtl, D2D1::RectF(rcPick.left + S(26), rcPick.top, rcPick.right - S(4), rcPick.bottom), pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, hexVal.c_str(), (UINT32)hexVal.size(), pFmtCtl, D2D1::RectF(rcPick.left + S(26), rcPick.top, rcPick.right - S(4), rcPick.bottom), pBrText);
             } else {
                 const wchar_t* pkTxt = ls.pickColor;
-                if (pFmtCtl) pRT->DrawText(pkTxt, (UINT32)wcslen(pkTxt), pFmtCtl, rcPick, pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, pkTxt, (UINT32)wcslen(pkTxt), pFmtCtl, rcPick, pBrText);
             }
             addHit(pickId, rcPick);
         };
@@ -14555,7 +14601,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             const auto rcReset = controlRect(grpRc.right - S(72), grpRc.right - cardInset, rowTop, rowH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
-            if (pFmtCtl) pRT->DrawText(L"Auto", 4, pFmtCtl, rcReset, pBrText);
+            if (pFmtCtl) DrawCenteredText(pRT, L"Auto", 4, pFmtCtl, rcReset, pBrText);
             addHit(resetId, rcReset);
 
             const auto rcPlus = controlRect(rcReset.left - S(36), rcReset.left - S(8), rowTop, rowH);
@@ -14566,9 +14612,9 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPlus, S(4), S(4)), st->hoveredId == plusId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPlus, S(4), S(4)), pBrBorder, 1.0f);
             if (pFmtCtl) {
-                pRT->DrawText(L"−", 1, pFmtCtl, rcMin, pBrText);
-                pRT->DrawText(valStr.c_str(), (UINT32)valStr.size(), pFmtCtl, rcVal, pBrText);
-                pRT->DrawText(L"+", 1, pFmtCtl, rcPlus, pBrText);
+                DrawCenteredText(pRT, L"−", 1, pFmtCtl, rcMin, pBrText);
+                DrawCenteredText(pRT, valStr.c_str(), (UINT32)valStr.size(), pFmtCtl, rcVal, pBrText);
+                DrawCenteredText(pRT, L"+", 1, pFmtCtl, rcPlus, pBrText);
             }
             addHit(minusId, rcMin);
             addHit(plusId, rcPlus);
@@ -14657,13 +14703,13 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), (st->hoveredId == 2220) ? pBrCardHov : pBrCtlBg);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), pBrBorder, 1.0f);
                 const wchar_t* pickLbl = ls.browse;
-                if (pFmtCtl) pRT->DrawText(pickLbl, (UINT32)wcslen(pickLbl), pFmtCtl, rcPick, pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, pickLbl, (UINT32)wcslen(pickLbl), pFmtCtl, rcPick, pBrText);
                 addHit(2220, rcPick);
 
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2221) ? pBrCardHov : pBrCtlBg);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), pBrBorder, 1.0f);
                 const wchar_t* clrLbl = ls.clear;
-                if (pFmtCtl) pRT->DrawText(clrLbl, (UINT32)wcslen(clrLbl), pFmtCtl, rcClr, pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, clrLbl, (UINT32)wcslen(clrLbl), pFmtCtl, rcClr, pBrText);
                 addHit(2221, rcClr);
             }
             {
@@ -14765,7 +14811,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2510) ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), pBrBorder, 1.0f);
             const wchar_t* btnTxt = ls.clearNow;
-            if (pFmtCtl) pRT->DrawText(btnTxt, (UINT32)wcslen(btnTxt), pFmtCtl, rcClr, pBrText);
+            if (pFmtCtl) DrawCenteredText(pRT, btnTxt, (UINT32)wcslen(btnTxt), pFmtCtl, rcClr, pBrText);
             addHit(2510, rcClr);
         } else if (st->activeTab == 3) {
             // Tab 3: Custom Command Aliases (Bí danh lệnh tùy chỉnh)
@@ -14784,7 +14830,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), (st->hoveredId == 2700) ? pBrCardHov : pBrChipSel);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), pBrAccent, 1.0f);
                 const wchar_t* addLbl = isViNav ? L"+ Thêm mới" : L"+ Add Alias";
-                if (pFmtCtl) pRT->DrawText(addLbl, (UINT32)wcslen(addLbl), pFmtCtl, rcAdd, pBrAccent);
+                if (pFmtCtl) DrawCenteredText(pRT, addLbl, (UINT32)wcslen(addLbl), pFmtCtl, rcAdd, pBrAccent);
                 addHit(2700, rcAdd);
             }
             for (int i = 0; i < aliasCnt; ++i) {
@@ -14798,14 +14844,14 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 const auto rcAdm = controlRect(g1.right - S(156), g1.right - S(84), ry, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcAdm, S(4), S(4)), ca.runAsAdmin ? pBrChipSel : ((st->hoveredId == 2800 + i) ? pBrCardHov : pBrCtlBg));
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdm, S(4), S(4)), ca.runAsAdmin ? pBrAccent : pBrBorder, 1.0f);
-                if (pFmtCtl) pRT->DrawText(L"Admin", 5, pFmtCtl, rcAdm, ca.runAsAdmin ? pBrAccent : pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, L"Admin", 5, pFmtCtl, rcAdm, ca.runAsAdmin ? pBrAccent : pBrText);
                 addHit(2800 + i, rcAdm, L"", i);
 
                 // Delete button for alias i (id 2900 + i)
                 const auto rcDel = controlRect(g1.right - S(76), g1.right - cardInset, ry, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcDel, S(4), S(4)), (st->hoveredId == 2900 + i) ? pBrCardHov : pBrCtlBg);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcDel, S(4), S(4)), pBrBorder, 1.0f);
-                if (pFmtCtl) pRT->DrawText(ls.clear, (UINT32)wcslen(ls.clear), pFmtCtl, rcDel, pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, ls.clear, (UINT32)wcslen(ls.clear), pFmtCtl, rcDel, pBrText);
                 addHit(2900 + i, rcDel, L"", i);
             }
         } else {
@@ -14843,7 +14889,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 bool hov = (st->hoveredId == kLangs[i].id);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcChip, S(4), S(4)), sel ? pBrChipSel : (hov ? pBrCardHov : pBrCtlBg));
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcChip, S(4), S(4)), sel ? pBrAccent : pBrBorder, sel ? 1.5f : 1.0f);
-                if (pFmtCtl) pRT->DrawText(kLangs[i].label, (UINT32)wcslen(kLangs[i].label), pFmtCtl, rcChip, sel ? pBrAccent : pBrText);
+                if (pFmtCtl) DrawCenteredText(pRT, kLangs[i].label, (UINT32)wcslen(kLangs[i].label), pFmtCtl, rcChip, sel ? pBrAccent : pBrText);
                 addHit(kLangs[i].id, rcChip, kLangs[i].code);
             }
         }
@@ -14856,9 +14902,6 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         HRESULT hrEnd = pRT->EndDraw();
 
         if (pFmtHeader) pFmtHeader->Release();
-        if (pFmtCrumb)  pFmtCrumb->Release();
-        if (pFmtTitle)  pFmtTitle->Release();
-        if (pFmtSub)    pFmtSub->Release();
         if (pFmtNav)    pFmtNav->Release();
         if (pFmtCtl)    pFmtCtl->Release();
         if (pFmtRight)  pFmtRight->Release();
@@ -14990,7 +15033,7 @@ static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rPill, S(1.5f), S(1.5f)), pBrAccent);
         }
         if (pFmt && pBrText) {
-            pRT->DrawText(s->items[i].second.c_str(), (UINT32)s->items[i].second.size(), pFmt,
+            DrawCenteredText(pRT, s->items[i].second.c_str(), (UINT32)s->items[i].second.size(), pFmt,
                 D2D1::RectF(rRow.left + S(12.0f), rRow.top, rRow.right - S(10.0f), rRow.bottom), pBrText);
         }
         curY += rowH;
@@ -15309,11 +15352,11 @@ static bool ShowAddAliasDialog(HWND hOwner, bool isLight, bool isViUI, UINT dpi,
         return hc;
     };
 
-    addCtrl(L"STATIC", isViUI ? L"Lệnh tắt (ví dụ: hosts, ws):" : L"Alias keyword (e.g. hosts, ws):", 0, 0,
+    addCtrl(L"STATIC", isViUI ? L"Lệnh tắt (ví dụ: hosts, ws):" : L"Alias keyword (e.g. hosts, ws):", SS_CENTERIMAGE, 0,
             inset, inset, fieldWidth, labelHeight, 0);
     sess.hEditAlias = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
                               inset, inset + labelHeight + labelGap, fieldWidth, fieldHeight, 101);
-    addCtrl(L"STATIC", isViUI ? L"Lệnh hoặc đường dẫn đích:" : L"Target command or path:", 0, 0,
+    addCtrl(L"STATIC", isViUI ? L"Lệnh hoặc đường dẫn đích:" : L"Target command or path:", SS_CENTERIMAGE, 0,
             inset, targetTop, fieldWidth, labelHeight, 0);
     sess.hEditCmd = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
                             inset, targetTop + labelHeight + labelGap, fieldWidth, fieldHeight, 102);
@@ -16860,8 +16903,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             tStr.c_str(), (UINT32)tStr.size(), pFmtTime, maxTimeWidth, rowH, &pTimeLayout))) {
                                         DWRITE_TEXT_METRICS tm = {};
                                         pTimeLayout->GetMetrics(&tm);
-                                        pRT->DrawTextLayout(D2D1::Point2F(timeRight - maxTimeWidth, GetCenteredInkTop(pTimeLayout, rowTop, rowH)),
-                                                            pTimeLayout, pBrTime, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                                        DrawCenteredTextLayout(pRT, pTimeLayout,
+                                            D2D1::RectF(timeRight - maxTimeWidth, rowTop, timeRight, rowTop + rowH), pBrTime);
                                         rightLimit = timeRight - (std::min)(maxTimeWidth, tm.widthIncludingTrailingWhitespace) -
                                                      DpiScaleSF(12.0f, state);
                                         pTimeLayout->Release();
@@ -16920,8 +16963,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             pRowLayout->SetDrawingEffect(pBrSecondary, appRange);
                                         }
 
-                                        pRT->DrawTextLayout(D2D1::Point2F(textLeftX, GetCenteredInkTop(pRowLayout, rowTop, rowH)),
-                                                            pRowLayout, pBrPrimary, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                                        DrawCenteredTextLayout(pRT, pRowLayout,
+                                            D2D1::RectF(textLeftX, rowTop, textLeftX + availW, rowTop + rowH), pBrPrimary);
                                         pRowLayout->Release();
                                     }
                                 }
@@ -16959,11 +17002,14 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         }
 
                         // 5. Draw Input Text inside the Pill Input Bar (supports multi-line wrap in Translate Mode)
-                        RECT rcEditWin = layout.rcEdit;
-                        D2D1_RECT_F rcEdit = D2D1::RectF((float)rcEditWin.left, (float)rcEditWin.top,
-                                                         (float)rcEditWin.right, (float)rcEditWin.bottom);
-                        float editW = rcEdit.right - rcEdit.left;
-                        float editH = rcEdit.bottom - rcEdit.top;
+                        const RECT rcEditWin = layout.rcEdit;
+                        const float editH = static_cast<float>(rcEditWin.bottom - rcEditWin.top);
+                        const float editTop = (rcBarPill.top + rcBarPill.bottom - editH) * 0.5f;
+                        const auto rcEdit = D2D1::RectF(static_cast<float>(rcEditWin.left), editTop,
+                                                       static_cast<float>(rcEditWin.right), editTop + editH);
+                        const float editW = rcEdit.right - rcEdit.left;
+                        const auto inputLine = MeasureTextLine(pFmtInput);
+                        const float inputTextTop = rcEdit.top + inputLine.offset;
 
                         DWORD selStart = 0, selEnd = 0;
                         std::wstring displayStr = GetEffectiveInputText(state->hModernEdit, &selStart, &selEnd);
@@ -16974,8 +17020,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         pRT->PushAxisAlignedClip(rcEdit, D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
 
                         float caretXPos = 0.0f;
-                        float caretYPos = rcEdit.top;
-                        float caretH    = editH;
+                        const float caretH = inputLine.height > 0.0f ? (std::min)(inputLine.height, editH) : editH;
+                        const float caretYPos = inputTextTop + (editH - caretH) * 0.5f;
                         float scrollOffsetX = 0.0f;
 
                         const wchar_t* placeholderStr = state->settings.dialogLayout == DialogLayout::Pill
@@ -16984,8 +17030,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
 
                         if (textLen == 0) {
                             if (pFmtInput && pBrHint) {
-                                pRT->DrawText(placeholderStr, (UINT32)wcslen(placeholderStr),
-                                              pFmtInput, rcEdit, pBrHint);
+                                DrawCenteredText(pRT, placeholderStr, static_cast<UINT32>(wcslen(placeholderStr)),
+                                                 pFmtInput, rcEdit, pBrHint, inputLine.offset);
                             }
                         } else if (pFmtInput && pBrPrimary) {
                             IDWriteTextLayout* pInputLayout = nullptr;
@@ -16993,8 +17039,9 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     displayStr.c_str(), textLen, pFmtInput, 10000.0f, editH, &pInputLayout))) {
                                 FLOAT hitX = 0.0f, hitY = 0.0f;
                                 DWRITE_HIT_TEST_METRICS htm = {};
-                                pInputLayout->HitTestTextPosition(selEnd, FALSE, &hitX, &hitY, &htm);
-                                caretXPos = hitX;
+                                if (SUCCEEDED(pInputLayout->HitTestTextPosition(selEnd, FALSE, &hitX, &hitY, &htm))) {
+                                    caretXPos = hitX;
+                                }
 
                                 float scrollPad = DpiScaleSF(6.0f, state);
                                 if (caretXPos > editW - scrollPad) {
@@ -17013,17 +17060,17 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     accent.a = 0.45f;
                                     ID2D1SolidColorBrush* pSelBr = nullptr;
                                     if (SUCCEEDED(pRT->CreateSolidColorBrush(accent, &pSelBr))) {
-                                        float padY = DpiScaleSF(2.0f, state);
+                                        const float selTop = inputTextTop + m0.top;
                                         pRT->FillRectangle(
-                                            D2D1::RectF(rcEdit.left + x0 - scrollOffsetX, rcEdit.top + padY,
-                                                        rcEdit.left + x1 - scrollOffsetX, rcEdit.bottom - padY),
+                                            D2D1::RectF(rcEdit.left + x0 - scrollOffsetX, selTop,
+                                                        rcEdit.left + x1 - scrollOffsetX, selTop + m0.height),
                                             pSelBr);
                                         pSelBr->Release();
                                     }
                                 }
 
-                                pRT->DrawTextLayout(D2D1::Point2F(rcEdit.left - scrollOffsetX, rcEdit.top),
-                                                    pInputLayout, pBrPrimary);
+                                pRT->DrawTextLayout(D2D1::Point2F(rcEdit.left - scrollOffsetX, inputTextTop),
+                                                    pInputLayout, pBrPrimary, D2D1_DRAW_TEXT_OPTIONS_NO_SNAP);
                                 pInputLayout->Release();
                             }
                         }
@@ -17153,7 +17200,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                         rcBtn.top,
                                         rcBtn.right - DpiScaleSF(26.0f, state),
                                         rcBtn.bottom);
-                                    pRT->DrawText(label, (UINT32)wcslen(label), pFmtBtn, rcText, pContentBr, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                                    DrawCenteredText(pRT, label, (UINT32)wcslen(label), pFmtBtn, rcText, pContentBr);
                                 }
 
                                 if (kind == ActionBtnKind::Gear) {
@@ -17265,10 +17312,11 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
 
                                         DrawD2DShieldVector(pRT, pBrAmberBanner, pRoundStroke,
                                                             groupStartX + DpiScaleSF(6.0f, state), centerY, effectiveDpi, 0.90f);
-                                        const float textY = GetCenteredInkTop(pFinalLayout, rcAdminPill.top, static_cast<float>(adminH));
-                                        pRT->DrawTextLayout(D2D1::Point2F(groupStartX + iconSlotW, textY),
-                                                            pFinalLayout, pBrAmberBanner,
-                                                            D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_NO_SNAP);
+                                        const float textLeft = groupStartX + iconSlotW;
+                                        DrawCenteredTextLayout(pRT, pFinalLayout,
+                                            D2D1::RectF(textLeft, rcAdminPill.top,
+                                                        (std::min)(textLeft + availBannerW, rcAdminPill.right - pillInnerPadX),
+                                                        rcAdminPill.bottom), pBrAmberBanner);
                                         pFinalLayout->Release();
                                     }
                                     pFmtAdmin->Release();

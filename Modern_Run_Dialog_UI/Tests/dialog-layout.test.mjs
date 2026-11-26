@@ -317,13 +317,109 @@ test('centered rows split spare space and keep dropdown input within its rows', 
     `);
 });
 
+test('DirectWrite keeps the rendered history text centered on the row', () => {
+    const center = source.match(/float GetCenteredInkTop\([\s\S]*?\n\}/)?.[0];
+    const draw = source.match(/void DrawCenteredTextLayout\([\s\S]*?\n\}/)?.[0];
+    assert.ok(center && draw, 'The history and other surfaces use the same text renderer');
+    compileChecks(String.raw`
+        #include <windows.h>
+        #include <d2d1.h>
+        #include <dwrite.h>
+        #include <cassert>
+        #include <cmath>
+        #include <cstdint>
+        #include <cwchar>
+        #include <optional>
+
+        ${center}
+        ${draw}
+
+        int main() {
+            constexpr int width = 420, height = 80;
+            IDWriteFactory* textFactory = nullptr;
+            assert(SUCCEEDED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
+                reinterpret_cast<IUnknown**>(&textFactory))));
+            ID2D1Factory* graphicsFactory = nullptr;
+            assert(SUCCEEDED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &graphicsFactory)));
+            const auto dc = CreateCompatibleDC(nullptr);
+            BITMAPINFO info{};
+            info.bmiHeader = {sizeof(BITMAPINFOHEADER), width, -height, 1, 32, BI_RGB};
+            void* pixels = nullptr;
+            const auto bitmap = CreateDIBSection(dc, &info, DIB_RGB_COLORS, &pixels, nullptr, 0);
+            assert(bitmap && pixels);
+            const auto previous = SelectObject(dc, bitmap);
+            ID2D1DCRenderTarget* target = nullptr;
+            const auto properties = D2D1::RenderTargetProperties(D2D1_RENDER_TARGET_TYPE_SOFTWARE,
+                D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96, 96);
+            assert(SUCCEEDED(graphicsFactory->CreateDCRenderTarget(&properties, &target)));
+            const RECT client{0, 0, width, height};
+            assert(SUCCEEDED(target->BindDC(dc, &client)));
+            target->SetTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE);
+            IDWriteRenderingParams* rendering = nullptr;
+            assert(SUCCEEDED(textFactory->CreateCustomRenderingParams(1.0f, 0.0f, 0.0f,
+                DWRITE_PIXEL_GEOMETRY_FLAT, DWRITE_RENDERING_MODE_NATURAL_SYMMETRIC, &rendering)));
+            target->SetTextRenderingParams(rendering);
+            ID2D1SolidColorBrush* brush = nullptr;
+            assert(SUCCEEDED(target->CreateSolidColorBrush(D2D1::ColorF(D2D1::ColorF::White), &brush)));
+
+            const wchar_t* examples[] = {
+                L"main.cpl   \u2013   Mouse Properties", L"\u0421\u0435\u0433\u043e\u0434\u043d\u044f, 16:11",
+                L"Ctrl+O", L"\u8f93\u5165\u547d\u4ee4", L"\u0627\u0633\u0645 \u0627\u0644\u0623\u0645\u0631"
+            };
+            constexpr float scales[]{1.0f, 1.25f, 1.5f};
+            for (const float scale : scales) {
+                for (int i = 0; i < 5; ++i) {
+                    IDWriteTextFormat* format = nullptr;
+                    const float size = (i == 1 ? 12.0f : 13.5f) * scale;
+                    assert(SUCCEEDED(textFactory->CreateTextFormat(L"Segoe UI Variable Text", nullptr,
+                        DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, size, L"", &format)));
+                    format->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+                    format->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
+                    IDWriteTextLayout* layout = nullptr;
+                    const auto bounds = D2D1::RectF(8, 8 * scale, width - 8, 40 * scale);
+                    assert(SUCCEEDED(textFactory->CreateTextLayout(examples[i], static_cast<UINT32>(wcslen(examples[i])),
+                        format, bounds.right - bounds.left, bounds.bottom - bounds.top, &layout)));
+                    if (i == 0) layout->SetFontWeight(DWRITE_FONT_WEIGHT_SEMI_BOLD, {0, 8});
+
+                    target->BeginDraw();
+                    target->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+                    DrawCenteredTextLayout(target, layout, bounds, brush);
+                    assert(SUCCEEDED(target->EndDraw()));
+                    GdiFlush();
+                    int top = height, bottom = -1;
+                    const auto image = static_cast<const uint32_t*>(pixels);
+                    for (int y = 0; y < height; ++y) {
+                        for (int x = 0; x < width; ++x) {
+                            if ((image[y * width + x] & 255) <= 16) continue;
+                            if (y < top) top = y;
+                            if (y > bottom) bottom = y;
+                        }
+                    }
+                    assert(top <= bottom && std::abs((top + bottom + 1) * 0.5f - 24.0f * scale) <= 0.5f);
+                    layout->Release();
+                    format->Release();
+                }
+            }
+
+            brush->Release();
+            rendering->Release();
+            target->Release();
+            SelectObject(dc, previous);
+            DeleteObject(bitmap);
+            DeleteDC(dc);
+            graphicsFactory->Release();
+            textFactory->Release();
+        }
+    `, true, ['-ld2d1', '-ldwrite', '-lgdi32']);
+});
+
 test('history actions keep delete in the same group', () => {
     const deleteItem = source.match(/if \(canDeleteFromHistory\) \{([\s\S]*?)ctxItems\.push_back\(std::move\(delItem\)\)/)?.[1];
     assert.ok(deleteItem);
     assert.doesNotMatch(deleteItem, /isSeparator/);
 });
 
-function compileChecks(checks, run = false) {
+function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });
     const build = mkdtempSync(join(buildRoot, 'layout-test-'));
@@ -332,7 +428,7 @@ function compileChecks(checks, run = false) {
     try {
         writeFileSync(translationUnit, checks);
         const flags = run ? ['-D_WIN32_WINNT=0x0A00', '-static', '-o', executable] : ['-fsyntax-only'];
-        execFileSync(compiler, ['-std=c++23', ...flags, translationUnit], { stdio: 'pipe' });
+        execFileSync(compiler, ['-std=c++23', ...flags, translationUnit, ...libraries], { stdio: 'pipe' });
         if (run) execFileSync(executable, { stdio: 'pipe' });
     } finally {
         rmSync(executable, { force: true });
