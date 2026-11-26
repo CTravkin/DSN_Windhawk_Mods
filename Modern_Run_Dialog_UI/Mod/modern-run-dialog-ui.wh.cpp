@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.5.0
+// @version         6.6.0
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 22
+// Build: 23
 
 // ==WindhawkModReadme==
 /*
@@ -755,6 +755,175 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $options:ar:
     - mod: نمط التعديل
     - windows_fluent: Windows (Fluent)
+  - contextMenuBorderMode: own
+    $name: Context Menu Borders
+    $description: Outer border of the mod-style menu
+    $options:
+    - own: Own border
+    - window: Defined by window settings
+    - windows: Windows-defined
+    - accent: Windows accent
+    - off: Off
+    $name:vi-VN: Viền menu ngữ cảnh
+    $description:vi-VN: Viền ngoài của menu kiểu mod
+    $options:vi-VN:
+    - own: Viền riêng
+    - window: Theo cài đặt cửa sổ
+    - windows: Theo Windows
+    - accent: Màu nhấn Windows
+    - off: Tắt
+    $name:th-TH: ขอบเมนูบริบท
+    $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
+    $options:th-TH:
+    - own: ขอบของเมนู
+    - window: ตามการตั้งค่าหน้าต่าง
+    - windows: ตาม Windows
+    - accent: สีเน้น Windows
+    - off: ปิด
+    $name:id-ID: Bingkai Menu Konteks
+    $description:id-ID: Garis luar menu bergaya mod
+    $options:id-ID:
+    - own: Bingkai menu
+    - window: Sesuai pengaturan jendela
+    - windows: Sesuai Windows
+    - accent: Aksen Windows
+    - off: Nonaktif
+    $name:ms-MY: Sempadan Menu Konteks
+    $description:ms-MY: Sempadan luar menu gaya mod
+    $options:ms-MY:
+    - own: Sempadan menu
+    - window: Mengikut tetapan tetingkap
+    - windows: Mengikut Windows
+    - accent: Aksen Windows
+    - off: Dimatikan
+    $name:ja-JP: コンテキスト メニューの境界線
+    $description:ja-JP: Mod スタイルのメニューの外枠
+    $options:ja-JP:
+    - own: メニュー独自の境界線
+    - window: ウィンドウの設定に従う
+    - windows: Windows に従う
+    - accent: Windows のアクセント
+    - off: 表示しない
+    $name:zh-CN: 右键菜单边框
+    $description:zh-CN: 模组样式菜单的外边框
+    $options:zh-CN:
+    - own: 菜单自带边框
+    - window: 由窗口设置决定
+    - windows: 由 Windows 决定
+    - accent: Windows 强调色
+    - off: 关闭
+    $name:zh-TW: 快顯選單邊框
+    $description:zh-TW: 模組樣式選單的外邊框
+    $options:zh-TW:
+    - own: 選單自帶邊框
+    - window: 由視窗設定決定
+    - windows: 由 Windows 決定
+    - accent: Windows 輔色
+    - off: 關閉
+    $name:ko-KR: 상황에 맞는 메뉴 테두리
+    $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
+    $options:ko-KR:
+    - own: 메뉴 고유 테두리
+    - window: 창 설정에 따름
+    - windows: Windows 설정
+    - accent: Windows 강조색
+    - off: 끔
+    $name:fr-FR: Bordures du menu contextuel
+    $description:fr-FR: Contour du menu dans le style du mod
+    $options:fr-FR:
+    - own: Bordure propre au menu
+    - window: Selon les paramètres de fenêtre
+    - windows: Selon Windows
+    - accent: Accentuation Windows
+    - off: Désactivées
+    $name:de-DE: Kontextmenürahmen
+    $description:de-DE: Außenrahmen des Menüs im Mod-Stil
+    $options:de-DE:
+    - own: Eigener Rahmen
+    - window: Nach Fenstereinstellungen
+    - windows: Von Windows festgelegt
+    - accent: Windows-Akzentfarbe
+    - off: Aus
+    $name:es-ES: Bordes del menú contextual
+    $description:es-ES: Contorno del menú con estilo del mod
+    $options:es-ES:
+    - own: Borde propio del menú
+    - window: Según los ajustes de ventana
+    - windows: Según Windows
+    - accent: Acento de Windows
+    - off: Desactivados
+    $name:pt-BR: Bordas do menu de contexto
+    $description:pt-BR: Contorno externo do menu no estilo do mod
+    $options:pt-BR:
+    - own: Borda própria do menu
+    - window: Conforme as configurações das janelas
+    - windows: Definido pelo Windows
+    - accent: Destaque do Windows
+    - off: Desativadas
+    $name:it-IT: Bordi del menu contestuale
+    $description:it-IT: Contorno esterno del menu in stile mod
+    $options:it-IT:
+    - own: Bordo proprio del menu
+    - window: Secondo le impostazioni delle finestre
+    - windows: Secondo Windows
+    - accent: Colore principale di Windows
+    - off: Disattivati
+    $name:ru-RU: Рамки контекстного меню
+    $description:ru-RU: Внешний контур меню «Стиль мода»
+    $options:ru-RU:
+    - own: Собственная рамка
+    - window: Определено настройками окон
+    - windows: Определено Windows
+    - accent: Акцентный Windows
+    - off: Отключены
+    $name:uk-UA: Рамки контекстного меню
+    $description:uk-UA: Зовнішній контур меню в стилі мода
+    $options:uk-UA:
+    - own: Власна рамка
+    - window: Визначено параметрами вікон
+    - windows: Визначено Windows
+    - accent: Акцент Windows
+    - off: Вимкнено
+    $name:pl-PL: Obramowanie menu kontekstowego
+    $description:pl-PL: Zewnętrzna ramka menu w stylu moda
+    $options:pl-PL:
+    - own: Własne obramowanie
+    - window: Według ustawień okien
+    - windows: Według systemu Windows
+    - accent: Akcent systemu Windows
+    - off: Wyłączone
+    $name:nl-NL: Randen van het snelmenu
+    $description:nl-NL: Buitenrand van het menu in de modstijl
+    $options:nl-NL:
+    - own: Eigen rand
+    - window: Volgens de vensterinstellingen
+    - windows: Volgens Windows
+    - accent: Windows-accentkleur
+    - off: Uit
+    $name:tr-TR: Bağlam Menüsü Kenarlıkları
+    $description:tr-TR: Mod stilindeki menünün dış kenarlığı
+    $options:tr-TR:
+    - own: Menüye özel kenarlık
+    - window: Pencere ayarlarına göre
+    - windows: Windows’a göre
+    - accent: Windows vurgu rengi
+    - off: Kapalı
+    $name:hi-IN: संदर्भ मेनू की सीमाएँ
+    $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
+    $options:hi-IN:
+    - own: मेनू की अपनी सीमा
+    - window: विंडो सेटिंग के अनुसार
+    - windows: Windows के अनुसार
+    - accent: Windows का एक्सेंट रंग
+    - off: बंद
+    $name:ar: حدود قائمة السياق
+    $description:ar: الحد الخارجي للقائمة بنمط التعديل
+    $options:ar:
+    - own: حد خاص بالقائمة
+    - window: حسب إعدادات النوافذ
+    - windows: حسب Windows
+    - accent: لون تمييز Windows
+    - off: معطلة
   - uiScalePercent: "100"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
@@ -1220,6 +1389,23 @@ struct CommandAlias {
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
 enum class ContextMenuStyle { Mod, WindowsFluent };
 enum class WindowBorderMode { Mod, Windows, Accent, Off };
+enum class ContextMenuBorderMode { Own, Window, Windows, Accent, Off };
+
+constexpr std::array<const wchar_t*, 5> kContextMenuBorderModeValues{
+    L"own", L"window", L"windows", L"accent", L"off"
+};
+
+constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode(
+    ContextMenuBorderMode mode, WindowBorderMode windowMode) {
+    switch (mode) {
+        case ContextMenuBorderMode::Window: return windowMode;
+        case ContextMenuBorderMode::Windows: return WindowBorderMode::Windows;
+        case ContextMenuBorderMode::Accent: return WindowBorderMode::Accent;
+        case ContextMenuBorderMode::Off: return WindowBorderMode::Off;
+        case ContextMenuBorderMode::Own: return std::nullopt;
+    }
+    return std::nullopt;
+}
 
 constexpr WindowBorderMode ResolveWindowBorderMode(WindowBorderMode mode, bool highContrast,
                                                     bool windowsUsesAccent, bool active) {
@@ -1276,6 +1462,7 @@ struct ModSettings {
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
     ContextMenuStyle contextMenuStyle = ContextMenuStyle::Mod;
+    ContextMenuBorderMode contextMenuBorderMode = ContextMenuBorderMode::Own;
     HiddenActions hiddenActions{};
     bool rememberPosition = false;
     int uiScalePercent = 100;
@@ -1563,6 +1750,13 @@ bool WindowsUsesAccentBorder() {
     return RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
                         L"ColorPrevalence", RRF_RT_REG_DWORD, nullptr, &value,
                         &size) == ERROR_SUCCESS && value != 0;
+}
+
+D2D1_COLOR_F GetWindowsBorderColor(WindowBorderMode mode, bool highContrast, bool active) {
+    if (mode == WindowBorderMode::Accent) return GetSystemAccentColorF();
+    const COLORREF color = GetSysColor(highContrast ? COLOR_WINDOWTEXT
+        : (active ? COLOR_ACTIVEBORDER : COLOR_INACTIVEBORDER));
+    return D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f, GetBValue(color) / 255.0f);
 }
 
 // --- Real-Time iOS 26 Optical Liquid Glass Snapshot, Gaussian Blur & 3D Snell's-Law Lens Refraction Engine ---
@@ -5188,6 +5382,7 @@ struct WindhawkRawSnapshot {
     std::wstring colorMode;
     DialogLayout dialogLayout = DialogLayout::Classic;
     std::wstring contextMenuStyle;
+    std::wstring contextMenuBorderMode;
     HiddenActions hiddenActions{};
     std::wstring uiScalePercent;
     int customDialogWidth = 0;
@@ -5286,6 +5481,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.dialogPosition          = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
     curWh.colorMode               = ReadGroupedStringSetting(L"appearanceGroup.colorMode", L"colorMode", L"auto");
     curWh.contextMenuStyle = ReadGroupedStringSetting(L"layoutGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
+    curWh.contextMenuBorderMode = ReadGroupedStringSetting(
+        L"layoutGroup.contextMenuBorderMode", L"contextMenuBorderMode", L"own");
     {
         auto layout = WindhawkUtils::StringSetting::make(L"layoutGroup.minimalMode");
         const std::wstring_view value = layout.get() ? layout.get() : L"";
@@ -5335,6 +5532,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.dialogPosition != g_lastWhSnapshot.dialogPosition, L"dialogPosition");
             dropIfChanged(curWh.colorMode != g_lastWhSnapshot.colorMode, L"colorMode");
             dropIfChanged(curWh.contextMenuStyle != g_lastWhSnapshot.contextMenuStyle, L"contextMenuStyle");
+            dropIfChanged(curWh.contextMenuBorderMode != g_lastWhSnapshot.contextMenuBorderMode, L"contextMenuBorderMode");
             dropIfChanged(curWh.dialogLayout != g_lastWhSnapshot.dialogLayout, L"minimalModeV3");
             for (size_t i = 0; i < kRunActionCount; ++i) {
                 dropIfChanged(curWh.hiddenActions[i] != g_lastWhSnapshot.hiddenActions[i], kHiddenActionKeys[i]);
@@ -5488,6 +5686,16 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
     newSettings.contextMenuStyle = contextMenuStyle == L"windows_fluent"
         ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Mod;
+    wchar_t menuBorderOverride[24]{};
+    Wh_GetStringValue(GetUserOverrideKey(L"contextMenuBorderMode").c_str(),
+                      menuBorderOverride, ARRAYSIZE(menuBorderOverride));
+    const std::wstring_view menuBorder = menuBorderOverride[0]
+        ? std::wstring_view(menuBorderOverride) : std::wstring_view(curWh.contextMenuBorderMode);
+    const auto menuBorderSetting = std::find(kContextMenuBorderModeValues.begin(), kContextMenuBorderModeValues.end(), menuBorder);
+    if (menuBorderSetting != kContextMenuBorderModeValues.end()) {
+        newSettings.contextMenuBorderMode = static_cast<ContextMenuBorderMode>(
+            menuBorderSetting - kContextMenuBorderModeValues.begin());
+    }
     for (size_t i = 0; i < kRunActionCount; ++i) {
         int value = Wh_GetIntValue(GetUserOverrideKey(kHiddenActionKeys[i]).c_str(), -1);
         newSettings.hiddenActions[i] = value < 0 ? curWh.hiddenActions[i] : value != 0;
@@ -11775,6 +11983,13 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 float rimInset = DpiScaleF(0.75f, dpi);
                 D2D1_RECT_F rcMenuCard = D2D1::RectF(rimInset, rimInset, (float)w - rimInset, (float)h - rimInset);
                 const auto& settings = s->dlgState->settings;
+                const auto preferredBorder = settings.contextMenuStyle == ContextMenuStyle::Mod
+                    ? ResolveContextMenuWindowBorderMode(settings.contextMenuBorderMode, settings.windowBorderMode)
+                    : std::nullopt;
+                const bool windowsAccent = preferredBorder == WindowBorderMode::Windows && WindowsUsesAccentBorder();
+                const auto borderMode = ResolveWindowBorderMode(preferredBorder.value_or(WindowBorderMode::Mod),
+                                                                 highContrast, windowsAccent, s->wasForeground);
+                const bool glassEdgeHighlight = borderMode == WindowBorderMode::Mod;
                 const float menuRadiusPx = settings.customCornerRadius >= 0
                     ? DpiScaleF(static_cast<float>(settings.customCornerRadius), dpi) : -1.0f;
                 const float menuCornerR = ClampCornerRadius(
@@ -11806,14 +12021,14 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         ? MapBackgroundOpacityToGlassPct(s->dlgState->settings.customBackgroundOpacity)
                         : -20;
                     DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, glassPct, isLight, true, slot,
-                                                   -999999, -999999, false, 0, 0, menuRadiusPx);
+                                                   -999999, -999999, false, 0, 0, menuRadiusPx, glassEdgeHighlight);
                 } else {
                     // Windows Blur: translucent vibrant Acrylic blur matching Windows 11 right-click menu (Image 2)
                     int blurOp = (s->dlgState)
                         ? std::clamp(s->dlgState->settings.customBackgroundOpacity, 30, 255)
                         : 215;
                     DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, -(1000 + blurOp), isLight, true, slot,
-                                                   -999999, -999999, false, 0, 0, menuRadiusPx);
+                                                   -999999, -999999, false, 0, 0, menuRadiusPx, glassEdgeHighlight);
                 }
 
                 // 2. Brushes & Text Format
@@ -12080,9 +12295,21 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     }
                 }
 
-                // Outer Synchronized Pill-Card Rim
-                if (!highContrast) {
-                    DrawD2DGlassRim(pRT, rcMenuCard, menuCornerR, dpi, isLight, 1.35f);
+                if (borderMode != WindowBorderMode::Off) {
+                    const auto visuals = ResolveEffectiveThemeVisuals(settings, isLight);
+                    if (borderMode == WindowBorderMode::Mod && (!preferredBorder || !visuals.hasCustomBorder)) {
+                        DrawD2DGlassRim(pRT, rcMenuCard, menuCornerR, dpi, isLight, preferredBorder ? 1.25f : 1.35f);
+                    } else {
+                        const auto outline = borderMode == WindowBorderMode::Mod ? visuals.borderColor
+                            : GetWindowsBorderColor(borderMode, highContrast, s->wasForeground);
+                        ID2D1SolidColorBrush* brush = nullptr;
+                        if (SUCCEEDED(pRT->CreateSolidColorBrush(outline, &brush))) {
+                            const float width = borderMode == WindowBorderMode::Mod ? 1.25f : 1.0f;
+                            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcMenuCard, menuCornerR, menuCornerR),
+                                                      brush, DpiScaleF(width, dpi));
+                            brush->Release();
+                        }
+                    }
                 }
 
                 pRT->EndDraw();
@@ -13124,6 +13351,38 @@ ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) 
     if (lang == L"hi") return { L"संदर्भ मेनू की शैली", L"राइट-क्लिक मेनू का रूप बदलता है", L"मॉड की शैली" };
     if (lang == L"ar") return { L"نمط قائمة السياق", L"يغير مظهر القائمة عند النقر بزر الماوس الأيمن", L"نمط التعديل" };
     return { L"Context Menu Style", L"Changes the appearance of the right-click menu", L"Mod Style" };
+}
+
+struct ContextMenuBorderStrings {
+    const wchar_t* title;
+    const wchar_t* description;
+    const wchar_t* labels[5];
+};
+
+ContextMenuBorderStrings GetContextMenuBorderStrings(const std::wstring& rawLang) {
+    const auto lang = ResolveEffectiveLanguageCode(rawLang);
+    if (lang == L"vi") return { L"Viền menu ngữ cảnh", L"Viền ngoài của menu kiểu mod", { L"Viền riêng", L"Theo cài đặt cửa sổ", L"Theo Windows", L"Màu nhấn Windows", L"Tắt" } };
+    if (lang == L"th") return { L"ขอบเมนูบริบท", L"ขอบด้านนอกของเมนูแบบม็อด", { L"ขอบของเมนู", L"ตามการตั้งค่าหน้าต่าง", L"ตาม Windows", L"สีเน้น Windows", L"ปิด" } };
+    if (lang == L"id") return { L"Bingkai Menu Konteks", L"Garis luar menu bergaya mod", { L"Bingkai menu", L"Sesuai pengaturan jendela", L"Sesuai Windows", L"Aksen Windows", L"Nonaktif" } };
+    if (lang == L"ms") return { L"Sempadan Menu Konteks", L"Sempadan luar menu gaya mod", { L"Sempadan menu", L"Mengikut tetapan tetingkap", L"Mengikut Windows", L"Aksen Windows", L"Dimatikan" } };
+    if (lang == L"ja") return { L"コンテキスト メニューの境界線", L"Mod スタイルのメニューの外枠", { L"メニュー独自の境界線", L"ウィンドウの設定に従う", L"Windows に従う", L"Windows のアクセント", L"表示しない" } };
+    if (lang == L"zh_cn") return { L"右键菜单边框", L"模组样式菜单的外边框", { L"菜单自带边框", L"由窗口设置决定", L"由 Windows 决定", L"Windows 强调色", L"关闭" } };
+    if (lang == L"zh_tw") return { L"快顯選單邊框", L"模組樣式選單的外邊框", { L"選單自帶邊框", L"由視窗設定決定", L"由 Windows 決定", L"Windows 輔色", L"關閉" } };
+    if (lang == L"ko") return { L"상황에 맞는 메뉴 테두리", L"모드 스타일 메뉴의 바깥 테두리", { L"메뉴 고유 테두리", L"창 설정에 따름", L"Windows 설정", L"Windows 강조색", L"끔" } };
+    if (lang == L"fr") return { L"Bordures du menu contextuel", L"Contour du menu dans le style du mod", { L"Bordure propre au menu", L"Selon les paramètres de fenêtre", L"Selon Windows", L"Accentuation Windows", L"Désactivées" } };
+    if (lang == L"de") return { L"Kontextmenürahmen", L"Außenrahmen des Menüs im Mod-Stil", { L"Eigener Rahmen", L"Nach Fenstereinstellungen", L"Von Windows festgelegt", L"Windows-Akzentfarbe", L"Aus" } };
+    if (lang == L"es") return { L"Bordes del menú contextual", L"Contorno del menú con estilo del mod", { L"Borde propio del menú", L"Según los ajustes de ventana", L"Según Windows", L"Acento de Windows", L"Desactivados" } };
+    if (lang == L"pt") return { L"Bordas do menu de contexto", L"Contorno externo do menu no estilo do mod", { L"Borda própria do menu", L"Conforme as configurações das janelas", L"Definido pelo Windows", L"Destaque do Windows", L"Desativadas" } };
+    if (lang == L"it") return { L"Bordi del menu contestuale", L"Contorno esterno del menu in stile mod", { L"Bordo proprio del menu", L"Secondo le impostazioni delle finestre", L"Secondo Windows", L"Colore principale di Windows", L"Disattivati" } };
+    if (lang == L"ru") return { L"Рамки контекстного меню", L"Внешний контур меню «Стиль мода»", { L"Собственная рамка", L"Определено настройками окон", L"Определено Windows", L"Акцентный Windows", L"Отключены" } };
+    if (lang == L"uk") return { L"Рамки контекстного меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Акцент Windows", L"Вимкнено" } };
+    if (lang == L"pl") return { L"Obramowanie menu kontekstowego", L"Zewnętrzna ramka menu w stylu moda", { L"Własne obramowanie", L"Według ustawień okien", L"Według systemu Windows", L"Akcent systemu Windows", L"Wyłączone" } };
+    if (lang == L"nl") return { L"Randen van het snelmenu", L"Buitenrand van het menu in de modstijl", { L"Eigen rand", L"Volgens de vensterinstellingen", L"Volgens Windows", L"Windows-accentkleur", L"Uit" } };
+    if (lang == L"tr") return { L"Bağlam Menüsü Kenarlıkları", L"Mod stilindeki menünün dış kenarlığı", { L"Menüye özel kenarlık", L"Pencere ayarlarına göre", L"Windows’a göre", L"Windows vurgu rengi", L"Kapalı" } };
+    if (lang == L"hi") return { L"संदर्भ मेनू की सीमाएँ", L"मॉड शैली के मेनू की बाहरी सीमा", { L"मेनू की अपनी सीमा", L"विंडो सेटिंग के अनुसार", L"Windows के अनुसार", L"Windows का एक्सेंट रंग", L"बंद" } };
+    if (lang == L"ar") return { L"حدود قائمة السياق", L"الحد الخارجي للقائمة بنمط التعديل", { L"حد خاص بالقائمة", L"حسب إعدادات النوافذ", L"حسب Windows", L"لون تمييز Windows", L"معطلة" } };
+    return { L"Context Menu Borders", L"Outer border of the mod-style menu",
+             { L"Own border", L"Defined by window settings", L"Windows-defined", L"Windows accent", L"Off" } };
 }
 
 struct WindowBorderStrings {
@@ -14190,18 +14449,19 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         auto drawDropdownRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int id,
                                           const wchar_t* glyph, const wchar_t* title, const wchar_t* desc,
-                                          const std::wstring& curValueLabel) {
+                                          const std::wstring& curValueLabel, float comboWidth = 178.0f) {
             pRT->DrawLine(D2D1::Point2F(grpRc.left + 1.0f, rowTop), D2D1::Point2F(grpRc.right - 1.0f, rowTop), pBrDiv, 1.0f);
             D2D1_RECT_F rRow = D2D1::RectF(grpRc.left + 1.0f, rowTop + 1.0f, grpRc.right - 1.0f, rowTop + rowH - 1.0f);
             if (pFmtGlyph) pRT->DrawText(glyph, (UINT32)wcslen(glyph), pFmtGlyph, D2D1::RectF(grpRc.left + S(26), rowTop, grpRc.left + S(56), rowTop + rowH), pBrSub);
+            const float textRight = grpRc.right - S(comboWidth + 37.0f);
             if (desc && desc[0]) {
-                if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), grpRc.right - S(215), rowTop + S(31)), pBrText);
-                if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), grpRc.right - S(215), rowTop + rowH - S(6)), pBrSub);
+                if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), textRight, rowTop + S(31)), pBrText);
+                if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), textRight, rowTop + rowH - S(6)), pBrSub);
             } else {
-                if (pFmtNav) pRT->DrawText(title, (UINT32)wcslen(title), pFmtNav, D2D1::RectF(grpRc.left + S(64), rowTop, grpRc.right - S(215), rowTop + rowH), pBrText);
+                if (pFmtNav) pRT->DrawText(title, (UINT32)wcslen(title), pFmtNav, D2D1::RectF(grpRc.left + S(64), rowTop, textRight, rowTop + rowH), pBrText);
             }
             // Win11 ComboBox pill on the right (matching Image 2: "[ Ẩn  ⌄ ]")
-            D2D1_RECT_F rcCombo = D2D1::RectF(grpRc.right - S(196), rowTop + S(14), grpRc.right - S(18), rowTop + rowH - S(14));
+            D2D1_RECT_F rcCombo = D2D1::RectF(grpRc.right - S(comboWidth + 18.0f), rowTop + S(14), grpRc.right - S(18), rowTop + rowH - S(14));
             bool hov = (st->hoveredId == id);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), hov ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), pBrBorder, 1.0f);
@@ -14390,11 +14650,12 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
+            const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Mod;
             float rH = S(60.0f);
             auto [g1, y1] = beginGroupCard(
                 ls.gPosTitle,
                 ls.gPosSub,
-                5, rH);
+                showMenuBorder ? 6 : 5, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE740",
                 ls.posTitle,
                 ls.posSub,
@@ -14412,7 +14673,13 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 menuStrings.title, menuStrings.description,
                 st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
                     ? kWindowsFluentMenuLabel : menuStrings.modLabel);
-            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2410, L"\uE740",
+            if (showMenuBorder) {
+                const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
+                drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2111, L"\uE91B",
+                    borderStrings.title, borderStrings.description,
+                    borderStrings.labels[static_cast<int>(st->settings.contextMenuBorderMode)], 248.0f);
+            }
+            drawDropdownRowInGroup(g1, y1 + rH * (showMenuBorder ? 5 : 4), rH, 2410, L"\uE740",
                 ls.scaleTitle,
                 ls.scaleSub,
                 std::to_wstring(st->settings.uiScalePercent) + L"%");
@@ -15178,6 +15445,18 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     if (sel >= 1 && sel <= 2 && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(),
                                                     sel == 2 ? L"windows_fluent" : L"mod");
+                    }
+                } else if (id == 2111) {
+                    const auto strings = GetContextMenuBorderStrings(st->settings.language);
+                    std::vector<std::pair<int, std::wstring>> options;
+                    for (int i = 0; i < static_cast<int>(kContextMenuBorderModeValues.size()); ++i) {
+                        options.emplace_back(i + 1, strings.labels[i]);
+                    }
+                    const int current = static_cast<int>(st->settings.contextMenuBorderMode) + 1;
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
+                    if (sel >= 1 && sel <= static_cast<int>(kContextMenuBorderModeValues.size()) && sel != current) {
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuBorderMode").c_str(),
+                                                    kContextMenuBorderModeValues[sel - 1]);
                     }
                 } else if (id == 2201) {
                     COLORREF initRgb = RGB(30, 30, 36);
@@ -16968,12 +17247,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.15f, &adminColor);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.25f, custom);
                             } else {
-                                const COLORREF color = GetSysColor(highContrast ? COLOR_WINDOWTEXT
-                                    : (active ? COLOR_ACTIVEBORDER : COLOR_INACTIVEBORDER));
-                                const D2D1_COLOR_F outline = borderMode == WindowBorderMode::Accent
-                                    ? GetSystemAccentColorF()
-                                    : D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f,
-                                                   GetBValue(color) / 255.0f);
+                                const D2D1_COLOR_F outline = GetWindowsBorderColor(borderMode, highContrast, active);
                                 if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.0f, &outline);
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.0f, &outline);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.0f, &outline);

@@ -65,7 +65,7 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 });
 
 test('the context menu retains its previous style by default', () => {
-    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
+    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - contextMenuBorderMode:)/)?.[0];
     assert.match(style, /\$name: Context Menu Style/);
     assert.match(style, /- mod: Mod Style/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
@@ -76,7 +76,7 @@ test('layout settings keep position and menu style directly below their related 
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys.slice(0, 5), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'uiScalePercent']);
+    assert.deepEqual(keys.slice(0, 6), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'contextMenuBorderMode', 'uiScalePercent']);
     assert.match(layout, /\$name:ru-RU: Макет окна/);
     assert.match(layout, /\$description:ru-RU: Базовая компоновка окна, использующая параметры персонализации/);
 });
@@ -206,6 +206,26 @@ test('the four window border modes resolve to the expected outline', () => {
         static_assert(ResolveWindowBorderMode(Accent, false, false, true) == Accent);
         static_assert(ResolveWindowBorderMode(Accent, true, true, true) == Windows);
         static_assert(ResolveWindowBorderMode(Off, true, true, true) == Off);
+    `);
+});
+
+test('context menus can keep their own border or override the window border policy', () => {
+    const modes = source.match(/enum class WindowBorderMode[^\n]*;\s*enum class ContextMenuBorderMode[^\n]*;/)?.[0];
+    const resolve = source.match(/constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode\([\s\S]*?\n\}/)?.[0];
+    assert.ok(modes && resolve);
+    assert.match(source, /- contextMenuBorderMode: own/);
+    compileChecks(`
+        #include <optional>
+        ${modes}
+        ${resolve}
+        using Menu = ContextMenuBorderMode;
+        using Window = WindowBorderMode;
+        static_assert(!ResolveContextMenuWindowBorderMode(Menu::Own, Window::Off));
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Mod) == Window::Mod);
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Off) == Window::Off);
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Windows, Window::Off) == Window::Windows);
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Accent, Window::Off) == Window::Accent);
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Off, Window::Accent) == Window::Off);
     `);
 });
 
