@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.3
+// @version         6.6.4
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 26
+// Build: 27
 
 // ==WindhawkModReadme==
 /*
@@ -1653,6 +1653,8 @@ constexpr int kLegacyListPadding   = 20;
 constexpr int kBaseDetachedGap      = 12;
 constexpr int kBaseAdminBannerHeight = 32;
 constexpr int kBaseInputBarHeight   = 54;
+constexpr int kSettingsControlHeight = 32;
+constexpr int kSettingsCardInset = 18;
 constexpr UINT_PTR kTimerCaret              = 9010;
 constexpr UINT_PTR kTimerLuminance          = 9011;
 constexpr UINT_PTR kTimerOpenAnim           = 9014;
@@ -7363,6 +7365,25 @@ constexpr int GetVerticalPanelInset(int panelHeight, int contentHeight, bool bot
     return (panelHeight - contentHeight + (bottom ? 1 : 0)) / 2;
 }
 
+constexpr float GetCenteredInset(float outer, float inner) {
+    return inner < outer ? (outer - inner) * 0.5f : 0.0f;
+}
+
+D2D1_RECT_F CenterVertically(D2D1_RECT_F rect, float contentHeight) {
+    const float inset = GetCenteredInset(rect.bottom - rect.top, contentHeight);
+    rect.top += inset;
+    rect.bottom -= inset;
+    return rect;
+}
+
+float GetCenteredInkTop(IDWriteTextLayout* layout, float top, float height) {
+    DWRITE_OVERHANG_METRICS ink{};
+    if (SUCCEEDED(layout->GetOverhangMetrics(&ink)) && height + ink.top + ink.bottom > 0.0f) {
+        return top + (ink.top - ink.bottom) * 0.5f;
+    }
+    return top;
+}
+
 int GetListPadding(const RunDialogState* state, bool bottom = false) {
     const int barHeight = GetInputBarHeight(state);
     const int inset = GetVerticalPanelInset(barHeight, GetActionButtonHeight(state, barHeight), bottom);
@@ -11502,6 +11523,9 @@ std::atomic<HWND> g_hActiveCustomSizeWnd{nullptr};
 constexpr UINT_PTR kTimerMenuSubHover = 9501;
 constexpr UINT_PTR kTimerMenuWatchdog = 9502;
 constexpr wchar_t kFluentMenuClassName[] = L"WindhawkModernRunFluentMenuWnd";
+constexpr int kMenuTextInset = 12;
+constexpr int kMenuIconColumn = 18;
+constexpr int kMenuControlInset = 6;
 
 
 void CloseActiveGearMenu() {
@@ -11684,7 +11708,7 @@ void GetInlineControlRects(const FluentMenuSession* s, const FluentMenuPanelStat
                            D2D1_RECT_F* outMinus, D2D1_RECT_F* outBox, D2D1_RECT_F* outPlus) {
     UINT dpi = s->effectiveDpi;
     float sbReserve = PanelNeedsScroll(p) ? DpiScaleF(8.0f, dpi) : 0.0f;
-    float rightEdge = (float)p->width - DpiScaleF(8.0f, dpi) - sbReserve;
+    float rightEdge = (float)p->width - DpiScale(kBasePanelInset, dpi) - DpiScaleF(kMenuControlInset, dpi) - sbReserve;
     float btnW = DpiScaleF(24.0f, dpi);
     float boxW = DpiScaleF(66.0f, dpi);
     float gap  = DpiScaleF(4.0f, dpi);
@@ -11738,7 +11762,7 @@ void ComputeFluentPanelMetrics(FluentMenuSession* s, FluentMenuPanelState* p) {
             break;
         }
     }
-    // Left icon margin (42px) + text width + right ToggleSwitch/checkmark/chevron padding
+    // Reserve the leading icon column and the space used by trailing controls.
     int extraRight = hasToggleSwitches
         ? DpiScale(62, s->effectiveDpi)
         : (PanelNeedsScroll(p) ? DpiScale(46, s->effectiveDpi) : DpiScale(38, s->effectiveDpi));
@@ -11748,7 +11772,7 @@ void ComputeFluentPanelMetrics(FluentMenuSession* s, FluentMenuPanelState* p) {
     p->shortcutColumnWidth = std::any_of(p->items.begin(), p->items.end(), [](const FluentMenuItem& item) {
         return item.shortcut != nullptr;
     }) ? DpiScale(62, s->effectiveDpi) : 0;
-    p->width = DpiScale(42, s->effectiveDpi) + (int)std::ceil(maxTextW) +
+    p->width = DpiScale(kBasePanelInset + kMenuTextInset + kMenuIconColumn, s->effectiveDpi) + (int)std::ceil(maxTextW) +
                extraRight + p->shortcutColumnWidth;
     p->width = std::clamp(p->width, DpiScale(210, s->effectiveDpi), DpiScale(460, s->effectiveDpi));
 
@@ -12111,15 +12135,19 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         }
                     }
 
-                    float shortcutWidth = static_cast<float>(p->shortcutColumnWidth);
-                    float iconCx = DpiScaleF(22.0f, dpi);
+                    const float right = static_cast<float>(w) - padX - sbReserve;
+                    const float textInset = DpiScaleF(kMenuTextInset, dpi);
+                    const float textLeft = padX + textInset;
+                    const float iconTextLeft = textLeft + DpiScaleF(kMenuIconColumn, dpi);
+                    const float shortcutWidth = static_cast<float>(p->shortcutColumnWidth);
+                    const float iconCx = textLeft;
                     float iconCy = curY + rowH * 0.5f;
                     ID2D1Brush* pItemTextBr = item.disabled ? pBrMuted : pBrText;
                     ID2D1Brush* pCheckedBr  = (item.id == 450 && pBrAmber) ? pBrAmber : pBrAccent;
                     ID2D1Brush* pItemIconBr = item.disabled ? pBrMuted : (item.checked && pCheckedBr ? pCheckedBr : pBrIcon);
 
                     if (item.shortcut && pFmtItem && pBrSub) {
-                        const float hintRight = static_cast<float>(w) - sbReserve - DpiScaleF(16.0f, dpi);
+                        const float hintRight = right - textInset;
                         const auto hintRect = D2D1::RectF(hintRight - shortcutWidth, curY,
                                                         hintRight, curY + rowH);
                         pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
@@ -12137,7 +12165,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
 
                         if (pFmtItem && pItemTextBr && !item.label.empty()) {
                             D2D1_RECT_F rcText = D2D1::RectF(
-                                DpiScaleF(42.0f, dpi),
+                                iconTextLeft,
                                 curY,
                                 rcMinus.left - DpiScaleF(6.0f, dpi),
                                 curY + rowH);
@@ -12216,31 +12244,30 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         // Boolean on/off switches (Compact Mode = 350, Command History = 400, Run as Admin = 450) use a Toggle Switch;
                         // single-choice selection options in submenus/popups use a Checkmark (✓).
                         bool isToggleRow = (item.id == 350 || item.id == 355 || item.id == 400 || item.id == 450 || item.id == 460);
-                        float leftTextX = (item.icon == FluentMenuIcon::None)
-                            ? DpiScaleF(18.0f, dpi)
-                            : DpiScaleF(42.0f, dpi);
-                        float rightReserve = isToggleRow ? DpiScaleF(56.0f, dpi) : DpiScaleF(30.0f, dpi);
-                        if (item.shortcut) rightReserve += shortcutWidth;
+                        const float leftTextX = item.icon == FluentMenuIcon::None ? textLeft : iconTextLeft;
+                        float rightReserve = isToggleRow ? DpiScaleF(48.0f, dpi) : textInset;
+                        if (item.shortcut) rightReserve += shortcutWidth + DpiScaleF(8.0f, dpi);
+                        else if (!item.subItems.empty() || item.checked) rightReserve += DpiScaleF(10.0f, dpi);
 
                         if (pFmtItem && pItemTextBr && !item.label.empty()) {
                             D2D1_RECT_F rcText = D2D1::RectF(
                                 leftTextX,
                                 curY,
-                                (float)w - rightReserve - sbReserve,
+                                right - rightReserve,
                                 curY + rowH);
                             pRT->DrawText(item.label.c_str(), (UINT32)item.label.size(),
                                           pFmtItem, rcText, pItemTextBr, D2D1_DRAW_TEXT_OPTIONS_CLIP);
                         }
 
                         if (!item.subItems.empty() && pBrSub && pRoundStroke) {
-                            float chevX = (float)w - DpiScaleF(16.0f, dpi) - sbReserve;
+                            const float chevX = right - textInset;
                             DrawD2DMenuChevronRight(pRT, pBrSub, pRoundStroke, chevX, iconCy, dpi);
                         } else if (isToggleRow) {
-                            float swRightX = (float)w - DpiScaleF(12.0f, dpi) - sbReserve;
+                            const float swRightX = right - DpiScaleF(kMenuControlInset, dpi);
                             DrawD2DWin11ToggleSwitch(pRT, swRightX, iconCy, dpi,
                                                      item.checked, isLight, item.disabled, isHovered, item.id == 450);
                         } else if (item.checked && pRoundStroke && (pBrAccent || pBrText)) {
-                            float checkX = (float)w - DpiScaleF(18.0f, dpi) - sbReserve;
+                            const float checkX = right - textInset;
                             DrawD2DMenuCheckmark(pRT, pBrAccent ? pBrAccent : pBrText, pRoundStroke, checkX, iconCy, dpi);
                         }
                     }
@@ -13738,6 +13765,16 @@ struct WinUI3ColorPickerSession {
     ID2D1Bitmap* pSpectrumBmp = nullptr;
 };
 
+constexpr int kColorPickerSectionGap = 14;
+constexpr int kColorPickerSpectrumHeight = 170;
+constexpr int kColorPickerPreviewHeight = 52;
+constexpr int kColorPickerPaletteHeader = 24;
+constexpr int kColorPickerSwatchHeight = 28;
+constexpr int kColorPickerSwatchGap = 8;
+constexpr int kColorPickerHeight = 2 * kSettingsCardInset + kColorPickerSpectrumHeight +
+    kColorPickerPreviewHeight + kColorPickerPaletteHeader + 2 * kColorPickerSwatchHeight +
+    kColorPickerSwatchGap + 3 * kColorPickerSectionGap + kSettingsControlHeight;
+
 static constexpr COLORREF kWinUI3CuratedSwatches[16] = {
     RGB(12, 12, 16),   RGB(30, 30, 36),   RGB(46, 52, 64),   RGB(30, 30, 46),
     RGB(40, 42, 54),   RGB(25, 23, 36),   RGB(17, 30, 28),   RGB(250, 247, 242),
@@ -13835,9 +13872,12 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
         pFmtBtn->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
     }
 
-    float pad = S(18.0f);
+    if (pFmtHex) pFmtHex->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+    if (pFmtLabel) pFmtLabel->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+    const float pad = S(kSettingsCardInset);
+    const float sectionGap = S(kColorPickerSectionGap);
     float specW = (float)w - pad * 2.0f - S(34.0f);
-    float specH = S(170.0f);
+    const float specH = S(kColorPickerSpectrumHeight);
     D2D1_RECT_F rSpec = D2D1::RectF(pad, pad, pad + specW, pad + specH);
     s->rcSpectrum = { (LONG)rSpec.left, (LONG)rSpec.top, (LONG)rSpec.right, (LONG)rSpec.bottom };
 
@@ -13886,8 +13926,8 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     pRT->DrawEllipse(D2D1::Ellipse(D2D1::Point2F(barCx, valY), S(8.0f), S(8.0f)), pBrBlack, 1.5f);
 
     // Live Preview Card + Hex & RGB readout
-    float prevY = rSpec.bottom + S(14.0f);
-    D2D1_RECT_F rPrevCard = D2D1::RectF(pad, prevY, (float)w - pad, prevY + S(52.0f));
+    const float prevY = rSpec.bottom + sectionGap;
+    const auto rPrevCard = D2D1::RectF(pad, prevY, (float)w - pad, prevY + S(kColorPickerPreviewHeight));
     pRT->FillRoundedRectangle(D2D1::RoundedRect(rPrevCard, S(6), S(6)), pBrCard);
     pRT->DrawRoundedRectangle(D2D1::RoundedRect(rPrevCard, S(6), S(6)), pBrBorder, 1.0f);
     D2D1_RECT_F rSwatch = D2D1::RectF(rPrevCard.left + S(10), rPrevCard.top + S(10), rPrevCard.left + S(56), rPrevCard.bottom - S(10));
@@ -13897,20 +13937,21 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     std::wstring hexStr = FormatHexColor(curRgb);
     wchar_t rgbInfo[64] = {};
     swprintf_s(rgbInfo, L"R %u  •  G %u  •  B %u", (unsigned)GetRValue(curRgb), (unsigned)GetGValue(curRgb), (unsigned)GetBValue(curRgb));
+    const float readoutCenter = (rPrevCard.top + rPrevCard.bottom) * 0.5f;
     if (pFmtHex) pRT->DrawText(hexStr.c_str(), (UINT32)hexStr.size(), pFmtHex,
-        D2D1::RectF(rSwatch.right + S(12), rPrevCard.top + S(7), rPrevCard.right - S(10), rPrevCard.top + S(27)), pBrText);
+        D2D1::RectF(rSwatch.right + S(12), rSwatch.top, rPrevCard.right - S(10), readoutCenter), pBrText);
     if (pFmtLabel) pRT->DrawText(rgbInfo, (UINT32)wcslen(rgbInfo), pFmtLabel,
-        D2D1::RectF(rSwatch.right + S(12), rPrevCard.top + S(27), rPrevCard.right - S(10), rPrevCard.bottom - S(6)), pBrSub);
+        D2D1::RectF(rSwatch.right + S(12), readoutCenter, rPrevCard.right - S(10), rSwatch.bottom), pBrSub);
 
     // Quick Swatches (2 rows x 8)
-    float swTop = rPrevCard.bottom + S(14.0f);
+    const float swTop = rPrevCard.bottom + sectionGap;
     const wchar_t* swHdr = s->ls.cpSwatches;
     if (pFmtLabel) pRT->DrawText(swHdr, (UINT32)wcslen(swHdr), pFmtLabel,
         D2D1::RectF(pad, swTop, (float)w - pad, swTop + S(20)), pBrSub);
-    float gridTop = swTop + S(24.0f);
-    float gap = S(8.0f);
+    const float gridTop = swTop + S(kColorPickerPaletteHeader);
+    const float gap = S(kColorPickerSwatchGap);
     float tileW = ((float)w - pad * 2.0f - gap * 7.0f) / 8.0f;
-    float tileH = S(28.0f);
+    const float tileH = S(kColorPickerSwatchHeight);
     for (int i = 0; i < 16; ++i) {
         int r = i / 8, c = i % 8;
         D2D1_RECT_F rt = D2D1::RectF(pad + c * (tileW + gap), gridTop + r * (tileH + gap),
@@ -13928,11 +13969,11 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     }
 
     // Bottom WinUI 3 Buttons (Apply / Cancel)
-    float btnH = S(34.0f);
+    const float btnH = S(kSettingsControlHeight);
     float btnY = (float)h - pad - btnH;
-    float btnW = ((float)w - pad * 2.0f - S(10.0f)) * 0.5f;
+    const float btnW = ((float)w - pad * 2.0f - gap) * 0.5f;
     D2D1_RECT_F rApply  = D2D1::RectF(pad, btnY, pad + btnW, btnY + btnH);
-    D2D1_RECT_F rCancel = D2D1::RectF(rApply.right + S(10.0f), btnY, (float)w - pad, btnY + btnH);
+    D2D1_RECT_F rCancel = D2D1::RectF(rApply.right + gap, btnY, (float)w - pad, btnY + btnH);
     s->rcApply  = { (LONG)rApply.left,  (LONG)rApply.top,  (LONG)rApply.right,  (LONG)rApply.bottom };
     s->rcCancel = { (LONG)rCancel.left, (LONG)rCancel.top, (LONG)rCancel.right, (LONG)rCancel.bottom };
 
@@ -14123,7 +14164,7 @@ bool PickColorViaWinUI3Dialog(HWND hOwner, COLORREF initialRgb, bool isLight, co
     RgbToHsv(initialRgb, session.hue, session.sat, session.val);
 
     int cw = DpiScale(364, session.dpi);
-    int ch = DpiScale(412, session.dpi);
+    int ch = DpiScale(kColorPickerHeight, session.dpi);
     DWORD style = WS_POPUP | WS_CAPTION | WS_SYSMENU;
     RECT rcAdj = { 0, 0, cw, ch };
     AdjustWindowRectEx(&rcAdj, style, FALSE, WS_EX_DLGMODALFRAME);
@@ -14382,17 +14423,55 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         }
         curY += S(52.0f);
 
-        // Helper: Grouped SettingsExpander Card (like Image 2 "Mục trên thanh tác vụ" with crisp 1px row dividers!)
+        const float rowHeight = S(68.0f);
+        const float cardInset = S(kSettingsCardInset);
+        const float controlHeight = S(kSettingsControlHeight);
+        auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description) {
+            if (!pFmtNav || bounds.right <= bounds.left || bounds.bottom <= bounds.top) return;
+            std::wstring text(title);
+            if (!description.empty()) {
+                text += L'\n';
+                text += description;
+            }
+            IDWriteTextLayout* layout = nullptr;
+            if (FAILED(g_pDWriteFactory->CreateTextLayout(text.c_str(), static_cast<UINT32>(text.size()), pFmtNav,
+                    bounds.right - bounds.left, bounds.bottom - bounds.top, &layout))) return;
+
+            if (!description.empty()) {
+                const DWRITE_TEXT_RANGE range{static_cast<UINT32>(title.size() + 1), static_cast<UINT32>(description.size())};
+                layout->SetFontSize(S(11.5f), range);
+                layout->SetDrawingEffect(pBrSub, range);
+            }
+            pRT->DrawTextLayout(D2D1::Point2F(bounds.left, bounds.top), layout, pBrText, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+            layout->Release();
+        };
+
+        auto controlRect = [&](float left, float right, float top, float height) {
+            return CenterVertically(D2D1::RectF(left, top, right, top + height), controlHeight);
+        };
+
+        auto drawSettingRowHeader = [&](const D2D1_RECT_F& card, float top, float height, float textRight,
+                                        const wchar_t* glyph, const wchar_t* title, const wchar_t* description,
+                                        ID2D1Brush* iconBrush) {
+            pRT->DrawLine(D2D1::Point2F(card.left + 1.0f, top), D2D1::Point2F(card.right - 1.0f, top), pBrDiv, 1.0f);
+            if (pFmtGlyph) {
+                pRT->DrawText(glyph, static_cast<UINT32>(wcslen(glyph)), pFmtGlyph,
+                    D2D1::RectF(card.left + S(26), top, card.left + S(56), top + height), iconBrush);
+            }
+            drawCardText(D2D1::RectF(card.left + S(64), top + S(6), textRight, top + height - S(6)),
+                         title, description ? std::wstring_view(description) : std::wstring_view{});
+        };
+
         auto beginGroupCard = [&](const wchar_t* groupTitle, const wchar_t* groupSub, int rowCount, float rowH) -> std::pair<D2D1_RECT_F, float> {
-            float headerH = S(62.0f);
+            const float headerH = rowHeight;
             float totalH = headerH + rowCount * rowH;
             D2D1_RECT_F rc = D2D1::RectF(contentX, curY, contentX + contentW, curY + totalH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rc, S(6), S(6)), pBrCard);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rc, S(6), S(6)), pBrBorder, 1.0f);
-            if (pFmtTitle) pRT->DrawText(groupTitle, (UINT32)wcslen(groupTitle), pFmtTitle, D2D1::RectF(rc.left + S(18), rc.top + S(13), rc.right - S(42), rc.top + S(33)), pBrText);
-            if (pFmtSub)   pRT->DrawText(groupSub,   (UINT32)wcslen(groupSub),   pFmtSub,   D2D1::RectF(rc.left + S(18), rc.top + S(34), rc.right - S(42), rc.top + S(54)), pBrSub);
+            drawCardText(D2D1::RectF(rc.left + cardInset, rc.top + S(6), rc.right - S(42), rc.top + headerH - S(6)),
+                         groupTitle, groupSub);
             // Subtle chevron-up indicator on the right (matching Win11 SettingsExpander in Image 2)
-            if (pFmtGlyph) pRT->DrawText(L"\uE70E", 1, pFmtGlyph, D2D1::RectF(rc.right - S(40), rc.top + S(14), rc.right - S(14), rc.top + S(48)), pBrSub);
+            if (pFmtGlyph) pRT->DrawText(L"\uE70E", 1, pFmtGlyph, D2D1::RectF(rc.right - S(40), rc.top, rc.right - S(14), rc.top + headerH), pBrSub);
             curY += totalH + S(12.0f);
             return { rc, rc.top + headerH };
         };
@@ -14400,42 +14479,30 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         auto drawToggleRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int id,
                                         const wchar_t* glyph, const wchar_t* title, const wchar_t* desc,
                                         bool checked, bool amber = false) {
-            pRT->DrawLine(D2D1::Point2F(grpRc.left + 1.0f, rowTop), D2D1::Point2F(grpRc.right - 1.0f, rowTop), pBrDiv, 1.0f);
             D2D1_RECT_F rRow = D2D1::RectF(grpRc.left + 1.0f, rowTop + 1.0f, grpRc.right - 1.0f, rowTop + rowH - 1.0f);
             bool hov = (st->hoveredId == id);
-            if (hov) pRT->FillRectangle(rRow, pBrCardHov);
-            float cy = rowTop + rowH * 0.5f;
-            if (pFmtGlyph) pRT->DrawText(glyph, (UINT32)wcslen(glyph), pFmtGlyph, D2D1::RectF(grpRc.left + S(26), rowTop, grpRc.left + S(56), rowTop + rowH), pBrSub);
-            if (desc && desc[0]) {
-                if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), grpRc.right - S(124), rowTop + S(31)), pBrText);
-                if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), grpRc.right - S(124), rowTop + rowH - S(6)), pBrSub);
-            } else {
-                if (pFmtNav) pRT->DrawText(title, (UINT32)wcslen(title), pFmtNav, D2D1::RectF(grpRc.left + S(64), rowTop, grpRc.right - S(124), rowTop + rowH), pBrText);
+            if (hov) {
+                const auto highlight = D2D1::RectF(grpRc.left + S(2), rowTop + S(2), grpRc.right - S(2), rowTop + rowH - S(2));
+                pRT->FillRoundedRectangle(D2D1::RoundedRect(highlight, S(4), S(4)), pBrCardHov);
             }
+            float cy = rowTop + rowH * 0.5f;
+            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(124), glyph, title, desc, pBrSub);
             const wchar_t* stateTxt = checked ? ls.on : ls.off;
             if (pFmtRight) {
                 pRT->DrawText(stateTxt, (UINT32)wcslen(stateTxt), pFmtRight,
                               D2D1::RectF(grpRc.right - S(118), rowTop, grpRc.right - S(68), rowTop + rowH), pBrText);
             }
-            DrawWin11NativeToggle(pRT, grpRc.right - S(18.0f), cy, dpi, checked, isLight, hov, colAccent, amber);
+            DrawWin11NativeToggle(pRT, grpRc.right - cardInset, cy, dpi, checked, isLight, hov, colAccent, amber);
             addHit(id, rRow);
         };
 
         auto drawDropdownRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int id,
                                           const wchar_t* glyph, const wchar_t* title, const wchar_t* desc,
                                           const std::wstring& curValueLabel, float comboWidth = 178.0f) {
-            pRT->DrawLine(D2D1::Point2F(grpRc.left + 1.0f, rowTop), D2D1::Point2F(grpRc.right - 1.0f, rowTop), pBrDiv, 1.0f);
-            D2D1_RECT_F rRow = D2D1::RectF(grpRc.left + 1.0f, rowTop + 1.0f, grpRc.right - 1.0f, rowTop + rowH - 1.0f);
-            if (pFmtGlyph) pRT->DrawText(glyph, (UINT32)wcslen(glyph), pFmtGlyph, D2D1::RectF(grpRc.left + S(26), rowTop, grpRc.left + S(56), rowTop + rowH), pBrSub);
             const float textRight = grpRc.right - S(comboWidth + 37.0f);
-            if (desc && desc[0]) {
-                if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), textRight, rowTop + S(31)), pBrText);
-                if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), textRight, rowTop + rowH - S(6)), pBrSub);
-            } else {
-                if (pFmtNav) pRT->DrawText(title, (UINT32)wcslen(title), pFmtNav, D2D1::RectF(grpRc.left + S(64), rowTop, textRight, rowTop + rowH), pBrText);
-            }
+            drawSettingRowHeader(grpRc, rowTop, rowH, textRight, glyph, title, desc, pBrSub);
             // Win11 ComboBox pill on the right (matching Image 2: "[ Ẩn  ⌄ ]")
-            D2D1_RECT_F rcCombo = D2D1::RectF(grpRc.right - S(comboWidth + 18.0f), rowTop + S(14), grpRc.right - S(18), rowTop + rowH - S(14));
+            const auto rcCombo = controlRect(grpRc.right - S(comboWidth) - cardInset, grpRc.right - cardInset, rowTop, rowH);
             bool hov = (st->hoveredId == id);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), hov ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), pBrBorder, 1.0f);
@@ -14451,19 +14518,16 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         auto drawColorRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int pickId, int resetId,
                                        const wchar_t* glyph, const wchar_t* title, const wchar_t* desc, const std::wstring& hexVal) {
-            pRT->DrawLine(D2D1::Point2F(grpRc.left + 1.0f, rowTop), D2D1::Point2F(grpRc.right - 1.0f, rowTop), pBrDiv, 1.0f);
-            if (pFmtGlyph) pRT->DrawText(glyph, (UINT32)wcslen(glyph), pFmtGlyph, D2D1::RectF(grpRc.left + S(26), rowTop, grpRc.left + S(56), rowTop + rowH), pBrSub);
-            if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), grpRc.right - S(215), rowTop + S(31)), pBrText);
-            if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), grpRc.right - S(215), rowTop + rowH - S(6)), pBrSub);
+            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(215), glyph, title, desc, pBrSub);
 
-            D2D1_RECT_F rcReset = D2D1::RectF(grpRc.right - S(86), rowTop + S(15), grpRc.right - S(18), rowTop + rowH - S(15));
+            const auto rcReset = controlRect(grpRc.right - S(86), grpRc.right - cardInset, rowTop, rowH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
             const wchar_t* rstTxt = ls.defBtn;
             if (pFmtCtl) pRT->DrawText(rstTxt, (UINT32)wcslen(rstTxt), pFmtCtl, rcReset, pBrText);
             addHit(resetId, rcReset);
 
-            D2D1_RECT_F rcPick = D2D1::RectF(rcReset.left - S(106), rowTop + S(15), rcReset.left - S(8), rowTop + rowH - S(15));
+            const auto rcPick = controlRect(rcReset.left - S(106), rcReset.left - S(8), rowTop, rowH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), st->hoveredId == pickId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), pBrBorder, 1.0f);
             COLORREF parsedRgb = 0;
@@ -14486,20 +14550,17 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         auto drawStepperRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int minusId, int plusId, int resetId,
                                          const wchar_t* glyph, const wchar_t* title, const wchar_t* desc, const std::wstring& valStr) {
-            pRT->DrawLine(D2D1::Point2F(grpRc.left + 1.0f, rowTop), D2D1::Point2F(grpRc.right - 1.0f, rowTop), pBrDiv, 1.0f);
-            if (pFmtGlyph) pRT->DrawText(glyph, (UINT32)wcslen(glyph), pFmtGlyph, D2D1::RectF(grpRc.left + S(26), rowTop, grpRc.left + S(56), rowTop + rowH), pBrSub);
-            if (pFmtTitle) pRT->DrawText(title, (UINT32)wcslen(title), pFmtTitle, D2D1::RectF(grpRc.left + S(64), rowTop + S(11), grpRc.right - S(215), rowTop + S(31)), pBrText);
-            if (pFmtSub)   pRT->DrawText(desc,  (UINT32)wcslen(desc),  pFmtSub,   D2D1::RectF(grpRc.left + S(64), rowTop + S(32), grpRc.right - S(215), rowTop + rowH - S(6)), pBrSub);
+            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(215), glyph, title, desc, pBrSub);
 
-            D2D1_RECT_F rcReset = D2D1::RectF(grpRc.right - S(72), rowTop + S(15), grpRc.right - S(18), rowTop + rowH - S(15));
+            const auto rcReset = controlRect(grpRc.right - S(72), grpRc.right - cardInset, rowTop, rowH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
             if (pFmtCtl) pRT->DrawText(L"Auto", 4, pFmtCtl, rcReset, pBrText);
             addHit(resetId, rcReset);
 
-            D2D1_RECT_F rcPlus = D2D1::RectF(rcReset.left - S(34), rowTop + S(15), rcReset.left - S(6), rowTop + rowH - S(15));
-            D2D1_RECT_F rcVal  = D2D1::RectF(rcPlus.left - S(58), rowTop + S(15), rcPlus.left - S(4), rowTop + rowH - S(15));
-            D2D1_RECT_F rcMin  = D2D1::RectF(rcVal.left - S(30), rowTop + S(15), rcVal.left - S(4), rowTop + rowH - S(15));
+            const auto rcPlus = controlRect(rcReset.left - S(36), rcReset.left - S(8), rowTop, rowH);
+            const auto rcVal  = controlRect(rcPlus.left - S(62), rcPlus.left - S(8), rowTop, rowH);
+            const auto rcMin  = controlRect(rcVal.left - S(36), rcVal.left - S(8), rowTop, rowH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcMin, S(4), S(4)), st->hoveredId == minusId ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcMin, S(4), S(4)), pBrBorder, 1.0f);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPlus, S(4), S(4)), st->hoveredId == plusId ? pBrCardHov : pBrCtlBg);
@@ -14541,7 +14602,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         if (st->activeTab == 0) {
             // Group 1: Chủ đề & Chế độ màu (matching Win11 SettingsExpander!)
-            float rH = S(60.0f);
+            const float rH = rowHeight;
             auto [g1, y1] = beginGroupCard(
                 ls.gThemeTitle,
                 ls.gThemeSub,
@@ -14582,9 +14643,6 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             {
                 // Custom Background Image / Animated GIF Picker
                 float rowTop = y2 + rH * 3;
-                pRT->DrawLine(D2D1::Point2F(g2.left + 1.0f, rowTop), D2D1::Point2F(g2.right - 1.0f, rowTop), pBrDiv, 1.0f);
-                if (pFmtGlyph) pRT->DrawText(L"\uEB9F", 1, pFmtGlyph, D2D1::RectF(g2.left + S(26), rowTop, g2.left + S(56), rowTop + rH), pBrSub);
-                const wchar_t* bgTitle = ls.bgImgTitle;
                 std::wstring bgSub;
                 if (st->settings.customBackgroundPath.empty()) {
                     bgSub = ls.bgImgNone;
@@ -14592,11 +14650,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     const wchar_t* fn = PathFindFileNameW(st->settings.customBackgroundPath.c_str());
                     bgSub = std::wstring(ls.bgImgActive) + (fn ? fn : st->settings.customBackgroundPath.c_str());
                 }
-                if (pFmtTitle) pRT->DrawText(bgTitle, (UINT32)wcslen(bgTitle), pFmtTitle, D2D1::RectF(g2.left + S(64), rowTop + S(11), g2.right - S(215), rowTop + S(31)), pBrText);
-                if (pFmtSub)   pRT->DrawText(bgSub.c_str(), (UINT32)bgSub.size(), pFmtSub, D2D1::RectF(g2.left + S(64), rowTop + S(32), g2.right - S(215), rowTop + rH - S(6)), pBrSub);
+                drawSettingRowHeader(g2, rowTop, rH, g2.right - S(215), L"\uEB9F", ls.bgImgTitle, bgSub.c_str(), pBrSub);
 
-                D2D1_RECT_F rcPick = D2D1::RectF(g2.right - S(196), rowTop + S(14), g2.right - S(94), rowTop + rH - S(14));
-                D2D1_RECT_F rcClr  = D2D1::RectF(g2.right - S(86),  rowTop + S(14), g2.right - S(18), rowTop + rH - S(14));
+                const auto rcPick = controlRect(g2.right - S(196), g2.right - S(94), rowTop, rH);
+                const auto rcClr = controlRect(g2.right - S(86), g2.right - cardInset, rowTop, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), (st->hoveredId == 2220) ? pBrCardHov : pBrCtlBg);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), pBrBorder, 1.0f);
                 const wchar_t* pickLbl = ls.browse;
@@ -14631,7 +14688,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             }
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
-            float rH = S(60.0f);
+            const float rH = rowHeight;
             auto [g1, y1] = beginGroupCard(
                 ls.gPosTitle,
                 ls.gPosSub,
@@ -14671,7 +14728,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     st->settings.hiddenActions[i]);
             }
         } else if (st->activeTab == 2) {
-            float rH = S(60.0f);
+            const float rH = rowHeight;
             auto [g1, y1] = beginGroupCard(
                 ls.gHistTitle,
                 ls.gHistSub,
@@ -14703,13 +14760,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
             // Clear history row
             float clrY = y1 + rH * 6;
-            pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, clrY), D2D1::Point2F(g1.right - 1.0f, clrY), pBrDiv, 1.0f);
-            if (pFmtGlyph) pRT->DrawText(L"\uE74D", 1, pFmtGlyph, D2D1::RectF(g1.left + S(26), clrY, g1.left + S(56), clrY + rH), pBrSub);
-            const wchar_t* clrT = ls.clearHistTitle;
-            const wchar_t* clrD = ls.clearHistSub;
-            if (pFmtTitle) pRT->DrawText(clrT, (UINT32)wcslen(clrT), pFmtTitle, D2D1::RectF(g1.left + S(64), clrY + S(11), g1.right - S(130), clrY + S(31)), pBrText);
-            if (pFmtSub)   pRT->DrawText(clrD, (UINT32)wcslen(clrD), pFmtSub,   D2D1::RectF(g1.left + S(64), clrY + S(32), g1.right - S(130), clrY + rH - S(6)), pBrSub);
-            D2D1_RECT_F rcClr = D2D1::RectF(g1.right - S(118), clrY + S(14), g1.right - S(18), clrY + rH - S(14));
+            drawSettingRowHeader(g1, clrY, rH, g1.right - S(130), L"\uE74D", ls.clearHistTitle, ls.clearHistSub, pBrSub);
+            const auto rcClr = controlRect(g1.right - S(118), g1.right - cardInset, clrY, rH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2510) ? pBrCardHov : pBrCtlBg);
             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), pBrBorder, 1.0f);
             const wchar_t* btnTxt = ls.clearNow;
@@ -14717,48 +14769,40 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             addHit(2510, rcClr);
         } else if (st->activeTab == 3) {
             // Tab 3: Custom Command Aliases (Bí danh lệnh tùy chỉnh)
-            float rH = S(58.0f);
-            int aliasCnt = static_cast<int>(st->settings.customAliases.size());
+            const float rH = rowHeight;
+            const int aliasCnt = static_cast<int>((std::min)(st->settings.customAliases.size(), size_t{32}));
             auto [g1, y1] = beginGroupCard(
                 isViNav ? L"Bí danh lệnh tùy chỉnh (Custom Aliases)" : L"Custom Command Aliases",
                 isViNav ? L"Khai báo từ khóa gõ tắt (ví dụ hosts, ws) để mở nhanh tệp hoặc chạy quyền Admin" : L"Create shorthand keywords (e.g. hosts, ws) to launch commands or elevated tools",
                 aliasCnt + 1, rH);
             // Top action row: + Add Alias
             {
-                pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, y1), D2D1::Point2F(g1.right - 1.0f, y1), pBrDiv, 1.0f);
-                if (pFmtGlyph) pRT->DrawText(L"\uE710", 1, pFmtGlyph, D2D1::RectF(g1.left + S(26), y1, g1.left + S(56), y1 + rH), pBrAccent);
                 const wchar_t* addT = isViNav ? L"Thêm bí danh mới" : L"Add New Alias";
                 const wchar_t* addD = isViNav ? L"Gõ tên tắt, lệnh đích và chọn chạy quyền Quản trị nếu cần" : L"Enter a keyword, target command, and optional Admin flag";
-                if (pFmtTitle) pRT->DrawText(addT, (UINT32)wcslen(addT), pFmtTitle, D2D1::RectF(g1.left + S(64), y1 + S(11), g1.right - S(146), y1 + S(31)), pBrText);
-                if (pFmtSub)   pRT->DrawText(addD, (UINT32)wcslen(addD), pFmtSub,   D2D1::RectF(g1.left + S(64), y1 + S(32), g1.right - S(146), y1 + rH - S(6)), pBrSub);
-                D2D1_RECT_F rcAdd = D2D1::RectF(g1.right - S(132), y1 + S(13), g1.right - S(18), y1 + rH - S(13));
+                drawSettingRowHeader(g1, y1, rH, g1.right - S(146), L"\uE710", addT, addD, pBrAccent);
+                const auto rcAdd = controlRect(g1.right - S(132), g1.right - cardInset, y1, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), (st->hoveredId == 2700) ? pBrCardHov : pBrChipSel);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), pBrAccent, 1.0f);
                 const wchar_t* addLbl = isViNav ? L"+ Thêm mới" : L"+ Add Alias";
                 if (pFmtCtl) pRT->DrawText(addLbl, (UINT32)wcslen(addLbl), pFmtCtl, rcAdd, pBrAccent);
                 addHit(2700, rcAdd);
             }
-            for (int i = 0; i < aliasCnt && i < 32; ++i) {
+            for (int i = 0; i < aliasCnt; ++i) {
                 const auto& ca = st->settings.customAliases[i];
                 float ry = y1 + rH * (i + 1);
-                pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, ry), D2D1::Point2F(g1.right - 1.0f, ry), pBrDiv, 1.0f);
-                if (pFmtGlyph) pRT->DrawText(ca.runAsAdmin ? L"\uE72E" : L"\uE8AC", 1, pFmtGlyph,
-                    D2D1::RectF(g1.left + S(26), ry, g1.left + S(56), ry + rH), ca.runAsAdmin ? pBrAccent : pBrSub);
-                std::wstring titleLine = ca.alias + (ca.runAsAdmin ? L"  [Admin]" : L"");
-                if (pFmtTitle) pRT->DrawText(titleLine.c_str(), (UINT32)titleLine.size(), pFmtTitle,
-                    D2D1::RectF(g1.left + S(64), ry + S(10), g1.right - S(168), ry + S(30)), pBrText);
-                if (pFmtSub)   pRT->DrawText(ca.command.c_str(), (UINT32)ca.command.size(), pFmtSub,
-                    D2D1::RectF(g1.left + S(64), ry + S(31), g1.right - S(168), ry + rH - S(6)), pBrSub);
+                const std::wstring titleLine = ca.alias + (ca.runAsAdmin ? L"  [Admin]" : L"");
+                drawSettingRowHeader(g1, ry, rH, g1.right - S(168), ca.runAsAdmin ? L"\uE72E" : L"\uE8AC",
+                                     titleLine.c_str(), ca.command.c_str(), ca.runAsAdmin ? pBrAccent : pBrSub);
 
                 // Toggle Admin button for alias i (id 2800 + i)
-                D2D1_RECT_F rcAdm = D2D1::RectF(g1.right - S(156), ry + S(14), g1.right - S(84), ry + rH - S(14));
+                const auto rcAdm = controlRect(g1.right - S(156), g1.right - S(84), ry, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcAdm, S(4), S(4)), ca.runAsAdmin ? pBrChipSel : ((st->hoveredId == 2800 + i) ? pBrCardHov : pBrCtlBg));
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdm, S(4), S(4)), ca.runAsAdmin ? pBrAccent : pBrBorder, 1.0f);
                 if (pFmtCtl) pRT->DrawText(L"Admin", 5, pFmtCtl, rcAdm, ca.runAsAdmin ? pBrAccent : pBrText);
                 addHit(2800 + i, rcAdm, L"", i);
 
                 // Delete button for alias i (id 2900 + i)
-                D2D1_RECT_F rcDel = D2D1::RectF(g1.right - S(76), ry + S(14), g1.right - S(18), ry + rH - S(14));
+                const auto rcDel = controlRect(g1.right - S(76), g1.right - cardInset, ry, rH);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcDel, S(4), S(4)), (st->hoveredId == 2900 + i) ? pBrCardHov : pBrCtlBg);
                 pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcDel, S(4), S(4)), pBrBorder, 1.0f);
                 if (pFmtCtl) pRT->DrawText(ls.clear, (UINT32)wcslen(ls.clear), pFmtCtl, rcDel, pBrText);
@@ -14779,20 +14823,22 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             };
             int cols = 3;
             int rows = (ARRAYSIZE(kLangs) + cols - 1) / cols;
-            float gridH = S(16.0f) + rows * S(38.0f);
+            const float gap = S(8.0f);
+            const float ch = controlHeight;
+            const float gridH = 2 * cardInset + rows * ch + (rows - 1) * gap;
             auto [g1, y1] = beginGroupCard(
                 ls.gLangTitle,
                 ls.gLangSub,
                 1, gridH);
             pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, y1), D2D1::Point2F(g1.right - 1.0f, y1), pBrDiv, 1.0f);
-            float gx = g1.left + S(18.0f);
-            float gw = (g1.right - g1.left) - S(36.0f);
-            float gap = S(8.0f);
-            float cw = (gw - gap * (cols - 1)) / (float)cols;
-            float ch = S(30.0f);
+            const float gx = g1.left + cardInset;
+            const float gw = (g1.right - g1.left) - 2 * cardInset;
+            const float cw = (gw - gap * (cols - 1)) / (float)cols;
             for (int i = 0; i < (int)ARRAYSIZE(kLangs); ++i) {
                 int r = i / cols, c = i % cols;
-                D2D1_RECT_F rcChip = D2D1::RectF(gx + c * (cw + gap), y1 + S(10) + r * S(38), gx + c * (cw + gap) + cw, y1 + S(10) + r * S(38) + ch);
+                const float left = gx + c * (cw + gap);
+                const float top = y1 + cardInset + r * (ch + gap);
+                const auto rcChip = D2D1::RectF(left, top, left + cw, top + ch);
                 bool sel = (st->settings.language == kLangs[i].code);
                 bool hov = (st->hoveredId == kLangs[i].id);
                 pRT->FillRoundedRectangle(D2D1::RoundedRect(rcChip, S(4), S(4)), sel ? pBrChipSel : (hov ? pBrCardHov : pBrCtlBg));
@@ -14857,6 +14903,16 @@ struct WinUI3ComboFlyoutSession {
     ID2D1HwndRenderTarget* pRT = nullptr;
 };
 
+constexpr int kDropdownPad = 5;
+constexpr int kDropdownRowHeight = 36;
+
+constexpr int GetDropdownRowIndex(int y, int scroll, int pad, int rowHeight, int count) {
+    const int rowY = y + scroll - pad;
+    if (rowY < 0) return -1;
+    const int index = rowY / rowHeight;
+    return index < count ? index : -1;
+}
+
 static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
     PAINTSTRUCT ps = {};
     HDC hdc = BeginPaint(hWnd, &ps);
@@ -14917,11 +14973,12 @@ static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
         pFmt->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
     }
 
-    float pad = S(5.0f);
-    float rowH = S(36.0f);
+    const float pad = static_cast<float>(DpiScale(kDropdownPad, s->dpi));
+    const float rowH = static_cast<float>(DpiScale(kDropdownRowHeight, s->dpi));
     float curY = pad - (float)s->scrollY;
     for (int i = 0; i < (int)s->items.size(); ++i) {
-        D2D1_RECT_F rRow = D2D1::RectF(pad, curY, (float)w - pad, curY + rowH - S(2.0f));
+        const auto rRow = CenterVertically(D2D1::RectF(pad, curY, (float)w - pad, curY + rowH),
+                                           rowH - S(2.0f));
         bool sel = (s->items[i].first == s->checkedId);
         bool hov = (i == s->hoveredIdx);
         if (hov || sel) {
@@ -14990,10 +15047,8 @@ static LRESULT CALLBACK WinUI3ComboFlyoutWndProc(HWND hWnd, UINT uMsg, WPARAM wP
         case WM_MOUSEMOVE: {
             if (s) {
                 int y = (short)HIWORD(lParam);
-                float pad = DpiScaleF(5.0f, s->dpi);
-                float rowH = DpiScaleF(36.0f, s->dpi);
-                int idx = static_cast<int>(std::floor((y + s->scrollY - pad) / rowH));
-                if (idx < 0 || idx >= (int)s->items.size()) idx = -1;
+                const int idx = GetDropdownRowIndex(y, s->scrollY, DpiScale(kDropdownPad, s->dpi),
+                                                    DpiScale(kDropdownRowHeight, s->dpi), static_cast<int>(s->items.size()));
                 if (idx != s->hoveredIdx) {
                     s->hoveredIdx = idx;
                     InvalidateRect(hWnd, nullptr, FALSE);
@@ -15004,10 +15059,9 @@ static LRESULT CALLBACK WinUI3ComboFlyoutWndProc(HWND hWnd, UINT uMsg, WPARAM wP
         case WM_LBUTTONUP: {
             if (s) {
                 int y = (short)HIWORD(lParam);
-                float pad = DpiScaleF(5.0f, s->dpi);
-                float rowH = DpiScaleF(36.0f, s->dpi);
-                int idx = static_cast<int>(std::floor((y + s->scrollY - pad) / rowH));
-                if (idx >= 0 && idx < (int)s->items.size()) {
+                const int idx = GetDropdownRowIndex(y, s->scrollY, DpiScale(kDropdownPad, s->dpi),
+                                                    DpiScale(kDropdownRowHeight, s->dpi), static_cast<int>(s->items.size()));
+                if (idx >= 0) {
                     s->chosenId = s->items[idx].first;
                 }
                 s->done = true;
@@ -15079,8 +15133,8 @@ int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<st
     session.items = items;
     session.checkedId = checkedId;
 
-    int padPx = DpiScale(5, session.dpi);
-    int rowPx = DpiScale(36, session.dpi);
+    int padPx = DpiScale(kDropdownPad, session.dpi);
+    int rowPx = DpiScale(kDropdownRowHeight, session.dpi);
     int totalH = padPx * 2 + rowPx * static_cast<int>(items.size());
     int maxVisH = DpiScale(372, session.dpi);
     int popH = (std::min)(totalH, maxVisH);
@@ -15151,6 +15205,12 @@ static LRESULT CALLBACK AddAliasDialogWndProc(HWND hWnd, UINT uMsg, WPARAM wPara
             if (s) s->hWnd = hWnd;
             return 0;
         }
+        case WM_CTLCOLORSTATIC: {
+            const auto dc = reinterpret_cast<HDC>(wParam);
+            SetBkMode(dc, TRANSPARENT);
+            SetTextColor(dc, GetSysColor(COLOR_WINDOWTEXT));
+            return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_WINDOW));
+        }
         case WM_COMMAND: {
             if (!s) break;
             int id = LOWORD(wParam);
@@ -15201,7 +15261,22 @@ static bool ShowAddAliasDialog(HWND hOwner, bool isLight, bool isViUI, UINT dpi,
     RegisterClassExW(&wc);
 
     AddAliasDialogSession sess;
-    int cw = DpiScale(420, dpi), ch = DpiScale(210, dpi);
+    constexpr int contentWidth = 420;
+    constexpr int inset = kSettingsCardInset;
+    constexpr int labelHeight = 20;
+    constexpr int labelGap = 4;
+    constexpr int fieldHeight = 26;
+    constexpr int groupGap = 12;
+    constexpr int checkboxHeight = 22;
+    constexpr int fieldWidth = contentWidth - 2 * inset;
+    constexpr int targetTop = inset + labelHeight + labelGap + fieldHeight + groupGap;
+    constexpr int checkboxTop = targetTop + labelHeight + labelGap + fieldHeight + groupGap;
+    constexpr int buttonTop = checkboxTop + checkboxHeight + groupGap;
+    constexpr int buttonWidth = 82;
+    constexpr int buttonGap = 8;
+    constexpr int cancelLeft = contentWidth - inset - buttonWidth;
+    const int cw = DpiScale(contentWidth, dpi);
+    const int ch = DpiScale(buttonTop + kSettingsControlHeight + inset, dpi);
     DWORD style = WS_POPUP | WS_CAPTION | WS_SYSMENU;
     RECT rcAdj = { 0, 0, cw, ch };
     AdjustWindowRectEx(&rcAdj, style, FALSE, WS_EX_DLGMODALFRAME);
@@ -15234,14 +15309,20 @@ static bool ShowAddAliasDialog(HWND hOwner, bool isLight, bool isViUI, UINT dpi,
         return hc;
     };
 
-    addCtrl(L"STATIC", isViUI ? L"Lệnh tắt (ví dụ: hosts, ws):" : L"Alias keyword (e.g. hosts, ws):", 0, 0, 16, 14, 388, 20, 0);
-    sess.hEditAlias = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE, 16, 36, 388, 26, 101);
-    addCtrl(L"STATIC", isViUI ? L"Lệnh hoặc đường dẫn đích:" : L"Target command or path:", 0, 0, 16, 72, 388, 20, 0);
-    sess.hEditCmd = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE, 16, 94, 388, 26, 102);
+    addCtrl(L"STATIC", isViUI ? L"Lệnh tắt (ví dụ: hosts, ws):" : L"Alias keyword (e.g. hosts, ws):", 0, 0,
+            inset, inset, fieldWidth, labelHeight, 0);
+    sess.hEditAlias = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
+                              inset, inset + labelHeight + labelGap, fieldWidth, fieldHeight, 101);
+    addCtrl(L"STATIC", isViUI ? L"Lệnh hoặc đường dẫn đích:" : L"Target command or path:", 0, 0,
+            inset, targetTop, fieldWidth, labelHeight, 0);
+    sess.hEditCmd = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
+                            inset, targetTop + labelHeight + labelGap, fieldWidth, fieldHeight, 102);
     sess.hChkAdmin = addCtrl(L"BUTTON", isViUI ? L"Chạy với quyền Quản trị viên (Admin)" : L"Run as Administrator",
-                             WS_TABSTOP | BS_AUTOCHECKBOX, 0, 16, 130, 300, 22, 103);
-    addCtrl(L"BUTTON", isViUI ? L"Thêm" : L"Add", WS_TABSTOP | BS_DEFPUSHBUTTON, 0, 232, 164, 82, 30, IDOK);
-    addCtrl(L"BUTTON", isViUI ? L"Hủy" : L"Cancel", WS_TABSTOP, 0, 322, 164, 82, 30, IDCANCEL);
+                             WS_TABSTOP | BS_AUTOCHECKBOX, 0, inset, checkboxTop, fieldWidth, checkboxHeight, 103);
+    addCtrl(L"BUTTON", isViUI ? L"Thêm" : L"Add", WS_TABSTOP | BS_DEFPUSHBUTTON, 0,
+            cancelLeft - buttonGap - buttonWidth, buttonTop, buttonWidth, kSettingsControlHeight, IDOK);
+    addCtrl(L"BUTTON", isViUI ? L"Hủy" : L"Cancel", WS_TABSTOP, 0,
+            cancelLeft, buttonTop, buttonWidth, kSettingsControlHeight, IDCANCEL);
 
     if (hOwner) EnableWindow(hOwner, FALSE);
     ShowWindow(hDlg, SW_SHOWNORMAL);
@@ -16763,11 +16844,15 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     }
                                 }
 
-                                float rightLimit = (float)w - DpiScaleSF(20.0f, state) - sbReserve;
+                                const float rowCenter = rowTop + rowH * 0.5f;
+                                const float insetRight = static_cast<float>(w) - DpiScaleS(kBasePanelInset, state) - sbReserve;
+                                const float statusX = insetRight - DpiScaleSF(16.0f, state);
+                                float rightLimit = insetRight - DpiScaleSF(10.0f, state);
                                 const auto& rowItem = activeRows[i];
 
                                 if (!rowItem.isSuggestion && state->settings.showTimestamp && pFmtTime && pBrTime && !rowItem.timeStr.empty()) {
-                                    rightLimit = (float)w - DpiScaleSF(44.0f, state) - sbReserve;
+                                    const float timeRight = statusX - DpiScaleSF(16.0f, state);
+                                    rightLimit = timeRight;
                                     const std::wstring& tStr = rowItem.timeStr;
                                     const float maxTimeWidth = (std::min)(DpiScaleSF(220.0f, state), w * 0.48f);
                                     IDWriteTextLayout* pTimeLayout = nullptr;
@@ -16775,9 +16860,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             tStr.c_str(), (UINT32)tStr.size(), pFmtTime, maxTimeWidth, rowH, &pTimeLayout))) {
                                         DWRITE_TEXT_METRICS tm = {};
                                         pTimeLayout->GetMetrics(&tm);
-                                        float timeRight = (float)w - DpiScaleSF(44.0f, state) - sbReserve;
-                                        pRT->DrawTextLayout(D2D1::Point2F(timeRight - maxTimeWidth, rowTop),
-                                                            pTimeLayout, pBrTime);
+                                        pRT->DrawTextLayout(D2D1::Point2F(timeRight - maxTimeWidth, GetCenteredInkTop(pTimeLayout, rowTop, rowH)),
+                                                            pTimeLayout, pBrTime, D2D1_DRAW_TEXT_OPTIONS_CLIP);
                                         rightLimit = timeRight - (std::min)(maxTimeWidth, tm.widthIncludingTrailingWhitespace) -
                                                      DpiScaleSF(12.0f, state);
                                         pTimeLayout->Release();
@@ -16789,28 +16873,28 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             : D2D1::ColorF(1.00f, 0.78f, 0.28f, 0.95f);
                                         if (SUCCEEDED(pRT->CreateSolidColorBrush(pinCol, &pPinBr))) {
                                             DrawD2DPinVector(pRT, pPinBr, pRoundStroke,
-                                                             (float)w - DpiScaleSF(28.0f, state) - sbReserve, rowTop + rowH * 0.5f, effectiveDpi);
+                                                             statusX, rowCenter, effectiveDpi);
                                             pPinBr->Release();
                                         }
                                     } else {
                                         DrawD2DClockVector(pRT, pBrTime, pRoundStroke,
-                                                           (float)w - DpiScaleSF(28.0f, state) - sbReserve, rowTop + rowH * 0.5f, effectiveDpi);
+                                                           statusX, rowCenter, effectiveDpi);
                                     }
                                 } else if (!rowItem.isSuggestion && rowItem.isPinned && pRoundStroke) {
-                                    rightLimit = (float)w - DpiScaleSF(40.0f, state) - sbReserve;
+                                    rightLimit = statusX - DpiScaleSF(13.0f, state);
                                     ID2D1SolidColorBrush* pPinBr = nullptr;
                                     D2D1_COLOR_F pinCol = isLight
                                         ? D2D1::ColorF(0.82f, 0.45f, 0.05f, 0.95f)
                                         : D2D1::ColorF(1.00f, 0.78f, 0.28f, 0.95f);
                                     if (SUCCEEDED(pRT->CreateSolidColorBrush(pinCol, &pPinBr))) {
                                         DrawD2DPinVector(pRT, pPinBr, pRoundStroke,
-                                                         (float)w - DpiScaleSF(28.0f, state) - sbReserve, rowTop + rowH * 0.5f, effectiveDpi);
+                                                         statusX, rowCenter, effectiveDpi);
                                         pPinBr->Release();
                                     }
                                 } else if (rowItem.isSuggestion && pBrTime && pRoundStroke) {
-                                    rightLimit = (float)w - DpiScaleSF(40.0f, state) - sbReserve;
+                                    rightLimit = statusX - DpiScaleSF(13.0f, state);
                                     DrawD2DReturnArrowVector(pRT, pBrTime, pRoundStroke,
-                                                             (float)w - DpiScaleSF(27.0f, state) - sbReserve, rowTop + rowH * 0.5f, effectiveDpi);
+                                                             statusX, rowCenter, effectiveDpi);
                                 }
 
                                 if (pFmtRow && pBrPrimary) {
@@ -16821,9 +16905,9 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                         fullStr += L"   –   " + appStr;
                                     }
 
-                                    float availW = (std::max)(DpiScaleSF(40.0f, state), rightLimit - textLeftX);
+                                    const float availW = (std::max)(0.0f, rightLimit - textLeftX);
                                     IDWriteTextLayout* pRowLayout = nullptr;
-                                    if (SUCCEEDED(g_pDWriteFactory->CreateTextLayout(
+                                    if (availW > 0.0f && SUCCEEDED(g_pDWriteFactory->CreateTextLayout(
                                             fullStr.c_str(), (UINT32)fullStr.size(), pFmtRow, availW, rowH, &pRowLayout))) {
                                         DWRITE_TEXT_RANGE cmdRange = { 0, (UINT32)cmdStr.size() };
                                         pRowLayout->SetFontWeight(DWRITE_FONT_WEIGHT_SEMI_BOLD, cmdRange);
@@ -16836,7 +16920,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             pRowLayout->SetDrawingEffect(pBrSecondary, appRange);
                                         }
 
-                                        pRT->DrawTextLayout(D2D1::Point2F(textLeftX, rowTop),
+                                        pRT->DrawTextLayout(D2D1::Point2F(textLeftX, GetCenteredInkTop(pRowLayout, rowTop, rowH)),
                                                             pRowLayout, pBrPrimary, D2D1_DRAW_TEXT_OPTIONS_CLIP);
                                         pRowLayout->Release();
                                     }
@@ -17069,7 +17153,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                         rcBtn.top,
                                         rcBtn.right - DpiScaleSF(26.0f, state),
                                         rcBtn.bottom);
-                                    pRT->DrawText(label, (UINT32)wcslen(label), pFmtBtn, rcText, pContentBr);
+                                    pRT->DrawText(label, (UINT32)wcslen(label), pFmtBtn, rcText, pContentBr, D2D1_DRAW_TEXT_OPTIONS_CLIP);
                                 }
 
                                 if (kind == ActionBtnKind::Gear) {
@@ -17181,12 +17265,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
 
                                         DrawD2DShieldVector(pRT, pBrAmberBanner, pRoundStroke,
                                                             groupStartX + DpiScaleSF(6.0f, state), centerY, effectiveDpi, 0.90f);
-                                        DWRITE_OVERHANG_METRICS ink{};
-                                        float textY = rcAdminPill.top;
-                                        if (SUCCEEDED(pFinalLayout->GetOverhangMetrics(&ink)) &&
-                                            adminH + ink.top + ink.bottom > 0.0f) {
-                                            textY = centerY - (adminH + ink.bottom - ink.top) * 0.5f;
-                                        }
+                                        const float textY = GetCenteredInkTop(pFinalLayout, rcAdminPill.top, static_cast<float>(adminH));
                                         pRT->DrawTextLayout(D2D1::Point2F(groupStartX + iconSlotW, textY),
                                                             pFinalLayout, pBrAmberBanner,
                                                             D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_NO_SNAP);

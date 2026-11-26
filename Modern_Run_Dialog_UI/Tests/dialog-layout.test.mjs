@@ -154,8 +154,9 @@ test('vertical panel insets center controls with at most a one-pixel difference'
 });
 
 test('history with one row has the same height as the input panel across scales', () => {
-    const sizing = source.match(/int GetInputBarHeight\([\s\S]*?(?=\ninline bool HasActiveCustomBackground)/)?.[0];
-    assert.ok(sizing, 'The production layout calculations are present');
+    const bar = source.match(/int GetInputBarHeight\([\s\S]*?constexpr int GetVerticalPanelInset\([\s\S]*?\n\}/)?.[0];
+    const list = source.match(/int GetListPadding\([\s\S]*?int GetRowHeight\([\s\S]*?\n\}/)?.[0];
+    assert.ok(bar && list, 'The production layout calculations are present');
     compileChecks(`
         #include <algorithm>
         #include <cassert>
@@ -177,7 +178,8 @@ test('history with one row has the same height as the input panel across scales'
         int DpiScaleS(int value, const RunDialogState* state) {
             return DpiScale(value, state->dpi, state->scale);
         }
-        ${sizing}
+        ${bar}
+        ${list}
         int main() {
             const RunDialogState profiles[] = {
                 {{0}, 96, 100}, {{0}, 96, 85}, {{0}, 144, 120},
@@ -294,6 +296,24 @@ test('context menus can keep their own border or override the window border poli
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Off) == Window::Off);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Windows, Window::Off) == Window::Windows);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Off, Window::Windows) == Window::Off);
+    `);
+});
+
+test('centered rows split spare space and keep dropdown input within its rows', () => {
+    const inset = source.match(/constexpr float GetCenteredInset\([\s\S]*?\n\}/)?.[0];
+    const hit = source.match(/constexpr int GetDropdownRowIndex\([\s\S]*?\n\}/)?.[0];
+    assert.ok(inset && hit);
+    compileChecks(`
+        ${inset}
+        ${hit}
+        static_assert(GetCenteredInset(36, 32) == 2);
+        static_assert(GetCenteredInset(67, 32) == 17.5f);
+        static_assert(GetCenteredInset(32, 36) == 0);
+        static_assert(GetDropdownRowIndex(4, 0, 5, 36, 3) == -1);
+        static_assert(GetDropdownRowIndex(5, 0, 5, 36, 3) == 0);
+        static_assert(GetDropdownRowIndex(41, 0, 5, 36, 3) == 1);
+        static_assert(GetDropdownRowIndex(113, 0, 5, 36, 3) == -1);
+        static_assert(GetDropdownRowIndex(7, 45, 6, 45, 4) == 1);
     `);
 });
 
