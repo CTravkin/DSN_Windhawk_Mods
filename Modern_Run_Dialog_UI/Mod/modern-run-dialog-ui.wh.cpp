@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.8.6
+// @version         6.8.7
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 43
+// Build: 44
 
 // ==WindhawkModReadme==
 /*
@@ -14498,7 +14498,8 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 43)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 44)";
+constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
     const wchar_t* winTitle;
@@ -15373,24 +15374,31 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(12.5f), L"", &pFmtCtl);
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.0f), L"", &pFmtRight);
         const wchar_t* iconFont = GetWindowsIconFontFamily();
-        const bool legacyIconFont = wcscmp(iconFont, L"Segoe MDL2 Assets") == 0;
         g_pDWriteFactory->CreateTextFormat(iconFont, nullptr, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(16.0f), L"", &pFmtGlyph);
         if (pFmtNav)   pFmtNav->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
         if (pFmtCtl)   { pFmtCtl->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtCtl->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtRight) { pFmtRight->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING); pFmtRight->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtGlyph) { pFmtGlyph->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtGlyph->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
+        winrt::com_ptr<IDWriteTextFormat> colorModeFormat;
+        if (st->activeTab == 0 &&
+            SUCCEEDED(g_pDWriteFactory->CreateTextFormat(L"Segoe UI Symbol", nullptr,
+                DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+                S(22.0f), L"", colorModeFormat.put()))) {
+            colorModeFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER);
+            colorModeFormat->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+        }
         auto drawSettingsGlyph = [&](const wchar_t* glyph, const D2D1_RECT_F& rect, ID2D1Brush* brush,
                                      bool rotate = false) {
-            if (legacyIconFont && *glyph == L'\uE7A1') glyph = L"\uE706";
+            auto* format = *glyph == kColorModeSettingsGlyph[0] ? colorModeFormat.get() : pFmtGlyph;
             if (!rotate) {
-                DrawCenteredText(pRT, glyph, 1, pFmtGlyph, rect, brush);
+                DrawCenteredText(pRT, glyph, 1, format, rect, brush);
                 return;
             }
             D2D1::Matrix3x2F transform;
             pRT->GetTransform(&transform);
             const auto center = D2D1::Point2F((rect.left + rect.right) * 0.5f, (rect.top + rect.bottom) * 0.5f);
             pRT->SetTransform(D2D1::Matrix3x2F::Rotation(180.0f, center) * transform);
-            DrawCenteredText(pRT, glyph, 1, pFmtGlyph, rect, brush);
+            DrawCenteredText(pRT, glyph, 1, format, rect, brush);
             pRT->SetTransform(transform);
         };
 
@@ -15659,7 +15667,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             std::wstring cmLbl = (st->settings.colorMode == ColorMode::Dark) ? ls.colorDark
                                : ((st->settings.colorMode == ColorMode::Light) ? ls.colorLight
                                                                                : ls.colorAuto);
-            drawDropdownRowInGroup(g1, y1 + rH, rH, 2100, L"\uE7A1",
+            drawDropdownRowInGroup(g1, y1 + rH, rH, 2100, kColorModeSettingsGlyph,
                 ls.colorTitle,
                 ls.colorSub,
                 cmLbl);

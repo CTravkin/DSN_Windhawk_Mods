@@ -109,7 +109,10 @@ test('approved settings glyphs keep the selected shapes and orientation', () => 
     assert.match(source, /2506, L"\\uE90E"/);
     assert.match(source, /2213, 2214, 2215, L"\\uE744",\s*cornerStrings\.innerTitle, cornerStrings\.innerHint, innerRadius, true/);
     assert.match(source, /Matrix3x2F::Rotation\(180\.0f, center\) \* transform/);
-    assert.match(source, /legacyIconFont && \*glyph == L'\\uE7A1'\) glyph = L"\\uE706"/);
+    assert.match(source, /kColorModeSettingsGlyph\[\] = L"\\u25D0"/);
+    assert.match(source, /2100, kColorModeSettingsGlyph,/);
+    assert.match(source, /CreateTextFormat\(L"Segoe UI Symbol",[^;]+colorModeFormat\.put\(\)/);
+    assert.match(source, /\*glyph == kColorModeSettingsGlyph\[0\] \? colorModeFormat\.get\(\) : pFmtGlyph/);
     assert.match(source, /drawAliasButton\(rcAdm, 2800 \+ i, L"\\uEA18"/);
     assert.match(source, /drawAliasButton\(rcDel, 2900 \+ i, L"\\uE894"/);
 });
