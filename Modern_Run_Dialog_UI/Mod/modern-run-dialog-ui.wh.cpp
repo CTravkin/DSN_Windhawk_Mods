@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.7
+// @version         6.7.0
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 30
+// Build: 32
 
 // ==WindhawkModReadme==
 /*
@@ -76,7 +76,8 @@ Replaces the classic Win32 **Run (`Win + R`)** and **Task Manager "Create new ta
 
 - **Task Manager Support, Pinning, Custom Aliases & Safe Elevation:**
   - Supports **Task Manager → Run new task** while respecting Task Manager's own elevation checkbox (including for `google:` and `Shift + Enter` terminal launches).
-  - Supports **Pinned Commands**, **Custom Command Aliases** (e.g., `hosts`), **`Ctrl + Shift + Enter`** one-time Administrator elevation, **`Shift + Enter`** terminal execution, and optional **Remember Last Window Position**.
+  - Supports **Pinned Commands**, **Custom Command Aliases** (e.g., `hosts`), and optional **Remember Last Window Position**.
+  - Hold **Ctrl + Shift** to preview the opposite privilege level, then press **Enter** to use it for the current command. **Shift + Enter** runs in a terminal by default and can also be configured to switch privileges.
 
 - **Instant Math Calculator, Live App Suggestions & Web Search (`google:`):**
   - Evaluate math expressions directly in the Run box (`1+1`, `(25*4)/2`, `sqrt(144)`, `sin(pi/2)`, `2^10`) and click or press `Enter` to copy/insert the result.
@@ -117,7 +118,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - **Hỗ trợ Task Manager, Ghim lệnh, Bí danh (Alias) & Chạy Admin an toàn:**
   - Hoạt động đồng bộ trên cả `Win + R` lẫn **Task Manager → Chạy tác vụ mới** và tôn trọng đúng tùy chọn quyền quản trị của Task Manager (kể cả với `google:` và `Shift + Enter`).
-  - Hỗ trợ **ghim lệnh yêu thích**, **bí danh lệnh tùy chỉnh** (ví dụ `hosts`), chạy Admin nhanh 1 lần bằng **`Ctrl + Shift + Enter`**, mở lệnh trong Terminal bằng **`Shift + Enter`** và tùy chọn **Nhớ vị trí cửa sổ lần cuối**.
+  - Hỗ trợ **ghim lệnh yêu thích**, **bí danh lệnh tùy chỉnh** (ví dụ `hosts`) và tùy chọn **Nhớ vị trí cửa sổ lần cuối**.
+  - Giữ **Ctrl + Shift** để xem trước mức quyền ngược lại, rồi nhấn **Enter** để dùng cho lệnh hiện tại. **Shift + Enter** mặc định chạy lệnh trong terminal và có thể được cấu hình để đổi quyền.
 
 - **Máy tính nhanh, Gợi ý ứng dụng tức thì & Tìm kiếm Google (`google:`):**
   - Gõ trực tiếp phép tính (`1+1`, `(25*4)/2`, `sqrt(144)`, `sin(pi/2)`, `2^10`) để xem kết quả ngay trên đầu danh sách; nhấn `Enter` hoặc nhấp chuột để chép/điền kết quả.
@@ -882,6 +884,133 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $options:ar:
     - mod: نمط التعديل
     - windows_fluent: Windows (Fluent)
+  - dialogWidthPreset: layout
+    $name: "Window width"
+    $description: "Set the width of the Run window"
+    $options:
+    - layout: "Layout default"
+    - narrow: "Narrow"
+    - wide: "Wide"
+    $name:ru-RU: "Ширина окна"
+    $description:ru-RU: "Задает ширину окна «Выполнить»"
+    $options:ru-RU:
+    - layout: "Определено макетом"
+    - narrow: "Узкое"
+    - wide: "Широкое"
+    $name:vi-VN: "Chiều rộng cửa sổ"
+    $description:vi-VN: "Đặt chiều rộng của cửa sổ Run"
+    $options:vi-VN:
+    - layout: "Theo bố cục"
+    - narrow: "Hẹp"
+    - wide: "Rộng"
+    $name:th-TH: "ความกว้างหน้าต่าง"
+    $description:th-TH: "กำหนดความกว้างของหน้าต่าง Run"
+    $options:th-TH:
+    - layout: "ตามเค้าโครง"
+    - narrow: "แคบ"
+    - wide: "กว้าง"
+    $name:id-ID: "Lebar jendela"
+    $description:id-ID: "Atur lebar jendela Run"
+    $options:id-ID:
+    - layout: "Sesuai tata letak"
+    - narrow: "Sempit"
+    - wide: "Lebar"
+    $name:ms-MY: "Lebar tetingkap"
+    $description:ms-MY: "Tetapkan lebar tetingkap Run"
+    $options:ms-MY:
+    - layout: "Mengikut susun atur"
+    - narrow: "Sempit"
+    - wide: "Lebar"
+    $name:ja-JP: "ウィンドウの幅"
+    $description:ja-JP: "「ファイル名を指定して実行」のウィンドウ幅を設定"
+    $options:ja-JP:
+    - layout: "レイアウトに従う"
+    - narrow: "狭い"
+    - wide: "広い"
+    $name:zh-CN: "窗口宽度"
+    $description:zh-CN: "设置“运行”窗口的宽度"
+    $options:zh-CN:
+    - layout: "由布局决定"
+    - narrow: "窄"
+    - wide: "宽"
+    $name:zh-TW: "視窗寬度"
+    $description:zh-TW: "設定「執行」視窗的寬度"
+    $options:zh-TW:
+    - layout: "依版面配置"
+    - narrow: "窄"
+    - wide: "寬"
+    $name:ko-KR: "창 너비"
+    $description:ko-KR: "실행 창의 너비를 설정"
+    $options:ko-KR:
+    - layout: "레이아웃 기본값"
+    - narrow: "좁게"
+    - wide: "넓게"
+    $name:fr-FR: "Largeur de la fenêtre"
+    $description:fr-FR: "Définit la largeur de la fenêtre Exécuter"
+    $options:fr-FR:
+    - layout: "Selon la disposition"
+    - narrow: "Étroite"
+    - wide: "Large"
+    $name:de-DE: "Fensterbreite"
+    $description:de-DE: "Legt die Breite des Fensters „Ausführen“ fest"
+    $options:de-DE:
+    - layout: "Nach Layout"
+    - narrow: "Schmal"
+    - wide: "Breit"
+    $name:es-ES: "Ancho de ventana"
+    $description:es-ES: "Ajusta el ancho de la ventana Ejecutar"
+    $options:es-ES:
+    - layout: "Según el diseño"
+    - narrow: "Estrecha"
+    - wide: "Ancha"
+    $name:pt-BR: "Largura da janela"
+    $description:pt-BR: "Define a largura da janela Executar"
+    $options:pt-BR:
+    - layout: "Conforme o layout"
+    - narrow: "Estreita"
+    - wide: "Larga"
+    $name:it-IT: "Larghezza della finestra"
+    $description:it-IT: "Imposta la larghezza della finestra Esegui"
+    $options:it-IT:
+    - layout: "Secondo il layout"
+    - narrow: "Stretta"
+    - wide: "Larga"
+    $name:uk-UA: "Ширина вікна"
+    $description:uk-UA: "Задає ширину вікна «Виконати»"
+    $options:uk-UA:
+    - layout: "За макетом"
+    - narrow: "Вузьке"
+    - wide: "Широке"
+    $name:pl-PL: "Szerokość okna"
+    $description:pl-PL: "Ustawia szerokość okna Uruchamianie"
+    $options:pl-PL:
+    - layout: "Zgodnie z układem"
+    - narrow: "Wąskie"
+    - wide: "Szerokie"
+    $name:nl-NL: "Vensterbreedte"
+    $description:nl-NL: "Stelt de breedte van het venster Uitvoeren in"
+    $options:nl-NL:
+    - layout: "Volgens indeling"
+    - narrow: "Smal"
+    - wide: "Breed"
+    $name:tr-TR: "Pencere genişliği"
+    $description:tr-TR: "Çalıştır penceresinin genişliğini ayarlar"
+    $options:tr-TR:
+    - layout: "Düzene göre"
+    - narrow: "Dar"
+    - wide: "Geniş"
+    $name:hi-IN: "विंडो की चौड़ाई"
+    $description:hi-IN: "रन विंडो की चौड़ाई सेट करें"
+    $options:hi-IN:
+    - layout: "लेआउट के अनुसार"
+    - narrow: "संकरा"
+    - wide: "चौड़ा"
+    $name:ar: "عرض النافذة"
+    $description:ar: "يضبط عرض نافذة تشغيل"
+    $options:ar:
+    - layout: "حسب التخطيط"
+    - narrow: "ضيق"
+    - wide: "عريض"
   - uiScalePercent: "100"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
@@ -1087,18 +1216,203 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $options:
     - minimize: Minimize – Restore
     - close: Close Window
-  - runAsAdmin: false
-    $name: Run Commands with Administrative Privileges
-    $name:vi-VN: Cho phép chạy với quyền quản trị
-    $description: Run commands as Administrator by default (can also be toggled anytime from the Gear menu with confirmation).
-    $description:vi-VN: Chạy lệnh với quyền Quản trị viên (có thể bật/tắt trực tiếp kèm xác nhận trong menu Bánh răng).
   - closeOnClickOutside: false
     $name: Close on Click Outside
     $name:vi-VN: Tự động đóng khi bấm ra ngoài cửa sổ
     $description: Automatically close the Run dialog when clicking outside the window.
     $description:vi-VN: Tự động đóng hộp thoại Run khi click chuột ra ngoài cửa sổ.
-  $name: 3. History & Behavior
-  $name:vi-VN: 3. Lịch sử lệnh & Hành vi cửa sổ
+  - runAsAdmin: false
+    $name: "Elevate by default"
+    $description: "Ctrl+Shift+Enter switches privileges for the current command"
+    $name:ru-RU: "Повышать права по умолчанию"
+    $description:ru-RU: "Ctrl+Shift+Enter меняет права для текущей команды"
+    $name:vi-VN: "Nâng quyền theo mặc định"
+    $description:vi-VN: "Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại"
+    $name:th-TH: "ยกระดับสิทธิ์ตามค่าเริ่มต้น"
+    $description:th-TH: "Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน"
+    $name:id-ID: "Tingkatkan hak akses secara default"
+    $description:id-ID: "Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini"
+    $name:ms-MY: "Tingkatkan keistimewaan secara lalai"
+    $description:ms-MY: "Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa"
+    $name:ja-JP: "既定で管理者権限で実行"
+    $description:ja-JP: "Ctrl+Shift+Enter で現在のコマンドの権限を切り替え"
+    $name:zh-CN: "默认提升权限"
+    $description:zh-CN: "Ctrl+Shift+Enter 切换当前命令的权限"
+    $name:zh-TW: "預設提高權限"
+    $description:zh-TW: "Ctrl+Shift+Enter 切換目前命令的權限"
+    $name:ko-KR: "기본적으로 권한 상승"
+    $description:ko-KR: "Ctrl+Shift+Enter로 현재 명령의 권한을 전환"
+    $name:fr-FR: "Élever les privilèges par défaut"
+    $description:fr-FR: "Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle"
+    $name:de-DE: "Standardmäßig mit erhöhten Rechten"
+    $description:de-DE: "Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl"
+    $name:es-ES: "Elevar los permisos de forma predeterminada"
+    $description:es-ES: "Ctrl+Mayús+Entrar cambia los permisos del comando actual"
+    $name:pt-BR: "Elevar privilégios por padrão"
+    $description:pt-BR: "Ctrl+Shift+Enter alterna os privilégios do comando atual"
+    $name:it-IT: "Eleva i privilegi per impostazione predefinita"
+    $description:it-IT: "Ctrl+Maiusc+Invio cambia i privilegi del comando corrente"
+    $name:uk-UA: "Підвищувати права за замовчуванням"
+    $description:uk-UA: "Ctrl+Shift+Enter змінює права для поточної команди"
+    $name:pl-PL: "Domyślnie podnoś uprawnienia"
+    $description:pl-PL: "Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia"
+    $name:nl-NL: "Standaard met verhoogde rechten"
+    $description:nl-NL: "Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht"
+    $name:tr-TR: "Varsayılan olarak yetkileri yükselt"
+    $description:tr-TR: "Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir"
+    $name:hi-IN: "डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ"
+    $description:hi-IN: "Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है"
+    $name:ar: "رفع الامتيازات افتراضيًا"
+    $description:ar: "يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي"
+  - adminIndicator: panel
+    $name: "Indicator placement"
+    $options:
+    - panel: "Separate panel"
+    - field: "Inline indicator"
+    $name:ru-RU: "Размещение индикатора"
+    $options:ru-RU:
+    - panel: "Отдельная панель"
+    - field: "Индикатор в поле"
+    $name:vi-VN: "Vị trí chỉ báo"
+    $options:vi-VN:
+    - panel: "Bảng riêng"
+    - field: "Chỉ báo trong ô nhập"
+    $name:th-TH: "ตำแหน่งตัวบ่งชี้"
+    $options:th-TH:
+    - panel: "แผงแยก"
+    - field: "ตัวบ่งชี้ในช่องป้อนข้อมูล"
+    $name:id-ID: "Posisi indikator"
+    $options:id-ID:
+    - panel: "Panel terpisah"
+    - field: "Indikator di kolom input"
+    $name:ms-MY: "Kedudukan penunjuk"
+    $options:ms-MY:
+    - panel: "Panel berasingan"
+    - field: "Penunjuk dalam medan input"
+    $name:ja-JP: "インジケーターの位置"
+    $options:ja-JP:
+    - panel: "独立したパネル"
+    - field: "入力欄内のインジケーター"
+    $name:zh-CN: "指示器位置"
+    $options:zh-CN:
+    - panel: "独立面板"
+    - field: "输入框内指示器"
+    $name:zh-TW: "指示器位置"
+    $options:zh-TW:
+    - panel: "獨立面板"
+    - field: "輸入欄內指示器"
+    $name:ko-KR: "표시기 위치"
+    $options:ko-KR:
+    - panel: "별도의 패널"
+    - field: "입력란 안에 표시"
+    $name:fr-FR: "Emplacement de l’indicateur"
+    $options:fr-FR:
+    - panel: "Panneau séparé"
+    - field: "Indicateur dans le champ"
+    $name:de-DE: "Position der Anzeige"
+    $options:de-DE:
+    - panel: "Separater Bereich"
+    - field: "Anzeige im Eingabefeld"
+    $name:es-ES: "Ubicación del indicador"
+    $options:es-ES:
+    - panel: "Panel separado"
+    - field: "Indicador en el campo"
+    $name:pt-BR: "Posição do indicador"
+    $options:pt-BR:
+    - panel: "Painel separado"
+    - field: "Indicador no campo"
+    $name:it-IT: "Posizione dell’indicatore"
+    $options:it-IT:
+    - panel: "Pannello separato"
+    - field: "Indicatore nel campo"
+    $name:uk-UA: "Розташування індикатора"
+    $options:uk-UA:
+    - panel: "Окрема панель"
+    - field: "Індикатор у полі"
+    $name:pl-PL: "Położenie wskaźnika"
+    $options:pl-PL:
+    - panel: "Oddzielny panel"
+    - field: "Wskaźnik w polu"
+    $name:nl-NL: "Positie van indicator"
+    $options:nl-NL:
+    - panel: "Apart paneel"
+    - field: "Indicator in het veld"
+    $name:tr-TR: "Gösterge konumu"
+    $options:tr-TR:
+    - panel: "Ayrı panel"
+    - field: "Giriş alanında gösterge"
+    $name:hi-IN: "संकेतक का स्थान"
+    $options:hi-IN:
+    - panel: "अलग पैनल"
+    - field: "इनपुट फ़ील्ड में संकेतक"
+    $name:ar: "موضع المؤشر"
+    $options:ar:
+    - panel: "لوحة منفصلة"
+    - field: "مؤشر في حقل الإدخال"
+  - shiftEnterSwitchesPrivileges: false
+    $name: "Switch privileges with Shift+Enter"
+    $description: "When off, Shift+Enter runs the command in a terminal"
+    $name:ru-RU: "Менять права по Shift+Enter"
+    $description:ru-RU: "Если выключено, Shift+Enter запускает команду в терминале"
+    $name:vi-VN: "Đổi quyền bằng Shift+Enter"
+    $description:vi-VN: "Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"
+    $name:th-TH: "สลับสิทธิ์ด้วย Shift+Enter"
+    $description:th-TH: "เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"
+    $name:id-ID: "Ganti hak akses dengan Shift+Enter"
+    $description:id-ID: "Jika nonaktif, Shift+Enter menjalankan perintah di terminal"
+    $name:ms-MY: "Tukar keistimewaan dengan Shift+Enter"
+    $description:ms-MY: "Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"
+    $name:ja-JP: "Shift+Enter で権限を切り替え"
+    $description:ja-JP: "オフの場合、Shift+Enter でターミナル内でコマンドを実行"
+    $name:zh-CN: "用 Shift+Enter 切换权限"
+    $description:zh-CN: "关闭后，Shift+Enter 在终端中运行命令"
+    $name:zh-TW: "用 Shift+Enter 切換權限"
+    $description:zh-TW: "關閉時，Shift+Enter 會在終端機中執行命令"
+    $name:ko-KR: "Shift+Enter로 권한 전환"
+    $description:ko-KR: "끄면 Shift+Enter로 터미널에서 명령을 실행"
+    $name:fr-FR: "Changer les privilèges avec Maj+Entrée"
+    $description:fr-FR: "Si désactivé, Maj+Entrée lance la commande dans un terminal"
+    $name:de-DE: "Rechte mit Umschalt+Eingabe wechseln"
+    $description:de-DE: "Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"
+    $name:es-ES: "Cambiar permisos con Mayús+Entrar"
+    $description:es-ES: "Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"
+    $name:pt-BR: "Alternar privilégios com Shift+Enter"
+    $description:pt-BR: "Desativado, Shift+Enter executa o comando em um terminal"
+    $name:it-IT: "Cambia privilegi con Maiusc+Invio"
+    $description:it-IT: "Se disattivato, Maiusc+Invio esegue il comando in un terminale"
+    $name:uk-UA: "Змінювати права через Shift+Enter"
+    $description:uk-UA: "Якщо вимкнено, Shift+Enter запускає команду в терміналі"
+    $name:pl-PL: "Przełączaj uprawnienia klawiszami Shift+Enter"
+    $description:pl-PL: "Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"
+    $name:nl-NL: "Rechten wisselen met Shift+Enter"
+    $description:nl-NL: "Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"
+    $name:tr-TR: "Shift+Enter ile yetkileri değiştir"
+    $description:tr-TR: "Kapalıyken Shift+Enter komutu terminalde çalıştırır"
+    $name:hi-IN: "Shift+Enter से विशेषाधिकार बदलें"
+    $description:hi-IN: "बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"
+    $name:ar: "تبديل الامتيازات باستخدام Shift+Enter"
+    $description:ar: "عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"
+  $name: "3. Behavior"
+  $name:ru-RU: "3. Поведение"
+  $name:vi-VN: "3. Hành vi"
+  $name:th-TH: "3. ลักษณะการทำงาน"
+  $name:id-ID: "3. Perilaku"
+  $name:ms-MY: "3. Tingkah laku"
+  $name:ja-JP: "3. 動作"
+  $name:zh-CN: "3. 行为"
+  $name:zh-TW: "3. 行為"
+  $name:ko-KR: "3. 동작"
+  $name:fr-FR: "3. Comportement"
+  $name:de-DE: "3. Verhalten"
+  $name:es-ES: "3. Comportamiento"
+  $name:pt-BR: "3. Comportamento"
+  $name:it-IT: "3. Comportamento"
+  $name:uk-UA: "3. Поведінка"
+  $name:pl-PL: "3. Zachowanie"
+  $name:nl-NL: "3. Gedrag"
+  $name:tr-TR: "3. Davranış"
+  $name:hi-IN: "3. व्यवहार"
+  $name:ar: "3. السلوك"
 
 - customAliases:
   - - alias: "hosts"
@@ -1345,6 +1659,30 @@ struct CommandAlias {
 };
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
+enum class DialogWidthPreset { Layout, Narrow, Wide };
+enum class RunEnterAction { Normal, InvertElevation, Terminal };
+
+constexpr RunEnterAction ResolveRunEnterAction(bool shiftSwitchesPrivileges, bool shift, bool ctrl) {
+    if (!shift) return RunEnterAction::Normal;
+    return ctrl || shiftSwitchesPrivileges ? RunEnterAction::InvertElevation : RunEnterAction::Terminal;
+}
+
+constexpr bool ResolveRunElevation(bool defaultAdmin, RunEnterAction action) {
+    return defaultAdmin != (action == RunEnterAction::InvertElevation);
+}
+
+constexpr int GetLayoutWidthDip(DialogLayout layout, DialogWidthPreset preset) {
+    const int width = layout == DialogLayout::Pill ? 360 : layout == DialogLayout::Fluent ? 500 : 600;
+    switch (preset) {
+        case DialogWidthPreset::Narrow: return width * 7 / 10;
+        case DialogWidthPreset::Wide: return width * 13 / 10;
+        default: return width;
+    }
+}
+
+constexpr int FitDialogWidth(int requested, int controlWidth, int scaledInputMinimum) {
+    return (std::max)(requested, controlWidth + (std::max)(100, scaledInputMinimum));
+}
 enum class ContextMenuStyle { Mod, WindowsFluent };
 enum class WindowBorderMode { Mod, Windows, Off };
 enum class ContextMenuBorderMode { Own, Window, Windows, Off };
@@ -1417,6 +1755,7 @@ struct ModSettings {
     int customInnerCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
+    DialogWidthPreset dialogWidthPreset = DialogWidthPreset::Layout;
     ContextMenuStyle contextMenuStyle = ContextMenuStyle::Mod;
     ContextMenuBorderMode contextMenuBorderMode = ContextMenuBorderMode::Own;
     HiddenActions hiddenActions{};
@@ -1438,6 +1777,8 @@ struct ModSettings {
     bool clearInitialInput = false;
     bool closeOnClickOutside = false;
     bool runAsAdmin = false;
+    bool inlineAdminIndicator = false;
+    bool shiftEnterSwitchesPrivileges = false;
     std::vector<CommandAlias> customAliases;
 };
 
@@ -1643,8 +1984,7 @@ enum ToggleAction : WPARAM {
 };
 
 // Base dimensions at 96 DPI
-constexpr int kBaseDlgWidth = 636;
-constexpr int kBaseCompactDlgWidth  = 360;
+constexpr int kBaseDlgWidth = GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Layout);
 constexpr int kLegacyRowHeight      = 38;
 constexpr int kBasePanelInset       = 11;
 constexpr int kBaseRowHighlightInset = 2;
@@ -5348,6 +5688,7 @@ struct WindhawkRawSnapshot {
     std::wstring contextMenuBorderMode;
     HiddenActions hiddenActions{};
     std::wstring uiScalePercent;
+    std::wstring dialogWidthPreset;
     int customDialogWidth = 0;
     int customBarHeight = 0;
     int customFontSize = 0;
@@ -5358,6 +5699,8 @@ struct WindhawkRawSnapshot {
     int clearInitialInput = 0;
     int closeOnClickOutside = 0;
     int runAsAdmin = 0;
+    std::wstring adminIndicator;
+    int shiftEnterSwitchesPrivileges = 0;
     std::vector<CommandAlias> customAliases;
 };
 
@@ -5456,6 +5799,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
         curWh.hiddenActions[i] = Wh_GetIntSetting(L"actionButtonsGroup.%s", kHiddenActionKeys[i]) != 0;
     }
     curWh.uiScalePercent          = ReadGroupedStringSetting(L"layoutGroup.uiScalePercent", L"uiScalePercent", L"100");
+    curWh.dialogWidthPreset       = ReadGroupedStringSetting(L"layoutGroup.dialogWidthPreset", L"dialogWidthPreset", L"layout");
     curWh.customDialogWidth       = ReadGroupedIntSetting(L"layoutGroup.customDialogWidth", L"customDialogWidth", 0);
     curWh.customBarHeight         = ReadGroupedIntSetting(L"layoutGroup.customBarHeight", L"customBarHeight", 0);
     curWh.customFontSize          = ReadGroupedIntSetting(L"layoutGroup.customFontSize", L"customFontSize", 0);
@@ -5466,6 +5810,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.clearInitialInput       = (Wh_GetIntSetting(L"historyBehaviorGroup.clearInitialInput") != 0) ? 1 : 0;
     curWh.closeOnClickOutside     = (Wh_GetIntSetting(L"historyBehaviorGroup.closeOnClickOutside") != 0) ? 1 : 0;
     curWh.runAsAdmin              = (Wh_GetIntSetting(L"historyBehaviorGroup.runAsAdmin") != 0) ? 1 : 0;
+    curWh.adminIndicator          = ReadGroupedStringSetting(L"historyBehaviorGroup.adminIndicator", L"adminIndicator", L"panel");
+    curWh.shiftEnterSwitchesPrivileges = Wh_GetIntSetting(L"historyBehaviorGroup.shiftEnterSwitchesPrivileges");
     for (int i = 0; i < 64; ++i) {
         auto aStr = WindhawkUtils::StringSetting::make(L"customAliases[%d].alias", i);
         auto cStr = WindhawkUtils::StringSetting::make(L"customAliases[%d].command", i);
@@ -5501,6 +5847,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
                 dropIfChanged(curWh.hiddenActions[i] != g_lastWhSnapshot.hiddenActions[i], kHiddenActionKeys[i]);
             }
             dropIfChanged(curWh.uiScalePercent != g_lastWhSnapshot.uiScalePercent, L"uiScalePercent");
+            dropIfChanged(curWh.dialogWidthPreset != g_lastWhSnapshot.dialogWidthPreset, L"dialogWidthPreset");
             dropIfChanged(curWh.customDialogWidth != g_lastWhSnapshot.customDialogWidth, L"customDialogWidth");
             dropIfChanged(curWh.customBarHeight != g_lastWhSnapshot.customBarHeight, L"customBarHeight");
             dropIfChanged(curWh.customFontSize != g_lastWhSnapshot.customFontSize, L"customFontSize");
@@ -5511,6 +5858,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.clearInitialInput != g_lastWhSnapshot.clearInitialInput, L"clearInitialInput");
             dropIfChanged(curWh.closeOnClickOutside != g_lastWhSnapshot.closeOnClickOutside, L"closeOnClickOutside");
             dropIfChanged(curWh.runAsAdmin != g_lastWhSnapshot.runAsAdmin, L"runAsAdmin");
+            dropIfChanged(curWh.adminIndicator != g_lastWhSnapshot.adminIndicator, L"adminIndicator");
+            dropIfChanged(curWh.shiftEnterSwitchesPrivileges != g_lastWhSnapshot.shiftEnterSwitchesPrivileges,
+                          L"shiftEnterSwitchesPrivileges");
             if (!AliasesEqual(curWh.customAliases, g_lastWhSnapshot.customAliases)) {
                 ClearInAppAliasesOverride();
             }
@@ -5687,6 +6037,14 @@ void LoadSettings(bool fromSettingsChanged = false) {
     int scaleOverride = Wh_GetIntValue(GetUserOverrideKey(L"uiScalePercent").c_str(), -1);
     newSettings.uiScalePercent = std::clamp(scaleOverride > 0 ? scaleOverride : scaleSetting, 85, 120);
 
+    wchar_t widthPresetOverride[16]{};
+    Wh_GetStringValue(GetUserOverrideKey(L"dialogWidthPreset").c_str(), widthPresetOverride,
+                      ARRAYSIZE(widthPresetOverride));
+    const std::wstring_view widthPreset = widthPresetOverride[0]
+        ? std::wstring_view(widthPresetOverride) : std::wstring_view(curWh.dialogWidthPreset);
+    if (widthPreset == L"narrow") newSettings.dialogWidthPreset = DialogWidthPreset::Narrow;
+    if (widthPreset == L"wide") newSettings.dialogWidthPreset = DialogWidthPreset::Wide;
+
     int widthSetting = ReadGroupedIntSetting(L"layoutGroup.customDialogWidth", L"customDialogWidth", 0);
     int widthOverride = Wh_GetIntValue(GetUserOverrideKey(L"customDialogWidth").c_str(), -1);
     int rawWidth = (widthOverride >= 0) ? widthOverride : widthSetting;
@@ -5748,12 +6106,15 @@ void LoadSettings(bool fromSettingsChanged = false) {
     int closeOutOverride = Wh_GetIntValue(GetUserOverrideKey(L"closeOnClickOutside").c_str(), -1);
     newSettings.closeOnClickOutside = (closeOutOverride >= 0) ? (closeOutOverride != 0) : (Wh_GetIntSetting(L"historyBehaviorGroup.closeOnClickOutside") != 0);
 
-    int adminOverride = Wh_GetIntValue(GetUserOverrideKey(L"runAsAdmin").c_str(), -1);
-    if (adminOverride >= 0) {
-        newSettings.runAsAdmin = (adminOverride != 0);
-    } else {
-        newSettings.runAsAdmin = (Wh_GetIntSetting(L"historyBehaviorGroup.runAsAdmin") != 0);
-    }
+    newSettings.runAsAdmin = Wh_GetIntValue(GetUserOverrideKey(L"runAsAdmin").c_str(), curWh.runAsAdmin) != 0;
+    wchar_t adminIndicatorOverride[16]{};
+    Wh_GetStringValue(GetUserOverrideKey(L"adminIndicator").c_str(), adminIndicatorOverride,
+                      ARRAYSIZE(adminIndicatorOverride));
+    const std::wstring_view adminIndicator = adminIndicatorOverride[0]
+        ? std::wstring_view(adminIndicatorOverride) : std::wstring_view(curWh.adminIndicator);
+    newSettings.inlineAdminIndicator = adminIndicator == L"field";
+    newSettings.shiftEnterSwitchesPrivileges = Wh_GetIntValue(
+        GetUserOverrideKey(L"shiftEnterSwitchesPrivileges").c_str(), curWh.shiftEnterSwitchesPrivileges) != 0;
 
     newSettings.customAliases.clear();
     int aliasCountOv = Wh_GetIntValue(GetUserOverrideKey(L"aliasCount").c_str(), -1);
@@ -7091,6 +7452,7 @@ struct ActionButtonsLayout {
     RECT rcClose;
     RECT rcGear;
     RECT rcEdit;
+    RECT rcAdminIndicator;
 };
 
 struct RunDialogState {
@@ -7099,6 +7461,12 @@ struct RunDialogState {
     HWND hOrigEdit = nullptr;
     HWND hModernEdit = nullptr;
     HWND hOkBtn = nullptr;
+    HWND hAdminTooltip = nullptr;
+    RECT adminTooltipRect{};
+    const wchar_t* adminTooltipText = nullptr;
+    bool adminTooltipActive = false;
+    mutable std::array<int, 3> actionWidthsAt96Dpi{};
+    RunEnterAction enterPreview = RunEnterAction::Normal;
     HWND hAdminCheck = nullptr;
 
     HFONT hFontEditCtl = nullptr;
@@ -7299,7 +7667,8 @@ void RefreshDialogVisual(HWND hWnd, RunDialogState* state, bool redrawContents =
 void CloseActiveGearMenu();
 void CloseRunDialog(HWND hDlg);
 void SyncInputToNativeCombo(RunDialogState* state, const wchar_t* textOverride = nullptr);
-void ExecuteCommandImmediate(RunDialogState* state, const std::wstring& rawCommand, bool forceElevateOnce = false, bool runInTerminal = false);
+void ExecuteCommandImmediate(RunDialogState* state, const std::wstring& rawCommand,
+                             RunEnterAction action = RunEnterAction::Normal);
 void PerformDialogUninit(HWND hWnd, RunDialogState* state);
 void RecomputeDialogMetrics(RunDialogState* state);
 void UpdateDialogEditFont(RunDialogState* state);
@@ -7332,16 +7701,7 @@ float GetFontSizeSF(float baseDip, const RunDialogState* state) {
     return DpiScaleSF(baseDip, state);
 }
 
-int GetDlgWidth(const RunDialogState* state) {
-    if (state && state->settings.customDialogWidth >= 300) {
-        int wDip = std::clamp(state->settings.customDialogWidth, 300, 1200);
-        return DpiScale(wDip, state->dpi, 100);
-    }
-    if (state && state->settings.dialogLayout == DialogLayout::Pill) {
-        return DpiScaleS(kBaseCompactDlgWidth, state);
-    }
-    return DpiScaleS(kBaseDlgWidth, state);
-}
+int GetDlgWidth(const RunDialogState* state);
 
 std::wstring GetEffectiveInputText(HWND hEdit, DWORD* outSelStart = nullptr, DWORD* outSelEnd = nullptr);
 
@@ -9088,10 +9448,10 @@ bool LaunchWebSearchCommand(HWND, int, const std::wstring& query) {
     return ShellExecuteExW(&sei) != FALSE;
 }
 
-void SyncNativeAdminCheckbox(RunDialogState* state) {
+void SyncNativeAdminCheckbox(RunDialogState* state, bool elevated) {
     if (!state || !state->hDlg || !state->hAdminCheck || !IsWindow(state->hAdminCheck)) return;
     EnableWindow(state->hAdminCheck, TRUE);
-    WPARAM targetCheck = state->settings.runAsAdmin ? BST_CHECKED : BST_UNCHECKED;
+    WPARAM targetCheck = elevated ? BST_CHECKED : BST_UNCHECKED;
     if ((WPARAM)SendMessageW(state->hAdminCheck, BM_GETCHECK, 0, 0) != targetCheck) {
         SendMessageW(state->hAdminCheck, BM_SETCHECK, targetCheck, 0);
         int chkId = GetDlgCtrlID(state->hAdminCheck);
@@ -9460,7 +9820,8 @@ bool LaunchCommandInTerminal(HWND hOwner, const std::wstring& rawCmd, bool runAs
     return ShellExecuteExW(&sei) != FALSE;
 }
 
-void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& item, bool forceElevateOnce = false, bool runInTerminal = false) {
+void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& item,
+                                    RunEnterAction action = RunEnterAction::Normal) {
     if (!state || !state->hDlg || state->isTriggeringRun) return;
     CloseActiveGearMenu();
 
@@ -9478,20 +9839,17 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
 
     // Expand user-defined Custom Command Aliases (e.g. hosts, env, ws)
     HistoryItem resolvedItem = item;
+    bool aliasAdmin = item.isAlias && item.aliasRunAsAdmin;
     if (!item.isShortcutFile) {
         std::wstring expandedAliasCmd;
-        bool aliasAdmin = false;
+        bool expandedAliasAdmin = false;
         const std::wstring& rawAliasCheck = !item.execTarget.empty() ? item.execTarget : item.cmd;
-        if (ResolveCustomAlias(state->settings, rawAliasCheck, &expandedAliasCmd, &aliasAdmin)) {
+        if (ResolveCustomAlias(state->settings, rawAliasCheck, &expandedAliasCmd, &expandedAliasAdmin)) {
             resolvedItem.execTarget = expandedAliasCmd;
-            if (aliasAdmin) forceElevateOnce = true;
+            aliasAdmin = aliasAdmin || expandedAliasAdmin;
         }
     }
-    if (item.isAlias && item.aliasRunAsAdmin) {
-        forceElevateOnce = true;
-    }
-
-    bool wantAdmin = state->settings.runAsAdmin || forceElevateOnce;
+    const bool wantAdmin = ResolveRunElevation(state->settings.runAsAdmin || aliasAdmin, action);
 
     // Handle google:<keyword> — in elevated Task Manager when not requesting admin, delegate the URL
     // through Task Manager's native Run box so it launches de-elevated with Task Manager's own token!
@@ -9515,7 +9873,7 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
 
     // Shift+Enter: Run command inside Windows Terminal (wt.exe) or CMD/PowerShell keeping window open for logs.
     // In elevated Task Manager when not requesting admin, delegate the composed command line to Task Manager's native Run box.
-    if (runInTerminal) {
+    if (action == RunEnterAction::Terminal) {
         const std::wstring& termTarget = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
         std::wstring trimmedTerm = TrimCommandString(termTarget);
         if (trimmedTerm.empty()) return;
@@ -9595,7 +9953,7 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
 
     SaveCommandTimestamp(item.cmd.empty() ? rawBuf : item.cmd);
 
-    SyncNativeAdminCheckbox(state);
+    SyncNativeAdminCheckbox(state, wantAdmin);
     if (state->hCombo) EnableWindow(state->hCombo, TRUE);
     if (state->hOrigEdit) EnableWindow(state->hOrigEdit, TRUE);
     SyncInputToNativeCombo(state, rawBuf);
@@ -9619,6 +9977,7 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
             PostMessageW(hDlg, WM_NULL, 0, 0);
         } else if (g_hActiveRunDlg.load() == hDlg) {
             state->isTriggeringRun = false;
+            SyncNativeAdminCheckbox(state, state->settings.runAsAdmin);
             if (state->pendingUninit || g_unloading.load()) {
                 return;
             }
@@ -9626,14 +9985,14 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
     }
 }
 
-void ExecuteCommandImmediate(RunDialogState* state, const std::wstring& rawCommand, bool forceElevateOnce, bool runInTerminal) {
+void ExecuteCommandImmediate(RunDialogState* state, const std::wstring& rawCommand, RunEnterAction action) {
     HistoryItem tempItem;
     tempItem.cmd = rawCommand;
     tempItem.execTarget = rawCommand;
-    ExecuteHistoryOrSuggestionItem(state, tempItem, forceElevateOnce, runInTerminal);
+    ExecuteHistoryOrSuggestionItem(state, tempItem, action);
 }
 
-void TriggerRunCommand(RunDialogState* state, bool forceElevateOnce = false, bool runInTerminal = false) {
+void TriggerRunCommand(RunDialogState* state, RunEnterAction action = RunEnterAction::Normal) {
     if (!state || !state->hDlg || state->isTriggeringRun) return;
 
     if (state->hModernEdit) {
@@ -9647,12 +10006,12 @@ void TriggerRunCommand(RunDialogState* state, bool forceElevateOnce = false, boo
     const auto& activeRows = GetActiveRowItems(state);
     if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < (int)activeRows.size()) {
         HistoryItem chosen = activeRows[state->selectedRow];
-        ExecuteHistoryOrSuggestionItem(state, chosen, forceElevateOnce, runInTerminal);
+        ExecuteHistoryOrSuggestionItem(state, chosen, action);
         return;
     }
 
     std::wstring effectiveText = GetEffectiveInputText(state->hModernEdit);
-    ExecuteCommandImmediate(state, effectiveText, forceElevateOnce, runInTerminal);
+    ExecuteCommandImmediate(state, effectiveText, action);
 }
 
 bool ResolveDialogLightContrast(const RunDialogState* state) {
@@ -10636,15 +10995,33 @@ int MeasureButtonWidthAt96Dpi(const wchar_t* label, int minWidth96) {
     }
     // 12px left pad + textWidth + 12px gap + 14px icon + 10px right pad = textWidth + 48
     int computed = textWidth96 + 48;
-    return std::clamp(computed, minWidth96, 132);
+    return (std::max)(computed, minWidth96);
 }
 
 int GetDetachedGap(const RunDialogState* state) {
     return DpiScaleS(kBaseDetachedGap, state);
 }
 
+bool ShouldShowRunElevation(const RunDialogState* state) {
+    bool defaultAdmin = state->settings.runAsAdmin;
+    if (!defaultAdmin && !state->settings.customAliases.empty()) {
+        const auto& rows = GetActiveRowItems(state);
+        if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < static_cast<int>(rows.size())) {
+            const auto& item = rows[state->selectedRow];
+            defaultAdmin = item.isAlias && item.aliasRunAsAdmin;
+            if (!defaultAdmin && !item.isShortcutFile) {
+                ResolveCustomAlias(state->settings, item.execTarget.empty() ? item.cmd : item.execTarget,
+                                   nullptr, &defaultAdmin);
+            }
+        } else if (state->hModernEdit) {
+            ResolveCustomAlias(state->settings, GetEffectiveInputText(state->hModernEdit), nullptr, &defaultAdmin);
+        }
+    }
+    return ResolveRunElevation(defaultAdmin, state->enterPreview);
+}
+
 int GetAdminBannerHeight(const RunDialogState* state) {
-    if (!state || !state->settings.runAsAdmin) return 0;
+    if (!state || state->settings.inlineAdminIndicator || !ShouldShowRunElevation(state)) return 0;
     return DpiScaleS(kBaseAdminBannerHeight, state);
 }
 
@@ -10684,33 +11061,59 @@ int GetDetachedCardTopY(const RunDialogState* state) {
     return GetInputBarHeight(state) + adminExtra + GetDetachedGap(state);
 }
 
+ActionWidths GetVisibleActionButtonWidths(const RunDialogState* state, int btnH) {
+    auto& widths96 = state->actionWidthsAt96Dpi;
+    if (widths96[0] == 0) {
+        widths96 = {MeasureButtonWidthAt96Dpi(state->i18n.browseBtn, 86),
+                    MeasureButtonWidthAt96Dpi(state->i18n.runBtn, 80),
+                    MeasureButtonWidthAt96Dpi(state->i18n.exitBtn, 76)};
+    }
+    const auto scaleBtnW = [&](size_t index) {
+        const float textScale = GetFontSizeSF(13.0f, state) / 13.0f;
+        return static_cast<int>(std::ceil((widths96[index] - 48) * textScale)) + DpiScaleS(48, state);
+    };
+    const bool isCompact = state->settings.dialogLayout == DialogLayout::Pill;
+    const bool compactActions = state->settings.dialogLayout != DialogLayout::Classic;
+    const int wBrowse = compactActions ? btnH : scaleBtnW(0);
+    const int wRun = isCompact ? btnH : scaleBtnW(1);
+    const int wClose = compactActions ? btnH : scaleBtnW(2);
+    return VisibleActionWidths(state->settings.hiddenActions, {wBrowse, wRun, wClose, btnH});
+}
+
+int GetInputLeft(const RunDialogState* state) {
+    return DpiScaleS(state->settings.dialogLayout == DialogLayout::Pill ? 46 : 50, state);
+}
+
+int GetAdminIndicatorWidth(const RunDialogState* state) {
+    return state->settings.inlineAdminIndicator ? DpiScaleS(26, state) : 0;
+}
+
+int GetDlgWidth(const RunDialogState* state) {
+    if (!state) return kBaseDlgWidth;
+    const auto preset = state->settings.dialogWidthPreset;
+    const int requested = preset == DialogWidthPreset::Layout && state->settings.customDialogWidth > 0
+        ? DpiScale(state->settings.customDialogWidth, state->dpi)
+        : DpiScaleS(GetLayoutWidthDip(state->settings.dialogLayout, preset), state);
+    const auto widths = GetVisibleActionButtonWidths(state, GetActionButtonHeight(state, GetInputBarHeight(state)));
+    int actionWidth = 0;
+    int visible = 0;
+    for (const auto width : widths) {
+        actionWidth += width;
+        visible += width > 0;
+    }
+    const int controls = GetInputLeft(state) + DpiScaleS(kBasePanelInset, state) + DpiScaleS(8, state) +
+                         GetAdminIndicatorWidth(state) + actionWidth + (std::max)(0, visible - 1) * DpiScaleS(6, state);
+    return FitDialogWidth(requested, controls, DpiScaleS(100, state));
+}
+
 ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     int dlgW = GetDlgWidth(state);
     int barH = GetInputBarHeight(state);
-    UINT dpi = state ? state->dpi : 96;
+    UINT dpi = state->dpi;
     const int btnH = GetActionButtonHeight(state, barH);
-
-    int gap = DpiScaleS(6, state);
-    int rightMargin = DpiScaleS(kBasePanelInset, state);
-
-    float fontScale = (state && state->settings.customFontSize > 0)
-                      ? (std::clamp(state->settings.customFontSize, 9, 24) / 13.5f)
-                      : (GetDlgScale(state) / 100.0f);
-    auto scaleBtnW = [&](int base96W) -> int {
-        return (int)std::ceil(base96W * (dpi / 96.0f) * std::clamp(fontScale, 0.80f, 1.45f));
-    };
-
-    const wchar_t* runLabel = state ? state->i18n.runBtn : L"Run";
-    bool isCompact = state && state->settings.dialogLayout == DialogLayout::Pill;
-    bool isFluent = state && state->settings.dialogLayout == DialogLayout::Fluent;
-    bool compactActions = isCompact || isFluent;
-
-    int wGear   = btnH;
-    int wBrowse = compactActions ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.browseBtn, 86));
-    int wRun    = isCompact ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(runLabel, 80));
-    int wClose  = compactActions ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.exitBtn, 76));
-    const auto widths = VisibleActionWidths(state->settings.hiddenActions,
-                                            {wBrowse, wRun, wClose, wGear});
+    const int gap = DpiScaleS(6, state);
+    const int rightMargin = DpiScaleS(kBasePanelInset, state);
+    const auto widths = GetVisibleActionButtonWidths(state, btnH);
 
     int barTop = GetInputBarTopY(state);
     int top = barTop + GetVerticalPanelInset(barH, btnH, false);
@@ -10734,11 +11137,13 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     int editH = (std::max)(DpiScaleS(24, state), (int)std::ceil(GetFontSizeSF(13.5f, state) * 1.6f));
     editH = (std::min)(editH, barH - DpiScale(6, dpi, 100));
     int editTop = barTop + (barH - editH) / 2;
-    int editLeft = isCompact ? DpiScaleS(46, state) : DpiScaleS(50, state);
+    int editLeft = GetInputLeft(state);
+    const int indicatorWidth = GetAdminIndicatorWidth(state);
+    layout.rcAdminIndicator = {editRightAnchor - indicatorWidth, top, editRightAnchor, top + btnH};
     layout.rcEdit = {
         editLeft,
         editTop,
-        editRightAnchor - DpiScaleS(8, state),
+        editRightAnchor - indicatorWidth - DpiScaleS(8, state),
         editTop + editH
     };
     return layout;
@@ -11630,9 +12035,7 @@ int GetInlineMenuFieldValue(const RunDialogState* state, int kind) {
     int scale = GetDlgScale(state);
     switch (kind) {
         case 1:
-            return (state->settings.customDialogWidth >= 360)
-                   ? std::clamp(state->settings.customDialogWidth, 360, 1200)
-                   : MulDiv(kBaseDlgWidth, scale, 100);
+            return MulDiv(GetDlgWidth(state), 96, state->dpi);
         case 2:
             return (state->settings.customBarHeight > 0)
                    ? std::clamp(state->settings.customBarHeight, 36, 96)
@@ -13569,6 +13972,55 @@ static LayoutLocalizedStrings GetLayoutLocalizedStrings(const std::wstring& rawL
     return { L"Dialog Layout", L"Base window layout that uses personalization settings", { L"Classic", L"Compact Mini-Pill", L"Fluent" } };
 }
 
+struct RunDisplaySettingStrings {
+    const wchar_t* language;
+    const wchar_t* widthTitle;
+    const wchar_t* widthDescription;
+    const wchar_t* widthOptions0;
+    const wchar_t* widthOptions1;
+    const wchar_t* widthOptions2;
+    const wchar_t* behavior;
+    const wchar_t* adminTitle;
+    const wchar_t* adminDefault;
+    const wchar_t* adminDefaultDescription;
+    const wchar_t* indicatorTitle;
+    const wchar_t* panel;
+    const wchar_t* field;
+    const wchar_t* shiftTitle;
+    const wchar_t* shiftDescription;
+};
+
+const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& language) {
+    static constexpr RunDisplaySettingStrings strings[] = {
+        {L"en", L"Window width", L"Set the width of the Run window", L"Layout default", L"Narrow", L"Wide", L"Behavior", L"Run as administrator", L"Elevate by default", L"Ctrl+Shift+Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift+Enter", L"When off, Shift+Enter runs the command in a terminal"},
+        {L"ru", L"Ширина окна", L"Задает ширину окна «Выполнить»", L"Определено макетом", L"Узкое", L"Широкое", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Ctrl+Shift+Enter меняет права для текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift+Enter", L"Если выключено, Shift+Enter запускает команду в терминале"},
+        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp", L"Rộng", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift+Enter", L"Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"},
+        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบ", L"กว้าง", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift+Enter", L"เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
+        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Sempit", L"Lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift+Enter", L"Jika nonaktif, Shift+Enter menjalankan perintah di terminal"},
+        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Sempit", L"Lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift+Enter", L"Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"},
+        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"狭い", L"広い", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl+Shift+Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift+Enter で権限を切り替え", L"オフの場合、Shift+Enter でターミナル内でコマンドを実行"},
+        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"窄", L"宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl+Shift+Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift+Enter 切换权限", L"关闭后，Shift+Enter 在终端中运行命令"},
+        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"窄", L"寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl+Shift+Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift+Enter 切換權限", L"關閉時，Shift+Enter 會在終端機中執行命令"},
+        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"좁게", L"넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl+Shift+Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift+Enter로 권한 전환", L"끄면 Shift+Enter로 터미널에서 명령을 실행"},
+        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Étroite", L"Large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj+Entrée", L"Si désactivé, Maj+Entrée lance la commande dans un terminal"},
+        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmal", L"Breit", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt+Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"},
+        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Estrecha", L"Ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl+Mayús+Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús+Entrar", L"Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"},
+        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Estreita", L"Larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl+Shift+Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift+Enter", L"Desativado, Shift+Enter executa o comando em um terminal"},
+        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Stretta", L"Larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl+Maiusc+Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc+Invio", L"Se disattivato, Maiusc+Invio esegue il comando in un terminale"},
+        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вузьке", L"Широке", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl+Shift+Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift+Enter", L"Якщо вимкнено, Shift+Enter запускає команду в терміналі"},
+        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Wąskie", L"Szerokie", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift+Enter", L"Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"},
+        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smal", L"Breed", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift+Enter", L"Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"},
+        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Dar", L"Geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift+Enter ile yetkileri değiştir", L"Kapalıyken Shift+Enter komutu terminalde çalıştırır"},
+        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"संकरा", L"चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift+Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"},
+        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"ضيق", L"عريض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift+Enter", L"عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"},
+    };
+    const auto code = ResolveEffectiveLanguageCode(language);
+    for (const auto& value : strings) {
+        if (code == value.language) return value;
+    }
+    return strings[0];
+}
+
 struct SettingsLocalizedStrings {
     const wchar_t* winTitle;
     const wchar_t* version;
@@ -14367,6 +14819,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         auto S = [&](float v) { return DpiScaleF(v, dpi); };
         bool isLight = st->isLight;
         SettingsLocalizedStrings ls = GetSettingsLocalizedStrings(st->settings.language);
+        const auto& displaySettings = GetRunDisplaySettingStrings(st->settings.language);
 
         // Authentic Windows 11 Settings Palette (matching Image 2: Cá nhân hóa > Thanh tác vụ)
         D2D1_COLOR_F colBg        = isLight ? D2D1::ColorF(0.953f, 0.957f, 0.969f, 1.0f) : D2D1::ColorF(0.125f, 0.125f, 0.133f, 1.0f);
@@ -14457,7 +14910,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         NavDef kNavs[] = {
             { 0, L"\uE790", ls.nav0 },
             { 1, L"\uE740", ls.nav1 },
-            { 2, L"\uE81C", ls.nav2 },
+            { 2, L"\uE81C", displaySettings.behavior },
             { 3, L"\uE8AC", isViNav ? L"Bí danh (Aliases)" : L"Aliases" },
             { 4, L"\uE774", ls.nav3 }
         };
@@ -14747,7 +15200,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1] = beginGroupCard(
                 ls.gPosTitle,
                 ls.gPosSub,
-                5, rH);
+                6, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE740",
                 ls.posTitle,
                 ls.posSub,
@@ -14765,7 +15218,12 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 menuStrings.title, menuStrings.description,
                 st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
                     ? kWindowsFluentMenuLabel : menuStrings.modLabel);
-            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2410, L"\uE740",
+            const std::array widthLabels{displaySettings.widthOptions0, displaySettings.widthOptions1,
+                                         displaySettings.widthOptions2};
+            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2411, L"\uE740",
+                displaySettings.widthTitle, displaySettings.widthDescription,
+                widthLabels[static_cast<size_t>(st->settings.dialogWidthPreset)]);
+            drawDropdownRowInGroup(g1, y1 + rH * 5, rH, 2410, L"\uE740",
                 ls.scaleTitle,
                 ls.scaleSub,
                 std::to_wstring(st->settings.uiScalePercent) + L"%");
@@ -14787,7 +15245,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1] = beginGroupCard(
                 ls.gHistTitle,
                 ls.gHistSub,
-                7, rH);
+                6, rH);
             drawToggleRowInGroup(g1, y1, rH, 2501, L"\uE81C",
                 ls.showHistTitle,
                 ls.showHistSub,
@@ -14808,13 +15266,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 isViNav ? L"Bấm icon Taskbar để đóng hẳn (thay vì thu nhỏ)" : L"Taskbar Click Closes Dialog",
                 isViNav ? L"Tắt = thu nhỏ bình thường, Bật = đóng hẳn hộp thoại Run" : L"Off = minimize normally, On = close Run dialog",
                 st->settings.taskbarCloseInsteadOfMinimize);
-            drawToggleRowInGroup(g1, y1 + rH * 5, rH, 2503, L"\uE72E",
-                ls.adminTitle,
-                ls.adminSub,
-                st->settings.runAsAdmin, true);
-
             // Clear history row
-            float clrY = y1 + rH * 6;
+            float clrY = y1 + rH * 5;
             drawSettingRowHeader(g1, clrY, rH, g1.right - S(130), L"\uE74D", ls.clearHistTitle, ls.clearHistSub, pBrSub);
             const auto rcClr = controlRect(g1.right - S(118), g1.right - cardInset, clrY, rH);
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2510) ? pBrCardHov : pBrCtlBg);
@@ -14822,6 +15275,14 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             const wchar_t* btnTxt = ls.clearNow;
             if (pFmtCtl) DrawCenteredText(pRT, btnTxt, (UINT32)wcslen(btnTxt), pFmtCtl, rcClr, pBrText);
             addHit(2510, rcClr);
+            auto [adminGroup, adminY] = beginGroupCard(displaySettings.adminTitle, L"", 3, rH);
+            drawToggleRowInGroup(adminGroup, adminY, rH, 2503, L"\uE72E",
+                displaySettings.adminDefault, displaySettings.adminDefaultDescription, st->settings.runAsAdmin, true);
+            drawDropdownRowInGroup(adminGroup, adminY + rH, rH, 2507, L"\uE72E",
+                displaySettings.indicatorTitle, L"",
+                st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel, 210.0f);
+            drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uE765",
+                displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
         } else if (st->activeTab == 3) {
             // Tab 3: Custom Command Aliases (Bí danh lệnh tùy chỉnh)
             const float rH = rowHeight;
@@ -15685,6 +16146,17 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 } else if (id == 2403) {
                     Wh_SetIntValue(GetUserOverrideKey(L"rememberPosition").c_str(), st->settings.rememberPosition ? 0 : 1);
                     changed = true;
+                } else if (id == 2411) {
+                    const auto& str = GetRunDisplaySettingStrings(st->settings.language);
+                    const std::vector<std::pair<int, std::wstring>> opts{
+                        {1, str.widthOptions0}, {2, str.widthOptions1}, {3, str.widthOptions2}
+                    };
+                    const int current = static_cast<int>(st->settings.dialogWidthPreset) + 1;
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    if (sel >= 1 && sel <= 3 && sel != current) {
+                        constexpr std::array keys{L"layout", L"narrow", L"wide"};
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogWidthPreset").c_str(), keys[sel - 1]);
+                    }
                 } else if (id == 2410) {
                     std::vector<std::pair<int, std::wstring>> opts = {
                         { 85, L"85%" }, { 90, L"90%" }, { 100, L"100%" }, { 110, L"110%" }, { 120, L"120%" }
@@ -15716,6 +16188,18 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     }
                     Wh_SetIntValue(GetUserOverrideKey(L"runAsAdmin").c_str(), nextAdmin ? 1 : 0);
                     changed = true;
+                } else if (id == 2507) {
+                    const auto& str = GetRunDisplaySettingStrings(st->settings.language);
+                    const std::vector<std::pair<int, std::wstring>> opts{{1, str.panel}, {2, str.field}};
+                    const int current = st->settings.inlineAdminIndicator ? 2 : 1;
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    if (sel >= 1 && sel <= 2 && sel != current) {
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"adminIndicator").c_str(),
+                                                    sel == 2 ? L"field" : L"panel");
+                    }
+                } else if (id == 2508) {
+                    changed = Wh_SetIntValue(GetUserOverrideKey(L"shiftEnterSwitchesPrivileges").c_str(),
+                                             st->settings.shiftEnterSwitchesPrivileges ? 0 : 1);
                 } else if (id == 2504) {
                     Wh_SetIntValue(GetUserOverrideKey(L"showTimestamp").c_str(), st->settings.showTimestamp ? 0 : 1);
                     changed = true;
@@ -15979,8 +16463,9 @@ void ApplyReloadedSettingsToDialog(RunDialogState* state) {
         std::lock_guard<std::mutex> lock(g_settingsMutex);
         state->settings = g_settings;
         state->i18n = g_i18n;
+        state->actionWidthsAt96Dpi = {};
     }
-    SyncNativeAdminCheckbox(state);
+    SyncNativeAdminCheckbox(state, state->settings.runAsAdmin);
     UpdateDialogEditFont(state);
     RefreshDialogRunIcons(state);
     ReloadCustomBackgroundMedia(state, false);
@@ -16286,6 +16771,23 @@ bool TryTabCompletePathOrEnv(HWND hEdit, RunDialogState* state, bool reverse) {
     return true;
 }
 
+RunEnterAction GetCurrentEnterAction(const RunDialogState* state) {
+    if ((GetKeyState(VK_MENU) & 0x8000) != 0) return RunEnterAction::Normal;
+    return ResolveRunEnterAction(state->settings.shiftEnterSwitchesPrivileges,
+        (GetKeyState(VK_SHIFT) & 0x8000) != 0, (GetKeyState(VK_CONTROL) & 0x8000) != 0);
+}
+
+void UpdateRunElevationPreview(RunDialogState* state, RunEnterAction action) {
+    if (!state || state->enterPreview == action) return;
+    const int oldHeight = state->totalHeight;
+    state->enterPreview = action;
+    RecomputeDialogMetrics(state);
+    if (state->totalHeight != oldHeight) {
+        ResizeDialogPreservingBottomAnchor(state, oldHeight);
+    }
+    RefreshDialogVisual(state->hDlg, state);
+}
+
 LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                         UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
     auto* state = reinterpret_cast<RunDialogState*>(dwRefData);
@@ -16301,6 +16803,11 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     if (uMsg == WM_MOUSEWHEEL && state && state->hDlg) {
         SendMessageW(state->hDlg, WM_MOUSEWHEEL, wParam, lParam);
         return 0;
+    }
+
+    if (state && (uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP) &&
+        (wParam == VK_CONTROL || wParam == VK_SHIFT || wParam == VK_MENU)) {
+        UpdateRunElevationPreview(state, GetCurrentEnterAction(state));
     }
 
     if (uMsg == WM_KEYDOWN && state) {
@@ -16327,7 +16834,7 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
             return 0;
         }
         if (wParam == VK_RETURN) {
-            TriggerRunCommand(state, ctrlDown && shiftDown, !ctrlDown && shiftDown);
+            TriggerRunCommand(state, GetCurrentEnterAction(state));
             return 0;
         }
         if (wParam == VK_TAB) {
@@ -16449,6 +16956,10 @@ void CleanupDialogState(HWND hWnd, RunDialogState* state) {
 
     if (state) {
         ReleaseCustomBackgroundMedia(state);
+        if (state->hAdminTooltip) {
+            DestroyWindow(state->hAdminTooltip);
+            state->hAdminTooltip = nullptr;
+        }
         if (state->hModernEdit && IsWindow(state->hModernEdit)) {
             RemoveWindowSubclass(state->hModernEdit, ModernEditSubclassProc, 1);
             DestroyWindow(state->hModernEdit);
@@ -17304,8 +17815,21 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         drawActionButton(layout.rcClose, closeBtnLabel, ActionBtnKind::Exit, state->closeHovered, state->closePressed);
                         drawActionButton(layout.rcGear,  nullptr,       ActionBtnKind::Gear, state->gearHovered,  state->gearPressed);
 
-                        // 6b. Draw Dedicated Amber-Orange Admin Status Pill Box (above or below the Input Bar)
-                        if (adminH > 0 && ex.adminActiveBanner && ex.adminActiveBanner[0] != L'\0') {
+                        if (state->settings.inlineAdminIndicator && ShouldShowRunElevation(state) && pRoundStroke) {
+                            winrt::com_ptr<ID2D1SolidColorBrush> shieldBrush;
+                            const D2D1_COLOR_F shieldColor = highContrast ? colPrimary : isLight
+                                ? D2D1::ColorF(0.70f, 0.35f, 0.01f, 1.0f)
+                                : D2D1::ColorF(1.00f, 0.71f, 0.18f, 1.0f);
+                            if (SUCCEEDED(pRT->CreateSolidColorBrush(shieldColor, shieldBrush.put()))) {
+                                const auto& box = layout.rcAdminIndicator;
+                                DrawD2DShieldVector(pRT, shieldBrush.get(), pRoundStroke,
+                                    (box.left + box.right) * 0.5f, (box.top + box.bottom) * 0.5f, effectiveDpi, 1.0f);
+                            }
+                        }
+
+                        // Separate administrator indicator panel.
+                        const wchar_t* adminStatus = GetRunDisplaySettingStrings(state->settings.language).adminTitle;
+                        if (adminH > 0) {
                             D2D1_ROUNDED_RECT rrAdmin = D2D1::RoundedRect(rcAdminPill, adminCornerR, adminCornerR);
                             if (!highContrast) {
                                 D2D1_GRADIENT_STOP ambStops[2] = {
@@ -17337,7 +17861,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 float availBannerW  = (std::max)(DpiScaleSF(60.0f, state),
                                                                  (rcAdminPill.right - rcAdminPill.left) - pillInnerPadX * 2.0f - iconSlotW);
                                 float targetFontPx  = DpiScaleSF(12.2f, state);
-                                UINT32 bannerLen    = (UINT32)wcslen(ex.adminActiveBanner);
+                                UINT32 bannerLen    = (UINT32)wcslen(adminStatus);
                                 float measuredTextW = availBannerW;
 
                                 IDWriteTextFormat* pFmtMeasure = nullptr;
@@ -17347,7 +17871,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     pFmtMeasure->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
                                     IDWriteTextLayout* pMeasureLayout = nullptr;
                                     if (SUCCEEDED(g_pDWriteFactory->CreateTextLayout(
-                                            ex.adminActiveBanner, bannerLen, pFmtMeasure, 2000.0f, (float)adminH, &pMeasureLayout)) && pMeasureLayout) {
+                                            adminStatus, bannerLen, pFmtMeasure, 2000.0f, (float)adminH, &pMeasureLayout)) && pMeasureLayout) {
                                         DWRITE_TEXT_METRICS tm = {};
                                         if (SUCCEEDED(pMeasureLayout->GetMetrics(&tm))) {
                                             measuredTextW = tm.widthIncludingTrailingWhitespace;
@@ -17377,7 +17901,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
 
                                     IDWriteTextLayout* pFinalLayout = nullptr;
                                     if (SUCCEEDED(g_pDWriteFactory->CreateTextLayout(
-                                            ex.adminActiveBanner, bannerLen, pFmtAdmin, availBannerW, (float)adminH, &pFinalLayout)) && pFinalLayout) {
+                                            adminStatus, bannerLen, pFmtAdmin, availBannerW, (float)adminH, &pFinalLayout)) && pFinalLayout) {
                                         DWRITE_TEXT_METRICS tmFinal = {};
                                         if (SUCCEEDED(pFinalLayout->GetMetrics(&tmFinal))) {
                                             measuredTextW = (std::min)(availBannerW, tmFinal.widthIncludingTrailingWhitespace + DpiScaleSF(2.0f, state));
@@ -17501,10 +18025,42 @@ void PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, 
     }
 }
 
+void UpdateAdminIndicatorTooltip(RunDialogState* state) {
+    const bool active = state->settings.inlineAdminIndicator && ShouldShowRunElevation(state);
+    if (active) {
+        const auto rect = GetActionButtonsLayout(state).rcAdminIndicator;
+        const auto text = GetRunDisplaySettingStrings(state->settings.language).adminTitle;
+        TOOLINFOW tool{};
+        tool.cbSize = sizeof(tool);
+        tool.uFlags = TTF_SUBCLASS;
+        tool.hwnd = state->hDlg;
+        tool.uId = 1;
+        tool.rect = rect;
+        tool.lpszText = const_cast<wchar_t*>(text);
+        if (!state->hAdminTooltip) {
+            INITCOMMONCONTROLSEX controls{sizeof(controls), ICC_WIN95_CLASSES};
+            InitCommonControlsEx(&controls);
+            state->hAdminTooltip = CreateWindowExW(WS_EX_TOPMOST | WS_EX_NOACTIVATE, TOOLTIPS_CLASSW,
+                nullptr, WS_POPUP | TTS_NOPREFIX, 0, 0, 0, 0, state->hDlg, nullptr, GetModuleHandleW(nullptr), nullptr);
+            if (!state->hAdminTooltip) return;
+            SendMessageW(state->hAdminTooltip, TTM_ADDTOOLW, 0, reinterpret_cast<LPARAM>(&tool));
+        } else if (!EqualRect(&state->adminTooltipRect, &rect) || state->adminTooltipText != text) {
+            SendMessageW(state->hAdminTooltip, TTM_SETTOOLINFOW, 0, reinterpret_cast<LPARAM>(&tool));
+        }
+        state->adminTooltipRect = rect;
+        state->adminTooltipText = text;
+    }
+    if (state->hAdminTooltip && active != state->adminTooltipActive) {
+        SendMessageW(state->hAdminTooltip, TTM_ACTIVATE, active, 0);
+        state->adminTooltipActive = active;
+    }
+}
+
 void RefreshDialogVisual(HWND hWnd, RunDialogState* state, bool redrawContents) {
     if (!hWnd || !IsWindow(hWnd) || IsIconic(hWnd)) return;
     if (state && state->useLayeredPresentation) {
         PresentDialogWindow(hWnd, state, redrawContents);
+        UpdateAdminIndicatorTooltip(state);
     } else {
         InvalidateRect(hWnd, nullptr, FALSE);
     }
@@ -17857,6 +18413,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                 g_dlgIsForeground.store(false);
                 CloseActiveGearMenu();
+                UpdateRunElevationPreview(state, RunEnterAction::Normal);
                 if (state && state->settings.closeOnClickOutside &&
                     IsWindowVisible(hWnd) && !IsIconic(hWnd) && !state->isTriggeringRun &&
                     (!state->isBrowsingFile || g_hActiveGearMenu.load() != nullptr)) {
@@ -17869,6 +18426,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 g_dlgIsForeground.store(true);
                 g_deactivatedByTaskbarTick.store(0);
                 if (!IsIconic(hWnd) && IsWindowVisible(hWnd) && state) {
+                    UpdateRunElevationPreview(state, GetCurrentEnterAction(state));
                     if (!state->isBrowsingFile && g_hActiveGearMenu.load() == nullptr && g_hActiveCustomSizeWnd.load() == nullptr) {
                         SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
                     }

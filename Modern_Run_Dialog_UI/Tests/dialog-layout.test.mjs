@@ -76,10 +76,58 @@ test('layout settings keep position and menu style directly below their related 
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys.slice(0, 5), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'uiScalePercent']);
+    assert.deepEqual(keys.slice(0, 6), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'dialogWidthPreset', 'uiScalePercent']);
     assert.ok(!keys.includes('contextMenuBorderMode'));
     assert.match(layout, /\$name:ru-RU: Макет окна/);
     assert.match(layout, /\$description:ru-RU: Базовая компоновка окна, использующая параметры персонализации/);
+});
+
+test('all width presets reserve 100 pixels for input beside visible controls', () => {
+    const layout = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
+    const preset = source.match(/enum class DialogWidthPreset[^\n]*;/)?.[0];
+    const desired = source.match(/constexpr int GetLayoutWidthDip\([\s\S]*?\n\}/)?.[0];
+    const fit = source.match(/constexpr int FitDialogWidth\([\s\S]*?\n\}/)?.[0];
+    assert.ok(layout && preset && desired && fit);
+    compileChecks(`
+        #include <algorithm>
+        ${layout}
+        ${preset}
+        ${desired}
+        ${fit}
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Layout) == 500);
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Narrow) == 350);
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Wide) == 650);
+        static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Layout) == 600);
+        static_assert(GetLayoutWidthDip(DialogLayout::Pill, DialogWidthPreset::Narrow) == 252);
+        static_assert(FitDialogWidth(420, 467, 85) == 567);
+        static_assert(FitDialogWidth(500, 467, 100) == 567);
+        static_assert(FitDialogWidth(520, 467, 150) == 617);
+        static_assert(FitDialogWidth(780, 467, 100) == 780);
+    `);
+});
+
+test('the administrator gesture inverts the effective default without changing it', () => {
+    const action = source.match(/enum class RunEnterAction[^\n]*;/)?.[0];
+    const resolve = source.match(/constexpr RunEnterAction ResolveRunEnterAction\([\s\S]*?\n\}/)?.[0];
+    const privileges = source.match(/constexpr bool ResolveRunElevation\([\s\S]*?\n\}/)?.[0];
+    assert.ok(action && resolve && privileges);
+    compileChecks(`
+        ${action}
+        ${resolve}
+        ${privileges}
+        using enum RunEnterAction;
+        static_assert(ResolveRunEnterAction(false, false, false) == Normal);
+        static_assert(ResolveRunEnterAction(true, false, false) == Normal);
+        static_assert(ResolveRunEnterAction(false, true, false) == Terminal);
+        static_assert(ResolveRunEnterAction(false, true, true) == InvertElevation);
+        static_assert(ResolveRunEnterAction(true, true, false) == InvertElevation);
+        static_assert(ResolveRunEnterAction(true, true, true) == InvertElevation);
+        static_assert(!ResolveRunElevation(false, Normal));
+        static_assert(ResolveRunElevation(true, Normal));
+        static_assert(ResolveRunElevation(false, InvertElevation));
+        static_assert(!ResolveRunElevation(true, InvertElevation));
+        static_assert(ResolveRunElevation(true, Terminal));
+    `);
 });
 
 test('history follows the Windows short date and short time formats', () => {
