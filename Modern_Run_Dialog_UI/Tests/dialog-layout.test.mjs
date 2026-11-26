@@ -65,12 +65,12 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 });
 
 test('the context menu retains its previous style by default', () => {
-    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
+    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - dialogWidthPreset:)/)?.[0];
     assert.match(style, /\$name: "?Context Menu Style"?/);
     assert.match(style, /- mod: Standard/);
     assert.match(style, /- mod: Обычный/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
-    assert.match(style, /\$description:ru-RU: "?Оформление меню по правой кнопке мыши"?/);
+    assert.match(style, /\$description:ru-RU: "?Оформление меню при нажатии правой кнопки мыши"?/);
 });
 
 test('both menu styles use the separately selected icon set', () => {
@@ -150,7 +150,8 @@ test('layout settings keep position and menu style directly below their related 
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys.slice(0, 6), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'dialogWidthPreset', 'uiScalePercent']);
+    assert.deepEqual(keys, ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle',
+        'dialogWidthPreset', 'customDialogWidth', 'customBarHeight', 'customFontSize', 'uiScalePercent']);
     assert.ok(!keys.includes('contextMenuBorderMode'));
     assert.match(layout, /\$name:ru-RU: "?Макет окна"?/);
     assert.match(layout, /\$description:ru-RU: "?Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"?/);
@@ -448,6 +449,36 @@ test('the border settings are grouped in color, window, and context menu order',
     assert.ok(group, 'The window borders group is present');
     const keys = Array.from(group.matchAll(/^  - (\w+):/gm), match => match[1]);
     assert.deepEqual(keys, ['customBorderColor', 'windowBorderMode', 'contextMenuBorderMode']);
+});
+
+test('all three taskbar choices use the existing setting key and keep the existing values valid', () => {
+    const schema = source.match(/- taskbarClickAction: minimize[\s\S]*?(?=\n  - closeOnClickOutside:)/)?.[0];
+    assert.ok(schema);
+    for (const choice of schema.split(/^    \$options[^\n]*\n/m).slice(1)) {
+        assert.deepEqual(Array.from(choice.matchAll(/^    - (\w+):/gm), match => match[1]), ['minimize', 'close', 'hidden']);
+    }
+    const handler = source.match(/else if \(id == 2506\) \{[\s\S]*?(?=\} else if \(id == 2510\))/)?.[0];
+    assert.match(handler, /sel >= 1[\s\S]+kTaskbarIconModeValues\[sel - 1\]/);
+    const modes = source.match(/enum class TaskbarIconMode[\s\S]*?\n\}/)?.[0];
+    assert.ok(modes);
+    compileChecks(`
+        #include <array>
+        #include <string_view>
+        ${modes}
+        static_assert(ParseTaskbarIconMode(L"minimize") == TaskbarIconMode::MinimizeRestore);
+        static_assert(ParseTaskbarIconMode(L"close") == TaskbarIconMode::Close);
+        static_assert(ParseTaskbarIconMode(L"hidden") == TaskbarIconMode::Hidden);
+        static_assert(ParseTaskbarIconMode(L"") == TaskbarIconMode::MinimizeRestore);
+        int main() {}
+    `);
+});
+
+test('history stores and displays up to 50 items while retaining its default limit', () => {
+    assert.match(source, /- maxHistoryItems: 20/);
+    assert.match(source, /constexpr int kMaxHistoryItems = 50;/);
+    assert.match(source, /kMaxMruEntries\s*= kMaxHistoryItems;/);
+    assert.match(source, /newSettings\.maxHistoryItems = std::clamp\([^;]+, 0, kMaxHistoryItems\);/);
+    assert.match(source, /Wh_SetIntValue\(GetUserOverrideKey\(L"maxHistoryItems"\)\.c_str\(\), val\);/);
 });
 
 test('all localized border lists omit the explicit accent and preserve the option order', () => {

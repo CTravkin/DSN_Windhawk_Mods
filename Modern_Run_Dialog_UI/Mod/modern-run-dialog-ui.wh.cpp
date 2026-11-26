@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.8.9
+// @version         6.9.1
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 46
+// Build: 48
 
 // ==WindhawkModReadme==
 /*
@@ -84,7 +84,7 @@ Replaces the classic Win32 **Run (`Win + R`)** and **Task Manager "Create new ta
   - Instant suggestions for Start Menu apps, Registry `App Paths`, and system tools (`cmd`, `powershell`, `regedit`, `wt`, `.cpl`, `.msc`), plus `google:<query>` quick web search.
 
 - **Lightweight 20-Item History, Native Vietnamese IME & 21 Languages:**
-  - Scrollable 5-row history card (up to 20 items) with timestamps, pinning, and right-click/`Delete` removal.
+  - Scrollable 5-row history card (20 items by default, up to 50) with timestamps, pinning, and right-click/`Delete` removal.
   - Uses `RICHEDIT50W` (`msftedit.dll`) for smooth inline TSF composition on Windows Vietnamese keyboard (Telex/VNI) and third-party IMEs (UniKey/EVKey) with auto-focus on `Win + R`.
   - Auto-detects or lets you choose from **21 built-in languages** across the Run dialog and WinUI 3 Settings window.
 
@@ -125,7 +125,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
   - Gõ trực tiếp phép tính (`1+1`, `(25*4)/2`, `sqrt(144)`, `sin(pi/2)`, `2^10`) để xem kết quả ngay trên đầu danh sách; nhấn `Enter` hoặc nhấp chuột để chép/điền kết quả.
   - Gợi ý tức thì ứng dụng Start Menu, `App Paths` và công cụ hệ thống (`cmd`, `powershell`, `regedit`, `wt`, `.cpl`, `.msc`), cùng cú pháp `google:<từ khóa>` để tìm kiếm nhanh bằng trình duyệt mặc định.
 
-- **Lịch sử 20 mục nhẹ bộ nhớ, Bộ gõ Tiếng Việt mượt mà & 21 Ngôn ngữ:**
+- **Lịch sử mặc định 20 mục, tối đa 50, Bộ gõ Tiếng Việt mượt mà & 21 Ngôn ngữ:**
   - Khung lịch sử cuộn 5 dòng (tối đa 20 lệnh) kèm thời gian chạy, ghim lệnh và chuột phải/`Delete` để xóa từng mục.
   - Dùng `RICHEDIT50W` (`msftedit.dll`) tương thích tốt với cả bàn phím Tiếng Việt mặc định Windows (Telex/VNI) lẫn UniKey/EVKey, tự động focus ô nhập ngay khi bấm `Win + R`.
   - Tự nhận diện hoặc tùy chọn trong **21 ngôn ngữ hiển thị** đồng bộ cho cả hộp thoại Run và cửa sổ Cài đặt WinUI 3.
@@ -171,11 +171,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - warm_paper: Warm Paper (Soft Light Ivory)
     - custom: Custom Colors & Corner Radius
   - colorMode: auto
-    $description:ru-RU: "Оформление по настройкам Windows или выбранному режиму"
+    $description:ru-RU: "Соответствие настройкам Windows или выбор вручную"
     $name:ru-RU: "Цветовой режим"
     $name: "Color Mode"
     $name:vi-VN: Chế độ màu Sáng / Tối
-    $description: "Appearance based on Windows settings or the selected mode"
+    $description: "Follows Windows settings or a manually selected mode"
     $description:vi-VN: Tự động theo giao diện Sáng/Tối của Windows và độ sáng nền, hoặc chọn cố định.
     $options:vi-VN:
     - auto: Tự động theo Windows
@@ -284,7 +284,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu nền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - customCornerRadius: -1
-    $description:ru-RU: "Радиус от 0 до 28 px. Например, 0 px — прямые углы, 14 px — в стиле Windows 11, 27 px — сильное скругление. Значение -1 следует теме"
+    $description:ru-RU: "От -1 до 28 px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула"
     $name: "Outer Corner Radius"
     $name:vi-VN: Bán kính góc ngoài
     $name:th-TH: รัศมีมุมด้านนอก
@@ -306,11 +306,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:tr-TR: Dış Köşe Yarıçapı
     $name:hi-IN: बाहरी कोनों की त्रिज्या
     $name:ar-SA: نصف قطر الزوايا الخارجية
-    $description: "Radius from 0 to 28 px. For example, 0 px gives square corners, 14 px gives Windows 11-style corners, and 27 px gives strongly rounded corners. -1 follows the theme"
+    $description: "From -1 to 28 px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape"
     $description:vi-VN: Chỉnh độ bo góc theo pixel (0 = góc vuông, 8–12 = Win11 cổ điển, 24–28 = viên thuốc, -1 = theo chủ đề).
   - customInnerCornerRadius: "-1"
     $name: "Inner Corner Radius"
-    $description: "Highlight corners in history, suggestions, and the standard menu. Range: 0–28 px. For example, 0 px gives square corners and 6 px gives rounded corners. -1 is automatic"
+    $description: "Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px"
     $name:vi-VN: Bán kính góc trong
     $description:vi-VN: Bo góc vùng tô sáng trong lịch sử, gợi ý và menu của mod (-1 = Tự động, 0–28 px)
     $name:th-TH: รัศมีมุมด้านใน
@@ -338,7 +338,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:it-IT: Raggio degli angoli interni
     $description:it-IT: Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod (-1 = Automatico, 0–28 px)
     $name:ru-RU: "Радиус внутренних углов"
-    $description:ru-RU: "Скругление подсветки в истории, подсказках и обычном меню. Диапазон 0–28 px, например 0 px — прямые углы, 6 px — скругленные. Значение -1 выбирает радиус автоматически"
+    $description:ru-RU: "Углы выделения строк в истории, подсказках и контекстном меню; от -1 до 28 px"
     $name:uk-UA: Радіус внутрішніх кутів
     $description:uk-UA: Заокруглення виділення в історії, підказках і меню мода (-1 = Авто, 0–28 px)
     $name:pl-PL: Promień narożników wewnętrznych
@@ -359,9 +359,9 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description: "PNG, JPG, BMP, WebP, or GIF up to 25 MB"
     $description:vi-VN: Đường dẫn tệp ảnh tĩnh hoặc ảnh động GIF làm nền cho hộp thoại Run.
   - customBackgroundOpacity: 215
-    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения. 30–255, по умолчанию 215"
+    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения; 30–255 (по умолчанию 215)"
     $name:ru-RU: "Видимость фонового изображения"
-    $description: "Opacity of the image and window background. 30–255, default 215"
+    $description: "Opacity of the image and window background, including when no image is set. 30–255 (default 215)"
     $name: "Background Image Opacity"
     $name:vi-VN: Độ đậm nền hộp thoại & hình nền (30-255)
     $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 215 (~85%).
@@ -453,8 +453,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - windowBorderMode: mod
-    $name: Border Mode
-    $description: "Controls the color and visibility of the outer borders"
+    $name: Window Borders
+    $description: "Color of the outer outlines of the main panels"
     $options:
     - mod: Default
     - windows: Windows-defined
@@ -537,8 +537,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - mod: Secondo la mod
     - windows: Secondo Windows
     - off: Disattivati
-    $name:ru-RU: "Режим рамок"
-    $description:ru-RU: "Цвет внешних контуров панелей определяется модом или Windows, либо рамки отключены"
+    $name:ru-RU: "Рамки окон"
+    $description:ru-RU: "Цвет внешних контуров основных панелей"
     $options:ru-RU:
     - mod: По умолчанию
     - windows: Определено Windows
@@ -580,8 +580,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - windows: حسب Windows
     - off: معطلة
   - contextMenuBorderMode: own
-    $name: Context Menu Borders
-    $description: "Color and visibility of the border around the standard menu"
+    $name: Menu Borders
+    $description: "Color and visibility of the context menu border"
     $options:
     - own: Default
     - window: Same as window
@@ -678,14 +678,14 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - window: Secondo le impostazioni delle finestre
     - windows: Secondo Windows
     - off: Disattivati
-    $name:ru-RU: "Рамки контекстного меню"
-    $description:ru-RU: "Цвет и видимость рамки обычного меню"
+    $name:ru-RU: "Рамки меню"
+    $description:ru-RU: "Цвет и видимость рамки контекстного меню"
     $options:ru-RU:
     - own: По умолчанию
     - window: Как у окна
     - windows: Определено Windows
     - off: Отключены
-    $name:uk-UA: Рамки контекстного меню
+    $name:uk-UA: Рамки меню
     $description:uk-UA: Зовнішній контур меню в стилі мода
     $options:uk-UA:
     - own: Власна рамка
@@ -727,7 +727,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - window: حسب إعدادات النوافذ
     - windows: حسب Windows
     - off: معطلة
-  $name: Window Borders
+  $name: Borders
   $name:vi-VN: Viền cửa sổ
   $name:th-TH: ขอบหน้าต่าง
   $name:id-ID: Bingkai Jendela
@@ -741,7 +741,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
   $name:es-ES: Bordes de las ventanas
   $name:pt-BR: Bordas das janelas
   $name:it-IT: Bordi delle finestre
-  $name:ru-RU: Рамки окон
+  $name:ru-RU: Рамки
   $name:uk-UA: Рамки вікон
   $name:pl-PL: Obramowania okien
   $name:nl-NL: Vensterranden
@@ -751,11 +751,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - layoutGroup:
   - dialogPosition: auto
-    $description:ru-RU: "В режиме Авто положение зависит от макета окна"
+    $description:ru-RU: "В автоматическом режиме определяется макетом"
     $name: "Window Position"
     $name:vi-VN: Vị trí hiển thị hộp thoại
     $name:ru-RU: "Положение окна"
-    $description: "In Auto mode, the position follows the window layout"
+    $description: "The layout determines the position in Auto mode"
     $description:vi-VN: Chọn vị trí mở hộp thoại Run trên màn hình (Tự động sẽ theo góc Classic hoặc chính giữa dưới).
     $options:vi-VN:
     - auto: Tự động (Theo chế độ Classic / Pill)
@@ -981,7 +981,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - mod: Stile della mod
     - windows_fluent: Windows (Fluent)
     $name:ru-RU: "Стиль контекстного меню"
-    $description:ru-RU: "Оформление меню по правой кнопке мыши"
+    $description:ru-RU: "Оформление меню при нажатии правой кнопки мыши"
     $options:ru-RU:
     - mod: Обычный
     - windows_fluent: Windows (Fluent)
@@ -1142,6 +1142,27 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - layout: "حسب التخطيط"
     - narrow: "أضيق"
     - wide: "أعرض"
+  - customDialogWidth: 0
+    $description:ru-RU: "От 360 до 1200 px; при 0 зависит от масштаба интерфейса"
+    $name:ru-RU: "Точная ширина окна"
+    $name: "Exact Window Width"
+    $name:vi-VN: Chiều rộng hộp thoại tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 360–1200 px)
+    $description: "From 360 to 1200 px. At 0, follows the interface scale"
+    $description:vi-VN: Tự chỉnh chiều rộng hộp thoại Run theo pixel/DIP (ví dụ 560, 616, 720). Để 0 nếu muốn dùng theo mức 85%–120%.
+  - customBarHeight: 0
+    $description:ru-RU: "От 36 до 96 px, при 0 зависит от масштаба интерфейса"
+    $name:ru-RU: "Высота поля ввода"
+    $name: "Input Field Height"
+    $name:vi-VN: Chiều cao thanh nhập tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 36–96 px)
+    $description: "From 36 to 96 px. At 0, follows the interface scale"
+    $description:vi-VN: Tự chỉnh chiều cao thanh nhập lệnh (36–96 px, chuẩn 54 px). Để 0 để theo mức có sẵn.
+  - customFontSize: 0
+    $description:ru-RU: "От 9 до 24 DIP, при 0 зависит от масштаба интерфейса"
+    $name:ru-RU: "Размер шрифта"
+    $name: "Font Size"
+    $name:vi-VN: Cỡ chữ tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 9–24 pt)
+    $description: "From 9 to 24 DIP. At 0, follows the interface scale"
+    $description:vi-VN: Tự chỉnh cỡ chữ hiển thị trong hộp thoại Run (9–24 pt, chuẩn 14). Để 0 để theo mức kích thước có sẵn.
   - uiScalePercent: "100"
     $description:ru-RU: "Общий размер окна, элементов управления и текста"
     $name:ru-RU: "Масштаб интерфейса"
@@ -1161,27 +1182,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - "100": 100% – Default (Standard)
     - "110": 110% – Medium Large
     - "120": 120% – Large
-  - customDialogWidth: 0
-    $description:ru-RU: "От 360 до 1200 px, например 560, 616 или 720 px. При 0 ширина зависит от выбранной ширины окна и масштаба интерфейса"
-    $name:ru-RU: "Точная ширина окна"
-    $name: "Exact Window Width"
-    $name:vi-VN: Chiều rộng hộp thoại tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 360–1200 px)
-    $description: "360–1200 px, for example 560, 616, or 720 px. Zero follows the selected window width and interface scale"
-    $description:vi-VN: Tự chỉnh chiều rộng hộp thoại Run theo pixel/DIP (ví dụ 560, 616, 720). Để 0 nếu muốn dùng theo mức 85%–120%.
-  - customBarHeight: 0
-    $description:ru-RU: "От 36 до 96 px, например 54 px. При 0 высота зависит от масштаба интерфейса"
-    $name:ru-RU: "Высота поля ввода"
-    $name: "Input Field Height"
-    $name:vi-VN: Chiều cao thanh nhập tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 36–96 px)
-    $description: "36–96 px, for example 54 px. Zero follows the interface scale"
-    $description:vi-VN: Tự chỉnh chiều cao thanh nhập lệnh (36–96 px, chuẩn 54 px). Để 0 để theo mức có sẵn.
-  - customFontSize: 0
-    $description:ru-RU: "От 9 до 24 DIP, например 14 DIP. При 0 размер зависит от масштаба интерфейса"
-    $name:ru-RU: "Размер шрифта"
-    $name: "Font Size"
-    $name:vi-VN: Cỡ chữ tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 9–24 pt)
-    $description: "9–24 DIP. Zero follows Interface Scale"
-    $description:vi-VN: Tự chỉnh cỡ chữ hiển thị trong hộp thoại Run (9–24 pt, chuẩn 14). Để 0 để theo mức kích thước có sẵn.
   $name: 2. Layout & Sizing
   $name:vi-VN: 2. Bố cục & Kích thước
   $name:ru-RU: 2. Макет и положение
@@ -1328,24 +1328,24 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - historyBehaviorGroup:
   - maxHistoryItems: 20
-    $description:ru-RU: "До 20 недавних команд, 0 — список отключен"
+    $description:ru-RU: "До 50 недавних команд, 0 — список отключен"
     $name:ru-RU: "Лимит истории"
-    $description: "Up to 20 recent commands. Zero disables the list"
+    $description: "Up to 50 recent commands. Zero disables the list"
     $name: "History Limit"
-    $name:vi-VN: Số mục lịch sử lưu tối đa (0 = Tắt lịch sử, hoặc 1–20)
-    $description:vi-VN: Số lượng lệnh lịch sử hoặc gợi ý tối đa được lưu (0–20, mặc định 20 mục giúp nhẹ bộ nhớ).
+    $name:vi-VN: Số mục lịch sử lưu tối đa (0 = Tắt lịch sử, hoặc 1–50)
+    $description:vi-VN: Số lượng lệnh lịch sử hoặc gợi ý tối đa được lưu (0–50, mặc định 20 mục).
   - visibleHistoryRows: 5
-    $description:ru-RU: "3–10 строк до появления прокрутки"
+    $description:ru-RU: "От 3 до 10 строк до появления прокрутки"
     $name:ru-RU: "Видимые строки истории"
-    $description: "3–10 rows before scrolling"
+    $description: "From 3 to 10 rows before scrolling"
     $name: "Visible History Rows"
     $name:vi-VN: Số dòng lịch sử hiển thị cùng lúc trước khi cuộn (3–10)
     $description:vi-VN: Số dòng hiển thị tối đa cùng lúc trước khi hiện thanh cuộn (mặc định 5 dòng).
   - showTimestamp: true
     $description:ru-RU: "Короткие форматы даты и времени в строках истории"
-    $name:ru-RU: "Показывать дату и время запуска"
+    $name:ru-RU: "Дата и время в истории"
     $description: "Short date and time formats in history"
-    $name: "Show Command Timestamps"
+    $name: "Date and Time in History"
     $name:vi-VN: Hiển thị thời gian thực thi ở mỗi dòng lịch sử
     $description:vi-VN: Hiển thị thời gian chạy lệnh gần nhất và biểu tượng đồng hồ ở mỗi dòng lịch sử.
   - clearInitialInput: false
@@ -1363,21 +1363,24 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Xóa toàn bộ lịch sử đã lưu
     $description:vi-VN: Bật và bấm Lưu để xóa lịch sử đã lưu, hoặc bấm trực tiếp trong menu Bánh răng.
   - taskbarClickAction: minimize
-    $description:ru-RU: "Значок сворачивает, восстанавливает или закрывает открытое окно"
-    $name:ru-RU: "Действие по значку на панели задач"
-    $description: "Minimizes and restores or closes the open window"
-    $name: "Taskbar Icon Action"
-    $name:vi-VN: Hành vi khi bấm biểu tượng Run trên Taskbar
-    $description:vi-VN: Hành động khi bấm vào biểu tượng Run dưới Taskbar lúc cửa sổ đang mở.
+    $description:ru-RU: "Действие при клике по значку на панели задач"
+    $name:ru-RU: "Значок на панели задач"
+    $description: "Action when the taskbar icon is clicked"
+    $name: "Taskbar Icon"
+    $name:vi-VN: Biểu tượng trên thanh tác vụ
+    $description:vi-VN: Hành động khi bấm vào biểu tượng trên thanh tác vụ
     $options:vi-VN:
     - minimize: Ẩn & Mở lại cửa sổ Run
     - close: Đóng hẳn cửa sổ Run
+    - hidden: Ẩn biểu tượng
     $options:
-    - minimize: Minimize – Restore
-    - close: Close Window
+    - minimize: Minimize / Restore
+    - close: Close
+    - hidden: Hide icon
     $options:ru-RU:
-    - minimize: Сворачивание и восстановление
-    - close: Закрытие
+    - minimize: Свернуть / Восстановить
+    - close: Закрыть
+    - hidden: Отключить значок
   - closeOnClickOutside: false
     $description:ru-RU: "Нажатие за пределами окна закрывает его"
     $name:ru-RU: "Закрывать при нажатии вне окна"
@@ -1517,9 +1520,9 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - field: "مؤشر في حقل الإدخال"
   - shiftEnterSwitchesPrivileges: false
     $name: "Switch Privileges with Shift + Enter"
-    $description: "Shift + Enter can switch launch privileges in place of Ctrl + Shift + Enter"
+    $description: "Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
     $name:ru-RU: "Менять права по Shift + Enter"
-    $description:ru-RU: "Для переключения прав достаточно Shift + Enter вместо Ctrl + Shift + Enter"
+    $description:ru-RU: "Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
     $name:vi-VN: "Đổi quyền bằng Shift + Enter"
     $description:vi-VN: "Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"
     $name:th-TH: "สลับสิทธิ์ด้วย Shift + Enter"
@@ -1615,6 +1618,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 #include <dwmapi.h>
 #include <shellapi.h>
 #include <shlobj.h>
+#include <shobjidl.h>
 #include <shlwapi.h>
 #include <propsys.h>
 #include <commctrl.h>
@@ -1839,6 +1843,17 @@ struct CommandAlias {
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
 enum class DialogWidthPreset { Layout, Narrow, Wide };
 enum class RunEnterAction { Normal, InvertElevation, Terminal };
+enum class TaskbarIconMode { MinimizeRestore, Close, Hidden };
+
+constexpr std::array<const wchar_t*, 3> kTaskbarIconModeValues{L"minimize", L"close", L"hidden"};
+
+constexpr TaskbarIconMode ParseTaskbarIconMode(std::wstring_view setting) {
+    if (setting == kTaskbarIconModeValues[1]) return TaskbarIconMode::Close;
+    if (setting == kTaskbarIconModeValues[2]) return TaskbarIconMode::Hidden;
+    return TaskbarIconMode::MinimizeRestore;
+}
+
+constexpr int kMaxHistoryItems = 50;
 
 constexpr RunEnterAction ResolveRunEnterAction(bool shiftSwitchesPrivileges, bool shift, bool ctrl) {
     if (!shift) return RunEnterAction::Normal;
@@ -1943,7 +1958,7 @@ struct ModSettings {
     int customDialogWidth = 0;
     int customBarHeight = 0;
     int customFontSize = 0;
-    bool taskbarCloseInsteadOfMinimize = false;
+    TaskbarIconMode taskbarIconMode = TaskbarIconMode::MinimizeRestore;
     int glassOpacity = -100;
     int blurOpacity = 255;
     std::wstring customBackgroundPath;
@@ -2144,7 +2159,7 @@ DWORD g_settingsHostThreadId = 0;
 std::mutex g_settingsMutex;
 ModSettings g_settings;
 LocalizedStrings g_i18n = {
-    L"Type the name of a command to run",
+    L"Enter a command name or path",
     L"Browse",
     L"Run",
     L"Exit",
@@ -2156,6 +2171,7 @@ LocalizedStrings g_i18n = {
 
 UINT g_msgUninit = 0;
 UINT g_msgToggle = 0;
+UINT g_msgTaskbarButtonCreated = 0;
 
 enum ToggleAction : WPARAM {
     kActionMinimize = 1,
@@ -2185,7 +2201,7 @@ constexpr UINT_PTR kTimerOpenAnim           = 9014;
 constexpr UINT_PTR kTimerOpenSettings       = 9016;
 constexpr UINT_PTR kTimerBgMedia            = 9012;
 constexpr int kModernEditId         = 9901;
-constexpr size_t kMaxMruEntries     = 20;
+constexpr size_t kMaxMruEntries     = kMaxHistoryItems;
 
 int DpiScale(int value, UINT dpi, int uiScalePercent = 100) {
     return MulDiv(value, static_cast<int>(dpi) * std::clamp(uiScalePercent, 80, 140), 96 * 100);
@@ -5548,7 +5564,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"ru") {
         return {
-            L"Введите имя команды для выполнения",
+            L"Введите имя команды или путь",
             L"Обзор",
             L"Выполнить",
             L"Выход",
@@ -5632,7 +5648,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
 
     return {
-        L"Type the name of a command to run",
+        L"Enter a command name or path",
         L"Browse",
         L"Run",
         L"Exit",
@@ -6261,7 +6277,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     if (Wh_GetStringValue(GetUserOverrideKey(L"taskbarClickAction").c_str(), strOverride, MAX_PATH) > 0 && strOverride[0]) {
         tbAct = strOverride;
     }
-    newSettings.taskbarCloseInsteadOfMinimize = (tbAct == L"close");
+    newSettings.taskbarIconMode = ParseTaskbarIconMode(tbAct);
 
     // Liquid Glass & Windows Blur optical parameters are locked to their tuned defaults
     newSettings.glassOpacity = -100;
@@ -6276,7 +6292,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
         if (legacyMax > 0) maxHistSetting = legacyMax;
     }
     int maxHistOverride = Wh_GetIntValue(GetUserOverrideKey(L"maxHistoryItems").c_str(), -1);
-    newSettings.maxHistoryItems = std::clamp(maxHistOverride >= 0 ? maxHistOverride : maxHistSetting, 0, 20);
+    newSettings.maxHistoryItems = std::clamp(maxHistOverride >= 0 ? maxHistOverride : maxHistSetting, 0, kMaxHistoryItems);
 
     int visRowsSetting = ReadGroupedIntSetting(L"historyBehaviorGroup.visibleHistoryRows", L"visibleHistoryRows", 5);
     if (visRowsSetting <= 0) visRowsSetting = 5;
@@ -7651,6 +7667,7 @@ struct ActionButtonsLayout {
 
 struct RunDialogState {
     HWND hDlg = nullptr;
+    bool taskbarButtonManuallyAdded = false;
     HWND hCombo = nullptr;
     HWND hOrigEdit = nullptr;
     HWND hModernEdit = nullptr;
@@ -8819,7 +8836,7 @@ void MinimizeRunDialog(RunDialogState* state) {
     ULONGLONG now = GetTickCount64();
     if (now - g_lastToggleTick.load() < 250) return;
 
-    if (state->settings.taskbarCloseInsteadOfMinimize) {
+    if (state->settings.taskbarIconMode == TaskbarIconMode::Close) {
         CloseRunDialog(state->hDlg);
         return;
     }
@@ -12338,7 +12355,7 @@ int GetInlineMenuFieldValue(const RunDialogState* state, int kind) {
         case 6:
             return std::clamp(state->settings.customBackgroundOpacity, 20, 255);
         case 7:
-            return std::clamp(state->settings.maxHistoryItems, 0, 20);
+            return std::clamp(state->settings.maxHistoryItems, 0, kMaxHistoryItems);
         case 8:
             return std::clamp(state->settings.visibleHistoryRows, 3, 10);
         default:
@@ -12374,7 +12391,7 @@ void ApplyInlineMenuFieldValue(FluentMenuSession* s, int kind, int val) {
         val = std::clamp(val, 20, 255);
         Wh_SetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), val);
     } else if (kind == 7) {
-        val = std::clamp(val, 0, 20);
+        val = std::clamp(val, 0, kMaxHistoryItems);
         Wh_SetIntValue(GetUserOverrideKey(L"maxHistoryItems").c_str(), val);
     } else if (kind == 8) {
         val = std::clamp(val, 3, 10);
@@ -14284,7 +14301,7 @@ ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) 
     if (lang == L"es") return { L"Estilo del menú contextual", L"Cambia el aspecto del menú al hacer clic con el botón derecho", L"Estilo del mod" };
     if (lang == L"pt") return { L"Estilo do menu de contexto", L"Altera a aparência do menu do botão direito", L"Estilo do mod" };
     if (lang == L"it") return { L"Stile del menu contestuale", L"Modifica l’aspetto del menu del tasto destro", L"Stile della mod" };
-    if (lang == L"ru") return { L"Стиль контекстного меню", L"Оформление меню по правой кнопке мыши", L"Обычный" };
+    if (lang == L"ru") return { L"Стиль контекстного меню", L"Оформление меню при нажатии правой кнопки мыши", L"Обычный" };
     if (lang == L"uk") return { L"Стиль контекстного меню", L"Змінює вигляд меню при натисканні правою кнопкою миші", L"Стиль мода" };
     if (lang == L"pl") return { L"Styl menu kontekstowego", L"Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem", L"Styl moda" };
     if (lang == L"nl") return { L"Stijl van het snelmenu", L"Wijzigt het uiterlijk van het menu bij rechtsklikken", L"Stijl van de mod" };
@@ -14315,14 +14332,14 @@ ContextMenuBorderStrings GetContextMenuBorderStrings(const std::wstring& rawLang
     if (lang == L"es") return { L"Bordes del menú contextual", L"Contorno del menú con estilo del mod", { L"Borde propio del menú", L"Según los ajustes de ventana", L"Según Windows", L"Desactivados" } };
     if (lang == L"pt") return { L"Bordas do menu de contexto", L"Contorno externo do menu no estilo do mod", { L"Borda própria do menu", L"Conforme as configurações das janelas", L"Definido pelo Windows", L"Desativadas" } };
     if (lang == L"it") return { L"Bordi del menu contestuale", L"Contorno esterno del menu in stile mod", { L"Bordo proprio del menu", L"Secondo le impostazioni delle finestre", L"Secondo Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки контекстного меню", L"Цвет и видимость рамки обычного меню", { L"По умолчанию", L"Как у окна", L"Определено Windows", L"Отключены" } };
-    if (lang == L"uk") return { L"Рамки контекстного меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Вимкнено" } };
+    if (lang == L"ru") return { L"Рамки меню", L"Цвет и видимость рамки контекстного меню", { L"По умолчанию", L"Как у окна", L"Определено Windows", L"Отключены" } };
+    if (lang == L"uk") return { L"Рамки меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Вимкнено" } };
     if (lang == L"pl") return { L"Obramowanie menu kontekstowego", L"Zewnętrzna ramka menu w stylu moda", { L"Własne obramowanie", L"Według ustawień okien", L"Według systemu Windows", L"Wyłączone" } };
     if (lang == L"nl") return { L"Randen van het snelmenu", L"Buitenrand van het menu in de modstijl", { L"Eigen rand", L"Volgens de vensterinstellingen", L"Volgens Windows", L"Uit" } };
     if (lang == L"tr") return { L"Bağlam Menüsü Kenarlıkları", L"Mod stilindeki menünün dış kenarlığı", { L"Menüye özel kenarlık", L"Pencere ayarlarına göre", L"Windows’a göre", L"Kapalı" } };
     if (lang == L"hi") return { L"संदर्भ मेनू की सीमाएँ", L"मॉड शैली के मेनू की बाहरी सीमा", { L"मेनू की अपनी सीमा", L"विंडो सेटिंग के अनुसार", L"Windows के अनुसार", L"बंद" } };
     if (lang == L"ar") return { L"حدود قائمة السياق", L"الحد الخارجي للقائمة بنمط التعديل", { L"حد خاص بالقائمة", L"حسب إعدادات النوافذ", L"حسب Windows", L"معطلة" } };
-    return { L"Context Menu Borders", L"Color and visibility of the border around the standard menu",
+    return { L"Menu Borders", L"Color and visibility of the context menu border",
              { L"Default", L"Same as window", L"Windows-defined", L"Off" } };
 }
 
@@ -14348,15 +14365,35 @@ WindowBorderStrings GetWindowBorderStrings(const std::wstring& rawLang) {
     if (lang == L"es") return { L"Bordes de las ventanas", L"Modo de borde", L"Color y visibilidad del contorno de los paneles", { L"Según el mod", L"Según Windows", L"Desactivados" } };
     if (lang == L"pt") return { L"Bordas das janelas", L"Modo das bordas", L"Cor e visibilidade do contorno dos painéis", { L"Definido pelo mod", L"Definido pelo Windows", L"Desativadas" } };
     if (lang == L"it") return { L"Bordi delle finestre", L"Modalità dei bordi", L"Colore e visibilità del contorno dei riquadri", { L"Secondo la mod", L"Secondo Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки окон", L"Режим рамок", L"Цвет внешних контуров панелей определяется модом или Windows, либо рамки отключены", { L"По умолчанию", L"Определено Windows", L"Отключены" } };
+    if (lang == L"ru") return { L"Рамки", L"Рамки окон", L"Цвет внешних контуров основных панелей", { L"По умолчанию", L"Определено Windows", L"Отключены" } };
     if (lang == L"uk") return { L"Рамки вікон", L"Режим рамок", L"Колір і видимість зовнішніх контурів панелей", { L"Визначено модом", L"Визначено Windows", L"Вимкнено" } };
     if (lang == L"pl") return { L"Obramowania okien", L"Tryb obramowania", L"Kolor i widoczność obramowań paneli", { L"Według moda", L"Według systemu Windows", L"Wyłączone" } };
     if (lang == L"nl") return { L"Vensterranden", L"Randmodus", L"Kleur en zichtbaarheid van paneelranden", { L"Volgens de mod", L"Volgens Windows", L"Uit" } };
     if (lang == L"tr") return { L"Pencere Kenarlıkları", L"Kenarlık Modu", L"Panel kenarlıklarının rengi ve görünürlüğü", { L"Moda göre", L"Windows’a göre", L"Kapalı" } };
     if (lang == L"hi") return { L"विंडो की सीमाएँ", L"सीमा मोड", L"पैनल की बाहरी सीमाओं का रंग और दृश्यता", { L"मॉड के अनुसार", L"Windows के अनुसार", L"बंद" } };
     if (lang == L"ar") return { L"حدود النوافذ", L"وضع الحدود", L"لون وحدود ظهور الحواف الخارجية للوحات", { L"حسب التعديل", L"حسب Windows", L"معطلة" } };
-    return { L"Window Borders", L"Border Mode", L"Color and visibility of the panel outlines",
+    return { L"Borders", L"Window Borders", L"Color of the outer outlines of the main panels",
              { L"Default", L"Windows-defined", L"Off" } };
+}
+
+struct TaskbarIconStrings {
+    const wchar_t* title;
+    const wchar_t* description;
+    std::array<const wchar_t*, kTaskbarIconModeValues.size()> options;
+};
+
+TaskbarIconStrings GetTaskbarIconStrings(const std::wstring& language) {
+    const auto code = ResolveEffectiveLanguageCode(language);
+    if (code == L"ru") {
+        return { L"Значок на панели задач", L"Действие при клике по значку на панели задач",
+                 { L"Свернуть / Восстановить", L"Закрыть", L"Отключить значок" } };
+    }
+    if (code == L"vi") {
+        return { L"Biểu tượng trên thanh tác vụ", L"Hành động khi bấm vào biểu tượng trên thanh tác vụ",
+                 { L"Ẩn & Mở lại cửa sổ Run", L"Đóng hẳn cửa sổ Run", L"Ẩn biểu tượng" } };
+    }
+    return { L"Taskbar Icon", L"Action when the taskbar icon is clicked",
+             { L"Minimize / Restore", L"Close", L"Hide icon" } };
 }
 
 struct CornerRadiusStrings {
@@ -14380,14 +14417,14 @@ CornerRadiusStrings GetCornerRadiusStrings(const std::wstring& rawLang) {
     if (lang == L"es") return { L"Radio de las esquinas exteriores", L"Radio de las esquinas interiores", L"Redondeo del resaltado en el historial, las sugerencias y el menú del mod" };
     if (lang == L"pt") return { L"Raio dos cantos externos", L"Raio dos cantos internos", L"Arredondamento do realce no histórico, nas sugestões e no menu do mod" };
     if (lang == L"it") return { L"Raggio degli angoli esterni", L"Raggio degli angoli interni", L"Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod" };
-    if (lang == L"ru") return { L"Радиус внешних углов", L"Радиус внутренних углов", L"Подсветка в истории, подсказках и обычном меню. 0\u00A0px — прямые углы, 6\u00A0px — скругленные" };
+    if (lang == L"ru") return { L"Радиус внешних углов", L"Радиус внутренних углов", L"Углы выделения строк в истории, подсказках и контекстном меню; от -1 до 28\u00A0px" };
     if (lang == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділення в історії, підказках і меню мода" };
     if (lang == L"pl") return { L"Promień narożników zewnętrznych", L"Promień narożników wewnętrznych", L"Zaokrąglenie podświetlenia w historii, sugestiach i menu moda" };
     if (lang == L"nl") return { L"Buitenste hoekradius", L"Binnenste hoekradius", L"Afronding van markeringen in geschiedenis, suggesties en het modmenu" };
     if (lang == L"tr") return { L"Dış Köşe Yarıçapı", L"İç Köşe Yarıçapı", L"Geçmişte, önerilerde ve mod menüsünde vurgulanan satırların yuvarlaklığı" };
     if (lang == L"hi") return { L"बाहरी कोनों की त्रिज्या", L"भीतरी कोनों की त्रिज्या", L"इतिहास, सुझाव और मॉड मेनू में हाइलाइट का गोलाई स्तर" };
     if (lang == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل" };
-    return { L"Outer Corner Radius", L"Inner Corner Radius", L"Highlights in history, suggestions, and the standard menu. 0\u00A0px gives square corners, 6\u00A0px gives rounded corners" };
+    return { L"Outer Corner Radius", L"Inner Corner Radius", L"Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28\u00A0px" };
 }
 
 constexpr int kHideActionRowBase = 2420;
@@ -14469,8 +14506,8 @@ struct RunDisplaySettingStrings {
 
 const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& language) {
     static constexpr RunDisplaySettingStrings strings[] = {
-        {L"en", L"Window width", L"The default width follows the window layout", L"Default", L"Narrow", L"Wide", L"Behavior", L"Run as administrator", L"Elevate by default", L"Run as administrator. Ctrl + Shift + Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift + Enter", L"Shift + Enter can switch launch privileges in place of Ctrl + Shift + Enter"},
-        {L"ru", L"Ширина окна", L"Ширина по умолчанию зависит от макета окна", L"По умолчанию", L"Узкая", L"Широкая", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift + Enter", L"Для переключения прав достаточно Shift + Enter вместо Ctrl + Shift + Enter"},
+        {L"en", L"Window width", L"The default width follows the window layout", L"Default", L"Narrow", L"Wide", L"Behavior", L"Run as administrator", L"Elevate by default", L"Run as administrator. Ctrl + Shift + Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift + Enter", L"Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"},
+        {L"ru", L"Ширина окна", L"Ширина по умолчанию зависит от макета окна", L"По умолчанию", L"Узкая", L"Широкая", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift + Enter", L"Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"},
         {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp hơn", L"Rộng hơn", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl + Shift + Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift + Enter", L"Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"},
         {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบลง", L"กว้างขึ้น", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl + Shift + Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift + Enter", L"เมื่อปิด Shift + Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
         {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Lebih sempit", L"Lebih lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift + Enter", L"Jika nonaktif, Shift + Enter menjalankan perintah di terminal"},
@@ -14498,7 +14535,7 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 46)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 48)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -14617,7 +14654,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         return { L"Impostazioni Modern Run", L"Personalizzazione", L"Layout e posizione", L"Cronologia e comportamento", L"Lingua (21)", L"Attivo", L"Disattivo", L"Predef.", L"Auto", L"Scegli colore...", L"Sfoglia...", L"Rimuovi", L"Cancella ora", L"Personalizzato", L"Windows 11 Blur (Predef.)", L"Auto (Segui Windows)", L"Scuro", L"Chiaro", L"In basso a sinistra", L"In basso al centro", L"In basso a destra", L"In alto a sinistra", L"In alto al centro", L"In alto a destra", L"Centro schermo", L"Tema e superficie", L"Scegli un tema integrato (Windows 11 Blur e Liquid Glass ottimizzati)", L"Tema predefinito", L"Scegli tra 13 temi integrati (predefinito: Windows 11 Blur)", L"Modalità colore", L"Segui Windows o fissa Scuro / Chiaro", L"Colori, sfondo e angoli personalizzati", L"Personalizza colori, immagine/GIF animata e raggio angoli", L"Colore di sfondo", L"Lascia Predef. per seguire il tema", L"Colore del bordo", L"Modifica il bordo della barra e della cronologia", L"Raggio angoli", L"0 px = quadrato, 14 px = Win11, 27 px = pillola", L"Immagine di sfondo / GIF animata", L"Nessun file — PNG, JPG, WebP, GIF animata (max 25 MB)", L"Attivo: ", L"Opacità sfondo personalizzato", L"Regola la visibilità di immagine/GIF (predefinito 85%)", L"Posizione e modalità", L"Configura dove aprire Win + R e lo stile del layout", L"Posizione finestra", L"Fissa a un bordo/centro o usa Auto", L"Ricorda ultima posizione", L"Riapri nell'ultima posizione trascinata (Ctrl + 0 per ripristinare)", L"Scala interfaccia", L"Ridimensiona l'intera finestra Esegui", L"Cronologia ed esecuzione", L"Gestisci cronologia, input iniziale e privilegi Amministratore", L"Mostra cronologia comandi", L"Mostra comandi recenti ed elementi fissati", L"Svuota campo all'apertura", L"Disattiva per mantenere l'ultimo comando", L"Esegui come Amministratore", L"Avvia elevato per impostazione predefinita (Ctrl + Maiusc + Invio sempre attivo)", L"Cancella tutta la cronologia", L"Pulisci la cronologia recente da Windows RunMRU", L"Lingua interfaccia (21 lingue)", L"Applicata subito alla finestra Esegui e alle Impostazioni", L"Scegli un colore", L"Tavolozza rapida Fluent", L"Applica", L"Annulla", L"Seleziona immagine di sfondo o GIF animata", L"Se attivo, i comandi verranno eseguiti come Amministratore. Consentire?", L"Avviso Amministratore" };
     }
     else if (lang == L"ru") {
-        return { L"Настройки Modern Run", L"Персонализация", L"Макет и положение", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Цвет…", L"Обзор…", L"Удаление", L"Очистка", L"Собственная", L"Windows 11 Blur (по умолчанию)", L"Авто", L"Темный", L"Светлый", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и иконки", L"", L"Тема", L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Оформление по настройкам Windows или выбранному режиму", L"Цвета, фон и углы", L"", L"Цвет фона", L"Заменяет цвет фона из темы", L"Цвет рамок", L"Используется, когда выбран режим рамок по умолчанию", L"Радиус углов", L"0\u00A0px — прямые углы, 14\u00A0px — в стиле Windows 11, 27\u00A0px — сильное скругление", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения", L"Макет и положение", L"", L"Положение окна", L"В режиме Авто положение зависит от макета окна", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение", L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие", L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке", L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Недавние команды перестают отображаться в истории мода", L"Язык интерфейса", L"Применяется к окну запуска и настройкам мода", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора" };
+        return { L"Настройки Modern Run", L"Персонализация", L"Макет и положение", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Цвет…", L"Обзор…", L"Удаление", L"Очистка", L"Собственная", L"Windows 11 Blur (по умолчанию)", L"Авто", L"Темный", L"Светлый", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и иконки", L"", L"Тема", L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Соответствие настройкам Windows или выбор вручную", L"Цвета, фон и углы", L"", L"Цвет фона", L"Заменяет цвет фона из темы", L"Цвет рамок", L"Используется, когда для рамок окон выбрано значение по умолчанию", L"Радиус углов", L"От -1 до 28\u00A0px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения; 30–255 (по умолчанию 215)", L"Макет и положение", L"", L"Положение окна", L"В автоматическом режиме определяется макетом", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение", L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие", L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке", L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Недавние команды перестают отображаться в истории мода", L"Язык интерфейса", L"Применяется к окну запуска и настройкам мода", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора" };
     }
     else if (lang == L"uk") {
         return { L"Налаштування Modern Run", L"Персоналізація", L"Макет і позиція", L"Історія та поведінка", L"Мова (21)", L"Увімк.", L"Вимк.", L"Скинути", L"Авто", L"Колір...", L"Огляд...", L"Прибрати", L"Очистити", L"Власна", L"Windows 11 Blur (За замовч.)", L"Авто (як у Windows)", L"Темна", L"Світла", L"Знизу зліва", L"Знизу по центру", L"Знизу справа", L"Зверху зліва", L"Зверху по центру", L"Зверху справа", L"По центру екрана", L"Тема та поверхня", L"Оберіть вбудовану тему (Windows 11 Blur і Liquid Glass оптимізовано)", L"Пресет теми", L"13 вбудованих тем (за замовчуванням Windows 11 Blur)", L"Режим кольору", L"Слідувати Windows або обрати Темний / Світлий", L"Власні кольори, фон і заокруглення", L"Налаштуйте кольори, зображення/GIF-фон і радіус кутів", L"Колір фону", L"Залиште за замовчуванням для кольору теми", L"Колір рамки", L"Змінити колір рамки панелі та історії", L"Радіус кутів", L"0 px = прямі, 14 px = Win11, 27 px = капсула", L"Фонове зображення / GIF", L"Не обрано — PNG, JPG, WebP, анім. GIF (до 25 МБ)", L"Активно: ", L"Непрозорість фону", L"Видимість зображення/GIF (за замовч. 85%)", L"Позиція та режим показу", L"Налаштуйте розташування Win + R і стиль макета", L"Позиція вікна", L"Закріпити біля краю/центру або Авто", L"Запам'ятовувати позицію вікна", L"Відкривати в останньому місці (Ctrl + 0 для скидання)", L"Масштаб інтерфейсу", L"Змінити загальний розмір вікна Виконати", L"Історія та виконання", L"Керування історією, початковим полем і правами адміністратора", L"Показувати історію команд", L"Показувати останні та закріплені команди", L"Очищати поле при відкритті", L"Вимкніть, щоб зберігати останню команду", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням (Ctrl + Shift + Enter завжди працює)", L"Очистити всю історію", L"Видалити останні команди з Windows RunMRU", L"Мова інтерфейсу (21 мова)", L"Застосовується миттєво до вікна Виконати та Налаштувань", L"Вибір кольору", L"Швидка палітра Fluent", L"Застосувати", L"Скасувати", L"Оберіть фонове зображення або GIF", L"Якщо увімкнено, команди запускатимуться з правами адміністратора. Дозволити?", L"Попередження прав адміністратора" };
@@ -14637,7 +14674,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
     else if (lang == L"ar") {
         return { L"إعدادات Modern Run", L"التخصيص", L"التخطيط والموضع", L"السجل والسلوك", L"اللغة (21)", L"تشغيل", L"إيقاف", L"افتراضي", L"تلقائي", L"اختر لوناً...", L"استعراض...", L"مسح", L"مسح الآن", L"مخصص", L"Windows 11 Blur (افتراضي)", L"تلقائي (حسب Windows)", L"داكن", L"فاتح", L"أسفل اليسار", L"أسفل الوسط", L"أسفل اليمين", L"أعلى اليسار", L"أعلى الوسط", L"أعلى اليمين", L"وسط الشاشة", L"السمة والمظهر", L"اختر سمة جاهزة (Windows 11 Blur و Liquid Glass مضبوطان تلقائياً)", L"السمة الجاهزة", L"اختر من بين 13 سمة مدمجة (الافتراضي Windows 11 Blur)", L"وضع الألوان", L"اتبع سمة Windows أو اختر داكن / فاتح", L"الألوان والخلفية والزوايا المخصصة", L"خصّص الألوان وصورة/GIF المتحركة واستدارة الزوايا", L"لون الخلفية", L"اتركه افتراضياً ليتبع السمة", L"لون الإطار", L"تغيير لون إطار مربع التشغيل وبطاقة السجل", L"استدارة الزوايا", L"0 px = مربع، 14 px = Win11، 27 px = كبسولة", L"صورة خلفية / GIF متحرك", L"لم يتم الاختيار — يدعم PNG و JPG و WebP و GIF (حد 25 MB)", L"نشط: ", L"شفافية الخلفية المخصصة", L"اضبط وضوح الصورة/GIF (الافتراضي 85%)", L"الموضع ووضع العرض", L"اضبط مكان فتح Win + R ونمط التخطيط", L"موضع النافذة", L"ثبّت عند حافة/وسط الشاشة أو تلقائي", L"تذكّر آخر موضع للنافذة", L"إعادة الفتح في آخر مكان سحب (Ctrl + 0 لإعادة الضبط)", L"مقياس الواجهة", L"تكبير أو تصغير حجم نافذة التشغيل", L"السجل وسلوك التشغيل", L"إدارة سجل الأوامر والإدخال الأولي وصلاحيات المسؤول", L"إظهار سجل الأوامر", L"عرض الأوامر الأخيرة والمثبتة", L"تفريغ مربع الإدخال عند الفتح", L"أوقفه للإبقاء على آخر أمر كما في Run الكلاسيكي", L"التشغيل كمسؤول (Admin)", L"التشغيل بصلاحيات المسؤول افتراضياً (Ctrl + Shift + Enter يعمل دائماً)", L"مسح كل السجل المحفوظ", L"حذف الأوامر الأخيرة من Windows RunMRU", L"لغة العرض (21 لغة)", L"تُطبّق فوراً على نافذة Run ونافذة الإعدادات", L"اختر لوناً", L"ألوان Fluent السريعة", L"تطبيق", L"إلغاء", L"اختر صورة خلفية أو GIF متحرك", L"عند التفعيل، ستعمل الأوامر بصلاحيات المسؤول. هل توافق؟", L"تحذير صلاحيات المسؤول" };
     }
-    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Appearance based on Windows settings or the selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"0\u00A0px gives square corners, 14\u00A0px gives Windows 11-style corners, 27\u00A0px gives strongly rounded corners", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and of the window background, including when no image is set", L"Layout & Position", L"", L"Window Position", L"In Auto mode, the position follows the window layout", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
+    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"From -1 to 28\u00A0px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 30–255 (default 215)", L"Layout & Position", L"", L"Window Position", L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
 }
 
 struct Win11SettingsState {
@@ -15768,11 +15805,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 addHit(2221, rcClr);
             }
             {
-                int opPct = std::clamp(static_cast<int>(std::lround((st->settings.customBackgroundOpacity / 255.0) * 100.0)), 10, 100);
                 drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE890",
                     ls.bgOpTitle,
                     ls.bgOpSub,
-                    std::to_wstring(opPct) + L"%");
+                    std::to_wstring(st->settings.customBackgroundOpacity));
             }
             const auto borders = GetWindowBorderStrings(st->settings.language);
             const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Mod;
@@ -15844,7 +15880,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.showHistSub,
                 st->settings.maxHistoryItems > 0);
             drawToggleRowInGroup(g1, y1 + rH, rH, 2504, L"\uEC92",
-                isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Показывать дату и время запуска" : L"Show Command Timestamps",
+                isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Дата и время в истории" : L"Date and Time in History",
                 isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : isRuNav
                     ? L"Короткие форматы даты и времени в строках истории" : L"Short date and time formats in history",
                 st->settings.showTimestamp);
@@ -15857,12 +15893,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : isRuNav
                     ? L"Нажатие за пределами окна закрывает его" : L"Clicking outside closes the window",
                 st->settings.closeOnClickOutside);
-            drawToggleRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE90E",
-                isViNav ? L"Bấm icon Taskbar để đóng hẳn (thay vì thu nhỏ)" : isRuNav
-                    ? L"Закрывать по значку на панели задач" : L"Close on Taskbar Icon Click",
-                isViNav ? L"Tắt = thu nhỏ bình thường, Bật = đóng hẳn hộp thoại Run" : isRuNav
-                    ? L"Нажатие значка на панели задач закрывает окно" : L"A click on the taskbar icon closes the open window",
-                st->settings.taskbarCloseInsteadOfMinimize);
+            const auto taskbar = GetTaskbarIconStrings(st->settings.language);
+            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE90E",
+                taskbar.title, taskbar.description,
+                taskbar.options[static_cast<size_t>(st->settings.taskbarIconMode)], 210.0f);
             // Clear history row
             float clrY = y1 + rH * 5;
             drawSettingRowHeader(g1, clrY, rH, g1.right - S(130), L"\uE74D", ls.clearHistTitle, ls.clearHistSub, pBrSub);
@@ -16833,9 +16867,15 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     Wh_SetIntValue(GetUserOverrideKey(L"closeOnClickOutside").c_str(), st->settings.closeOnClickOutside ? 0 : 1);
                     changed = true;
                 } else if (id == 2506) {
-                    Wh_SetStringValue(GetUserOverrideKey(L"taskbarClickAction").c_str(),
-                                      st->settings.taskbarCloseInsteadOfMinimize ? L"minimize" : L"close");
-                    changed = true;
+                    const auto taskbar = GetTaskbarIconStrings(st->settings.language);
+                    const int current = static_cast<int>(st->settings.taskbarIconMode) + 1;
+                    const std::vector<std::pair<int, std::wstring>> opts{
+                        {1, taskbar.options[0]}, {2, taskbar.options[1]}, {3, taskbar.options[2]}
+                    };
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    if (sel >= 1 && sel <= static_cast<int>(kTaskbarIconModeValues.size()) && sel != current) {
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"taskbarClickAction").c_str(), kTaskbarIconModeValues[sel - 1]);
+                    }
                 } else if (id == 2510) {
                     ClearCurrentUserStoredHistory();
                     changed = true;
@@ -17200,9 +17240,28 @@ void OpenModernSettingsApp(RunDialogState* state) {
     state->settingsOpenDeadline = GetTickCount64() + kSettingsStartupTimeoutMs;
     AdvanceSettingsOpenRequest(state);
 }
+void SetRunTaskbarButtonVisible(RunDialogState* state, bool visible) {
+    const HRESULT apartment = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    if (FAILED(apartment) && apartment != RPC_E_CHANGED_MODE) return;
+    {
+        winrt::com_ptr<ITaskbarList> taskbar;
+        if (SUCCEEDED(CoCreateInstance(CLSID_TaskbarList, nullptr, CLSCTX_INPROC_SERVER,
+                                      IID_ITaskbarList, taskbar.put_void())) &&
+            SUCCEEDED(taskbar->HrInit())) {
+            if (visible) {
+                state->taskbarButtonManuallyAdded = SUCCEEDED(taskbar->AddTab(state->hDlg));
+            } else if (SUCCEEDED(taskbar->DeleteTab(state->hDlg))) {
+                state->taskbarButtonManuallyAdded = false;
+            }
+        }
+    }
+    if (SUCCEEDED(apartment)) CoUninitialize();
+}
+
 void ApplyReloadedSettingsToDialog(RunDialogState* state) {
     if (!state || !state->hDlg || !IsWindow(state->hDlg)) return;
     int oldHeight = state->totalHeight;
+    const bool taskbarWasHidden = state->settings.taskbarIconMode == TaskbarIconMode::Hidden;
     {
         std::lock_guard<std::mutex> lock(g_settingsMutex);
         state->settings = g_settings;
@@ -17242,6 +17301,10 @@ void ApplyReloadedSettingsToDialog(RunDialogState* state) {
         ResizeDialogPreservingBottomAnchor(state, oldHeight);
     }
     ApplyWindowAppearance(state->hDlg, state);
+    const bool taskbarIsHidden = state->settings.taskbarIconMode == TaskbarIconMode::Hidden;
+    if (taskbarWasHidden != taskbarIsHidden && IsWindowVisible(state->hDlg)) {
+        SetRunTaskbarButtonVisible(state, !taskbarIsHidden);
+    }
     if (NeedsBackdropSnapshot(state)) {
         int dlgW = GetDlgWidth(state);
         CaptureCleanMonitorBackdrop(state->hDlg, false);
@@ -17680,6 +17743,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 void CleanupDialogState(HWND hWnd, RunDialogState* state) {
     RemoveWindowSubclass(hWnd, RunDlgSubclassProc, 1);
+    if (state && state->taskbarButtonManuallyAdded) SetRunTaskbarButtonVisible(state, false);
     if (state) FinishSettingsOpenRequest(state);
     CloseActiveGearMenu();
     KillTimer(hWnd, kTimerCaret);
@@ -18816,6 +18880,11 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                                     UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
     auto* state = reinterpret_cast<RunDialogState*>(dwRefData);
 
+    if (g_msgTaskbarButtonCreated && uMsg == g_msgTaskbarButtonCreated &&
+        state && state->settings.taskbarIconMode == TaskbarIconMode::Hidden) {
+        SetRunTaskbarButtonVisible(state, false);
+    }
+
     if (uMsg == g_msgUninit && g_msgUninit != 0) {
         if (!state) {
             g_dialogSubclassInstalled.store(false, std::memory_order_release);
@@ -19788,6 +19857,9 @@ void TransformRunDialog(HWND hDlg) {
     g_hTrackedRunDlg.store(hDlg);
     g_dialogSubclassInstalled.store(true, std::memory_order_release);
     SetWindowSubclass(hDlg, RunDlgSubclassProc, 1, (DWORD_PTR)state);
+    if (g_msgTaskbarButtonCreated && g_isTaskManagerProcess) {
+        ChangeWindowMessageFilterEx(hDlg, g_msgTaskbarButtonCreated, MSGFLT_ALLOW, nullptr);
+    }
     RefreshDialogRunIcons(state);
     if (!state->hRunIcon) {
         ExtractIconExW(L"shell32.dll", kWindowsRunIconIndex, nullptr, &state->hRunIcon, 1);
@@ -20168,6 +20240,7 @@ BOOL RunDialogModInit() {
     g_msgUninit       = RegisterWindowMessageW(L"Windhawk_Uninit_" WH_MOD_ID);
     g_msgToggle       = RegisterWindowMessageW(L"Windhawk_Toggle_" WH_MOD_ID);
     g_msgOpenSettings = RegisterWindowMessageW(L"Windhawk_OpenRunSettings_" WH_MOD_ID);
+    g_msgTaskbarButtonCreated = RegisterWindowMessageW(L"TaskbarButtonCreated");
 
     g_hShell32 = GetModuleHandleW(L"shell32.dll");
 
