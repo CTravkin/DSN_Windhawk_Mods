@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.8
+// @version         6.6.7
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 31
+// Build: 30
 
 // ==WindhawkModReadme==
 /*
@@ -16532,34 +16532,11 @@ void DrawLayeredRunIcon(ID2D1RenderTarget* target, IWICImagingFactory* imaging, 
         FAILED(pixels->Initialize(source.get(), GUID_WICPixelFormat32bppPBGRA,
                                   WICBitmapDitherTypeNone, nullptr, 0, WICBitmapPaletteTypeCustom))) return;
 
-    UINT width = 0, height = 0;
-    if (FAILED(pixels->GetSize(&width, &height))) return;
-    const uint64_t pixelCount = static_cast<uint64_t>(width) * height;
-    if (pixelCount == 0 || pixelCount > UINT_MAX / sizeof(uint32_t)) return;
-    const UINT stride = width * sizeof(uint32_t);
-    const UINT byteCount = static_cast<UINT>(pixelCount * sizeof(uint32_t));
-    std::vector<uint32_t> bgra(static_cast<size_t>(pixelCount));
-    if (FAILED(pixels->CopyPixels(nullptr, stride, byteCount,
-                                  reinterpret_cast<BYTE*>(bgra.data())))) return;
-
-    UINT top = height, bottom = 0;
-    for (UINT y = 0; y < height; ++y) {
-        const auto row = bgra.data() + static_cast<size_t>(y) * width;
-        if (std::any_of(row, row + width, [](uint32_t pixel) { return pixel >> 24; })) {
-            top = (std::min)(top, y);
-            bottom = y + 1;
-        }
-    }
-    if (bottom <= top) return;
-    // Align the visible artwork, including its translucent edges, with the row center.
-    const float offset = (static_cast<float>(height) - top - bottom) *
-                         (bounds.bottom - bounds.top) / (2.0f * height);
-    const auto centeredBounds = D2D1::RectF(bounds.left, bounds.top + offset, bounds.right, bounds.bottom + offset);
     winrt::com_ptr<ID2D1Bitmap> bitmap;
     const auto properties = D2D1::BitmapProperties(
         D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED), 96, 96);
-    if (SUCCEEDED(target->CreateBitmap(D2D1::SizeU(width, height), bgra.data(), stride, properties, bitmap.put()))) {
-        target->DrawBitmap(bitmap.get(), centeredBounds);
+    if (SUCCEEDED(target->CreateBitmapFromWicBitmap(pixels.get(), properties, bitmap.put()))) {
+        target->DrawBitmap(bitmap.get(), bounds);
     }
 }
 

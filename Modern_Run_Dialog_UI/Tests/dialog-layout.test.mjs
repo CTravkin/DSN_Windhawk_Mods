@@ -519,7 +519,7 @@ test('history actions keep delete in the same group', () => {
     assert.doesNotMatch(deleteItem, /isSeparator/);
 });
 
-test('layered icons preserve alpha and center artwork with asymmetric transparent padding', () => {
+test('layered icon rendering preserves transparent and translucent pixels', () => {
     const drawIcon = source.match(/void DrawLayeredRunIcon\([\s\S]*?\n\}/)?.[0];
     assert.ok(drawIcon, 'The Run dialog uses an alpha-aware icon renderer');
     compileChecks(`
@@ -530,7 +530,6 @@ test('layered icons preserve alpha and center artwork with asymmetric transparen
         #include <cassert>
         #include <cstdlib>
         #include <cstdint>
-        #include <vector>
 
         ${drawIcon}
 
@@ -550,7 +549,7 @@ test('layered icons preserve alpha and center artwork with asymmetric transparen
             auto pixels = static_cast<uint32_t*>(iconBits);
             for (int y = 0; y < 8; ++y) {
                 for (int x = 0; x < 8; ++x) {
-                    pixels[y * 8 + x] = y < 3 || x < 2 ? 0 : x < 5 ? 0x8000FF00 : 0xFFFF0000;
+                    pixels[y * 8 + x] = x < 2 ? 0 : x < 5 ? 0x8000FF00 : 0xFFFF0000;
                 }
             }
             ICONINFO info{TRUE, 0, 0, mask, color};
@@ -595,9 +594,6 @@ test('layered icons preserve alpha and center artwork with asymmetric transparen
             assert(row[28] == row[4]);
             assert(row[22] == 0xFFFF0000);
             assert(row[38] == 0xFFFFFFFF);
-            const auto surface = static_cast<const uint32_t*>(surfaceBits);
-            assert(surface[4 * width + 22] == 0xFFFF0000);
-            assert(surface[14 * width + 22] == row[4]);
             assert(std::abs(static_cast<int>(row[14] >> 24) - 179) <= 1);
             assert(std::abs(static_cast<int>((row[14] >> 8) & 255) - 153) <= 1);
 
