@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.9.1
+// @version         6.9.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 48
+// Build: 49
 
 // ==WindhawkModReadme==
 /*
@@ -58,7 +58,7 @@ Replaces the classic Win32 **Run (`Win + R`)** and **Task Manager "Create new ta
 
 - **Bug Fixes in v6.0.2.0:**
   - **Fixed Position Anchoring When Typing:** Fixed a bug where the Run dialog could jump or drift from fixed positions (such as **Bottom Left**) when app suggestions expanded or shrank as you typed—especially in **Compact Mini-Pill Mode**. Dialog resizing now atomically preserves the configured anchor and rejects unsolicited external window moves.
-  - **Working Background Opacity on Windows 11 Blur & All Themes:** Wired **Background Opacity (`30–255`)** so it now visibly adjusts the translucency/tint of **Windows 11 Blur**, **Liquid Glass**, and solid themes even when no custom background image/GIF is selected.
+  - **Working Background Opacity on Windows 11 Blur & All Themes:** Wired **Background Opacity (`12–100%`)** so it now visibly adjusts the translucency/tint of **Windows 11 Blur**, **Liquid Glass**, and solid themes even when no custom background image/GIF is selected.
 
 - **Dedicated WinUI 3 Settings Window (Hosted in `windhawk.exe`):**
   - Clicking the `⚙️` button automatically closes the Run dialog (zero overlap) and opens a standalone **Windows 11 Settings–style** window hosted in a dedicated `windhawk.exe -tool-mod` process rather than `explorer.exe`.
@@ -68,7 +68,7 @@ Replaces the classic Win32 **Run (`Win + R`)** and **Task Manager "Create new ta
 - **13 Built-In Themes & Full Visual Customization:**
   - Defaults to **Windows 11 Blur** (authentic frosted Fluent Acrylic with balanced opacity, crisp `14px` corners, and subtle hairline border for clean readability on any wallpaper), with **Liquid Glass** (refractive 3D glass pill) and 11 more curated themes (**Windows 11 Mica**, **Fluent Solid**, **Classic Win11**, **Midnight OLED**, **Nord Frost**, **Catppuccin Mocha**, **Dracula Velvet**, **Rosé Pine**, **Emerald Slate**, **Warm Paper**, and **Custom**) one click away.
   - Customize **Background Color**, **Border Color**, **Corner Radius (`0–28 px`)**, and **Dialog Position** (Auto taskbar-aware, Bottom/Top Left/Center/Right, or Screen Center).
-  - **Custom Static Image & Animated GIF Background:** Choose any `.png`, `.jpg`, `.bmp`, `.webp`, or **animated `.gif`** (up to 25 MB, auto-scaled for low memory) with unified seamless rendering across both the history card and input bar, adjustable opacity (`30–255`), and a subtle readability scrim.
+  - **Custom Static Image & Animated GIF Background:** Choose any `.png`, `.jpg`, `.bmp`, `.webp`, or **animated `.gif`** (up to 25 MB, auto-scaled for low memory) with unified seamless rendering across both the history card and input bar, adjustable opacity (`12–100%`), and a subtle readability scrim.
 
 - **Classic Default + Optional Compact Mini-Pill (`360px`):**
   - **Classic is the default layout** with full **Browse / Run / Exit / Settings** buttons.
@@ -100,7 +100,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - **Bản vá lỗi trong v6.0.2.0:**
   - **Sửa lỗi lệch/nhảy vị trí hộp thoại khi gõ lệnh:** Khắc phục triệt để lỗi hộp thoại Run bị nhảy ra giữa màn hình hoặc lệch khỏi vị trí cố định (như **Dưới – Trái**) khi danh sách gợi ý mở rộng hoặc thu gọn lúc gõ, đặc biệt ở **Chế độ thu nhỏ (Compact Mini-Pill)**. Quá trình đổi kích thước nay cập nhật nguyên tử theo đúng điểm neo đã chọn và chặn các tác động di chuyển ngoài ý muốn.
-  - **Hỗ trợ chỉnh độ mờ đục (Opacity) cho Windows 11 Blur & mọi chủ đề:** Kết nối thanh chỉnh **Độ đậm nền (`30–255`)** để thay đổi trực tiếp độ mờ/độ trong suốt của **Windows 11 Blur**, **Liquid Glass** và các chủ đề màu đặc ngay cả khi không chọn ảnh/GIF nền.
+  - **Hỗ trợ chỉnh độ mờ đục (Opacity) cho Windows 11 Blur & mọi chủ đề:** Kết nối thanh chỉnh **Độ đậm nền (`12–100%`)** để thay đổi trực tiếp độ mờ/độ trong suốt của **Windows 11 Blur**, **Liquid Glass** và các chủ đề màu đặc ngay cả khi không chọn ảnh/GIF nền.
 
 - **Cửa sổ Cài đặt WinUI 3 độc lập (chạy trong tiến trình `windhawk.exe`):**
   - Khi bấm biểu tượng `⚙️`, hộp thoại Run tự đóng ngay (không chồng lấn) và mở cửa sổ **Cài đặt Modern Run** phong cách Windows 11 chạy riêng trong tiến trình `windhawk.exe -tool-mod` thay vì `explorer.exe`.
@@ -110,7 +110,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 - **13 Chủ đề giao diện có sẵn & Tùy chỉnh cá nhân hóa toàn diện:**
   - Mặc định sử dụng **Windows 11 Blur** (hiệu ứng Acrylic mờ đục dịu mắt, bo góc `14px` và viền mảnh chuẩn Windows 11 giúp chữ luôn rõ trên mọi hình nền), đồng thời giữ **Liquid Glass** (viên thuốc kính khúc xạ 3D) cùng 11 chủ đề khác (**Windows 11 Mica**, **Fluent Solid**, **Classic Win11**, **Midnight OLED**, **Nord Frost**, **Catppuccin Mocha**, **Dracula Velvet**, **Rosé Pine**, **Emerald Slate**, **Warm Paper** và **Tự tùy chỉnh**).
   - Tùy chỉnh trực tiếp **Màu nền**, **Màu viền**, **Bán kính bo góc (`0–28 px`)** và **Vị trí hiển thị hộp thoại** (Tự động theo Taskbar, Dưới/Trên Trái/Giữa/Phải hoặc Giữa màn hình).
-  - **Hình nền tĩnh & Ảnh động GIF tùy chỉnh:** Hỗ trợ chọn ảnh `.png`, `.jpg`, `.bmp`, `.webp` và **ảnh động `.gif`** (tối đa 25 MB, tự tối ưu kích thước) hiển thị liền mạch xuyên suốt cả thẻ lịch sử và thanh nhập, chỉnh được độ đậm nền (`30–255`) kèm lớp phủ bảo toàn độ rõ chữ.
+  - **Hình nền tĩnh & Ảnh động GIF tùy chỉnh:** Hỗ trợ chọn ảnh `.png`, `.jpg`, `.bmp`, `.webp` và **ảnh động `.gif`** (tối đa 25 MB, tự tối ưu kích thước) hiển thị liền mạch xuyên suốt cả thẻ lịch sử và thanh nhập, chỉnh được độ đậm nền (`12–100%`) kèm lớp phủ bảo toàn độ rõ chữ.
 
 - **Cổ điển mặc định và Thu gọn (`360px`):**
   - Bố cục **Cổ điển** có đủ nút **Duyệt / Chạy / Thoát / Cài đặt**.
@@ -189,92 +189,92 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - auto: Авто
     - dark: Темный
     - light: Светлый
-  - iconSet: mod
+  - iconSet: default
     $description:ru-RU: "Набор значков для окна и контекстного меню"
     $description: "Icon set for the window and context menu"
     $name: "Icons"
     $options:
-    - mod: Default
+    - default: Default
     - windows_fluent: Windows (Fluent)
     $name:vi-VN: Biểu tượng
     $options:vi-VN:
-    - mod: Biểu tượng của mod
+    - default: Biểu tượng của mod
     - windows_fluent: Windows (Fluent)
     $name:th-TH: ไอคอน
     $options:th-TH:
-    - mod: ไอคอนของม็อด
+    - default: ไอคอนของม็อด
     - windows_fluent: Windows (Fluent)
     $name:id-ID: Ikon
     $options:id-ID:
-    - mod: Ikon mod
+    - default: Ikon mod
     - windows_fluent: Windows (Fluent)
     $name:ms-MY: Ikon
     $options:ms-MY:
-    - mod: Ikon mod
+    - default: Ikon mod
     - windows_fluent: Windows (Fluent)
     $name:ja-JP: アイコン
     $options:ja-JP:
-    - mod: Mod のアイコン
+    - default: Mod のアイコン
     - windows_fluent: Windows (Fluent)
     $name:zh-CN: 图标
     $options:zh-CN:
-    - mod: 模组图标
+    - default: 模组图标
     - windows_fluent: Windows (Fluent)
     $name:zh-TW: 圖示
     $options:zh-TW:
-    - mod: 模組圖示
+    - default: 模組圖示
     - windows_fluent: Windows (Fluent)
     $name:ko-KR: 아이콘
     $options:ko-KR:
-    - mod: 모드 아이콘
+    - default: 모드 아이콘
     - windows_fluent: Windows (Fluent)
     $name:fr-FR: Icônes
     $options:fr-FR:
-    - mod: Icônes du mod
+    - default: Icônes du mod
     - windows_fluent: Windows (Fluent)
     $name:de-DE: Symbole
     $options:de-DE:
-    - mod: Symbole des Mods
+    - default: Symbole des Mods
     - windows_fluent: Windows (Fluent)
     $name:es-ES: Iconos
     $options:es-ES:
-    - mod: Iconos del mod
+    - default: Iconos del mod
     - windows_fluent: Windows (Fluent)
     $name:pt-BR: Ícones
     $options:pt-BR:
-    - mod: Ícones do mod
+    - default: Ícones do mod
     - windows_fluent: Windows (Fluent)
     $name:it-IT: Icone
     $options:it-IT:
-    - mod: Icone della mod
+    - default: Icone della mod
     - windows_fluent: Windows (Fluent)
     $name:ru-RU: "Иконки"
     $options:ru-RU:
-    - mod: По умолчанию
+    - default: По умолчанию
     - windows_fluent: Windows (Fluent)
     $name:uk-UA: Піктограми
     $options:uk-UA:
-    - mod: Піктограми мода
+    - default: Піктограми мода
     - windows_fluent: Windows (Fluent)
     $name:pl-PL: Ikony
     $options:pl-PL:
-    - mod: Ikony moda
+    - default: Ikony moda
     - windows_fluent: Windows (Fluent)
     $name:nl-NL: Pictogrammen
     $options:nl-NL:
-    - mod: Pictogrammen van de mod
+    - default: Pictogrammen van de mod
     - windows_fluent: Windows (Fluent)
     $name:tr-TR: Simgeler
     $options:tr-TR:
-    - mod: Mod simgeleri
+    - default: Mod simgeleri
     - windows_fluent: Windows (Fluent)
     $name:hi-IN: आइकन
     $options:hi-IN:
-    - mod: मॉड के आइकन
+    - default: मॉड के आइकन
     - windows_fluent: Windows (Fluent)
     $name:ar: الأيقونات
     $options:ar:
-    - mod: أيقونات التعديل
+    - default: أيقونات التعديل
     - windows_fluent: Windows (Fluent)
   - customBgColor: ""
     $description:ru-RU: "Цвет в формате #RRGGBB, например #1E1E24. Пустое значение использует цвет темы"
@@ -308,7 +308,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:ar-SA: نصف قطر الزوايا الخارجية
     $description: "From -1 to 28 px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape"
     $description:vi-VN: Chỉnh độ bo góc theo pixel (0 = góc vuông, 8–12 = Win11 cổ điển, 24–28 = viên thuốc, -1 = theo chủ đề).
-  - customInnerCornerRadius: "-1"
+  - innerCornerRadius: "-1"
     $name: "Inner Corner Radius"
     $description: "Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px"
     $name:vi-VN: Bán kính góc trong
@@ -358,13 +358,13 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Hình nền / Ảnh động tùy chỉnh (PNG, JPG, GIF, WebP)
     $description: "PNG, JPG, BMP, WebP, or GIF up to 25 MB"
     $description:vi-VN: Đường dẫn tệp ảnh tĩnh hoặc ảnh động GIF làm nền cho hộp thoại Run.
-  - customBackgroundOpacity: 215
-    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения; 30–255 (по умолчанию 215)"
+  - backgroundOpacityPercent: 84
+    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)"
     $name:ru-RU: "Видимость фонового изображения"
-    $description: "Opacity of the image and window background, including when no image is set. 30–255 (default 215)"
+    $description: "Opacity of the image and window background, including when no image is set. 12–100% (default 84%)"
     $name: "Background Image Opacity"
-    $name:vi-VN: Độ đậm nền hộp thoại & hình nền (30-255)
-    $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 215 (~85%).
+    $name:vi-VN: Độ đậm nền hộp thoại & hình nền (12–100%)
+    $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 84%.
   - language: auto
     $description:ru-RU: "Применяется к окну запуска и настройкам мода"
     $name:ru-RU: "Язык интерфейса"
@@ -441,8 +441,9 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - tr: Türkçe (Turkish)
     - hi: हिन्दी (Hindi)
     - ar: العربية (Arabic)
-  $name: 1. Appearance & Visual Effects
-  $name:vi-VN: 1. Giao diện & Hiệu ứng hình ảnh
+  $name: Personalization
+  $name:ru-RU: Персонализация
+  $name:vi-VN: Cá nhân hoá
 
 - windowBordersGroup:
   - customBorderColor: ""
@@ -452,278 +453,278 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name: "Border Color"
     $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
-  - windowBorderMode: mod
+  - windowBorderMode: default
     $name: Window Borders
     $description: "Color of the outer outlines of the main panels"
     $options:
-    - mod: Default
+    - default: Default
     - windows: Windows-defined
     - off: Off
     $name:vi-VN: Chế độ viền
     $description:vi-VN: Màu sắc và hiển thị viền các bảng
     $options:vi-VN:
-    - mod: Theo mod
+    - default: Theo mod
     - windows: Theo Windows
     - off: Tắt
     $name:th-TH: โหมดขอบ
     $description:th-TH: สีและการแสดงขอบแผง
     $options:th-TH:
-    - mod: ตามม็อด
+    - default: ตามม็อด
     - windows: ตาม Windows
     - off: ปิด
     $name:id-ID: Mode Bingkai
     $description:id-ID: Warna dan visibilitas garis luar panel
     $options:id-ID:
-    - mod: Sesuai mod
+    - default: Sesuai mod
     - windows: Sesuai Windows
     - off: Nonaktif
     $name:ms-MY: Mod Sempadan
     $description:ms-MY: Warna dan keterlihatan sempadan panel
     $options:ms-MY:
-    - mod: Mengikut mod
+    - default: Mengikut mod
     - windows: Mengikut Windows
     - off: Dimatikan
     $name:ja-JP: 境界線モード
     $description:ja-JP: パネルの境界線の色と表示
     $options:ja-JP:
-    - mod: Mod に従う
+    - default: Mod に従う
     - windows: Windows に従う
     - off: 表示しない
     $name:zh-CN: 边框模式
     $description:zh-CN: 面板边框的颜色和可见性
     $options:zh-CN:
-    - mod: 由模组决定
+    - default: 由模组决定
     - windows: 由 Windows 决定
     - off: 关闭
     $name:zh-TW: 邊框模式
     $description:zh-TW: 面板邊框的色彩和顯示
     $options:zh-TW:
-    - mod: 由模組決定
+    - default: 由模組決定
     - windows: 由 Windows 決定
     - off: 關閉
     $name:ko-KR: 테두리 모드
     $description:ko-KR: 패널 테두리의 색상과 표시 여부
     $options:ko-KR:
-    - mod: 모드 설정
+    - default: 모드 설정
     - windows: Windows 설정
     - off: 끔
     $name:fr-FR: Mode des bordures
     $description:fr-FR: Couleur et visibilité du contour des panneaux
     $options:fr-FR:
-    - mod: Selon le mod
+    - default: Selon le mod
     - windows: Selon Windows
     - off: Désactivées
     $name:de-DE: Rahmenmodus
     $description:de-DE: Farbe und Sichtbarkeit der Panelrahmen
     $options:de-DE:
-    - mod: Vom Mod festgelegt
+    - default: Vom Mod festgelegt
     - windows: Von Windows festgelegt
     - off: Aus
     $name:es-ES: Modo de borde
     $description:es-ES: Color y visibilidad del contorno de los paneles
     $options:es-ES:
-    - mod: Según el mod
+    - default: Según el mod
     - windows: Según Windows
     - off: Desactivados
     $name:pt-BR: Modo das bordas
     $description:pt-BR: Cor e visibilidade do contorno dos painéis
     $options:pt-BR:
-    - mod: Definido pelo mod
+    - default: Definido pelo mod
     - windows: Definido pelo Windows
     - off: Desativadas
     $name:it-IT: Modalità dei bordi
     $description:it-IT: Colore e visibilità del contorno dei riquadri
     $options:it-IT:
-    - mod: Secondo la mod
+    - default: Secondo la mod
     - windows: Secondo Windows
     - off: Disattivati
     $name:ru-RU: "Рамки окон"
     $description:ru-RU: "Цвет внешних контуров основных панелей"
     $options:ru-RU:
-    - mod: По умолчанию
+    - default: По умолчанию
     - windows: Определено Windows
     - off: Отключены
     $name:uk-UA: Режим рамок
     $description:uk-UA: Колір і видимість зовнішніх контурів панелей
     $options:uk-UA:
-    - mod: Визначено модом
+    - default: Визначено модом
     - windows: Визначено Windows
     - off: Вимкнено
     $name:pl-PL: Tryb obramowania
     $description:pl-PL: Kolor i widoczność obramowań paneli
     $options:pl-PL:
-    - mod: Według moda
+    - default: Według moda
     - windows: Według systemu Windows
     - off: Wyłączone
     $name:nl-NL: Randmodus
     $description:nl-NL: Kleur en zichtbaarheid van paneelranden
     $options:nl-NL:
-    - mod: Volgens de mod
+    - default: Volgens de mod
     - windows: Volgens Windows
     - off: Uit
     $name:tr-TR: Kenarlık Modu
     $description:tr-TR: Panel kenarlıklarının rengi ve görünürlüğü
     $options:tr-TR:
-    - mod: Moda göre
+    - default: Moda göre
     - windows: Windows’a göre
     - off: Kapalı
     $name:hi-IN: सीमा मोड
     $description:hi-IN: पैनल की बाहरी सीमाओं का रंग और दृश्यता
     $options:hi-IN:
-    - mod: मॉड के अनुसार
+    - default: मॉड के अनुसार
     - windows: Windows के अनुसार
     - off: बंद
     $name:ar: وضع الحدود
     $description:ar: لون وحدود ظهور الحواف الخارجية للوحات
     $options:ar:
-    - mod: حسب التعديل
+    - default: حسب التعديل
     - windows: حسب Windows
     - off: معطلة
-  - contextMenuBorderMode: own
+  - menuBorderMode: default
     $name: Menu Borders
     $description: "Color and visibility of the context menu border"
     $options:
-    - own: Default
+    - default: Default
     - window: Same as window
     - windows: Windows-defined
     - off: Off
     $name:vi-VN: Viền menu ngữ cảnh
     $description:vi-VN: Viền ngoài của menu kiểu mod
     $options:vi-VN:
-    - own: Viền riêng
+    - default: Viền riêng
     - window: Theo cài đặt cửa sổ
     - windows: Theo Windows
     - off: Tắt
     $name:th-TH: ขอบเมนูบริบท
     $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
     $options:th-TH:
-    - own: ขอบของเมนู
+    - default: ขอบของเมนู
     - window: ตามการตั้งค่าหน้าต่าง
     - windows: ตาม Windows
     - off: ปิด
     $name:id-ID: Bingkai Menu Konteks
     $description:id-ID: Garis luar menu bergaya mod
     $options:id-ID:
-    - own: Bingkai menu
+    - default: Bingkai menu
     - window: Sesuai pengaturan jendela
     - windows: Sesuai Windows
     - off: Nonaktif
     $name:ms-MY: Sempadan Menu Konteks
     $description:ms-MY: Sempadan luar menu gaya mod
     $options:ms-MY:
-    - own: Sempadan menu
+    - default: Sempadan menu
     - window: Mengikut tetapan tetingkap
     - windows: Mengikut Windows
     - off: Dimatikan
     $name:ja-JP: コンテキスト メニューの境界線
     $description:ja-JP: Mod スタイルのメニューの外枠
     $options:ja-JP:
-    - own: メニュー独自の境界線
+    - default: メニュー独自の境界線
     - window: ウィンドウの設定に従う
     - windows: Windows に従う
     - off: 表示しない
     $name:zh-CN: 右键菜单边框
     $description:zh-CN: 模组样式菜单的外边框
     $options:zh-CN:
-    - own: 菜单自带边框
+    - default: 菜单自带边框
     - window: 由窗口设置决定
     - windows: 由 Windows 决定
     - off: 关闭
     $name:zh-TW: 快顯選單邊框
     $description:zh-TW: 模組樣式選單的外邊框
     $options:zh-TW:
-    - own: 選單自帶邊框
+    - default: 選單自帶邊框
     - window: 由視窗設定決定
     - windows: 由 Windows 決定
     - off: 關閉
     $name:ko-KR: 상황에 맞는 메뉴 테두리
     $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
     $options:ko-KR:
-    - own: 메뉴 고유 테두리
+    - default: 메뉴 고유 테두리
     - window: 창 설정에 따름
     - windows: Windows 설정
     - off: 끔
     $name:fr-FR: Bordures du menu contextuel
     $description:fr-FR: Contour du menu dans le style du mod
     $options:fr-FR:
-    - own: Bordure propre au menu
+    - default: Bordure propre au menu
     - window: Selon les paramètres de fenêtre
     - windows: Selon Windows
     - off: Désactivées
     $name:de-DE: Kontextmenürahmen
     $description:de-DE: Außenrahmen des Menüs im Mod-Stil
     $options:de-DE:
-    - own: Eigener Rahmen
+    - default: Eigener Rahmen
     - window: Nach Fenstereinstellungen
     - windows: Von Windows festgelegt
     - off: Aus
     $name:es-ES: Bordes del menú contextual
     $description:es-ES: Contorno del menú con estilo del mod
     $options:es-ES:
-    - own: Borde propio del menú
+    - default: Borde propio del menú
     - window: Según los ajustes de ventana
     - windows: Según Windows
     - off: Desactivados
     $name:pt-BR: Bordas do menu de contexto
     $description:pt-BR: Contorno externo do menu no estilo do mod
     $options:pt-BR:
-    - own: Borda própria do menu
+    - default: Borda própria do menu
     - window: Conforme as configurações das janelas
     - windows: Definido pelo Windows
     - off: Desativadas
     $name:it-IT: Bordi del menu contestuale
     $description:it-IT: Contorno esterno del menu in stile mod
     $options:it-IT:
-    - own: Bordo proprio del menu
+    - default: Bordo proprio del menu
     - window: Secondo le impostazioni delle finestre
     - windows: Secondo Windows
     - off: Disattivati
     $name:ru-RU: "Рамки меню"
     $description:ru-RU: "Цвет и видимость рамки контекстного меню"
     $options:ru-RU:
-    - own: По умолчанию
+    - default: По умолчанию
     - window: Как у окна
     - windows: Определено Windows
     - off: Отключены
     $name:uk-UA: Рамки меню
     $description:uk-UA: Зовнішній контур меню в стилі мода
     $options:uk-UA:
-    - own: Власна рамка
+    - default: Власна рамка
     - window: Визначено параметрами вікон
     - windows: Визначено Windows
     - off: Вимкнено
     $name:pl-PL: Obramowanie menu kontekstowego
     $description:pl-PL: Zewnętrzna ramka menu w stylu moda
     $options:pl-PL:
-    - own: Własne obramowanie
+    - default: Własne obramowanie
     - window: Według ustawień okien
     - windows: Według systemu Windows
     - off: Wyłączone
     $name:nl-NL: Randen van het snelmenu
     $description:nl-NL: Buitenrand van het menu in de modstijl
     $options:nl-NL:
-    - own: Eigen rand
+    - default: Eigen rand
     - window: Volgens de vensterinstellingen
     - windows: Volgens Windows
     - off: Uit
     $name:tr-TR: Bağlam Menüsü Kenarlıkları
     $description:tr-TR: Mod stilindeki menünün dış kenarlığı
     $options:tr-TR:
-    - own: Menüye özel kenarlık
+    - default: Menüye özel kenarlık
     - window: Pencere ayarlarına göre
     - windows: Windows’a göre
     - off: Kapalı
     $name:hi-IN: संदर्भ मेनू की सीमाएँ
     $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
     $options:hi-IN:
-    - own: मेनू की अपनी सीमा
+    - default: मेनू की अपनी सीमा
     - window: विंडो सेटिंग के अनुसार
     - windows: Windows के अनुसार
     - off: बंद
     $name:ar: حدود قائمة السياق
     $description:ar: الحد الخارجي للقائمة بنمط التعديل
     $options:ar:
-    - own: حد خاص بالقائمة
+    - default: حد خاص بالقائمة
     - window: حسب إعدادات النوافذ
     - windows: حسب Windows
     - off: معطلة
@@ -782,364 +783,364 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Nhớ vị trí cửa sổ lần cuối
     $name:ru-RU: "Запоминать положение окна"
     $description:vi-VN: Ghi nhớ vị trí bạn đã kéo thả hộp thoại Run và tự động mở lại ở đúng vị trí đó cho các lần Win + R tiếp theo.
-  - minimalMode: "0"
+  - dialogLayout: classic
     $name: "Window Layout"
     $description: "Arrangement of the input field, lists, and buttons with personalization applied"
     $options:
-    - "0": Classic
-    - "1": Compact Mini-Pill
-    - "2": Fluent
+    - classic: Classic
+    - pill: Compact Mini-Pill
+    - fluent: Fluent
     $name:vi-VN: Bố cục hộp thoại
     $description:vi-VN: Bố cục cửa sổ cơ bản sử dụng các thiết lập cá nhân hóa
     $options:vi-VN:
-    - "0": Cổ điển
-    - "1": Thu gọn (Pill)
-    - "2": Fluent
+    - classic: Cổ điển
+    - pill: Thu gọn (Pill)
+    - fluent: Fluent
     $name:th-TH: รูปแบบกล่องโต้ตอบ
     $description:th-TH: รูปแบบหน้าต่างพื้นฐานที่ใช้การตั้งค่าส่วนบุคคล
     $options:th-TH:
-    - "0": คลาสสิก
-    - "1": กะทัดรัด (Pill)
-    - "2": Fluent
+    - classic: คลาสสิก
+    - pill: กะทัดรัด (Pill)
+    - fluent: Fluent
     $name:id-ID: Tata Letak Dialog
     $description:id-ID: Tata letak dasar jendela yang menggunakan pengaturan personalisasi
     $options:id-ID:
-    - "0": Klasik
-    - "1": Ringkas (Pill)
-    - "2": Fluent
+    - classic: Klasik
+    - pill: Ringkas (Pill)
+    - fluent: Fluent
     $name:ms-MY: Susun Atur Dialog
     $description:ms-MY: Susun atur asas tetingkap yang menggunakan tetapan pemperibadian
     $options:ms-MY:
-    - "0": Klasik
-    - "1": Padat (Pill)
-    - "2": Fluent
+    - classic: Klasik
+    - pill: Padat (Pill)
+    - fluent: Fluent
     $name:ja-JP: ダイアログのレイアウト
     $description:ja-JP: 個人用設定を使用する基本的なウィンドウレイアウト
     $options:ja-JP:
-    - "0": クラシック
-    - "1": コンパクト (Pill)
-    - "2": Fluent
+    - classic: クラシック
+    - pill: コンパクト (Pill)
+    - fluent: Fluent
     $name:zh-CN: 对话框布局
     $description:zh-CN: 使用个性化设置的基本窗口布局
     $options:zh-CN:
-    - "0": 经典
-    - "1": 紧凑（胶囊形）
-    - "2": Fluent
+    - classic: 经典
+    - pill: 紧凑（胶囊形）
+    - fluent: Fluent
     $name:zh-TW: 對話方塊版面配置
     $description:zh-TW: 使用個人化設定的基本視窗版面配置
     $options:zh-TW:
-    - "0": 傳統
-    - "1": 精簡（膠囊形）
-    - "2": Fluent
+    - classic: 傳統
+    - pill: 精簡（膠囊形）
+    - fluent: Fluent
     $name:ko-KR: 대화 상자 레이아웃
     $description:ko-KR: 개인 설정을 사용하는 기본 창 레이아웃
     $options:ko-KR:
-    - "0": 클래식
-    - "1": 간단히 (Pill)
-    - "2": Fluent
+    - classic: 클래식
+    - pill: 간단히 (Pill)
+    - fluent: Fluent
     $name:fr-FR: Disposition de la fenêtre
     $description:fr-FR: Disposition de base de la fenêtre qui utilise les paramètres de personnalisation
     $options:fr-FR:
-    - "0": Classique
-    - "1": Compact (Pill)
-    - "2": Fluent
+    - classic: Classique
+    - pill: Compact (Pill)
+    - fluent: Fluent
     $name:de-DE: Dialoglayout
     $description:de-DE: Grundlayout des Fensters unter Verwendung der Personalisierungseinstellungen
     $options:de-DE:
-    - "0": Klassisch
-    - "1": Kompakt (Pill)
-    - "2": Fluent
+    - classic: Klassisch
+    - pill: Kompakt (Pill)
+    - fluent: Fluent
     $name:es-ES: Diseño del cuadro de diálogo
     $description:es-ES: Diseño básico de la ventana que usa la configuración de personalización
     $options:es-ES:
-    - "0": Clásico
-    - "1": Compacto (Pill)
-    - "2": Fluent
+    - classic: Clásico
+    - pill: Compacto (Pill)
+    - fluent: Fluent
     $name:pt-BR: Layout da janela
     $description:pt-BR: Layout básico da janela que usa as configurações de personalização
     $options:pt-BR:
-    - "0": Clássico
-    - "1": Compacto (Pill)
-    - "2": Fluent
+    - classic: Clássico
+    - pill: Compacto (Pill)
+    - fluent: Fluent
     $name:it-IT: Layout della finestra
     $description:it-IT: Layout di base della finestra che usa le impostazioni di personalizzazione
     $options:it-IT:
-    - "0": Classico
-    - "1": Compatto (Pill)
-    - "2": Fluent
+    - classic: Classico
+    - pill: Compatto (Pill)
+    - fluent: Fluent
     $name:ru-RU: "Макет окна"
     $description:ru-RU: "Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"
     $options:ru-RU:
-    - "0": Классический
-    - "1": Компактный (Pill)
-    - "2": Современный (Fluent)
+    - classic: Классический
+    - pill: Компактный (Pill)
+    - fluent: Современный (Fluent)
     $name:uk-UA: Макет вікна
     $description:uk-UA: Базове компонування вікна з урахуванням параметрів персоналізації
     $options:uk-UA:
-    - "0": Класичний
-    - "1": Компактний (Pill)
-    - "2": Fluent
+    - classic: Класичний
+    - pill: Компактний (Pill)
+    - fluent: Fluent
     $name:pl-PL: Układ okna
     $description:pl-PL: Podstawowy układ okna, który korzysta z ustawień personalizacji
     $options:pl-PL:
-    - "0": Klasyczny
-    - "1": Kompaktowy (Pill)
-    - "2": Fluent
+    - classic: Klasyczny
+    - pill: Kompaktowy (Pill)
+    - fluent: Fluent
     $name:nl-NL: Vensterindeling
     $description:nl-NL: Basisindeling van het venster met de instellingen voor persoonlijke voorkeur
     $options:nl-NL:
-    - "0": Klassiek
-    - "1": Compact (Pill)
-    - "2": Fluent
+    - classic: Klassiek
+    - pill: Compact (Pill)
+    - fluent: Fluent
     $name:tr-TR: İletişim Kutusu Düzeni
     $description:tr-TR: Kişiselleştirme ayarlarını kullanan temel pencere düzeni
     $options:tr-TR:
-    - "0": Klasik
-    - "1": Kompakt (Pill)
-    - "2": Fluent
+    - classic: Klasik
+    - pill: Kompakt (Pill)
+    - fluent: Fluent
     $name:hi-IN: डायलॉग का लेआउट
     $description:hi-IN: वैयक्तिकरण सेटिंग का उपयोग करने वाला मूल विंडो लेआउट
     $options:hi-IN:
-    - "0": क्लासिक
-    - "1": कॉम्पैक्ट (Pill)
-    - "2": Fluent
+    - classic: क्लासिक
+    - pill: कॉम्पैक्ट (Pill)
+    - fluent: Fluent
     $name:ar: تخطيط النافذة
     $description:ar: التخطيط الأساسي للنافذة الذي يستخدم إعدادات التخصيص
     $options:ar:
-    - "0": كلاسيكي
-    - "1": مدمج (Pill)
-    - "2": Fluent
-  - contextMenuStyle: mod
+    - classic: كلاسيكي
+    - pill: مدمج (Pill)
+    - fluent: Fluent
+  - contextMenuStyle: standard
     $name: "Context Menu Style"
     $description: "Appearance of the right-click menu"
     $options:
-    - mod: Standard
+    - standard: Standard
     - windows_fluent: Windows (Fluent)
     $name:vi-VN: Kiểu menu ngữ cảnh
     $description:vi-VN: Đổi giao diện menu khi nhấp chuột phải
     $options:vi-VN:
-    - mod: Kiểu của mod
+    - standard: Kiểu của mod
     - windows_fluent: Windows (Fluent)
     $name:th-TH: รูปแบบเมนูบริบท
     $description:th-TH: เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา
     $options:th-TH:
-    - mod: รูปแบบของม็อด
+    - standard: รูปแบบของม็อด
     - windows_fluent: Windows (Fluent)
     $name:id-ID: Gaya Menu Konteks
     $description:id-ID: Mengubah tampilan menu saat klik kanan
     $options:id-ID:
-    - mod: Gaya Mod
+    - standard: Gaya Mod
     - windows_fluent: Windows (Fluent)
     $name:ms-MY: Gaya Menu Konteks
     $description:ms-MY: Mengubah rupa menu apabila klik kanan
     $options:ms-MY:
-    - mod: Gaya Mod
+    - standard: Gaya Mod
     - windows_fluent: Windows (Fluent)
     $name:ja-JP: コンテキスト メニューのスタイル
     $description:ja-JP: 右クリック メニューの外観を変更します
     $options:ja-JP:
-    - mod: Mod のスタイル
+    - standard: Mod のスタイル
     - windows_fluent: Windows (Fluent)
     $name:zh-CN: 右键菜单样式
     $description:zh-CN: 更改右键单击时显示的菜单外观
     $options:zh-CN:
-    - mod: 模组样式
+    - standard: 模组样式
     - windows_fluent: Windows (Fluent)
     $name:zh-TW: 快顯選單樣式
     $description:zh-TW: 變更按下滑鼠右鍵時顯示的選單外觀
     $options:zh-TW:
-    - mod: 模組樣式
+    - standard: 模組樣式
     - windows_fluent: Windows (Fluent)
     $name:ko-KR: 상황에 맞는 메뉴 스타일
     $description:ko-KR: 마우스 오른쪽 클릭 메뉴의 모양을 변경합니다
     $options:ko-KR:
-    - mod: 모드 스타일
+    - standard: 모드 스타일
     - windows_fluent: Windows (Fluent)
     $name:fr-FR: Style du menu contextuel
     $description:fr-FR: Modifie l’apparence du menu du clic droit
     $options:fr-FR:
-    - mod: Style du mod
+    - standard: Style du mod
     - windows_fluent: Windows (Fluent)
     $name:de-DE: Kontextmenüstil
     $description:de-DE: Ändert das Aussehen des Menüs beim Rechtsklick
     $options:de-DE:
-    - mod: Mod-Stil
+    - standard: Mod-Stil
     - windows_fluent: Windows (Fluent)
     $name:es-ES: Estilo del menú contextual
     $description:es-ES: Cambia el aspecto del menú al hacer clic con el botón derecho
     $options:es-ES:
-    - mod: Estilo del mod
+    - standard: Estilo del mod
     - windows_fluent: Windows (Fluent)
     $name:pt-BR: Estilo do menu de contexto
     $description:pt-BR: Altera a aparência do menu do botão direito
     $options:pt-BR:
-    - mod: Estilo do mod
+    - standard: Estilo do mod
     - windows_fluent: Windows (Fluent)
     $name:it-IT: Stile del menu contestuale
     $description:it-IT: Modifica l’aspetto del menu del tasto destro
     $options:it-IT:
-    - mod: Stile della mod
+    - standard: Stile della mod
     - windows_fluent: Windows (Fluent)
     $name:ru-RU: "Стиль контекстного меню"
     $description:ru-RU: "Оформление меню при нажатии правой кнопки мыши"
     $options:ru-RU:
-    - mod: Обычный
+    - standard: Обычный
     - windows_fluent: Windows (Fluent)
     $name:uk-UA: Стиль контекстного меню
     $description:uk-UA: Змінює вигляд меню при натисканні правою кнопкою миші
     $options:uk-UA:
-    - mod: Стиль мода
+    - standard: Стиль мода
     - windows_fluent: Windows (Fluent)
     $name:pl-PL: Styl menu kontekstowego
     $description:pl-PL: Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem
     $options:pl-PL:
-    - mod: Styl moda
+    - standard: Styl moda
     - windows_fluent: Windows (Fluent)
     $name:nl-NL: Stijl van het snelmenu
     $description:nl-NL: Wijzigt het uiterlijk van het menu bij rechtsklikken
     $options:nl-NL:
-    - mod: Stijl van de mod
+    - standard: Stijl van de mod
     - windows_fluent: Windows (Fluent)
     $name:tr-TR: Bağlam menüsü stili
     $description:tr-TR: Sağ tıklama menüsünün görünümünü değiştirir
     $options:tr-TR:
-    - mod: Mod stili
+    - standard: Mod stili
     - windows_fluent: Windows (Fluent)
     $name:hi-IN: संदर्भ मेनू की शैली
     $description:hi-IN: राइट-क्लिक मेनू का रूप बदलता है
     $options:hi-IN:
-    - mod: मॉड की शैली
+    - standard: मॉड की शैली
     - windows_fluent: Windows (Fluent)
     $name:ar: نمط قائمة السياق
     $description:ar: يغير مظهر القائمة عند النقر بزر الماوس الأيمن
     $options:ar:
-    - mod: نمط التعديل
+    - standard: نمط التعديل
     - windows_fluent: Windows (Fluent)
-  - dialogWidthPreset: layout
+  - dialogWidthPreset: default
     $name: "Window Width"
     $description: "The default width follows the window layout"
     $options:
-    - layout: "Default"
+    - default: "Default"
     - narrow: "Narrow"
     - wide: "Wide"
     $name:ru-RU: "Ширина окна"
     $description:ru-RU: "Ширина по умолчанию зависит от макета окна"
     $options:ru-RU:
-    - layout: "По умолчанию"
+    - default: "По умолчанию"
     - narrow: "Узкая"
     - wide: "Широкая"
     $name:vi-VN: "Chiều rộng cửa sổ"
     $description:vi-VN: "Đặt chiều rộng của cửa sổ Run"
     $options:vi-VN:
-    - layout: "Theo bố cục"
+    - default: "Theo bố cục"
     - narrow: "Hẹp hơn"
     - wide: "Rộng hơn"
     $name:th-TH: "ความกว้างหน้าต่าง"
     $description:th-TH: "กำหนดความกว้างของหน้าต่าง Run"
     $options:th-TH:
-    - layout: "ตามเค้าโครง"
+    - default: "ตามเค้าโครง"
     - narrow: "แคบลง"
     - wide: "กว้างขึ้น"
     $name:id-ID: "Lebar jendela"
     $description:id-ID: "Atur lebar jendela Run"
     $options:id-ID:
-    - layout: "Sesuai tata letak"
+    - default: "Sesuai tata letak"
     - narrow: "Lebih sempit"
     - wide: "Lebih lebar"
     $name:ms-MY: "Lebar tetingkap"
     $description:ms-MY: "Tetapkan lebar tetingkap Run"
     $options:ms-MY:
-    - layout: "Mengikut susun atur"
+    - default: "Mengikut susun atur"
     - narrow: "Lebih sempit"
     - wide: "Lebih lebar"
     $name:ja-JP: "ウィンドウの幅"
     $description:ja-JP: "「ファイル名を指定して実行」のウィンドウ幅を設定"
     $options:ja-JP:
-    - layout: "レイアウトに従う"
+    - default: "レイアウトに従う"
     - narrow: "より狭く"
     - wide: "より広く"
     $name:zh-CN: "窗口宽度"
     $description:zh-CN: "设置“运行”窗口的宽度"
     $options:zh-CN:
-    - layout: "由布局决定"
+    - default: "由布局决定"
     - narrow: "更窄"
     - wide: "更宽"
     $name:zh-TW: "視窗寬度"
     $description:zh-TW: "設定「執行」視窗的寬度"
     $options:zh-TW:
-    - layout: "依版面配置"
+    - default: "依版面配置"
     - narrow: "較窄"
     - wide: "較寬"
     $name:ko-KR: "창 너비"
     $description:ko-KR: "실행 창의 너비를 설정"
     $options:ko-KR:
-    - layout: "레이아웃 기본값"
+    - default: "레이아웃 기본값"
     - narrow: "더 좁게"
     - wide: "더 넓게"
     $name:fr-FR: "Largeur de la fenêtre"
     $description:fr-FR: "Définit la largeur de la fenêtre Exécuter"
     $options:fr-FR:
-    - layout: "Selon la disposition"
+    - default: "Selon la disposition"
     - narrow: "Plus étroite"
     - wide: "Plus large"
     $name:de-DE: "Fensterbreite"
     $description:de-DE: "Legt die Breite des Fensters „Ausführen“ fest"
     $options:de-DE:
-    - layout: "Nach Layout"
+    - default: "Nach Layout"
     - narrow: "Schmaler"
     - wide: "Breiter"
     $name:es-ES: "Ancho de ventana"
     $description:es-ES: "Ajusta el ancho de la ventana Ejecutar"
     $options:es-ES:
-    - layout: "Según el diseño"
+    - default: "Según el diseño"
     - narrow: "Más estrecha"
     - wide: "Más ancha"
     $name:pt-BR: "Largura da janela"
     $description:pt-BR: "Define a largura da janela Executar"
     $options:pt-BR:
-    - layout: "Conforme o layout"
+    - default: "Conforme o layout"
     - narrow: "Mais estreita"
     - wide: "Mais larga"
     $name:it-IT: "Larghezza della finestra"
     $description:it-IT: "Imposta la larghezza della finestra Esegui"
     $options:it-IT:
-    - layout: "Secondo il layout"
+    - default: "Secondo il layout"
     - narrow: "Più stretta"
     - wide: "Più larga"
     $name:uk-UA: "Ширина вікна"
     $description:uk-UA: "Задає ширину вікна «Виконати»"
     $options:uk-UA:
-    - layout: "За макетом"
+    - default: "За макетом"
     - narrow: "Вужче"
     - wide: "Ширше"
     $name:pl-PL: "Szerokość okna"
     $description:pl-PL: "Ustawia szerokość okna Uruchamianie"
     $options:pl-PL:
-    - layout: "Zgodnie z układem"
+    - default: "Zgodnie z układem"
     - narrow: "Węższe"
     - wide: "Szersze"
     $name:nl-NL: "Vensterbreedte"
     $description:nl-NL: "Stelt de breedte van het venster Uitvoeren in"
     $options:nl-NL:
-    - layout: "Volgens indeling"
+    - default: "Volgens indeling"
     - narrow: "Smaller"
     - wide: "Breder"
     $name:tr-TR: "Pencere genişliği"
     $description:tr-TR: "Çalıştır penceresinin genişliğini ayarlar"
     $options:tr-TR:
-    - layout: "Düzene göre"
+    - default: "Düzene göre"
     - narrow: "Daha dar"
     - wide: "Daha geniş"
     $name:hi-IN: "विंडो की चौड़ाई"
     $description:hi-IN: "रन विंडो की चौड़ाई सेट करें"
     $options:hi-IN:
-    - layout: "लेआउट के अनुसार"
+    - default: "लेआउट के अनुसार"
     - narrow: "और संकरा"
     - wide: "और चौड़ा"
     $name:ar: "عرض النافذة"
     $description:ar: "يضبط عرض نافذة تشغيل"
     $options:ar:
-    - layout: "حسب التخطيط"
+    - default: "حسب التخطيط"
     - narrow: "أضيق"
     - wide: "أعرض"
   - customDialogWidth: 0
@@ -1182,9 +1183,9 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - "100": 100% – Default (Standard)
     - "110": 110% – Medium Large
     - "120": 120% – Large
-  $name: 2. Layout & Sizing
-  $name:vi-VN: 2. Bố cục & Kích thước
-  $name:ru-RU: 2. Макет и положение
+  $name: Layout & Position
+  $name:vi-VN: Bố cục & Vị trí
+  $name:ru-RU: Макет и положение
 
 - actionButtonsGroup:
   - hideBrowse: false
@@ -1431,7 +1432,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:hi-IN: "Ctrl + Shift + Enter मौजूदा कमांड के विशेषाधिकार बदलता है"
     $name:ar: "رفع الامتيازات افتراضيًا"
     $description:ar: "يبدّل Ctrl + Shift + Enter امتيازات الأمر الحالي"
-  - adminIndicator: panel
+  - adminIndicatorPlacement: panel
     $description:ru-RU: "Где отображается статус запуска от имени администратора"
     $description: "Where the administrator launch status appears"
     $name: "Indicator Placement"
@@ -1561,27 +1562,27 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:hi-IN: "बंद होने पर Shift + Enter कमांड को टर्मिनल में चलाता है"
     $name:ar: "تبديل الامتيازات باستخدام Shift + Enter"
     $description:ar: "عند إيقاف الخيار، يشغّل Shift + Enter الأمر في الطرفية"
-  $name: "3. Behavior"
-  $name:ru-RU: "3. Поведение"
-  $name:vi-VN: "3. Hành vi"
-  $name:th-TH: "3. ลักษณะการทำงาน"
-  $name:id-ID: "3. Perilaku"
-  $name:ms-MY: "3. Tingkah laku"
-  $name:ja-JP: "3. 動作"
-  $name:zh-CN: "3. 行为"
-  $name:zh-TW: "3. 行為"
-  $name:ko-KR: "3. 동작"
-  $name:fr-FR: "3. Comportement"
-  $name:de-DE: "3. Verhalten"
-  $name:es-ES: "3. Comportamiento"
-  $name:pt-BR: "3. Comportamento"
-  $name:it-IT: "3. Comportamento"
-  $name:uk-UA: "3. Поведінка"
-  $name:pl-PL: "3. Zachowanie"
-  $name:nl-NL: "3. Gedrag"
-  $name:tr-TR: "3. Davranış"
-  $name:hi-IN: "3. व्यवहार"
-  $name:ar: "3. السلوك"
+  $name: "Behavior"
+  $name:ru-RU: "Поведение"
+  $name:vi-VN: "Hành vi"
+  $name:th-TH: "ลักษณะการทำงาน"
+  $name:id-ID: "Perilaku"
+  $name:ms-MY: "Tingkah laku"
+  $name:ja-JP: "動作"
+  $name:zh-CN: "行为"
+  $name:zh-TW: "行為"
+  $name:ko-KR: "동작"
+  $name:fr-FR: "Comportement"
+  $name:de-DE: "Verhalten"
+  $name:es-ES: "Comportamiento"
+  $name:pt-BR: "Comportamento"
+  $name:it-IT: "Comportamento"
+  $name:uk-UA: "Поведінка"
+  $name:pl-PL: "Zachowanie"
+  $name:nl-NL: "Gedrag"
+  $name:tr-TR: "Davranış"
+  $name:hi-IN: "व्यवहार"
+  $name:ar: "السلوك"
 
 - customAliases:
   - - alias: "hosts"
@@ -1602,9 +1603,9 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
       $description: Elevated privileges for this command
       $description:ru-RU: Права для этой команды
       $name:vi-VN: Chạy với quyền Quản trị
-  $name: 4. Commands
-  $name:ru-RU: 4. Команды
-  $name:vi-VN: 4. Bí danh lệnh tùy chỉnh (Custom Aliases)
+  $name: Commands
+  $name:ru-RU: Команды
+  $name:vi-VN: Bí danh lệnh tùy chỉnh
   $description: Set up custom commands to launch programs and files by short name
   $description:ru-RU: Собственные команды для запуска программ и файлов по коротким именам
   $description:vi-VN: Khai báo các lệnh gõ tắt (ví dụ hosts, env, ws) để mở nhanh file, thư mục hoặc chạy lệnh với quyền Quản trị.
@@ -1821,7 +1822,7 @@ bool g_glassCpuSupported = false;
 
 enum class SurfaceTheme { Glass, Blur, Solid };
 enum class ColorMode { Auto, Dark, Light };
-enum class IconSet { Mod, WindowsFluent };
+enum class IconSet { Default, WindowsFluent };
 
 struct LocalizedStrings {
     const wchar_t* placeholder;
@@ -1841,7 +1842,7 @@ struct CommandAlias {
 };
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
-enum class DialogWidthPreset { Layout, Narrow, Wide };
+enum class DialogWidthPreset { Default, Narrow, Wide };
 enum class RunEnterAction { Normal, InvertElevation, Terminal };
 enum class TaskbarIconMode { MinimizeRestore, Close, Hidden };
 
@@ -1876,18 +1877,14 @@ constexpr int GetLayoutWidthDip(DialogLayout layout, DialogWidthPreset preset) {
 constexpr int FitDialogWidth(int requested, int controlWidth, int scaledInputMinimum) {
     return (std::max)(requested, controlWidth + (std::max)(100, scaledInputMinimum));
 }
-enum class ContextMenuStyle { Mod, WindowsFluent };
-enum class WindowBorderMode { Mod, Windows, Off };
-enum class ContextMenuBorderMode { Own, Window, Windows, Off };
+enum class ContextMenuStyle { Standard, WindowsFluent };
+enum class WindowBorderMode { Default, Windows, Off };
+enum class ContextMenuBorderMode { Default, Window, Windows, Off };
 
-constexpr std::array<const wchar_t*, 3> kWindowBorderModeValues{L"mod", L"windows", L"off"};
+constexpr std::array<const wchar_t*, 3> kWindowBorderModeValues{L"default", L"windows", L"off"};
 constexpr std::array<const wchar_t*, 4> kContextMenuBorderModeValues{
-    L"own", L"window", L"windows", L"off"
+    L"default", L"window", L"windows", L"off"
 };
-
-constexpr std::wstring_view NormalizeBorderMode(std::wstring_view value) {
-    return value == L"accent" ? L"windows" : value;
-}
 
 constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode(
     ContextMenuBorderMode mode, WindowBorderMode windowMode) {
@@ -1895,13 +1892,13 @@ constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode(
         case ContextMenuBorderMode::Window: return windowMode;
         case ContextMenuBorderMode::Windows: return WindowBorderMode::Windows;
         case ContextMenuBorderMode::Off: return WindowBorderMode::Off;
-        case ContextMenuBorderMode::Own: return std::nullopt;
+        case ContextMenuBorderMode::Default: return std::nullopt;
     }
     return std::nullopt;
 }
 
 constexpr WindowBorderMode ResolveWindowBorderMode(WindowBorderMode mode, bool highContrast) {
-    return highContrast && mode == WindowBorderMode::Mod ? WindowBorderMode::Off : mode;
+    return highContrast && mode == WindowBorderMode::Default ? WindowBorderMode::Off : mode;
 }
 
 enum class RunAction : size_t { Browse, Run, Close, Settings, Count };
@@ -1920,20 +1917,23 @@ constexpr std::array<const wchar_t*, kRunActionCount> kHiddenActionKeys{
     L"hideBrowse", L"hideRun", L"hideClose", L"hideSettings"
 };
 
-constexpr DialogLayout ApplyDialogLayoutOverride(DialogLayout layout, int inAppOverride) {
-    if (inAppOverride < 0 || inAppOverride > static_cast<int>(DialogLayout::Fluent)) {
-        return layout;
-    }
-    return static_cast<DialogLayout>(inAppOverride);
+constexpr std::array<const wchar_t*, 3> kDialogLayoutValues{L"classic", L"pill", L"fluent"};
+
+constexpr DialogLayout ParseDialogLayout(std::wstring_view setting) {
+    if (setting == kDialogLayoutValues[1]) return DialogLayout::Pill;
+    if (setting == kDialogLayoutValues[2]) return DialogLayout::Fluent;
+    return DialogLayout::Classic;
 }
 
-// Windhawk retains the legacy boolean as a DWORD when upgrading the schema.
-// The combobox uses the same 0/1 values, so both the editor and engine can read it.
-constexpr DialogLayout ResolveDialogLayout(std::wstring_view setting, int legacySetting) {
-    if (setting == L"2") return DialogLayout::Fluent;
-    if (setting == L"1") return DialogLayout::Pill;
-    if (setting == L"0") return DialogLayout::Classic;
-    return legacySetting != 0 ? DialogLayout::Pill : DialogLayout::Classic;
+constexpr int kMinBackgroundOpacityPercent = 12;
+constexpr int kDefaultBackgroundOpacityPercent = 84;
+
+constexpr int CatalogOpacityToPercent(int alpha) {
+    return (std::clamp(alpha, 30, 255) * 100 + 127) / 255;
+}
+
+constexpr int BackgroundOpacityToAlpha(int percent) {
+    return (percent * 255 + 50) / 100;
 }
 
 struct ModSettings {
@@ -1941,17 +1941,17 @@ struct ModSettings {
     std::wstring themePreset = L"windows_blur";
     SurfaceTheme surfaceTheme = SurfaceTheme::Blur;
     ColorMode colorMode = ColorMode::Auto;
-    IconSet iconSet = IconSet::Mod;
+    IconSet iconSet = IconSet::Default;
     std::wstring customBgColor;
     std::wstring customBorderColor;
-    WindowBorderMode windowBorderMode = WindowBorderMode::Mod;
+    WindowBorderMode windowBorderMode = WindowBorderMode::Default;
     int customCornerRadius = -1;
-    int customInnerCornerRadius = -1;
+    int innerCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
-    DialogWidthPreset dialogWidthPreset = DialogWidthPreset::Layout;
-    ContextMenuStyle contextMenuStyle = ContextMenuStyle::Mod;
-    ContextMenuBorderMode contextMenuBorderMode = ContextMenuBorderMode::Own;
+    DialogWidthPreset dialogWidthPreset = DialogWidthPreset::Default;
+    ContextMenuStyle contextMenuStyle = ContextMenuStyle::Standard;
+    ContextMenuBorderMode menuBorderMode = ContextMenuBorderMode::Default;
     HiddenActions hiddenActions{};
     bool rememberPosition = false;
     int uiScalePercent = 100;
@@ -1963,7 +1963,7 @@ struct ModSettings {
     int blurOpacity = 255;
     std::wstring customBackgroundPath;
     int customBackgroundMaxMb = 50;
-    int customBackgroundOpacity = 255;
+    int backgroundOpacityPercent = kDefaultBackgroundOpacityPercent;
     bool enableAppSuggestions = true;
     int maxHistoryItems = 20;
     int visibleHistoryRows = 5;
@@ -2182,7 +2182,7 @@ enum ToggleAction : WPARAM {
 };
 
 // Base dimensions at 96 DPI
-constexpr int kBaseDlgWidth = GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Layout);
+constexpr int kBaseDlgWidth = GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Default);
 constexpr int kLegacyRowHeight      = 38;
 constexpr int kBasePanelInset       = 11;
 constexpr int kBaseRowHighlightInset = 2;
@@ -2963,11 +2963,11 @@ void EnsurePreblurredMonitorCache(PreblurredMonitorCache& mcache, int softRad, i
     }
 }
 
-// Monotonic, continuous mapping from Background Opacity (30..255, default 215) to Liquid Glass glassPct (-100..+100):
+// Map the renderer's background alpha (30..255) to Liquid Glass glassPct (-100..+100):
 // - 30  -> -100 (ultra-clear crystal glass)
 // - 215 ->  -20 (default crystal Liquid Glass with full lens refraction)
 // - 255 -> +100 (dense frosted glass)
-inline int MapBackgroundOpacityToGlassPct(int bgOpacity) {
+inline int MapBackgroundAlphaToGlassPct(int bgOpacity) {
     int op = std::clamp(bgOpacity, 30, 255);
     if (op <= 215) {
         double t = (op - 30) / 185.0;
@@ -4025,10 +4025,10 @@ struct MenuLocalizedStrings {
     const wchar_t* selectBgFile;
     const wchar_t* clearCustomBg;
     const wchar_t* mediaOpacityRange;
-    const wchar_t* bgOpacity90;
-    const wchar_t* bgOpacity150;
-    const wchar_t* bgOpacity215;
-    const wchar_t* bgOpacity255;
+    const wchar_t* bgOpacity35;
+    const wchar_t* bgOpacity59;
+    const wchar_t* bgOpacity84;
+    const wchar_t* bgOpacity100;
     const wchar_t* historyMenu;
     const wchar_t* maxStoredRange;
     const wchar_t* visibleRowsRange;
@@ -4092,10 +4092,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Chọn tệp hình nền (Ảnh / GIF / MP4 ≤ 50MB)...",
             L"Gỡ bỏ hình nền tùy chỉnh",
             L"Độ rõ hình nền (20 – 255)",
-            L"Độ rõ nền: Dịu nhẹ (90)",
-            L"Độ rõ nền: Cân bằng (150)",
-            L"Độ rõ nền: Rõ nét (215)",
-            L"Độ rõ nền: Tối đa (255)",
+            L"Độ rõ nền: Dịu nhẹ (35%)",
+            L"Độ rõ nền: Cân bằng (59%)",
+            L"Độ rõ nền: Rõ nét (84%)",
+            L"Độ rõ nền: Tối đa (100%)",
             L"Lịch sử & Gợi ý (Tối đa 50 mục / Cuộn 5 dòng)",
             L"Số mục lưu tối đa (0 – 50)",
             L"Số dòng hiển thị (3 – 10)",
@@ -4156,10 +4156,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"เลือกไฟล์พื้นหลัง (รูปภาพ / GIF / MP4 ≤ 50MB)...",
             L"ลบพื้นหลังกำหนดเอง",
             L"ความชัดพื้นหลัง (20 – 255)",
-            L"ความชัดพื้นหลัง: นุ่มนวล (90)",
-            L"ความชัดพื้นหลัง: สมดุล (150)",
-            L"ความชัดพื้นหลัง: คมชัด (215)",
-            L"ความชัดพื้นหลัง: สูงสุด (255)",
+            L"ความชัดพื้นหลัง: นุ่มนวล (35%)",
+            L"ความชัดพื้นหลัง: สมดุล (59%)",
+            L"ความชัดพื้นหลัง: คมชัด (84%)",
+            L"ความชัดพื้นหลัง: สูงสุด (100%)",
             L"ประวัติ & คำแนะนำ (สูงสุด 50 / เลื่อน 5 แถว)",
             L"จำนวนประวัติสูงสุด (0 – 50)",
             L"จำนวนแถวที่แสดง (3 – 10)",
@@ -4220,10 +4220,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Pilih File Latar Belakang (Gambar / GIF / MP4 ≤ 50MB)...",
             L"Hapus Latar Belakang Kustom",
             L"Opasitas Media (20 – 255)",
-            L"Opasitas Media: Halus (90)",
-            L"Opasitas Media: Seimbang (150)",
-            L"Opasitas Media: Jelas (215)",
-            L"Opasitas Media: Penuh (255)",
+            L"Opasitas Media: Halus (35%)",
+            L"Opasitas Media: Seimbang (59%)",
+            L"Opasitas Media: Jelas (84%)",
+            L"Opasitas Media: Penuh (100%)",
             L"Riwayat & Saran (Maks 50 / Gulir 5 Baris)",
             L"Maks Item Tersimpan (0 – 50)",
             L"Baris Terlihat (3 – 10)",
@@ -4284,10 +4284,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Pilih Fail Latar Belakang (Imej / GIF / MP4 ≤ 50MB)...",
             L"Buang Latar Belakang Tersuai",
             L"Kelegapan Media (20 – 255)",
-            L"Kelegapan Media: Halus (90)",
-            L"Kelegapan Media: Seimbang (150)",
-            L"Kelegapan Media: Jelas (215)",
-            L"Kelegapan Media: Penuh (255)",
+            L"Kelegapan Media: Halus (35%)",
+            L"Kelegapan Media: Seimbang (59%)",
+            L"Kelegapan Media: Jelas (84%)",
+            L"Kelegapan Media: Penuh (100%)",
             L"Sejarah & Cadangan (Sehingga 50 / Tatal 5)",
             L"Item Disimpan Maksimum (0 – 50)",
             L"Baris Kelihatan (3 – 10)",
@@ -4348,10 +4348,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"背景ファイルを選択 (画像 / GIF / MP4 ≤ 50MB)...",
             L"カスタム背景をクリア",
             L"背景メディアの不透明度 (20 – 255)",
-            L"背景の不透明度: 控えめ (90)",
-            L"背景の不透明度: バランス (150)",
-            L"背景の不透明度: 鮮明 (215)",
-            L"背景の不透明度: 最大 (255)",
+            L"背景の不透明度: 控えめ (35%)",
+            L"背景の不透明度: バランス (59%)",
+            L"背景の不透明度: 鮮明 (84%)",
+            L"背景の不透明度: 最大 (100%)",
             L"履歴と候補 (最大50件 / 5行スクロール)",
             L"最大保存件数 (0 – 50)",
             L"表示行数 (3 – 10)",
@@ -4412,10 +4412,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"选择背景文件 (图片 / GIF / MP4 ≤ 50MB)...",
             L"清除自定义背景",
             L"背景媒体清晰度 (20 – 255)",
-            L"背景清晰度: 柔和 (90)",
-            L"背景清晰度: 均衡 (150)",
-            L"背景清晰度: 鲜明 (215)",
-            L"背景清晰度: 完全显示 (255)",
+            L"背景清晰度: 柔和 (35%)",
+            L"背景清晰度: 均衡 (59%)",
+            L"背景清晰度: 鲜明 (84%)",
+            L"背景清晰度: 完全显示 (100%)",
             L"历史与建议 (最多 50 项 / 滚动 5 行)",
             L"最大保存数量 (0 – 50)",
             L"可见行数 (3 – 10)",
@@ -4476,10 +4476,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"選擇背景檔案 (圖片 / GIF / MP4 ≤ 50MB)...",
             L"清除自訂背景",
             L"背景媒體清晰度 (20 – 255)",
-            L"背景清晰度: 柔和 (90)",
-            L"背景清晰度: 均衡 (150)",
-            L"背景清晰度: 鮮明 (215)",
-            L"背景清晰度: 完整顯示 (255)",
+            L"背景清晰度: 柔和 (35%)",
+            L"背景清晰度: 均衡 (59%)",
+            L"背景清晰度: 鮮明 (84%)",
+            L"背景清晰度: 完整顯示 (100%)",
             L"歷史與建議 (最多 50 項 / 捲動 5 行)",
             L"最大儲存數量 (0 – 50)",
             L"可見行數 (3 – 10)",
@@ -4540,10 +4540,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"배경 파일 선택 (이미지 / GIF / MP4 ≤ 50MB)...",
             L"사용자 지정 배경 지우기",
             L"배경 미디어 불투명도 (20 – 255)",
-            L"배경 불투명도: 은은함 (90)",
-            L"배경 불투명도: 균형 (150)",
-            L"배경 불투명도: 선명함 (215)",
-            L"배경 불투명도: 최대 (255)",
+            L"배경 불투명도: 은은함 (35%)",
+            L"배경 불투명도: 균형 (59%)",
+            L"배경 불투명도: 선명함 (84%)",
+            L"배경 불투명도: 최대 (100%)",
             L"기록 및 추천 (최대 50개 / 5줄 스크롤)",
             L"최대 저장 개수 (0 – 50)",
             L"표시할 줄 수 (3 – 10)",
@@ -4604,10 +4604,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Choisir un fichier de fond (Image / GIF / MP4 ≤ 50 Mo)...",
             L"Supprimer l'arrière-plan personnalisé",
             L"Opacité du média (20 – 255)",
-            L"Opacité : Subtile (90)",
-            L"Opacité : Équilibrée (150)",
-            L"Opacité : Vive (215)",
-            L"Opacité : Maximale (255)",
+            L"Opacité : Subtile (35%)",
+            L"Opacité : Équilibrée (59%)",
+            L"Opacité : Vive (84%)",
+            L"Opacité : Maximale (100%)",
             L"Historique et suggestions (Max 50 / 5 lignes)",
             L"Éléments max enregistrés (0 – 50)",
             L"Lignes visibles (3 – 10)",
@@ -4668,10 +4668,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Hintergrunddatei wählen (Bild / GIF / MP4 ≤ 50MB)...",
             L"Eigenen Hintergrund entfernen",
             L"Medien-Deckkraft (20 – 255)",
-            L"Deckkraft: Dezent (90)",
-            L"Deckkraft: Ausgewogen (150)",
-            L"Deckkraft: Kräftig (215)",
-            L"Deckkraft: Voll (255)",
+            L"Deckkraft: Dezent (35%)",
+            L"Deckkraft: Ausgewogen (59%)",
+            L"Deckkraft: Kräftig (84%)",
+            L"Deckkraft: Voll (100%)",
             L"Verlauf & Vorschläge (Bis 50 / 5 Zeilen)",
             L"Max. gespeicherte Einträge (0 – 50)",
             L"Sichtbare Zeilen (3 – 10)",
@@ -4732,10 +4732,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Seleccionar archivo de fondo (Imagen / GIF / MP4 ≤ 50MB)...",
             L"Quitar fondo personalizado",
             L"Opacidad del fondo (20 – 255)",
-            L"Opacidad: Sutil (90)",
-            L"Opacidad: Equilibrada (150)",
-            L"Opacidad: Nítida (215)",
-            L"Opacidad: Máxima (255)",
+            L"Opacidad: Sutil (35%)",
+            L"Opacidad: Equilibrada (59%)",
+            L"Opacidad: Nítida (84%)",
+            L"Opacidad: Máxima (100%)",
             L"Historial y sugerencias (Máx. 50 / 5 filas)",
             L"Máx. elementos guardados (0 – 50)",
             L"Filas visibles (3 – 10)",
@@ -4796,10 +4796,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Selecionar arquivo de fundo (Imagem / GIF / MP4 ≤ 50MB)...",
             L"Remover plano de fundo personalizado",
             L"Opacidade da mídia (20 – 255)",
-            L"Opacidade: Sutil (90)",
-            L"Opacidade: Equilibrada (150)",
-            L"Opacidade: Nítida (215)",
-            L"Opacidade: Total (255)",
+            L"Opacidade: Sutil (35%)",
+            L"Opacidade: Equilibrada (59%)",
+            L"Opacidade: Nítida (84%)",
+            L"Opacidade: Total (100%)",
             L"Histórico e sugestões (Até 50 / Rolar 5)",
             L"Máx. de itens salvos (0 – 50)",
             L"Linhas visíveis (3 – 10)",
@@ -4860,10 +4860,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Seleziona file di sfondo (Immagine / GIF / MP4 ≤ 50MB)...",
             L"Rimuovi sfondo personalizzato",
             L"Opacità sfondo (20 – 255)",
-            L"Opacità: Leggera (90)",
-            L"Opacità: Bilanciata (150)",
-            L"Opacità: Vivida (215)",
-            L"Opacità: Massima (255)",
+            L"Opacità: Leggera (35%)",
+            L"Opacità: Bilanciata (59%)",
+            L"Opacità: Vivida (84%)",
+            L"Opacità: Massima (100%)",
             L"Cronologia e suggerimenti (Max 50 / Scorri 5)",
             L"Elementi salvati max (0 – 50)",
             L"Righe visibili (3 – 10)",
@@ -4924,10 +4924,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Выбрать файл фона (Изображение / GIF / MP4 ≤ 50 МБ)...",
             L"Удалить пользовательский фон",
             L"Прозрачность медиафона (20 – 255)",
-            L"Прозрачность фона: Мягкая (90)",
-            L"Прозрачность фона: Средняя (150)",
-            L"Прозрачность фона: Яркая (215)",
-            L"Прозрачность фона: Полная (255)",
+            L"Прозрачность фона: Мягкая (35%)",
+            L"Прозрачность фона: Средняя (59%)",
+            L"Прозрачность фона: Яркая (84%)",
+            L"Прозрачность фона: Полная (100%)",
             L"История и подсказки (До 50 / Прокрутка 5)",
             L"Макс. число элементов (0 – 50)",
             L"Видимых строк (3 – 10)",
@@ -4988,10 +4988,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Вибрати файл фону (Зображення / GIF / MP4 ≤ 50 МБ)...",
             L"Видалити власний фон",
             L"Прозорість медіафону (20 – 255)",
-            L"Прозорість фону: М'яка (90)",
-            L"Прозорість фону: Збалансована (150)",
-            L"Прозорість фону: Яскрава (215)",
-            L"Прозорість фону: Повна (255)",
+            L"Прозорість фону: М'яка (35%)",
+            L"Прозорість фону: Збалансована (59%)",
+            L"Прозорість фону: Яскрава (84%)",
+            L"Прозорість фону: Повна (100%)",
             L"Історія та підказки (До 50 / Прокрутка 5)",
             L"Макс. кількість елементів (0 – 50)",
             L"Видимих рядків (3 – 10)",
@@ -5052,10 +5052,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Wybierz plik tła (Obraz / GIF / MP4 ≤ 50MB)...",
             L"Usuń własne tło",
             L"Krycie multimediów tła (20 – 255)",
-            L"Krycie tła: Subtelne (90)",
-            L"Krycie tła: Zrównoważone (150)",
-            L"Krycie tła: Wyraźne (215)",
-            L"Krycie tła: Pełne (255)",
+            L"Krycie tła: Subtelne (35%)",
+            L"Krycie tła: Zrównoważone (59%)",
+            L"Krycie tła: Wyraźne (84%)",
+            L"Krycie tła: Pełne (100%)",
             L"Historia i sugestie (Do 50 / Przewijaj 5)",
             L"Maks. zapisanych elementów (0 – 50)",
             L"Widoczne wiersze (3 – 10)",
@@ -5116,10 +5116,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Kies achtergrondbestand (Afbeelding / GIF / MP4 ≤ 50MB)...",
             L"Aangepaste achtergrond wissen",
             L"Media-dekking (20 – 255)",
-            L"Dekking: Subtiel (90)",
-            L"Dekking: Gebalanceerd (150)",
-            L"Dekking: Helder (215)",
-            L"Dekking: Volledig (255)",
+            L"Dekking: Subtiel (35%)",
+            L"Dekking: Gebalanceerd (59%)",
+            L"Dekking: Helder (84%)",
+            L"Dekking: Volledig (100%)",
             L"Geschiedenis & suggesties (Max 50 / Scroll 5)",
             L"Max. opgeslagen items (0 – 50)",
             L"Zichtbare rijen (3 – 10)",
@@ -5180,10 +5180,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"Arka Plan Dosyası Seç (Resim / GIF / MP4 ≤ 50MB)...",
             L"Özel Arka Planı Kaldır",
             L"Medya Opaklığı (20 – 255)",
-            L"Medya Opaklığı: Hafif (90)",
-            L"Medya Opaklığı: Dengeli (150)",
-            L"Medya Opaklığı: Canlı (215)",
-            L"Medya Opaklığı: Tam (255)",
+            L"Medya Opaklığı: Hafif (35%)",
+            L"Medya Opaklığı: Dengeli (59%)",
+            L"Medya Opaklığı: Canlı (84%)",
+            L"Medya Opaklığı: Tam (100%)",
             L"Geçmiş ve Öneriler (En Fazla 50 / 5 Satır Kaydır)",
             L"Maks. Kayıtlı Öğe (0 – 50)",
             L"Görünür Satır Sayısı (3 – 10)",
@@ -5244,10 +5244,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"पृष्ठभूमि फ़ाइल चुनें (छवि / GIF / MP4 ≤ 50MB)...",
             L"कस्टम पृष्ठभूमि हटाएँ",
             L"मीडिया अपारदर्शिता (20 – 255)",
-            L"मीडिया अपारदर्शिता: हल्का (90)",
-            L"मीडिया अपारदर्शिता: संतुलित (150)",
-            L"मीडिया अपारदर्शिता: स्पष्ट (215)",
-            L"मीडिया अपारदर्शिता: पूर्ण (255)",
+            L"मीडिया अपारदर्शिता: हल्का (35%)",
+            L"मीडिया अपारदर्शिता: संतुलित (59%)",
+            L"मीडिया अपारदर्शिता: स्पष्ट (84%)",
+            L"मीडिया अपारदर्शिता: पूर्ण (100%)",
             L"इतिहास और सुझाव (अधिकतम 50 / 5 पंक्तियाँ)",
             L"अधिकतम संग्रहीत आइटम (0 – 50)",
             L"दिखने वाली पंक्तियाँ (3 – 10)",
@@ -5308,10 +5308,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
             L"اختيار ملف الخلفية (صورة / GIF / MP4 ≤ 50MB)...",
             L"إزالة الخلفية المخصصة",
             L"عتامة وسائط الخلفية (20 – 255)",
-            L"عتامة الخلفية: خفيفة (90)",
-            L"عتامة الخلفية: متوازنة (150)",
-            L"عتامة الخلفية: واضحة (215)",
-            L"عتامة الخلفية: كاملة (255)",
+            L"عتامة الخلفية: خفيفة (35%)",
+            L"عتامة الخلفية: متوازنة (59%)",
+            L"عتامة الخلفية: واضحة (84%)",
+            L"عتامة الخلفية: كاملة (100%)",
             L"السجل والاقتراحات (حتى 50 / تمرير 5)",
             L"الحد الأقصى للعناصر المحفوظة (0 – 50)",
             L"الصفوف المرئية (3 – 10)",
@@ -5373,10 +5373,10 @@ MenuLocalizedStrings GetMenuLocalizedStrings(std::wstring lang) {
         L"Select Background File (Image / GIF / MP4 ≤ 50MB)...",
         L"Clear Custom Background",
         L"Media Opacity (20 – 255)",
-        L"Media Opacity: Subtle (90)",
-        L"Media Opacity: Balanced (150)",
-        L"Media Opacity: Vivid (215)",
-        L"Media Opacity: Full (255)",
+        L"Media Opacity: Subtle (35%)",
+        L"Media Opacity: Balanced (59%)",
+        L"Media Opacity: Vivid (84%)",
+        L"Media Opacity: Full (100%)",
         L"History & Suggestions (Up to 50 / Scroll 5)",
         L"Max Stored Items (0 – 50)",
         L"Visible Rows (3 – 10)",
@@ -5879,15 +5879,15 @@ struct WindhawkRawSnapshot {
     std::wstring customBorderColor;
     std::wstring windowBorderMode;
     int customCornerRadius = -1;
-    int customInnerCornerRadius = -1;
+    int innerCornerRadius = -1;
     std::wstring customBackgroundPath;
-    int customBackgroundOpacity = 215;
+    int backgroundOpacityPercent = kDefaultBackgroundOpacityPercent;
     std::wstring dialogPosition;
     std::wstring colorMode;
     std::wstring iconSet;
     DialogLayout dialogLayout = DialogLayout::Classic;
     std::wstring contextMenuStyle;
-    std::wstring contextMenuBorderMode;
+    std::wstring menuBorderMode;
     HiddenActions hiddenActions{};
     std::wstring uiScalePercent;
     std::wstring dialogWidthPreset;
@@ -5901,7 +5901,7 @@ struct WindhawkRawSnapshot {
     int clearInitialInput = 0;
     int closeOnClickOutside = 0;
     int runAsAdmin = 0;
-    std::wstring adminIndicator;
+    std::wstring adminIndicatorPlacement;
     int shiftEnterSwitchesPrivileges = 0;
     std::vector<CommandAlias> customAliases;
 };
@@ -5950,9 +5950,9 @@ std::wstring ReadGroupedStringSetting(const wchar_t* groupedKey, const wchar_t* 
     if (grp.get() && grp.get()[0] != L'\0') {
         return grp.get();
     }
-    auto flt = WindhawkUtils::StringSetting::make(flatKey);
-    if (flt.get() && flt.get()[0] != L'\0') {
-        return flt.get();
+    if (flatKey) {
+        auto flt = WindhawkUtils::StringSetting::make(flatKey);
+        if (flt.get() && flt.get()[0] != L'\0') return flt.get();
     }
     return defaultVal ? defaultVal : L"";
 }
@@ -5972,6 +5972,44 @@ int ParseInnerCornerRadius(const std::wstring& value) {
         ? static_cast<int>(radius) : -1;
 }
 
+void ImportCatalogSettings(const WindhawkRawSnapshot& current) {
+    const auto imported = GetUserOverrideKey(L"catalogSettingsImported");
+    if (Wh_GetIntValue(imported.c_str(), 0)) return;
+
+    bool saved = true;
+    const auto layoutKey = GetUserOverrideKey(L"dialogLayout");
+    wchar_t layout[16]{};
+    const int catalogLayout = Wh_GetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), -1);
+    const bool catalogPill = catalogLayout == 1 ||
+        (catalogLayout < 0 && Wh_GetIntSetting(L"layoutGroup.minimalMode") == 1);
+    if (catalogPill && current.dialogLayout == DialogLayout::Classic &&
+        !Wh_GetStringValue(layoutKey.c_str(), layout, ARRAYSIZE(layout))) {
+        saved = Wh_SetStringValue(layoutKey.c_str(), kDialogLayoutValues[1]) && saved;
+    }
+
+    const auto opacityKey = GetUserOverrideKey(L"backgroundOpacityPercent");
+    const int catalogAlphaOverride = Wh_GetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), -1);
+    const int catalogAlpha = catalogAlphaOverride >= 0 ? catalogAlphaOverride
+        : Wh_GetIntSetting(L"appearanceGroup.customBackgroundOpacity");
+    if ((catalogAlpha > 0 || catalogAlphaOverride == 0) &&
+        current.backgroundOpacityPercent == kDefaultBackgroundOpacityPercent &&
+        Wh_GetIntValue(opacityKey.c_str(), -1) < 0) {
+        const int percent = CatalogOpacityToPercent(catalogAlpha);
+        if (percent != kDefaultBackgroundOpacityPercent) {
+            saved = Wh_SetIntValue(opacityKey.c_str(), percent) && saved;
+        }
+    }
+
+    const auto borderColorKey = GetUserOverrideKey(L"customBorderColor");
+    wchar_t borderColor[32]{};
+    const auto catalogBorderColor = WindhawkUtils::StringSetting::make(L"appearanceGroup.customBorderColor");
+    if (current.customBorderColor.empty() && catalogBorderColor.get() && catalogBorderColor.get()[0] &&
+        !Wh_GetStringValue(borderColorKey.c_str(), borderColor, ARRAYSIZE(borderColor))) {
+        saved = Wh_SetStringValue(borderColorKey.c_str(), catalogBorderColor.get()) && saved;
+    }
+    if (saved) Wh_SetIntValue(imported.c_str(), 1);
+}
+
 void LoadSettings(bool fromSettingsChanged = false) {
     // Capture current raw Windhawk settings to selectively drop overrides ONLY for settings that actually changed
     WindhawkRawSnapshot curWh;
@@ -5980,29 +6018,25 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.themePreset             = ReadGroupedStringSetting(L"appearanceGroup.themePreset", L"themePreset", L"windows_blur");
     curWh.customBgColor           = ReadGroupedStringSetting(L"appearanceGroup.customBgColor", L"customBgColor", L"");
     curWh.customBorderColor       = ReadGroupedStringSetting(L"windowBordersGroup.customBorderColor", L"customBorderColor", L"");
-    curWh.windowBorderMode        = ReadGroupedStringSetting(L"windowBordersGroup.windowBorderMode", L"windowBorderMode", L"mod");
+    curWh.windowBorderMode        = ReadGroupedStringSetting(L"windowBordersGroup.windowBorderMode", nullptr, L"default");
     curWh.customCornerRadius      = Wh_GetIntSetting(L"appearanceGroup.customCornerRadius");
-    curWh.customInnerCornerRadius = ParseInnerCornerRadius(ReadGroupedStringSetting(
-        L"appearanceGroup.customInnerCornerRadius", L"customInnerCornerRadius", L"-1"));
+    curWh.innerCornerRadius = ParseInnerCornerRadius(ReadGroupedStringSetting(
+        L"appearanceGroup.innerCornerRadius", nullptr, L"-1"));
     curWh.customBackgroundPath    = ReadGroupedStringSetting(L"appearanceGroup.customBackgroundPath", L"customBackgroundPath", L"");
-    curWh.customBackgroundOpacity = ReadGroupedIntSetting(L"appearanceGroup.customBackgroundOpacity", L"customBackgroundOpacity", 215);
+    const int opacity = Wh_GetIntSetting(L"appearanceGroup.backgroundOpacityPercent");
+    curWh.backgroundOpacityPercent = opacity != 0 ? opacity : kDefaultBackgroundOpacityPercent;
     curWh.dialogPosition          = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
     curWh.colorMode               = ReadGroupedStringSetting(L"appearanceGroup.colorMode", L"colorMode", L"auto");
-    curWh.iconSet = ReadGroupedStringSetting(L"appearanceGroup.iconSet", L"iconSet", L"mod");
-    curWh.contextMenuStyle = ReadGroupedStringSetting(L"layoutGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
-    curWh.contextMenuBorderMode = ReadGroupedStringSetting(
-        L"windowBordersGroup.contextMenuBorderMode", L"contextMenuBorderMode", L"own");
-    {
-        auto layout = WindhawkUtils::StringSetting::make(L"layoutGroup.minimalMode");
-        const std::wstring_view value = layout.get() ? layout.get() : L"";
-        curWh.dialogLayout = ResolveDialogLayout(
-            value, value.empty() ? Wh_GetIntSetting(L"layoutGroup.minimalMode") : 0);
-    }
+    curWh.iconSet = ReadGroupedStringSetting(L"appearanceGroup.iconSet", nullptr, L"default");
+    curWh.contextMenuStyle = ReadGroupedStringSetting(L"layoutGroup.contextMenuStyle", nullptr, L"standard");
+    curWh.menuBorderMode = ReadGroupedStringSetting(
+        L"windowBordersGroup.menuBorderMode", nullptr, L"default");
+    curWh.dialogLayout = ParseDialogLayout(ReadGroupedStringSetting(L"layoutGroup.dialogLayout", nullptr, L"classic"));
     for (size_t i = 0; i < kRunActionCount; ++i) {
         curWh.hiddenActions[i] = Wh_GetIntSetting(L"actionButtonsGroup.%s", kHiddenActionKeys[i]) != 0;
     }
     curWh.uiScalePercent          = ReadGroupedStringSetting(L"layoutGroup.uiScalePercent", L"uiScalePercent", L"100");
-    curWh.dialogWidthPreset       = ReadGroupedStringSetting(L"layoutGroup.dialogWidthPreset", L"dialogWidthPreset", L"layout");
+    curWh.dialogWidthPreset       = ReadGroupedStringSetting(L"layoutGroup.dialogWidthPreset", nullptr, L"default");
     curWh.customDialogWidth       = ReadGroupedIntSetting(L"layoutGroup.customDialogWidth", L"customDialogWidth", 0);
     curWh.customBarHeight         = ReadGroupedIntSetting(L"layoutGroup.customBarHeight", L"customBarHeight", 0);
     curWh.customFontSize          = ReadGroupedIntSetting(L"layoutGroup.customFontSize", L"customFontSize", 0);
@@ -6013,7 +6047,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.clearInitialInput       = (Wh_GetIntSetting(L"historyBehaviorGroup.clearInitialInput") != 0) ? 1 : 0;
     curWh.closeOnClickOutside     = (Wh_GetIntSetting(L"historyBehaviorGroup.closeOnClickOutside") != 0) ? 1 : 0;
     curWh.runAsAdmin              = (Wh_GetIntSetting(L"historyBehaviorGroup.runAsAdmin") != 0) ? 1 : 0;
-    curWh.adminIndicator          = ReadGroupedStringSetting(L"historyBehaviorGroup.adminIndicator", L"adminIndicator", L"panel");
+    curWh.adminIndicatorPlacement = ReadGroupedStringSetting(L"historyBehaviorGroup.adminIndicatorPlacement", nullptr, L"panel");
     curWh.shiftEnterSwitchesPrivileges = Wh_GetIntSetting(L"historyBehaviorGroup.shiftEnterSwitchesPrivileges");
     for (int i = 0; i < 64; ++i) {
         auto aStr = WindhawkUtils::StringSetting::make(L"customAliases[%d].alias", i);
@@ -6038,15 +6072,15 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.customBorderColor != g_lastWhSnapshot.customBorderColor, L"customBorderColor");
             dropIfChanged(curWh.windowBorderMode != g_lastWhSnapshot.windowBorderMode, L"windowBorderMode");
             dropIfChanged(curWh.customCornerRadius != g_lastWhSnapshot.customCornerRadius, L"customCornerRadius");
-            dropIfChanged(curWh.customInnerCornerRadius != g_lastWhSnapshot.customInnerCornerRadius, L"customInnerCornerRadius");
+            dropIfChanged(curWh.innerCornerRadius != g_lastWhSnapshot.innerCornerRadius, L"innerCornerRadius");
             dropIfChanged(curWh.customBackgroundPath != g_lastWhSnapshot.customBackgroundPath, L"customBackgroundPath");
-            dropIfChanged(curWh.customBackgroundOpacity != g_lastWhSnapshot.customBackgroundOpacity, L"customBackgroundOpacity");
+            dropIfChanged(curWh.backgroundOpacityPercent != g_lastWhSnapshot.backgroundOpacityPercent, L"backgroundOpacityPercent");
             dropIfChanged(curWh.dialogPosition != g_lastWhSnapshot.dialogPosition, L"dialogPosition");
             dropIfChanged(curWh.colorMode != g_lastWhSnapshot.colorMode, L"colorMode");
             dropIfChanged(curWh.iconSet != g_lastWhSnapshot.iconSet, L"iconSet");
             dropIfChanged(curWh.contextMenuStyle != g_lastWhSnapshot.contextMenuStyle, L"contextMenuStyle");
-            dropIfChanged(curWh.contextMenuBorderMode != g_lastWhSnapshot.contextMenuBorderMode, L"contextMenuBorderMode");
-            dropIfChanged(curWh.dialogLayout != g_lastWhSnapshot.dialogLayout, L"minimalModeV3");
+            dropIfChanged(curWh.menuBorderMode != g_lastWhSnapshot.menuBorderMode, L"menuBorderMode");
+            dropIfChanged(curWh.dialogLayout != g_lastWhSnapshot.dialogLayout, L"dialogLayout");
             for (size_t i = 0; i < kRunActionCount; ++i) {
                 dropIfChanged(curWh.hiddenActions[i] != g_lastWhSnapshot.hiddenActions[i], kHiddenActionKeys[i]);
             }
@@ -6062,7 +6096,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.clearInitialInput != g_lastWhSnapshot.clearInitialInput, L"clearInitialInput");
             dropIfChanged(curWh.closeOnClickOutside != g_lastWhSnapshot.closeOnClickOutside, L"closeOnClickOutside");
             dropIfChanged(curWh.runAsAdmin != g_lastWhSnapshot.runAsAdmin, L"runAsAdmin");
-            dropIfChanged(curWh.adminIndicator != g_lastWhSnapshot.adminIndicator, L"adminIndicator");
+            dropIfChanged(curWh.adminIndicatorPlacement != g_lastWhSnapshot.adminIndicatorPlacement, L"adminIndicatorPlacement");
             dropIfChanged(curWh.shiftEnterSwitchesPrivileges != g_lastWhSnapshot.shiftEnterSwitchesPrivileges,
                           L"shiftEnterSwitchesPrivileges");
             if (!AliasesEqual(curWh.customAliases, g_lastWhSnapshot.customAliases)) {
@@ -6072,6 +6106,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
         g_lastWhSnapshot = curWh;
     }
 
+    ImportCatalogSettings(curWh);
     ModSettings newSettings;
     newSettings.language = ReadGroupedStringSetting(L"appearanceGroup.language", L"language", L"auto");
 
@@ -6106,27 +6141,13 @@ void LoadSettings(bool fromSettingsChanged = false) {
         if (hasOverride) {
             bdHex = (wcscmp(ovBuf, L"__NONE__") == 0) ? L"" : ovBuf;
         }
-        const auto previous = WindhawkUtils::StringSetting::make(L"appearanceGroup.customBorderColor");
-        if (previous.get() && previous.get()[0]) {
-            const auto movedKey = GetUserOverrideKey(L"customBorderColorMoved");
-            if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
-                if (!hasOverride && bdHex.empty()) {
-                    bdHex = previous.get();
-                    if (Wh_SetStringValue(key.c_str(), bdHex.c_str())) {
-                        Wh_SetIntValue(movedKey.c_str(), 1);
-                    }
-                } else {
-                    Wh_SetIntValue(movedKey.c_str(), 1);
-                }
-            }
-        }
     }
     newSettings.customBorderColor = bdHex;
     wchar_t borderModeOverride[24]{};
     Wh_GetStringValue(GetUserOverrideKey(L"windowBorderMode").c_str(),
                       borderModeOverride, ARRAYSIZE(borderModeOverride));
-    const auto borderMode = NormalizeBorderMode(borderModeOverride[0]
-        ? std::wstring_view(borderModeOverride) : std::wstring_view(curWh.windowBorderMode));
+    const std::wstring_view borderMode = borderModeOverride[0]
+        ? std::wstring_view(borderModeOverride) : std::wstring_view(curWh.windowBorderMode);
     if (borderMode == L"windows") newSettings.windowBorderMode = WindowBorderMode::Windows;
     else if (borderMode == L"off") newSettings.windowBorderMode = WindowBorderMode::Off;
 
@@ -6136,9 +6157,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
     int crOverride = Wh_GetIntValue(GetUserOverrideKey(L"customCornerRadius").c_str(), -99);
     newSettings.customCornerRadius = (crOverride >= -1) ? std::clamp(crOverride, -1, 28) : std::clamp(crSetting, -1, 28);
-    const int innerOverride = Wh_GetIntValue(GetUserOverrideKey(L"customInnerCornerRadius").c_str(), -2);
-    newSettings.customInnerCornerRadius = innerOverride >= -1
-        ? std::clamp(innerOverride, -1, 28) : curWh.customInnerCornerRadius;
+    const int innerOverride = Wh_GetIntValue(GetUserOverrideKey(L"innerCornerRadius").c_str(), -2);
+    newSettings.innerCornerRadius = innerOverride >= -1
+        ? std::clamp(innerOverride, -1, 28) : curWh.innerCornerRadius;
 
     std::wstring bgPath = ReadGroupedStringSetting(L"appearanceGroup.customBackgroundPath", L"customBackgroundPath", L"");
     {
@@ -6149,9 +6170,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
     newSettings.customBackgroundPath = bgPath;
 
-    int bgOpSetting = ReadGroupedIntSetting(L"appearanceGroup.customBackgroundOpacity", L"customBackgroundOpacity", 215);
-    int bgOpOverride = Wh_GetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), -1);
-    newSettings.customBackgroundOpacity = std::clamp((bgOpOverride >= 0) ? bgOpOverride : bgOpSetting, 30, 255);
+    const int opacityOverride = Wh_GetIntValue(GetUserOverrideKey(L"backgroundOpacityPercent").c_str(), -1);
+    newSettings.backgroundOpacityPercent = std::clamp(opacityOverride >= 0 ? opacityOverride : curWh.backgroundOpacityPercent,
+                                                     kMinBackgroundOpacityPercent, 100);
 
     std::wstring posSetting = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
     {
@@ -6182,58 +6203,27 @@ void LoadSettings(bool fromSettingsChanged = false) {
     Wh_GetStringValue(GetUserOverrideKey(L"iconSet").c_str(), iconSetOverride, ARRAYSIZE(iconSetOverride));
     const std::wstring_view iconSet = iconSetOverride[0]
         ? std::wstring_view(iconSetOverride) : std::wstring_view(curWh.iconSet);
-    newSettings.iconSet = iconSet == L"windows_fluent" ? IconSet::WindowsFluent : IconSet::Mod;
+    newSettings.iconSet = iconSet == L"windows_fluent" ? IconSet::WindowsFluent : IconSet::Default;
 
-    int minModeOverride = Wh_GetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), -1);
-    newSettings.dialogLayout = ApplyDialogLayoutOverride(curWh.dialogLayout, minModeOverride);
+    wchar_t layoutOverride[16]{};
+    Wh_GetStringValue(GetUserOverrideKey(L"dialogLayout").c_str(), layoutOverride, ARRAYSIZE(layoutOverride));
+    newSettings.dialogLayout = layoutOverride[0] ? ParseDialogLayout(layoutOverride) : curWh.dialogLayout;
     const auto menuStyleOverrideKey = GetUserOverrideKey(L"contextMenuStyle");
     wchar_t menuStyleOverride[32]{};
     Wh_GetStringValue(menuStyleOverrideKey.c_str(), menuStyleOverride, ARRAYSIZE(menuStyleOverride));
-    std::wstring_view contextMenuStyle = menuStyleOverride[0]
+    const std::wstring_view contextMenuStyle = menuStyleOverride[0]
         ? std::wstring_view(menuStyleOverride) : std::wstring_view(curWh.contextMenuStyle);
-    const auto oldMenuStyle = WindhawkUtils::StringSetting::make(L"appearanceGroup.contextMenuStyle");
-    if (oldMenuStyle.get() && std::wstring_view(oldMenuStyle.get()) == L"windows_fluent") {
-        const auto movedKey = GetUserOverrideKey(L"contextMenuStyleMoved");
-        if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
-            // Windhawk adds the new key with its default during an upgrade.
-            if (!menuStyleOverride[0] && curWh.contextMenuStyle == L"mod") {
-                contextMenuStyle = L"windows_fluent";
-                if (Wh_SetStringValue(menuStyleOverrideKey.c_str(), L"windows_fluent")) {
-                    Wh_SetIntValue(movedKey.c_str(), 1);
-                }
-            } else {
-                Wh_SetIntValue(movedKey.c_str(), 1);
-            }
-        }
-    }
     newSettings.contextMenuStyle = contextMenuStyle == L"windows_fluent"
-        ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Mod;
+        ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Standard;
     wchar_t menuBorderOverride[24]{};
-    const auto menuBorderKey = GetUserOverrideKey(L"contextMenuBorderMode");
+    const auto menuBorderKey = GetUserOverrideKey(L"menuBorderMode");
     Wh_GetStringValue(menuBorderKey.c_str(), menuBorderOverride, ARRAYSIZE(menuBorderOverride));
-    std::wstring_view menuBorder = menuBorderOverride[0]
-        ? std::wstring_view(menuBorderOverride) : std::wstring_view(curWh.contextMenuBorderMode);
-    const auto previousMenuBorder = WindhawkUtils::StringSetting::make(L"layoutGroup.contextMenuBorderMode");
-    const auto previousMode = NormalizeBorderMode(previousMenuBorder.get() ? previousMenuBorder.get() : L"");
-    if (std::find(kContextMenuBorderModeValues.begin() + 1, kContextMenuBorderModeValues.end(), previousMode)
-        != kContextMenuBorderModeValues.end()) {
-        const auto movedKey = GetUserOverrideKey(L"contextMenuBorderModeMoved");
-        if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
-            // Windhawk adds the new key with its default when merging an update.
-            if (!menuBorderOverride[0] && menuBorder == L"own") {
-                menuBorder = previousMode;
-                if (Wh_SetStringValue(menuBorderKey.c_str(), previousMode.data())) {
-                    Wh_SetIntValue(movedKey.c_str(), 1);
-                }
-            } else {
-                Wh_SetIntValue(movedKey.c_str(), 1);
-            }
-        }
-    }
+    const std::wstring_view menuBorder = menuBorderOverride[0]
+        ? std::wstring_view(menuBorderOverride) : std::wstring_view(curWh.menuBorderMode);
     const auto menuBorderSetting = std::find(kContextMenuBorderModeValues.begin(), kContextMenuBorderModeValues.end(),
-                                                 NormalizeBorderMode(menuBorder));
+                                                 menuBorder);
     if (menuBorderSetting != kContextMenuBorderModeValues.end()) {
-        newSettings.contextMenuBorderMode = static_cast<ContextMenuBorderMode>(
+        newSettings.menuBorderMode = static_cast<ContextMenuBorderMode>(
             menuBorderSetting - kContextMenuBorderModeValues.begin());
     }
     for (size_t i = 0; i < kRunActionCount; ++i) {
@@ -6318,10 +6308,10 @@ void LoadSettings(bool fromSettingsChanged = false) {
 
     newSettings.runAsAdmin = Wh_GetIntValue(GetUserOverrideKey(L"runAsAdmin").c_str(), curWh.runAsAdmin) != 0;
     wchar_t adminIndicatorOverride[16]{};
-    Wh_GetStringValue(GetUserOverrideKey(L"adminIndicator").c_str(), adminIndicatorOverride,
+    Wh_GetStringValue(GetUserOverrideKey(L"adminIndicatorPlacement").c_str(), adminIndicatorOverride,
                       ARRAYSIZE(adminIndicatorOverride));
     const std::wstring_view adminIndicator = adminIndicatorOverride[0]
-        ? std::wstring_view(adminIndicatorOverride) : std::wstring_view(curWh.adminIndicator);
+        ? std::wstring_view(adminIndicatorOverride) : std::wstring_view(curWh.adminIndicatorPlacement);
     newSettings.inlineAdminIndicator = adminIndicator == L"field";
     newSettings.shiftEnterSwitchesPrivileges = Wh_GetIntValue(
         GetUserOverrideKey(L"shiftEnterSwitchesPrivileges").c_str(), curWh.shiftEnterSwitchesPrivileges) != 0;
@@ -11307,7 +11297,7 @@ int GetAdminIndicatorWidth(const RunDialogState* state) {
 int GetDlgWidth(const RunDialogState* state) {
     if (!state) return kBaseDlgWidth;
     const auto preset = state->settings.dialogWidthPreset;
-    const int requested = preset == DialogWidthPreset::Layout && state->settings.customDialogWidth > 0
+    const int requested = preset == DialogWidthPreset::Default && state->settings.customDialogWidth > 0
         ? DpiScale(state->settings.customDialogWidth, state->dpi)
         : DpiScaleS(GetLayoutWidthDip(state->settings.dialogLayout, preset), state);
     const auto widths = GetVisibleActionButtonWidths(state, GetActionButtonHeight(state, GetInputBarHeight(state)));
@@ -12353,7 +12343,7 @@ int GetInlineMenuFieldValue(const RunDialogState* state, int kind) {
         case 5:
             return std::clamp(state->settings.blurOpacity, 0, 255);
         case 6:
-            return std::clamp(state->settings.customBackgroundOpacity, 20, 255);
+            return state->settings.backgroundOpacityPercent;
         case 7:
             return std::clamp(state->settings.maxHistoryItems, 0, kMaxHistoryItems);
         case 8:
@@ -12388,8 +12378,8 @@ void ApplyInlineMenuFieldValue(FluentMenuSession* s, int kind, int val) {
         Wh_SetIntValue(GetUserOverrideKey(L"blurOpacity").c_str(), val);
         Wh_SetStringValue(GetUserOverrideKey(L"surfaceTheme").c_str(), L"blur");
     } else if (kind == 6) {
-        val = std::clamp(val, 20, 255);
-        Wh_SetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), val);
+        val = std::clamp(val, kMinBackgroundOpacityPercent, 100);
+        Wh_SetIntValue(GetUserOverrideKey(L"backgroundOpacityPercent").c_str(), val);
     } else if (kind == 7) {
         val = std::clamp(val, 0, kMaxHistoryItems);
         Wh_SetIntValue(GetUserOverrideKey(L"maxHistoryItems").c_str(), val);
@@ -12443,10 +12433,10 @@ void ApplyInlineMenuFieldValue(FluentMenuSession* s, int kind, int val) {
         }
     } else if (kind == 6) {
         for (auto& it : s->subPanel.items) {
-            if (it.id == 503) it.checked = (val <= 95);
-            else if (it.id == 504) it.checked = (val > 95 && val <= 175);
-            else if (it.id == 505) it.checked = (val > 175 && val <= 230);
-            else if (it.id == 506) it.checked = (val > 230);
+            if (it.id == 503) it.checked = (val <= 37);
+            else if (it.id == 504) it.checked = (val > 37 && val <= 69);
+            else if (it.id == 505) it.checked = (val > 69 && val <= 90);
+            else if (it.id == 506) it.checked = (val > 90);
         }
     } else if (kind == 7) {
         for (auto& it : s->subPanel.items) {
@@ -12760,11 +12750,11 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 float rimInset = DpiScaleF(0.75f, dpi);
                 D2D1_RECT_F rcMenuCard = D2D1::RectF(rimInset, rimInset, (float)w - rimInset, (float)h - rimInset);
                 const auto& settings = s->dlgState->settings;
-                const auto preferredBorder = settings.contextMenuStyle == ContextMenuStyle::Mod
-                    ? ResolveContextMenuWindowBorderMode(settings.contextMenuBorderMode, settings.windowBorderMode)
+                const auto preferredBorder = settings.contextMenuStyle == ContextMenuStyle::Standard
+                    ? ResolveContextMenuWindowBorderMode(settings.menuBorderMode, settings.windowBorderMode)
                     : std::nullopt;
-                const auto borderMode = ResolveWindowBorderMode(preferredBorder.value_or(WindowBorderMode::Mod), highContrast);
-                const bool glassEdgeHighlight = borderMode == WindowBorderMode::Mod;
+                const auto borderMode = ResolveWindowBorderMode(preferredBorder.value_or(WindowBorderMode::Default), highContrast);
+                const bool glassEdgeHighlight = borderMode == WindowBorderMode::Default;
                 const float menuRadiusPx = settings.customCornerRadius >= 0
                     ? DpiScaleF(static_cast<float>(settings.customCornerRadius), dpi) : -1.0f;
                 const float menuCornerR = ClampCornerRadius(
@@ -12793,14 +12783,14 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     }
                 } else if (s->surface == SurfaceTheme::Glass) {
                     int glassPct = (s->dlgState)
-                        ? MapBackgroundOpacityToGlassPct(s->dlgState->settings.customBackgroundOpacity)
+                        ? MapBackgroundAlphaToGlassPct(BackgroundOpacityToAlpha(s->dlgState->settings.backgroundOpacityPercent))
                         : -20;
                     DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, glassPct, isLight, true, slot,
                                                    -999999, -999999, false, 0, 0, menuRadiusPx, glassEdgeHighlight);
                 } else {
                     // Windows Blur: translucent vibrant Acrylic blur matching Windows 11 right-click menu (Image 2)
                     int blurOp = (s->dlgState)
-                        ? std::clamp(s->dlgState->settings.customBackgroundOpacity, 30, 255)
+                        ? BackgroundOpacityToAlpha(s->dlgState->settings.backgroundOpacityPercent)
                         : 215;
                     DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, -(1000 + blurOp), isLight, true, slot,
                                                    -999999, -999999, false, 0, 0, menuRadiusPx, glassEdgeHighlight);
@@ -12885,8 +12875,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         D2D1_RECT_F rcPill = D2D1::RectF(
                             padX, curY + rowInset,
                             (float)w - padX - sbReserve, curY + rowH - rowInset);
-                        const float innerPx = settings.customInnerCornerRadius >= 0
-                            ? DpiScaleF(static_cast<float>(settings.customInnerCornerRadius), dpi)
+                        const float innerPx = settings.innerCornerRadius >= 0
+                            ? DpiScaleF(static_cast<float>(settings.innerCornerRadius), dpi)
                             : (rcPill.bottom - rcPill.top) * 0.5f;
                         const float pillRadius = ClampCornerRadius(
                             innerPx, rcPill.right - rcPill.left, rcPill.bottom - rcPill.top);
@@ -13002,7 +12992,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                     swprintf_s(valStr, L"%s|", s->inlineEditBuf.c_str());
                                 } else {
                                     int curVal = GetInlineMenuFieldValue(s->dlgState, item.inlineEditKind);
-                                    swprintf_s(valStr, L"%d", curVal);
+                                    swprintf_s(valStr, item.inlineEditKind == 6 ? L"%d%%" : L"%d", curVal);
                                 }
                                 DrawCenteredText(pRT, valStr, (UINT32)wcslen(valStr), pFmtCtl, rcBox,
                                               isEditingThis && pBrAccent ? pBrAccent : pBrText);
@@ -13073,14 +13063,14 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
 
                 if (borderMode != WindowBorderMode::Off) {
                     const auto visuals = ResolveEffectiveThemeVisuals(settings, isLight);
-                    if (borderMode == WindowBorderMode::Mod && (!preferredBorder || !visuals.hasCustomBorder)) {
+                    if (borderMode == WindowBorderMode::Default && (!preferredBorder || !visuals.hasCustomBorder)) {
                         DrawD2DGlassRim(pRT, rcMenuCard, menuCornerR, dpi, isLight, preferredBorder ? 1.25f : 1.35f);
                     } else {
-                        const auto outline = borderMode == WindowBorderMode::Mod ? visuals.borderColor
+                        const auto outline = borderMode == WindowBorderMode::Default ? visuals.borderColor
                             : GetWindowsBorderColor(highContrast, s->wasForeground, isLight, /*isFlyout=*/true);
                         ID2D1SolidColorBrush* brush = nullptr;
                         if (SUCCEEDED(pRT->CreateSolidColorBrush(outline, &brush))) {
-                            const float width = borderMode == WindowBorderMode::Mod ? 1.25f : 1.0f;
+                            const float width = borderMode == WindowBorderMode::Default ? 1.25f : 1.0f;
                             pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcMenuCard, menuCornerR, menuCornerR),
                                                       brush, DpiScaleF(width, dpi));
                             brush->Release();
@@ -14535,7 +14525,7 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 48)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 49)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -14654,7 +14644,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         return { L"Impostazioni Modern Run", L"Personalizzazione", L"Layout e posizione", L"Cronologia e comportamento", L"Lingua (21)", L"Attivo", L"Disattivo", L"Predef.", L"Auto", L"Scegli colore...", L"Sfoglia...", L"Rimuovi", L"Cancella ora", L"Personalizzato", L"Windows 11 Blur (Predef.)", L"Auto (Segui Windows)", L"Scuro", L"Chiaro", L"In basso a sinistra", L"In basso al centro", L"In basso a destra", L"In alto a sinistra", L"In alto al centro", L"In alto a destra", L"Centro schermo", L"Tema e superficie", L"Scegli un tema integrato (Windows 11 Blur e Liquid Glass ottimizzati)", L"Tema predefinito", L"Scegli tra 13 temi integrati (predefinito: Windows 11 Blur)", L"Modalità colore", L"Segui Windows o fissa Scuro / Chiaro", L"Colori, sfondo e angoli personalizzati", L"Personalizza colori, immagine/GIF animata e raggio angoli", L"Colore di sfondo", L"Lascia Predef. per seguire il tema", L"Colore del bordo", L"Modifica il bordo della barra e della cronologia", L"Raggio angoli", L"0 px = quadrato, 14 px = Win11, 27 px = pillola", L"Immagine di sfondo / GIF animata", L"Nessun file — PNG, JPG, WebP, GIF animata (max 25 MB)", L"Attivo: ", L"Opacità sfondo personalizzato", L"Regola la visibilità di immagine/GIF (predefinito 85%)", L"Posizione e modalità", L"Configura dove aprire Win + R e lo stile del layout", L"Posizione finestra", L"Fissa a un bordo/centro o usa Auto", L"Ricorda ultima posizione", L"Riapri nell'ultima posizione trascinata (Ctrl + 0 per ripristinare)", L"Scala interfaccia", L"Ridimensiona l'intera finestra Esegui", L"Cronologia ed esecuzione", L"Gestisci cronologia, input iniziale e privilegi Amministratore", L"Mostra cronologia comandi", L"Mostra comandi recenti ed elementi fissati", L"Svuota campo all'apertura", L"Disattiva per mantenere l'ultimo comando", L"Esegui come Amministratore", L"Avvia elevato per impostazione predefinita (Ctrl + Maiusc + Invio sempre attivo)", L"Cancella tutta la cronologia", L"Pulisci la cronologia recente da Windows RunMRU", L"Lingua interfaccia (21 lingue)", L"Applicata subito alla finestra Esegui e alle Impostazioni", L"Scegli un colore", L"Tavolozza rapida Fluent", L"Applica", L"Annulla", L"Seleziona immagine di sfondo o GIF animata", L"Se attivo, i comandi verranno eseguiti come Amministratore. Consentire?", L"Avviso Amministratore" };
     }
     else if (lang == L"ru") {
-        return { L"Настройки Modern Run", L"Персонализация", L"Макет и положение", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Цвет…", L"Обзор…", L"Удаление", L"Очистка", L"Собственная", L"Windows 11 Blur (по умолчанию)", L"Авто", L"Темный", L"Светлый", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и иконки", L"", L"Тема", L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Соответствие настройкам Windows или выбор вручную", L"Цвета, фон и углы", L"", L"Цвет фона", L"Заменяет цвет фона из темы", L"Цвет рамок", L"Используется, когда для рамок окон выбрано значение по умолчанию", L"Радиус углов", L"От -1 до 28\u00A0px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения; 30–255 (по умолчанию 215)", L"Макет и положение", L"", L"Положение окна", L"В автоматическом режиме определяется макетом", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение", L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие", L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке", L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Недавние команды перестают отображаться в истории мода", L"Язык интерфейса", L"Применяется к окну запуска и настройкам мода", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора" };
+        return { L"Настройки Modern Run", L"Персонализация", L"Макет и положение", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Выбрать", L"Обзор…", L"Удаление", L"Очистка", L"Собственная", L"Windows 11 Blur (по умолчанию)", L"Авто", L"Темный", L"Светлый", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и иконки", L"", L"Тема", L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Соответствие настройкам Windows или выбор вручную", L"Цвета, фон и углы", L"", L"Цвет фона", L"Заменяет цвет фона из темы", L"Цвет рамок", L"Используется, когда для рамок окон выбрано значение по умолчанию", L"Радиус углов", L"От -1 до 28\u00A0px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)", L"Макет и положение", L"", L"Положение окна", L"В автоматическом режиме определяется макетом", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение", L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие", L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке", L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Недавние команды перестают отображаться в истории мода", L"Язык интерфейса", L"Применяется к окну запуска и настройкам мода", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора" };
     }
     else if (lang == L"uk") {
         return { L"Налаштування Modern Run", L"Персоналізація", L"Макет і позиція", L"Історія та поведінка", L"Мова (21)", L"Увімк.", L"Вимк.", L"Скинути", L"Авто", L"Колір...", L"Огляд...", L"Прибрати", L"Очистити", L"Власна", L"Windows 11 Blur (За замовч.)", L"Авто (як у Windows)", L"Темна", L"Світла", L"Знизу зліва", L"Знизу по центру", L"Знизу справа", L"Зверху зліва", L"Зверху по центру", L"Зверху справа", L"По центру екрана", L"Тема та поверхня", L"Оберіть вбудовану тему (Windows 11 Blur і Liquid Glass оптимізовано)", L"Пресет теми", L"13 вбудованих тем (за замовчуванням Windows 11 Blur)", L"Режим кольору", L"Слідувати Windows або обрати Темний / Світлий", L"Власні кольори, фон і заокруглення", L"Налаштуйте кольори, зображення/GIF-фон і радіус кутів", L"Колір фону", L"Залиште за замовчуванням для кольору теми", L"Колір рамки", L"Змінити колір рамки панелі та історії", L"Радіус кутів", L"0 px = прямі, 14 px = Win11, 27 px = капсула", L"Фонове зображення / GIF", L"Не обрано — PNG, JPG, WebP, анім. GIF (до 25 МБ)", L"Активно: ", L"Непрозорість фону", L"Видимість зображення/GIF (за замовч. 85%)", L"Позиція та режим показу", L"Налаштуйте розташування Win + R і стиль макета", L"Позиція вікна", L"Закріпити біля краю/центру або Авто", L"Запам'ятовувати позицію вікна", L"Відкривати в останньому місці (Ctrl + 0 для скидання)", L"Масштаб інтерфейсу", L"Змінити загальний розмір вікна Виконати", L"Історія та виконання", L"Керування історією, початковим полем і правами адміністратора", L"Показувати історію команд", L"Показувати останні та закріплені команди", L"Очищати поле при відкритті", L"Вимкніть, щоб зберігати останню команду", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням (Ctrl + Shift + Enter завжди працює)", L"Очистити всю історію", L"Видалити останні команди з Windows RunMRU", L"Мова інтерфейсу (21 мова)", L"Застосовується миттєво до вікна Виконати та Налаштувань", L"Вибір кольору", L"Швидка палітра Fluent", L"Застосувати", L"Скасувати", L"Оберіть фонове зображення або GIF", L"Якщо увімкнено, команди запускатимуться з правами адміністратора. Дозволити?", L"Попередження прав адміністратора" };
@@ -14674,7 +14664,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
     else if (lang == L"ar") {
         return { L"إعدادات Modern Run", L"التخصيص", L"التخطيط والموضع", L"السجل والسلوك", L"اللغة (21)", L"تشغيل", L"إيقاف", L"افتراضي", L"تلقائي", L"اختر لوناً...", L"استعراض...", L"مسح", L"مسح الآن", L"مخصص", L"Windows 11 Blur (افتراضي)", L"تلقائي (حسب Windows)", L"داكن", L"فاتح", L"أسفل اليسار", L"أسفل الوسط", L"أسفل اليمين", L"أعلى اليسار", L"أعلى الوسط", L"أعلى اليمين", L"وسط الشاشة", L"السمة والمظهر", L"اختر سمة جاهزة (Windows 11 Blur و Liquid Glass مضبوطان تلقائياً)", L"السمة الجاهزة", L"اختر من بين 13 سمة مدمجة (الافتراضي Windows 11 Blur)", L"وضع الألوان", L"اتبع سمة Windows أو اختر داكن / فاتح", L"الألوان والخلفية والزوايا المخصصة", L"خصّص الألوان وصورة/GIF المتحركة واستدارة الزوايا", L"لون الخلفية", L"اتركه افتراضياً ليتبع السمة", L"لون الإطار", L"تغيير لون إطار مربع التشغيل وبطاقة السجل", L"استدارة الزوايا", L"0 px = مربع، 14 px = Win11، 27 px = كبسولة", L"صورة خلفية / GIF متحرك", L"لم يتم الاختيار — يدعم PNG و JPG و WebP و GIF (حد 25 MB)", L"نشط: ", L"شفافية الخلفية المخصصة", L"اضبط وضوح الصورة/GIF (الافتراضي 85%)", L"الموضع ووضع العرض", L"اضبط مكان فتح Win + R ونمط التخطيط", L"موضع النافذة", L"ثبّت عند حافة/وسط الشاشة أو تلقائي", L"تذكّر آخر موضع للنافذة", L"إعادة الفتح في آخر مكان سحب (Ctrl + 0 لإعادة الضبط)", L"مقياس الواجهة", L"تكبير أو تصغير حجم نافذة التشغيل", L"السجل وسلوك التشغيل", L"إدارة سجل الأوامر والإدخال الأولي وصلاحيات المسؤول", L"إظهار سجل الأوامر", L"عرض الأوامر الأخيرة والمثبتة", L"تفريغ مربع الإدخال عند الفتح", L"أوقفه للإبقاء على آخر أمر كما في Run الكلاسيكي", L"التشغيل كمسؤول (Admin)", L"التشغيل بصلاحيات المسؤول افتراضياً (Ctrl + Shift + Enter يعمل دائماً)", L"مسح كل السجل المحفوظ", L"حذف الأوامر الأخيرة من Windows RunMRU", L"لغة العرض (21 لغة)", L"تُطبّق فوراً على نافذة Run ونافذة الإعدادات", L"اختر لوناً", L"ألوان Fluent السريعة", L"تطبيق", L"إلغاء", L"اختر صورة خلفية أو GIF متحرك", L"عند التفعيل، ستعمل الأوامر بصلاحيات المسؤول. هل توافق؟", L"تحذير صلاحيات المسؤول" };
     }
-    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"From -1 to 28\u00A0px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 30–255 (default 215)", L"Layout & Position", L"", L"Window Position", L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
+    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"From -1 to 28\u00A0px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 12–100% (default 84%)", L"Layout & Position", L"", L"Window Position", L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
 }
 
 struct Win11SettingsState {
@@ -15774,8 +15764,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 cornerStrings.outerTitle,
                 ls.radiusSub,
                 crStr, true);
-            std::wstring innerRadius = st->settings.customInnerCornerRadius < 0
-                ? ls.autoLbl : std::to_wstring(st->settings.customInnerCornerRadius) + L" px";
+            std::wstring innerRadius = st->settings.innerCornerRadius < 0
+                ? ls.autoLbl : std::to_wstring(st->settings.innerCornerRadius) + L" px";
             drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2213, 2214, 2215, L"\uE744",
                 cornerStrings.innerTitle, cornerStrings.innerHint, innerRadius);
             {
@@ -15808,10 +15798,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE890",
                     ls.bgOpTitle,
                     ls.bgOpSub,
-                    std::to_wstring(st->settings.customBackgroundOpacity));
+                    std::to_wstring(st->settings.backgroundOpacityPercent) + L"%");
             }
             const auto borders = GetWindowBorderStrings(st->settings.language);
-            const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Mod;
+            const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Standard;
             auto [borderGroup, borderY] = beginGroupCard(borders.groupTitle, L"", showMenuBorder ? 3 : 2, rH);
             drawColorRowInGroup(borderGroup, borderY, rH, 2203, 2204, L"\uED66",
                 ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
@@ -15821,7 +15811,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
                 drawDropdownRowInGroup(borderGroup, borderY + rH * 2, rH, 2111, L"\uEDE3",
                     borderStrings.title, borderStrings.description,
-                    borderStrings.labels[static_cast<int>(st->settings.contextMenuBorderMode)], 248.0f);
+                    borderStrings.labels[static_cast<int>(st->settings.menuBorderMode)], 248.0f);
             }
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
@@ -16661,7 +16651,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
                     if (selected >= 1 && selected <= 2 && selected != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"iconSet").c_str(),
-                                                   selected == 2 ? L"windows_fluent" : L"mod");
+                                                   selected == 2 ? L"windows_fluent" : L"default");
                     }
                 } else if (id == 2110) {
                     const auto strings = GetContextMenuStyleStrings(st->settings.language);
@@ -16672,7 +16662,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
                     if (sel >= 1 && sel <= 2 && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(),
-                                                    sel == 2 ? L"windows_fluent" : L"mod");
+                                                    sel == 2 ? L"windows_fluent" : L"standard");
                     }
                 } else if (id == 2111) {
                     const auto strings = GetContextMenuBorderStrings(st->settings.language);
@@ -16680,10 +16670,10 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     for (int i = 0; i < static_cast<int>(kContextMenuBorderModeValues.size()); ++i) {
                         options.emplace_back(i + 1, strings.labels[i]);
                     }
-                    const int current = static_cast<int>(st->settings.contextMenuBorderMode) + 1;
+                    const int current = static_cast<int>(st->settings.menuBorderMode) + 1;
                     const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
                     if (sel >= 1 && sel <= static_cast<int>(kContextMenuBorderModeValues.size()) && sel != current) {
-                        changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuBorderMode").c_str(),
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"menuBorderMode").c_str(),
                                                     kContextMenuBorderModeValues[sel - 1]);
                     }
                 } else if (id == 2201) {
@@ -16714,11 +16704,11 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     Wh_SetIntValue(GetUserOverrideKey(L"customCornerRadius").c_str(), next);
                     changed = true;
                 } else if (id == 2213 || id == 2214 || id == 2215) {
-                    const int current = st->settings.customInnerCornerRadius;
+                    const int current = st->settings.innerCornerRadius;
                     const int radius = current < 0 ? 14 : current;
                     const int next = id == 2215 ? -1 : std::clamp(radius + (id == 2214 ? 1 : -1), 0, 28);
                     changed = next != current &&
-                        Wh_SetIntValue(GetUserOverrideKey(L"customInnerCornerRadius").c_str(), next);
+                        Wh_SetIntValue(GetUserOverrideKey(L"innerCornerRadius").c_str(), next);
                 } else if (id == 2220) {
                     wchar_t fileBuf[MAX_PATH * 2] = {};
                     std::wstring initDir;
@@ -16756,8 +16746,10 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     Wh_SetStringValue(GetUserOverrideKey(L"customBackgroundPath").c_str(), L"__NONE__");
                     changed = true;
                 } else if (id == 2225 || id == 2226 || id == 2227) {
-                    int nextOp = (id == 2227) ? 215 : std::clamp(st->settings.customBackgroundOpacity + (id == 2226 ? 25 : -25), 30, 255);
-                    Wh_SetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), nextOp);
+                    const int nextOp = id == 2227 ? kDefaultBackgroundOpacityPercent
+                        : std::clamp(st->settings.backgroundOpacityPercent + (id == 2226 ? 10 : -10),
+                                     kMinBackgroundOpacityPercent, 100);
+                    Wh_SetIntValue(GetUserOverrideKey(L"backgroundOpacityPercent").c_str(), nextOp);
                     changed = true;
                 } else if (id == 2230) {
                     const auto borders = GetWindowBorderStrings(st->settings.language);
@@ -16801,7 +16793,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     int current = static_cast<int>(st->settings.dialogLayout) + 1;
                     int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
                     if (sel >= 1 && sel <= 3 && sel != current) {
-                        changed = Wh_SetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), sel - 1);
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogLayout").c_str(), kDialogLayoutValues[sel - 1]);
                     }
                 } else if (id == 2403) {
                     Wh_SetIntValue(GetUserOverrideKey(L"rememberPosition").c_str(), st->settings.rememberPosition ? 0 : 1);
@@ -16814,7 +16806,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     const int current = static_cast<int>(st->settings.dialogWidthPreset) + 1;
                     const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
                     if (sel >= 1 && sel <= 3 && sel != current) {
-                        constexpr std::array keys{L"layout", L"narrow", L"wide"};
+                        constexpr std::array keys{L"default", L"narrow", L"wide"};
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogWidthPreset").c_str(), keys[sel - 1]);
                     }
                 } else if (id == 2410) {
@@ -16854,7 +16846,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     const int current = st->settings.inlineAdminIndicator ? 2 : 1;
                     const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
                     if (sel >= 1 && sel <= 2 && sel != current) {
-                        changed = Wh_SetStringValue(GetUserOverrideKey(L"adminIndicator").c_str(),
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"adminIndicatorPlacement").c_str(),
                                                     sel == 2 ? L"field" : L"panel");
                     }
                 } else if (id == 2508) {
@@ -18006,7 +17998,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         ResolvedThemeVisuals themeVis = ResolveEffectiveThemeVisuals(state->settings, isLight);
                         float maxPillCorner = DpiScaleSF(themeVis.cornerRadiusDip, state);
                         const float backdropRadiusPx = state->settings.customCornerRadius >= 0 ? maxPillCorner : -1.0f;
-                        const bool glassEdgeHighlight = state->settings.windowBorderMode == WindowBorderMode::Mod;
+                        const bool glassEdgeHighlight = state->settings.windowBorderMode == WindowBorderMode::Default;
                         float barCornerR   = (std::min)(maxPillCorner, (rcBarPill.bottom - rcBarPill.top) * 0.5f);
                         float adminCornerR = (adminH > 0)
                             ? (std::min)(maxPillCorner, (rcAdminPill.bottom - rcAdminPill.top) * 0.5f)
@@ -18042,17 +18034,17 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
                             int glassPct = hasBgMedia
                                 ? -20
-                                : MapBackgroundOpacityToGlassPct(state->settings.customBackgroundOpacity);
+                                : MapBackgroundAlphaToGlassPct(BackgroundOpacityToAlpha(state->settings.backgroundOpacityPercent));
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, glassPct, isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
                                                            adminH, adminGapH, backdropRadiusPx, glassEdgeHighlight);
                         } else if (surface == SurfaceTheme::Blur) {
-                            // Translucent, vibrant Windows 11 Acrylic Blur controlled by Background Opacity (30..255)
+                            // The blur renderer accepts alpha bytes.
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
                             int blurOp = hasBgMedia
                                 ? 215
-                                : std::clamp(state->settings.customBackgroundOpacity, 30, 255);
+                                : BackgroundOpacityToAlpha(state->settings.backgroundOpacityPercent);
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, -(1000 + blurOp), isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
@@ -18064,7 +18056,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 : (isLight ? D2D1::ColorF(0.96f, 0.96f, 0.98f, 1.0f)
                                            : D2D1::ColorF(0.12f, 0.12f, 0.15f, 1.0f));
                             if (!hasBgMedia) {
-                                float opScale = std::clamp(state->settings.customBackgroundOpacity, 30, 255) / 255.0f;
+                                float opScale = state->settings.backgroundOpacityPercent / 100.0f;
                                 solidCol.a = std::clamp(solidCol.a * opScale, 0.08f, 1.0f);
                             }
                             ID2D1SolidColorBrush* pSolidBr = nullptr;
@@ -18106,7 +18098,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 }
                                 ID2D1Bitmap* pBgBmp = state->pCachedBgBmp;
                                 if (pBgBmp) {
-                                    float bgOp = std::clamp(state->settings.customBackgroundOpacity, 30, 255) / 255.0f;
+                                    float bgOp = state->settings.backgroundOpacityPercent / 100.0f;
                                     ID2D1SolidColorBrush* pScrimBr = nullptr;
                                     pRT->CreateSolidColorBrush(
                                         isLight ? D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.36f * bgOp)
@@ -18265,7 +18257,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     float padX = DpiScaleS(kBasePanelInset, state);
                                     float padY = DpiScaleS(kBaseRowHighlightInset, state);
                                     D2D1_RECT_F rcPill = D2D1::RectF(padX, rowTop + padY, (float)w - padX - sbReserve, rowTop + rowH - padY);
-                                    const int innerRadius = state->settings.customInnerCornerRadius;
+                                    const int innerRadius = state->settings.innerCornerRadius;
                                     const float innerPx = innerRadius >= 0 ? DpiScaleSF(static_cast<float>(innerRadius), state)
                                         : (rcPill.bottom - rcPill.top) * 0.5f;
                                     const float rowPillRadius = ClampCornerRadius(
@@ -18749,7 +18741,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     DrawD2DGlassRim(pRT, rc, cr, effectiveDpi, isLight, thick);
                                 }
                             };
-                            if (borderMode == WindowBorderMode::Mod) {
+                            if (borderMode == WindowBorderMode::Default) {
                                 const auto* custom = themeVis.hasCustomBorder ? &themeVis.borderColor : nullptr;
                                 const auto adminColor = D2D1::ColorF(1.00f, 0.65f, 0.14f, isLight ? 0.65f : 0.78f);
                                 if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.25f, custom);

@@ -34,50 +34,44 @@ test('all four buttons share the same opt-out behavior', () => {
     `);
 });
 
-test('layout settings preserve the prior Classic/Pill values and accept Fluent', () => {
-    const schema = source.match(/- minimalMode: "0"[\s\S]*?(?=\n  - contextMenuStyle:)/)?.[0];
-    assert.match(schema, /- minimalMode: "0"/);
-    for (const [value, label] of [['0', 'Classic'], ['1', 'Compact Mini-Pill'], ['2', 'Fluent']]) {
-        assert.match(schema, new RegExp(`^    - "${value}": ${label}$`, 'm'));
+test('layout settings store the three named layouts', () => {
+    const schema = source.match(/- dialogLayout: classic[\s\S]*?(?=\n  - contextMenuStyle:)/)?.[0];
+    assert.ok(schema);
+    for (const [value, label] of [['classic', 'Classic'], ['pill', 'Compact Mini-Pill'], ['fluent', 'Fluent']]) {
+        assert.match(schema, new RegExp(`^    - ${value}: ${label}$`, 'm'));
     }
-
     const mode = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
-    const resolver = source.match(/constexpr DialogLayout ResolveDialogLayout\([\s\S]*?\n\}/)?.[0];
-    const override = source.match(/constexpr DialogLayout ApplyDialogLayoutOverride\([\s\S]*?\n\}/)?.[0];
-    assert.ok(mode && resolver && override, 'The production layout resolver is present');
+    const values = source.match(/constexpr std::array<const wchar_t\*, 3> kDialogLayoutValues[^\n]*;/)?.[0];
+    const parse = source.match(/constexpr DialogLayout ParseDialogLayout\([\s\S]*?\n\}/)?.[0];
+    assert.ok(mode && values && parse);
     compileChecks(`
-            #include <string_view>
-            ${mode}
-            ${resolver}
-            ${override}
-            using enum DialogLayout;
-            static_assert(ResolveDialogLayout(L"", 0) == Classic);
-            static_assert(ResolveDialogLayout(L"", 1) == Pill);
-            static_assert(ResolveDialogLayout(L"0", 1) == Classic);
-            static_assert(ResolveDialogLayout(L"1", 0) == Pill);
-            static_assert(ResolveDialogLayout(L"2", 0) == Fluent);
-            static_assert(ApplyDialogLayoutOverride(Fluent, 0) == Classic);
-            static_assert(ApplyDialogLayoutOverride(Classic, 1) == Pill);
-            static_assert(ApplyDialogLayoutOverride(Classic, 2) == Fluent);
-            static_assert(ApplyDialogLayoutOverride(Pill, -1) == Pill);
-            static_assert(ApplyDialogLayoutOverride(Pill, 3) == Pill);
-`);
+        #include <array>
+        #include <string_view>
+        ${mode}
+        ${values}
+        ${parse}
+        using enum DialogLayout;
+        static_assert(ParseDialogLayout(L"classic") == Classic);
+        static_assert(ParseDialogLayout(L"pill") == Pill);
+        static_assert(ParseDialogLayout(L"fluent") == Fluent);
+        static_assert(ParseDialogLayout(L"") == Classic);
+    `);
 });
 
 test('the context menu retains its previous style by default', () => {
-    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - dialogWidthPreset:)/)?.[0];
+    const style = source.match(/- contextMenuStyle: standard[\s\S]*?(?=\n  - dialogWidthPreset:)/)?.[0];
     assert.match(style, /\$name: "?Context Menu Style"?/);
-    assert.match(style, /- mod: Standard/);
-    assert.match(style, /- mod: Обычный/);
+    assert.match(style, /- standard: Standard/);
+    assert.match(style, /- standard: Обычный/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
     assert.match(style, /\$description:ru-RU: "?Оформление меню при нажатии правой кнопки мыши"?/);
 });
 
 test('both menu styles use the separately selected icon set', () => {
-    const schema = source.match(/  - colorMode:[\s\S]*?\n  - iconSet: mod([\s\S]*?)\n  - customBgColor:/)?.[1];
+    const schema = source.match(/  - colorMode:[\s\S]*?\n  - iconSet: default([\s\S]*?)\n  - customBgColor:/)?.[1];
     assert.ok(schema, 'The icon list follows Color Mode in Personalization');
     assert.match(schema, /\$name:ru-RU: "?Иконки"?/);
-    assert.match(schema, /- mod: По умолчанию/);
+    assert.match(schema, /- default: По умолчанию/);
     assert.equal((schema.match(/\$options(?::[\w-]+)?:/g) ?? []).length, 21);
     assert.match(source, /DrawRunUiIcon\(pRT, pItemIconBr, pRoundStroke, s->dlgState->settings\.iconSet/);
     assert.match(source, /MakeWindowsMenuIcon\(request\.iconSet, item\.icon\)/);
@@ -150,9 +144,9 @@ test('layout settings keep position and menu style directly below their related 
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys, ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle',
+    assert.deepEqual(keys, ['dialogPosition', 'rememberPosition', 'dialogLayout', 'contextMenuStyle',
         'dialogWidthPreset', 'customDialogWidth', 'customBarHeight', 'customFontSize', 'uiScalePercent']);
-    assert.ok(!keys.includes('contextMenuBorderMode'));
+    assert.ok(!keys.includes('menuBorderMode'));
     assert.match(layout, /\$name:ru-RU: "?Макет окна"?/);
     assert.match(layout, /\$description:ru-RU: "?Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"?/);
 });
@@ -169,10 +163,10 @@ test('all width presets reserve 100 pixels for input beside visible controls', (
         ${preset}
         ${desired}
         ${fit}
-        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Layout) == 500);
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Default) == 500);
         static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Narrow) == 425);
         static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Wide) == 575);
-        static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Layout) == 600);
+        static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Default) == 600);
         static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Narrow) == 510);
         static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Wide) == 690);
         static_assert(GetLayoutWidthDip(DialogLayout::Pill, DialogWidthPreset::Narrow) == 306);
@@ -299,7 +293,7 @@ test('history follows the Windows short date and short time formats', () => {
 });
 
 test('inner corners support auto, square and a radius bounded by the row', () => {
-    assert.match(source, /- customInnerCornerRadius: "-1"/);
+    assert.match(source, /- innerCornerRadius: "-1"/);
     const parser = source.match(/int ParseInnerCornerRadius\([\s\S]*?\n\}/)?.[0];
     const radius = source.match(/constexpr float ClampCornerRadius\([\s\S]*?\n\}/)?.[0];
     assert.ok(parser && radius, 'The settings parser and the rendering clamp are present');
@@ -381,17 +375,84 @@ test('history with one row has the same height as the input panel across scales'
     `, true);
 });
 
-test('a saved explicit accent becomes the Windows border mode', () => {
-    const normalize = source.match(/constexpr std::wstring_view NormalizeBorderMode\([\s\S]*?\n\}/)?.[0];
-    assert.ok(normalize);
+test('only the catalog keys are read for automatic settings import', () => {
+    const legacy = source.match(/void ImportCatalogSettings\([\s\S]*?\n\}/)?.[0];
+    const opacity = source.match(/constexpr int kMinBackgroundOpacityPercent[\s\S]*?\n\}(?=\s*struct ModSettings)/)?.[0];
+    const mode = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
+    const values = source.match(/constexpr std::array<const wchar_t\*, 3> kDialogLayoutValues[^\n]*;/)?.[0];
+    assert.ok(legacy && opacity && mode && values);
+    assert.doesNotMatch(source, /contextMenuStyleMoved|menuBorderModeMoved|NormalizeBorderMode/);
     compileChecks(`
-        #include <string_view>
-        ${normalize}
-        static_assert(NormalizeBorderMode(L"accent") == L"windows");
-        static_assert(NormalizeBorderMode(L"windows") == L"windows");
-        static_assert(NormalizeBorderMode(L"off") == L"off");
-        static_assert(NormalizeBorderMode(L"own") == L"own");
-    `);
+        #include <algorithm>
+        #include <array>
+        #include <cassert>
+        #include <cwchar>
+        #include <map>
+        #include <string>
+        #define ARRAYSIZE(a) (sizeof(a) / sizeof((a)[0]))
+        ${mode}
+        ${values}
+        ${opacity}
+        struct WindhawkRawSnapshot {
+            DialogLayout dialogLayout = DialogLayout::Classic;
+            int backgroundOpacityPercent = kDefaultBackgroundOpacityPercent;
+            std::wstring customBorderColor;
+        };
+        std::map<std::wstring, int> storageInts, catalogInts;
+        std::map<std::wstring, std::wstring> storageStrings, catalogStrings;
+        std::wstring GetUserOverrideKey(const wchar_t* key) { return key; }
+        int Wh_GetIntSetting(const wchar_t* key) { return catalogInts[key]; }
+        int Wh_GetIntValue(const wchar_t* key, int fallback) {
+            auto it = storageInts.find(key);
+            return it == storageInts.end() ? fallback : it->second;
+        }
+        int Wh_GetStringValue(const wchar_t* key, wchar_t* value, size_t size) {
+            auto it = storageStrings.find(key);
+            if (it == storageStrings.end()) return 0;
+            std::wcsncpy(value, it->second.c_str(), size);
+            return static_cast<int>(it->second.size());
+        }
+        bool Wh_SetStringValue(const wchar_t* key, const wchar_t* value) { storageStrings[key] = value; return true; }
+        bool Wh_SetIntValue(const wchar_t* key, int value) { storageInts[key] = value; return true; }
+        namespace WindhawkUtils {
+            struct StringSetting {
+                std::wstring value;
+                static StringSetting make(const wchar_t* key) { return {catalogStrings[key]}; }
+                const wchar_t* get() const { return value.c_str(); }
+            };
+        }
+        ${legacy}
+        static_assert(CatalogOpacityToPercent(30) == 12);
+        static_assert(CatalogOpacityToPercent(190) == 75);
+        static_assert(CatalogOpacityToPercent(215) == 84);
+        static_assert(CatalogOpacityToPercent(255) == 100);
+        static_assert(BackgroundOpacityToAlpha(100) == 255);
+        int main() {
+            catalogInts = {{L"layoutGroup.minimalMode", 1}, {L"appearanceGroup.customBackgroundOpacity", 190}};
+            catalogStrings = {{L"appearanceGroup.customBorderColor", L"#ABCDEF"}};
+            ImportCatalogSettings({});
+            assert(storageStrings[L"dialogLayout"] == L"pill");
+            assert(storageInts[L"backgroundOpacityPercent"] == 75);
+            assert(storageStrings[L"customBorderColor"] == L"#ABCDEF");
+            assert(storageInts[L"catalogSettingsImported"] == 1);
+            storageStrings[L"dialogLayout"] = L"classic";
+            storageInts[L"backgroundOpacityPercent"] = 84;
+            ImportCatalogSettings({});
+            assert(storageStrings[L"dialogLayout"] == L"classic");
+            assert(storageInts[L"backgroundOpacityPercent"] == 84);
+            storageStrings.clear();
+            storageInts = {{L"minimalModeV3", 0}, {L"customBackgroundOpacity", 150}};
+            ImportCatalogSettings({});
+            assert(!storageStrings.contains(L"dialogLayout"));
+            assert(storageInts[L"backgroundOpacityPercent"] == 59);
+            storageStrings.clear();
+            storageInts.clear();
+            ImportCatalogSettings({DialogLayout::Fluent, 92, L"#112233"});
+            assert(!storageStrings.contains(L"dialogLayout"));
+            assert(!storageInts.contains(L"backgroundOpacityPercent"));
+            assert(!storageStrings.contains(L"customBorderColor"));
+        }
+    `, true);
 });
 
 test('window border preferences respect high contrast', () => {
@@ -402,8 +463,8 @@ test('window border preferences respect high contrast', () => {
         ${mode}
         ${resolve}
         using enum WindowBorderMode;
-        static_assert(ResolveWindowBorderMode(Mod, false) == Mod);
-        static_assert(ResolveWindowBorderMode(Mod, true) == Off);
+        static_assert(ResolveWindowBorderMode(Default, false) == Default);
+        static_assert(ResolveWindowBorderMode(Default, true) == Off);
         static_assert(ResolveWindowBorderMode(Windows, false) == Windows);
         static_assert(ResolveWindowBorderMode(Windows, true) == Windows);
         static_assert(ResolveWindowBorderMode(Off, false) == Off);
@@ -448,7 +509,7 @@ test('the border settings are grouped in color, window, and context menu order',
     const group = source.match(/^\- windowBordersGroup:[\s\S]*?(?=^\- layoutGroup:)/m)?.[0];
     assert.ok(group, 'The window borders group is present');
     const keys = Array.from(group.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys, ['customBorderColor', 'windowBorderMode', 'contextMenuBorderMode']);
+    assert.deepEqual(keys, ['customBorderColor', 'windowBorderMode', 'menuBorderMode']);
 });
 
 test('all three taskbar choices use the existing setting key and keep the existing values valid', () => {
@@ -483,11 +544,11 @@ test('history stores and displays up to 50 items while retaining its default lim
 
 test('all localized border lists omit the explicit accent and preserve the option order', () => {
     const group = source.match(/^\- windowBordersGroup:[\s\S]*?(?=^\- layoutGroup:)/m)?.[0];
-    const windowOptions = group.slice(group.indexOf('  - windowBorderMode:'), group.indexOf('  - contextMenuBorderMode:'));
-    const menuOptions = group.slice(group.indexOf('  - contextMenuBorderMode:'));
+    const windowOptions = group.slice(group.indexOf('  - windowBorderMode:'), group.indexOf('  - menuBorderMode:'));
+    const menuOptions = group.slice(group.indexOf('  - menuBorderMode:'));
     for (const [entry, keys] of [
-        [windowOptions, ['mod', 'windows', 'off']],
-        [menuOptions, ['own', 'window', 'windows', 'off']],
+        [windowOptions, ['default', 'windows', 'off']],
+        [menuOptions, ['default', 'window', 'windows', 'off']],
     ]) {
         const localizedLists = entry.split(/^    \$options[^\n]*\n/m).slice(1);
         assert.equal(localizedLists.length, 21);
@@ -501,15 +562,15 @@ test('context menus can keep their own border or override the window border poli
     const modes = source.match(/enum class WindowBorderMode[^\n]*;\s*enum class ContextMenuBorderMode[^\n]*;/)?.[0];
     const resolve = source.match(/constexpr std::optional<WindowBorderMode> ResolveContextMenuWindowBorderMode\([\s\S]*?\n\}/)?.[0];
     assert.ok(modes && resolve);
-    assert.match(source, /- contextMenuBorderMode: own/);
+    assert.match(source, /- menuBorderMode: default/);
     compileChecks(`
         #include <optional>
         ${modes}
         ${resolve}
         using Menu = ContextMenuBorderMode;
         using Window = WindowBorderMode;
-        static_assert(!ResolveContextMenuWindowBorderMode(Menu::Own, Window::Off));
-        static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Mod) == Window::Mod);
+        static_assert(!ResolveContextMenuWindowBorderMode(Menu::Default, Window::Off));
+        static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Default) == Window::Default);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Window, Window::Off) == Window::Off);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Windows, Window::Off) == Window::Windows);
         static_assert(ResolveContextMenuWindowBorderMode(Menu::Off, Window::Windows) == Window::Off);
