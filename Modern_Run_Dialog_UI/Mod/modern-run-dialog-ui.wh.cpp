@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.7.2
+// @version         6.7.3
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 34
+// Build: 35
 
 // ==WindhawkModReadme==
 /*
@@ -889,128 +889,128 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description: "Set the width of the Run window"
     $options:
     - layout: "Layout default"
-    - narrow: "Narrow"
-    - wide: "Wide"
+    - narrow: "Narrower"
+    - wide: "Wider"
     $name:ru-RU: "Ширина окна"
     $description:ru-RU: "Задает ширину окна «Выполнить»"
     $options:ru-RU:
     - layout: "Определено макетом"
-    - narrow: "Узкое"
-    - wide: "Широкое"
+    - narrow: "Уже"
+    - wide: "Шире"
     $name:vi-VN: "Chiều rộng cửa sổ"
     $description:vi-VN: "Đặt chiều rộng của cửa sổ Run"
     $options:vi-VN:
     - layout: "Theo bố cục"
-    - narrow: "Hẹp"
-    - wide: "Rộng"
+    - narrow: "Hẹp hơn"
+    - wide: "Rộng hơn"
     $name:th-TH: "ความกว้างหน้าต่าง"
     $description:th-TH: "กำหนดความกว้างของหน้าต่าง Run"
     $options:th-TH:
     - layout: "ตามเค้าโครง"
-    - narrow: "แคบ"
-    - wide: "กว้าง"
+    - narrow: "แคบลง"
+    - wide: "กว้างขึ้น"
     $name:id-ID: "Lebar jendela"
     $description:id-ID: "Atur lebar jendela Run"
     $options:id-ID:
     - layout: "Sesuai tata letak"
-    - narrow: "Sempit"
-    - wide: "Lebar"
+    - narrow: "Lebih sempit"
+    - wide: "Lebih lebar"
     $name:ms-MY: "Lebar tetingkap"
     $description:ms-MY: "Tetapkan lebar tetingkap Run"
     $options:ms-MY:
     - layout: "Mengikut susun atur"
-    - narrow: "Sempit"
-    - wide: "Lebar"
+    - narrow: "Lebih sempit"
+    - wide: "Lebih lebar"
     $name:ja-JP: "ウィンドウの幅"
     $description:ja-JP: "「ファイル名を指定して実行」のウィンドウ幅を設定"
     $options:ja-JP:
     - layout: "レイアウトに従う"
-    - narrow: "狭い"
-    - wide: "広い"
+    - narrow: "より狭く"
+    - wide: "より広く"
     $name:zh-CN: "窗口宽度"
     $description:zh-CN: "设置“运行”窗口的宽度"
     $options:zh-CN:
     - layout: "由布局决定"
-    - narrow: "窄"
-    - wide: "宽"
+    - narrow: "更窄"
+    - wide: "更宽"
     $name:zh-TW: "視窗寬度"
     $description:zh-TW: "設定「執行」視窗的寬度"
     $options:zh-TW:
     - layout: "依版面配置"
-    - narrow: "窄"
-    - wide: "寬"
+    - narrow: "較窄"
+    - wide: "較寬"
     $name:ko-KR: "창 너비"
     $description:ko-KR: "실행 창의 너비를 설정"
     $options:ko-KR:
     - layout: "레이아웃 기본값"
-    - narrow: "좁게"
-    - wide: "넓게"
+    - narrow: "더 좁게"
+    - wide: "더 넓게"
     $name:fr-FR: "Largeur de la fenêtre"
     $description:fr-FR: "Définit la largeur de la fenêtre Exécuter"
     $options:fr-FR:
     - layout: "Selon la disposition"
-    - narrow: "Étroite"
-    - wide: "Large"
+    - narrow: "Plus étroite"
+    - wide: "Plus large"
     $name:de-DE: "Fensterbreite"
     $description:de-DE: "Legt die Breite des Fensters „Ausführen“ fest"
     $options:de-DE:
     - layout: "Nach Layout"
-    - narrow: "Schmal"
-    - wide: "Breit"
+    - narrow: "Schmaler"
+    - wide: "Breiter"
     $name:es-ES: "Ancho de ventana"
     $description:es-ES: "Ajusta el ancho de la ventana Ejecutar"
     $options:es-ES:
     - layout: "Según el diseño"
-    - narrow: "Estrecha"
-    - wide: "Ancha"
+    - narrow: "Más estrecha"
+    - wide: "Más ancha"
     $name:pt-BR: "Largura da janela"
     $description:pt-BR: "Define a largura da janela Executar"
     $options:pt-BR:
     - layout: "Conforme o layout"
-    - narrow: "Estreita"
-    - wide: "Larga"
+    - narrow: "Mais estreita"
+    - wide: "Mais larga"
     $name:it-IT: "Larghezza della finestra"
     $description:it-IT: "Imposta la larghezza della finestra Esegui"
     $options:it-IT:
     - layout: "Secondo il layout"
-    - narrow: "Stretta"
-    - wide: "Larga"
+    - narrow: "Più stretta"
+    - wide: "Più larga"
     $name:uk-UA: "Ширина вікна"
     $description:uk-UA: "Задає ширину вікна «Виконати»"
     $options:uk-UA:
     - layout: "За макетом"
-    - narrow: "Вузьке"
-    - wide: "Широке"
+    - narrow: "Вужче"
+    - wide: "Ширше"
     $name:pl-PL: "Szerokość okna"
     $description:pl-PL: "Ustawia szerokość okna Uruchamianie"
     $options:pl-PL:
     - layout: "Zgodnie z układem"
-    - narrow: "Wąskie"
-    - wide: "Szerokie"
+    - narrow: "Węższe"
+    - wide: "Szersze"
     $name:nl-NL: "Vensterbreedte"
     $description:nl-NL: "Stelt de breedte van het venster Uitvoeren in"
     $options:nl-NL:
     - layout: "Volgens indeling"
-    - narrow: "Smal"
-    - wide: "Breed"
+    - narrow: "Smaller"
+    - wide: "Breder"
     $name:tr-TR: "Pencere genişliği"
     $description:tr-TR: "Çalıştır penceresinin genişliğini ayarlar"
     $options:tr-TR:
     - layout: "Düzene göre"
-    - narrow: "Dar"
-    - wide: "Geniş"
+    - narrow: "Daha dar"
+    - wide: "Daha geniş"
     $name:hi-IN: "विंडो की चौड़ाई"
     $description:hi-IN: "रन विंडो की चौड़ाई सेट करें"
     $options:hi-IN:
     - layout: "लेआउट के अनुसार"
-    - narrow: "संकरा"
-    - wide: "चौड़ा"
+    - narrow: "और संकरा"
+    - wide: "और चौड़ा"
     $name:ar: "عرض النافذة"
     $description:ar: "يضبط عرض نافذة تشغيل"
     $options:ar:
     - layout: "حسب التخطيط"
-    - narrow: "ضيق"
-    - wide: "عريض"
+    - narrow: "أضيق"
+    - wide: "أعرض"
   - uiScalePercent: "100"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
@@ -1674,8 +1674,8 @@ constexpr bool ResolveRunElevation(bool defaultAdmin, RunEnterAction action) {
 constexpr int GetLayoutWidthDip(DialogLayout layout, DialogWidthPreset preset) {
     const int width = layout == DialogLayout::Pill ? 360 : layout == DialogLayout::Fluent ? 500 : 600;
     switch (preset) {
-        case DialogWidthPreset::Narrow: return width * 7 / 10;
-        case DialogWidthPreset::Wide: return width * 13 / 10;
+        case DialogWidthPreset::Narrow: return width * 85 / 100;
+        case DialogWidthPreset::Wide: return width * 115 / 100;
         default: return width;
     }
 }
@@ -11095,14 +11095,14 @@ int GetDlgWidth(const RunDialogState* state) {
         ? DpiScale(state->settings.customDialogWidth, state->dpi)
         : DpiScaleS(GetLayoutWidthDip(state->settings.dialogLayout, preset), state);
     const auto widths = GetVisibleActionButtonWidths(state, GetActionButtonHeight(state, GetInputBarHeight(state)));
-    int actionWidth = 0;
-    int visible = 0;
+    int occupiedWidth = GetAdminIndicatorWidth(state);
+    int visible = occupiedWidth > 0;
     for (const auto width : widths) {
-        actionWidth += width;
+        occupiedWidth += width;
         visible += width > 0;
     }
     const int controls = GetInputLeft(state) + DpiScaleS(kBasePanelInset, state) + DpiScaleS(8, state) +
-                         GetAdminIndicatorWidth(state) + actionWidth + (std::max)(0, visible - 1) * DpiScaleS(6, state);
+                         occupiedWidth + (std::max)(0, visible - 1) * DpiScaleS(6, state);
     return FitDialogWidth(requested, controls, DpiScaleS(100, state));
 }
 
@@ -11121,29 +11121,27 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
 
     int right = dlgW - rightMargin;
     int editRightAnchor = right;
-    auto placeButton = [&](RunAction action) -> RECT {
-        int width = widths[static_cast<size_t>(action)];
+    auto placeControl = [&](int width) -> RECT {
         if (width == 0) return {};
         RECT rect{ right - width, top, right, top + btnH };
         editRightAnchor = rect.left;
         right = rect.left - gap;
         return rect;
     };
-    layout.rcGear   = placeButton(RunAction::Settings);
-    layout.rcClose  = placeButton(RunAction::Close);
-    layout.rcRun    = placeButton(RunAction::Run);
-    layout.rcBrowse = placeButton(RunAction::Browse);
+    layout.rcGear   = placeControl(widths[static_cast<size_t>(RunAction::Settings)]);
+    layout.rcClose  = placeControl(widths[static_cast<size_t>(RunAction::Close)]);
+    layout.rcRun    = placeControl(widths[static_cast<size_t>(RunAction::Run)]);
+    layout.rcBrowse = placeControl(widths[static_cast<size_t>(RunAction::Browse)]);
+    layout.rcAdminIndicator = placeControl(GetAdminIndicatorWidth(state));
 
     int editH = (std::max)(DpiScaleS(24, state), (int)std::ceil(GetFontSizeSF(13.5f, state) * 1.6f));
     editH = (std::min)(editH, barH - DpiScale(6, dpi, 100));
     int editTop = barTop + (barH - editH) / 2;
     int editLeft = GetInputLeft(state);
-    const int indicatorWidth = GetAdminIndicatorWidth(state);
-    layout.rcAdminIndicator = {editRightAnchor - indicatorWidth, top, editRightAnchor, top + btnH};
     layout.rcEdit = {
         editLeft,
         editTop,
-        editRightAnchor - indicatorWidth - DpiScaleS(8, state),
+        editRightAnchor - DpiScaleS(8, state),
         editTop + editH
     };
     return layout;
@@ -13992,27 +13990,27 @@ struct RunDisplaySettingStrings {
 
 const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& language) {
     static constexpr RunDisplaySettingStrings strings[] = {
-        {L"en", L"Window width", L"Set the width of the Run window", L"Layout default", L"Narrow", L"Wide", L"Behavior", L"Run as administrator", L"Elevate by default", L"Ctrl+Shift+Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift+Enter", L"When off, Shift+Enter runs the command in a terminal"},
-        {L"ru", L"Ширина окна", L"Задает ширину окна «Выполнить»", L"Определено макетом", L"Узкое", L"Широкое", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Ctrl+Shift+Enter меняет права для текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift+Enter", L"Если выключено, Shift+Enter запускает команду в терминале"},
-        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp", L"Rộng", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift+Enter", L"Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"},
-        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบ", L"กว้าง", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift+Enter", L"เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
-        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Sempit", L"Lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift+Enter", L"Jika nonaktif, Shift+Enter menjalankan perintah di terminal"},
-        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Sempit", L"Lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift+Enter", L"Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"},
-        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"狭い", L"広い", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl+Shift+Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift+Enter で権限を切り替え", L"オフの場合、Shift+Enter でターミナル内でコマンドを実行"},
-        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"窄", L"宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl+Shift+Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift+Enter 切换权限", L"关闭后，Shift+Enter 在终端中运行命令"},
-        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"窄", L"寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl+Shift+Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift+Enter 切換權限", L"關閉時，Shift+Enter 會在終端機中執行命令"},
-        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"좁게", L"넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl+Shift+Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift+Enter로 권한 전환", L"끄면 Shift+Enter로 터미널에서 명령을 실행"},
-        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Étroite", L"Large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj+Entrée", L"Si désactivé, Maj+Entrée lance la commande dans un terminal"},
-        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmal", L"Breit", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt+Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"},
-        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Estrecha", L"Ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl+Mayús+Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús+Entrar", L"Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"},
-        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Estreita", L"Larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl+Shift+Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift+Enter", L"Desativado, Shift+Enter executa o comando em um terminal"},
-        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Stretta", L"Larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl+Maiusc+Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc+Invio", L"Se disattivato, Maiusc+Invio esegue il comando in un terminale"},
-        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вузьке", L"Широке", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl+Shift+Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift+Enter", L"Якщо вимкнено, Shift+Enter запускає команду в терміналі"},
-        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Wąskie", L"Szerokie", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift+Enter", L"Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"},
-        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smal", L"Breed", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift+Enter", L"Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"},
-        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Dar", L"Geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift+Enter ile yetkileri değiştir", L"Kapalıyken Shift+Enter komutu terminalde çalıştırır"},
-        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"संकरा", L"चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift+Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"},
-        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"ضيق", L"عريض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift+Enter", L"عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"},
+        {L"en", L"Window width", L"Set the width of the Run window", L"Layout default", L"Narrower", L"Wider", L"Behavior", L"Run as administrator", L"Elevate by default", L"Ctrl+Shift+Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift+Enter", L"When off, Shift+Enter runs the command in a terminal"},
+        {L"ru", L"Ширина окна", L"Задает ширину окна «Выполнить»", L"Определено макетом", L"Уже", L"Шире", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Ctrl+Shift+Enter меняет права для текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift+Enter", L"Если выключено, Shift+Enter запускает команду в терминале"},
+        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp hơn", L"Rộng hơn", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift+Enter", L"Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"},
+        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบลง", L"กว้างขึ้น", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift+Enter", L"เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
+        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Lebih sempit", L"Lebih lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift+Enter", L"Jika nonaktif, Shift+Enter menjalankan perintah di terminal"},
+        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Lebih sempit", L"Lebih lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift+Enter", L"Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"},
+        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"より狭く", L"より広く", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl+Shift+Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift+Enter で権限を切り替え", L"オフの場合、Shift+Enter でターミナル内でコマンドを実行"},
+        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"更窄", L"更宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl+Shift+Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift+Enter 切换权限", L"关闭后，Shift+Enter 在终端中运行命令"},
+        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"較窄", L"較寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl+Shift+Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift+Enter 切換權限", L"關閉時，Shift+Enter 會在終端機中執行命令"},
+        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"더 좁게", L"더 넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl+Shift+Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift+Enter로 권한 전환", L"끄면 Shift+Enter로 터미널에서 명령을 실행"},
+        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Plus étroite", L"Plus large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj+Entrée", L"Si désactivé, Maj+Entrée lance la commande dans un terminal"},
+        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmaler", L"Breiter", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt+Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"},
+        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Más estrecha", L"Más ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl+Mayús+Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús+Entrar", L"Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"},
+        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Mais estreita", L"Mais larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl+Shift+Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift+Enter", L"Desativado, Shift+Enter executa o comando em um terminal"},
+        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Più stretta", L"Più larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl+Maiusc+Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc+Invio", L"Se disattivato, Maiusc+Invio esegue il comando in un terminale"},
+        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вужче", L"Ширше", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl+Shift+Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift+Enter", L"Якщо вимкнено, Shift+Enter запускає команду в терміналі"},
+        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Węższe", L"Szersze", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift+Enter", L"Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"},
+        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smaller", L"Breder", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift+Enter", L"Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"},
+        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Daha dar", L"Daha geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift+Enter ile yetkileri değiştir", L"Kapalıyken Shift+Enter komutu terminalde çalıştırır"},
+        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"और संकरा", L"और चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift+Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"},
+        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"أضيق", L"أعرض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift+Enter", L"عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"},
     };
     const auto code = ResolveEffectiveLanguageCode(language);
     for (const auto& value : strings) {

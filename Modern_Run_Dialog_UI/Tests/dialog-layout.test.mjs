@@ -95,15 +95,79 @@ test('all width presets reserve 100 pixels for input beside visible controls', (
         ${desired}
         ${fit}
         static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Layout) == 500);
-        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Narrow) == 350);
-        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Wide) == 650);
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Narrow) == 425);
+        static_assert(GetLayoutWidthDip(DialogLayout::Fluent, DialogWidthPreset::Wide) == 575);
         static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Layout) == 600);
-        static_assert(GetLayoutWidthDip(DialogLayout::Pill, DialogWidthPreset::Narrow) == 252);
+        static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Narrow) == 510);
+        static_assert(GetLayoutWidthDip(DialogLayout::Classic, DialogWidthPreset::Wide) == 690);
+        static_assert(GetLayoutWidthDip(DialogLayout::Pill, DialogWidthPreset::Narrow) == 306);
+        static_assert(GetLayoutWidthDip(DialogLayout::Pill, DialogWidthPreset::Wide) == 414);
         static_assert(FitDialogWidth(420, 467, 85) == 567);
         static_assert(FitDialogWidth(500, 467, 100) == 567);
         static_assert(FitDialogWidth(520, 467, 150) == 617);
         static_assert(FitDialogWidth(780, 467, 100) == 780);
     `);
+});
+
+test('the inline shield uses the standard gap before any visible action', () => {
+    const layout = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
+    const preset = source.match(/enum class DialogWidthPreset[^\n]*;/)?.[0];
+    const actions = source.match(/enum class RunAction[\s\S]*?\nusing ActionWidths[^\n]*;/)?.[0];
+    const rects = source.match(/struct ActionButtonsLayout \{[\s\S]*?\n\};/)?.[0];
+    const functions = ['GetLayoutWidthDip', 'FitDialogWidth', 'GetInputLeft',
+        'GetAdminIndicatorWidth', 'GetDlgWidth', 'GetActionButtonsLayout']
+        .map(name => source.match(new RegExp(`(?:constexpr int|int|ActionButtonsLayout) ${name}\\([^;]*?\\) \\{[\\s\\S]*?\\n\\}`))?.[0]);
+    assert.ok(layout && preset && actions && rects && functions.every(Boolean));
+    compileChecks(`
+        #include <windows.h>
+        #include <algorithm>
+        #include <array>
+        #include <cassert>
+        #include <cmath>
+        ${layout}
+        ${preset}
+        ${actions}
+        ${rects}
+        struct RunDialogState {
+            UINT dpi = 96;
+            struct {
+                DialogLayout dialogLayout = DialogLayout::Pill;
+                DialogWidthPreset dialogWidthPreset = DialogWidthPreset::Narrow;
+                int customDialogWidth = 0;
+                bool inlineAdminIndicator = true;
+            } settings;
+            ActionWidths actions{};
+        };
+        constexpr int kBaseDlgWidth = 600;
+        constexpr int kBasePanelInset = 11;
+        int DpiScale(int size, UINT, int = 100) { return size; }
+        int DpiScaleS(int size, const RunDialogState*) { return size; }
+        int GetInputBarHeight(const RunDialogState*) { return 54; }
+        int GetActionButtonHeight(const RunDialogState*, int) { return 32; }
+        int GetInputBarTopY(const RunDialogState*) { return 0; }
+        int GetVerticalPanelInset(int bar, int button, bool) { return (bar - button) / 2; }
+        float GetFontSizeSF(float size, const RunDialogState*) { return size; }
+        ActionWidths GetVisibleActionButtonWidths(const RunDialogState* state, int) { return state->actions; }
+        ${functions.join('\n')}
+        int main() {
+            RunDialogState state;
+            for (unsigned visible = 0; visible < 16; ++visible) {
+                for (size_t i = 0; i < kRunActionCount; ++i) state.actions[i] = visible & (1u << i) ? 32 : 0;
+                const auto result = GetActionButtonsLayout(&state);
+                const RECT buttons[]{result.rcBrowse, result.rcRun, result.rcClose, result.rcGear};
+                assert(result.rcEdit.right - result.rcEdit.left >= 100);
+                assert(result.rcAdminIndicator.left - result.rcEdit.right == 8);
+                bool matched = false;
+                for (const auto& button : buttons) {
+                    if (button.right == button.left) continue;
+                    assert(button.left - result.rcAdminIndicator.right == 6);
+                    matched = true;
+                    break;
+                }
+                if (!matched) assert(GetDlgWidth(&state) - result.rcAdminIndicator.right == 11);
+            }
+        }
+    `, true);
 });
 
 test('the administrator gesture inverts the effective default without changing it', () => {
