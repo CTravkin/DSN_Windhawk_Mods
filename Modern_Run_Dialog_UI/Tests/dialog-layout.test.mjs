@@ -101,6 +101,34 @@ test('history follows the Windows short date and short time formats', () => {
     `, true);
 });
 
+test('inner corners support auto, square and a radius bounded by the row', () => {
+    assert.match(source, /- customInnerCornerRadius: "-1"/);
+    const parser = source.match(/int ParseInnerCornerRadius\([\s\S]*?\n\}/)?.[0];
+    const radius = source.match(/constexpr float ClampCornerRadius\([\s\S]*?\n\}/)?.[0];
+    assert.ok(parser && radius, 'The settings parser and the rendering clamp are present');
+    compileChecks(`
+        #include <algorithm>
+        #include <cassert>
+        #include <cwchar>
+        #include <string>
+        ${parser}
+        ${radius}
+        static_assert(ClampCornerRadius(0, 100, 30) == 0);
+        static_assert(ClampCornerRadius(6, 100, 30) == 6);
+        static_assert(ClampCornerRadius(28, 100, 30) == 15);
+        static_assert(ClampCornerRadius(12, 8, 30) == 4);
+        int main() {
+            assert(ParseInnerCornerRadius(L"") == -1);
+            assert(ParseInnerCornerRadius(L"-1") == -1);
+            assert(ParseInnerCornerRadius(L"0") == 0);
+            assert(ParseInnerCornerRadius(L"7") == 7);
+            assert(ParseInnerCornerRadius(L"28") == 28);
+            assert(ParseInnerCornerRadius(L"29") == -1);
+            assert(ParseInnerCornerRadius(L"12abc") == -1);
+        }
+    `, true);
+});
+
 function compileChecks(checks, run = false) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });

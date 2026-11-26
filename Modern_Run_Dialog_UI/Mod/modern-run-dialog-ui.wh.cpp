@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.3.3
+// @version         6.4.0
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 16
+// Build: 17
 
 // ==WindhawkModReadme==
 /*
@@ -296,10 +296,72 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - customCornerRadius: -1
-    $name: Corner Radius in px (-1 = Theme Default, or 0–28)
-    $name:vi-VN: Bán kính bo góc viền (-1 = Theo chủ đề, hoặc 0–28 px)
+    $name: Outer Corner Radius
+    $name:vi-VN: Bán kính góc ngoài
+    $name:th-TH: รัศมีมุมด้านนอก
+    $name:id-ID: Radius Sudut Luar
+    $name:ms-MY: Jejari Sudut Luar
+    $name:ja-JP: 外側の角の半径
+    $name:zh-CN: 外部圆角半径
+    $name:zh-TW: 外部圓角半徑
+    $name:ko-KR: 바깥쪽 모서리 반경
+    $name:fr-FR: Rayon des coins extérieurs
+    $name:de-DE: Äußerer Eckenradius
+    $name:es-ES: Radio de las esquinas exteriores
+    $name:pt-BR: Raio dos cantos externos
+    $name:it-IT: Raggio degli angoli esterni
+    $name:ru-RU: Радиус внешних углов
+    $name:uk-UA: Радіус зовнішніх кутів
+    $name:pl-PL: Promień narożników zewnętrznych
+    $name:nl-NL: Buitenste hoekradius
+    $name:tr-TR: Dış Köşe Yarıçapı
+    $name:hi-IN: बाहरी कोनों की त्रिज्या
+    $name:ar-SA: نصف قطر الزوايا الخارجية
     $description: Set exact corner roundness in pixels (0 = sharp square, 8–12 = Classic Win11, 24–28 = full pill, -1 = Theme default).
     $description:vi-VN: Chỉnh độ bo góc theo pixel (0 = góc vuông, 8–12 = Win11 cổ điển, 24–28 = viên thuốc, -1 = theo chủ đề).
+  - customInnerCornerRadius: "-1"
+    $name: Inner Corner Radius
+    $description: Roundness of highlights in history, suggestions, and the mod's context menu (-1 = Auto, 0–28 px)
+    $name:vi-VN: Bán kính góc trong
+    $description:vi-VN: Bo góc vùng tô sáng trong lịch sử, gợi ý và menu của mod (-1 = Tự động, 0–28 px)
+    $name:th-TH: รัศมีมุมด้านใน
+    $description:th-TH: ปรับความโค้งของแถบไฮไลต์ในประวัติ คำแนะนำ และเมนูของม็อด (-1 = อัตโนมัติ, 0–28 px)
+    $name:id-ID: Radius Sudut Dalam
+    $description:id-ID: Atur sudut sorotan di riwayat, saran, dan menu mod (-1 = Otomatis, 0–28 px)
+    $name:ms-MY: Jejari Sudut Dalam
+    $description:ms-MY: Laras sudut serlahan dalam sejarah, cadangan dan menu mod (-1 = Auto, 0–28 px)
+    $name:ja-JP: 内側の角の半径
+    $description:ja-JP: 履歴、候補、Mod のメニューで強調表示する行の角を丸めます (-1 = 自動, 0–28 px)
+    $name:zh-CN: 内部圆角半径
+    $description:zh-CN: 调整历史记录、建议和模组菜单中高亮行的圆角 (-1 = 自动, 0–28 px)
+    $name:zh-TW: 內部圓角半徑
+    $description:zh-TW: 調整歷程記錄、建議和模組選單中醒目提示列的圓角 (-1 = 自動, 0–28 px)
+    $name:ko-KR: 안쪽 모서리 반경
+    $description:ko-KR: 기록, 제안 및 모드 메뉴에서 강조 표시의 모서리를 조정합니다 (-1 = 자동, 0–28 px)
+    $name:fr-FR: Rayon des coins intérieurs
+    $description:fr-FR: Arrondi des éléments surlignés dans l’historique, les suggestions et le menu du mod (-1 = Auto, 0–28 px)
+    $name:de-DE: Innerer Eckenradius
+    $description:de-DE: Rundung der Hervorhebung in Verlauf, Vorschlägen und Mod-Menü (-1 = Automatisch, 0–28 px)
+    $name:es-ES: Radio de las esquinas interiores
+    $description:es-ES: Redondeo del resaltado en el historial, las sugerencias y el menú del mod (-1 = Automático, 0–28 px)
+    $name:pt-BR: Raio dos cantos internos
+    $description:pt-BR: Arredondamento do realce no histórico, nas sugestões e no menu do mod (-1 = Automático, 0–28 px)
+    $name:it-IT: Raggio degli angoli interni
+    $description:it-IT: Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod (-1 = Automatico, 0–28 px)
+    $name:ru-RU: Радиус внутренних углов
+    $description:ru-RU: Скругление подсветки в истории, подсказках и меню мода (-1 = Авто, 0–28 px)
+    $name:uk-UA: Радіус внутрішніх кутів
+    $description:uk-UA: Заокруглення виділення в історії, підказках і меню мода (-1 = Авто, 0–28 px)
+    $name:pl-PL: Promień narożników wewnętrznych
+    $description:pl-PL: Zaokrąglenie podświetlenia w historii, sugestiach i menu moda (-1 = Auto, 0–28 px)
+    $name:nl-NL: Binnenste hoekradius
+    $description:nl-NL: Afronding van markeringen in geschiedenis, suggesties en het modmenu (-1 = Automatisch, 0–28 px)
+    $name:tr-TR: İç Köşe Yarıçapı
+    $description:tr-TR: Geçmişte, önerilerde ve mod menüsünde vurgulanan satırların yuvarlaklığı (-1 = Otomatik, 0–28 px)
+    $name:hi-IN: भीतरी कोनों की त्रिज्या
+    $description:hi-IN: इतिहास, सुझाव और मॉड मेनू में हाइलाइट का गोलाई स्तर (-1 = स्वचालित, 0–28 px)
+    $name:ar-SA: نصف قطر الزوايا الداخلية
+    $description:ar-SA: استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل (-1 = تلقائي, 0–28 px)
   - customBackgroundPath: ""
     $name: Custom Background Image / Animated GIF
     $name:vi-VN: Hình nền / Ảnh động tùy chỉnh (PNG, JPG, GIF, WebP)
@@ -1024,6 +1086,7 @@ struct ModSettings {
     std::wstring customBgColor;
     std::wstring customBorderColor;
     int customCornerRadius = -1;
+    int customInnerCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
     ContextMenuStyle contextMenuStyle = ContextMenuStyle::Mod;
@@ -1353,6 +1416,7 @@ struct OpticalLensGeometryLUT {
     bool isLight = false;
     bool isMenu = false;
     bool anchoredTop = false;
+    float cornerRadiusPx = -1.0f;
     uint8_t interiorAlpha = 255;
     std::vector<int16_t> interiorDxG;
     std::vector<InteriorRowSpan> interiorSpans;
@@ -1621,9 +1685,13 @@ void BlurBufferSeparableRGB(std::vector<DWORD>& buf, std::vector<DWORD>& tmp, in
     }
 }
 
+constexpr float ClampCornerRadius(float radius, float width, float height) {
+    return std::clamp(radius, 0.0f, (std::max)(0.0f, (std::min)(width, height) * 0.5f));
+}
+
 void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int topAreaH, int gapH,
-                                 UINT dpi, int glassPct, bool isLight, bool isMenuPanel, bool anchoredTop = false,
-                                 int adminBannerH = 0, int adminGapH = 0) {
+                                 UINT dpi, int glassPct, bool isLight, bool isMenuPanel, bool anchoredTop,
+                                 int adminBannerH, int adminGapH, float cornerRadiusPx) {
     lut.w = w;
     lut.h = h;
     lut.topAreaH = topAreaH;
@@ -1635,6 +1703,7 @@ void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int 
     lut.isLight = isLight;
     lut.isMenu = isMenuPanel;
     lut.anchoredTop = anchoredTop;
+    lut.cornerRadiusPx = cornerRadiusPx;
 
     bool isWinBlurMode = (glassPct <= -1000);
     float negF = (!isWinBlurMode && glassPct < 0) ? (std::clamp(-glassPct, 0, 100) / 100.0f) : 0.0f;
@@ -1664,8 +1733,8 @@ void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int 
     for (int y = 0; y < h; ++y) {
         float panelTop = 0.0f;
         float panelBot = (float)h;
-        // Menu panel uses the exact same rounded pill-card curvature (20 DIPs) and lens refraction as the Input Bar!
-        float cornerR  = (std::min)(((float)dpi * 20.0f / 96.0f), (panelBot - panelTop) * 0.5f);
+        float cornerR = ClampCornerRadius(
+            cornerRadiusPx >= 0.0f ? cornerRadiusPx : DpiScaleF(20.0f, dpi), (float)w, panelBot - panelTop);
         float bevelW   = isWinBlurMode ? 1.5f : (((float)dpi / 96.0f) * (13.0f + 5.0f * negF));
         float maxDisp  = isWinBlurMode ? 0.0f : (((float)dpi / 96.0f) * (11.0f + 13.0f * negF));
         bool isHistorySquircle = false;
@@ -1719,6 +1788,9 @@ void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int 
             }
             bevelW  = isWinBlurMode ? 1.5f : (((float)dpi / 96.0f) * (13.0f + 5.0f * negF));
             maxDisp = isWinBlurMode ? 0.0f : (((float)dpi / 96.0f) * (11.0f + 13.0f * negF));
+            if (cornerRadiusPx >= 0.0f) {
+                cornerR = ClampCornerRadius(cornerRadiusPx, (float)w, panelBot - panelTop);
+            }
         }
 
         float panelH = (std::max)(2.0f, panelBot - panelTop);
@@ -2015,7 +2087,8 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
                                     UINT dpi, int glassPct, bool isLight, bool isMenuPanel, int cacheSlot,
                                     int overrideWndX = -999999, int overrideWndY = -999999,
                                     bool anchoredTop = false,
-                                    int adminBannerH = 0, int adminGapH = 0) {
+                                    int adminBannerH = 0, int adminGapH = 0,
+                                    float cornerRadiusPx = -1.0f) {
     if (!pRT || !hWnd || w <= 0 || h <= 0) return;
 
     int wndX = overrideWndX;
@@ -2053,6 +2126,7 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
          cache->wndX != wndX || cache->wndY != wndY ||
          cache->glassPct != glassPct || cache->isLight != isLight || cache->isMenu != isMenuPanel ||
          cache->anchoredTop != anchoredTop ||
+         cache->lut.dpi != dpi || cache->lut.cornerRadiusPx != cornerRadiusPx ||
          cache->snapTick != snapTick || (int)cache->premulPixels.size() != w * h);
 
     if (needRebuildPixels) {
@@ -2061,10 +2135,11 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
                                     cache->lut.adminBannerH != adminBannerH || cache->lut.adminGapH != adminGapH ||
                                     cache->lut.dpi != dpi || cache->lut.glassPct != glassPct ||
                                     cache->lut.isLight != isLight || cache->lut.isMenu != isMenuPanel ||
+                                    cache->lut.cornerRadiusPx != cornerRadiusPx ||
                                     cache->lut.anchoredTop != anchoredTop);
         if (shapeOrStyleChanged) {
             BuildOpticalLensGeometryLUT(cache->lut, w, h, topAreaH, gapH, dpi, glassPct, isLight, isMenuPanel, anchoredTop,
-                                        adminBannerH, adminGapH);
+                                        adminBannerH, adminGapH, cornerRadiusPx);
         }
 
         // At 1/4-res, softRad = 9..13 equals 36px..52px full-res Gaussian blur -> 100% blurs out any background text!
@@ -4907,6 +4982,7 @@ struct WindhawkRawSnapshot {
     std::wstring customBgColor;
     std::wstring customBorderColor;
     int customCornerRadius = -1;
+    int customInnerCornerRadius = -1;
     std::wstring customBackgroundPath;
     int customBackgroundOpacity = 215;
     std::wstring dialogPosition;
@@ -4987,6 +5063,13 @@ int ReadGroupedIntSetting(const wchar_t* groupedKey, const wchar_t* flatKey, int
     return defaultVal;
 }
 
+int ParseInnerCornerRadius(const std::wstring& value) {
+    wchar_t* end = nullptr;
+    const long radius = std::wcstol(value.c_str(), &end, 10);
+    return end != value.c_str() && *end == L'\0' && radius >= 0 && radius <= 28
+        ? static_cast<int>(radius) : -1;
+}
+
 void LoadSettings(bool fromSettingsChanged = false) {
     // Capture current raw Windhawk settings to selectively drop overrides ONLY for settings that actually changed
     WindhawkRawSnapshot curWh;
@@ -4996,6 +5079,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.customBgColor           = ReadGroupedStringSetting(L"appearanceGroup.customBgColor", L"customBgColor", L"");
     curWh.customBorderColor       = ReadGroupedStringSetting(L"appearanceGroup.customBorderColor", L"customBorderColor", L"");
     curWh.customCornerRadius      = Wh_GetIntSetting(L"appearanceGroup.customCornerRadius");
+    curWh.customInnerCornerRadius = ParseInnerCornerRadius(ReadGroupedStringSetting(
+        L"appearanceGroup.customInnerCornerRadius", L"customInnerCornerRadius", L"-1"));
     curWh.customBackgroundPath    = ReadGroupedStringSetting(L"appearanceGroup.customBackgroundPath", L"customBackgroundPath", L"");
     curWh.customBackgroundOpacity = ReadGroupedIntSetting(L"appearanceGroup.customBackgroundOpacity", L"customBackgroundOpacity", 215);
     curWh.dialogPosition          = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
@@ -5043,6 +5128,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.customBgColor != g_lastWhSnapshot.customBgColor, L"customBgColor");
             dropIfChanged(curWh.customBorderColor != g_lastWhSnapshot.customBorderColor, L"customBorderColor");
             dropIfChanged(curWh.customCornerRadius != g_lastWhSnapshot.customCornerRadius, L"customCornerRadius");
+            dropIfChanged(curWh.customInnerCornerRadius != g_lastWhSnapshot.customInnerCornerRadius, L"customInnerCornerRadius");
             dropIfChanged(curWh.customBackgroundPath != g_lastWhSnapshot.customBackgroundPath, L"customBackgroundPath");
             dropIfChanged(curWh.customBackgroundOpacity != g_lastWhSnapshot.customBackgroundOpacity, L"customBackgroundOpacity");
             dropIfChanged(curWh.dialogPosition != g_lastWhSnapshot.dialogPosition, L"dialogPosition");
@@ -5111,6 +5197,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
     int crOverride = Wh_GetIntValue(GetUserOverrideKey(L"customCornerRadius").c_str(), -99);
     newSettings.customCornerRadius = (crOverride >= -1) ? std::clamp(crOverride, -1, 28) : std::clamp(crSetting, -1, 28);
+    const int innerOverride = Wh_GetIntValue(GetUserOverrideKey(L"customInnerCornerRadius").c_str(), -2);
+    newSettings.customInnerCornerRadius = innerOverride >= -1
+        ? std::clamp(innerOverride, -1, 28) : curWh.customInnerCornerRadius;
 
     std::wstring bgPath = ReadGroupedStringSetting(L"appearanceGroup.customBackgroundPath", L"customBackgroundPath", L"");
     {
@@ -11446,7 +11535,12 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
 
                 float rimInset = DpiScaleF(0.75f, dpi);
                 D2D1_RECT_F rcMenuCard = D2D1::RectF(rimInset, rimInset, (float)w - rimInset, (float)h - rimInset);
-                float menuCornerR = (std::min)(DpiScaleF(20.0f, dpi), (rcMenuCard.bottom - rcMenuCard.top) * 0.5f);
+                const auto& settings = s->dlgState->settings;
+                const float menuRadiusPx = settings.customCornerRadius >= 0
+                    ? DpiScaleF(static_cast<float>(settings.customCornerRadius), dpi) : -1.0f;
+                const float menuCornerR = ClampCornerRadius(
+                    menuRadiusPx >= 0.0f ? menuRadiusPx : DpiScaleF(20.0f, dpi),
+                    rcMenuCard.right - rcMenuCard.left, rcMenuCard.bottom - rcMenuCard.top);
 
                 // Clear outer window corners to 100% transparent
                 pRT->Clear(D2D1::ColorF(0.0f, 0.0f, 0.0f, 0.0f));
@@ -11472,13 +11566,15 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     int glassPct = (s->dlgState)
                         ? MapBackgroundOpacityToGlassPct(s->dlgState->settings.customBackgroundOpacity)
                         : -20;
-                    DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, glassPct, isLight, true, slot);
+                    DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, glassPct, isLight, true, slot,
+                                                   -999999, -999999, false, 0, 0, menuRadiusPx);
                 } else {
                     // Windows Blur: translucent vibrant Acrylic blur matching Windows 11 right-click menu (Image 2)
                     int blurOp = (s->dlgState)
                         ? std::clamp(s->dlgState->settings.customBackgroundOpacity, 30, 255)
                         : 215;
-                    DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, -(1000 + blurOp), isLight, true, slot);
+                    DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, 0, 0, dpi, -(1000 + blurOp), isLight, true, slot,
+                                                   -999999, -999999, false, 0, 0, menuRadiusPx);
                 }
 
                 // 2. Brushes & Text Format
@@ -11521,7 +11617,6 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 int sepH = GetMenuSeparatorHeight(s);
                 float curY = (float)padY;
                 float padX = DpiScaleF(9.0f, dpi);
-                float pillRadius = (float)rowH * 0.5f;
                 bool hasScroll = PanelNeedsScroll(p);
                 float sbReserve = hasScroll ? DpiScaleF(8.0f, dpi) : 0.0f;
 
@@ -11555,7 +11650,11 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         D2D1_RECT_F rcPill = D2D1::RectF(
                             padX, curY + DpiScaleF(2.0f, dpi),
                             (float)w - padX - sbReserve, curY + rowH - DpiScaleF(2.0f, dpi));
-                        pillRadius = (rcPill.bottom - rcPill.top) * 0.5f;
+                        const float innerPx = settings.customInnerCornerRadius >= 0
+                            ? DpiScaleF(static_cast<float>(settings.customInnerCornerRadius), dpi)
+                            : (rcPill.bottom - rcPill.top) * 0.5f;
+                        const float pillRadius = ClampCornerRadius(
+                            innerPx, rcPill.right - rcPill.left, rcPill.bottom - rcPill.top);
                         if (s->surface == SurfaceTheme::Glass && !highContrast) {
                             D2D1_COLOR_F rowTint = isLight
                                 ? D2D1::ColorF(1.0f, 1.0f, 1.0f, isPressed ? 0.28f : 0.16f)
@@ -12788,6 +12887,37 @@ ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) 
     return { L"Context Menu Style", L"Changes the appearance of the right-click menu", L"Mod Style" };
 }
 
+struct CornerRadiusStrings {
+    const wchar_t* outerTitle;
+    const wchar_t* innerTitle;
+    const wchar_t* innerHint;
+};
+
+CornerRadiusStrings GetCornerRadiusStrings(const std::wstring& rawLang) {
+    const auto lang = ResolveEffectiveLanguageCode(rawLang);
+    if (lang == L"vi") return { L"Bán kính góc ngoài", L"Bán kính góc trong", L"Bo góc vùng tô sáng trong lịch sử, gợi ý và menu của mod" };
+    if (lang == L"th") return { L"รัศมีมุมด้านนอก", L"รัศมีมุมด้านใน", L"ปรับความโค้งของแถบไฮไลต์ในประวัติ คำแนะนำ และเมนูของม็อด" };
+    if (lang == L"id") return { L"Radius Sudut Luar", L"Radius Sudut Dalam", L"Atur sudut sorotan di riwayat, saran, dan menu mod" };
+    if (lang == L"ms") return { L"Jejari Sudut Luar", L"Jejari Sudut Dalam", L"Laras sudut serlahan dalam sejarah, cadangan dan menu mod" };
+    if (lang == L"ja") return { L"外側の角の半径", L"内側の角の半径", L"履歴、候補、Mod のメニューで強調表示する行の角を丸めます" };
+    if (lang == L"zh_cn") return { L"外部圆角半径", L"内部圆角半径", L"调整历史记录、建议和模组菜单中高亮行的圆角" };
+    if (lang == L"zh_tw") return { L"外部圓角半徑", L"內部圓角半徑", L"調整歷程記錄、建議和模組選單中醒目提示列的圓角" };
+    if (lang == L"ko") return { L"바깥쪽 모서리 반경", L"안쪽 모서리 반경", L"기록, 제안 및 모드 메뉴에서 강조 표시의 모서리를 조정합니다" };
+    if (lang == L"fr") return { L"Rayon des coins extérieurs", L"Rayon des coins intérieurs", L"Arrondi des éléments surlignés dans l’historique, les suggestions et le menu du mod" };
+    if (lang == L"de") return { L"Äußerer Eckenradius", L"Innerer Eckenradius", L"Rundung der Hervorhebung in Verlauf, Vorschlägen und Mod-Menü" };
+    if (lang == L"es") return { L"Radio de las esquinas exteriores", L"Radio de las esquinas interiores", L"Redondeo del resaltado en el historial, las sugerencias y el menú del mod" };
+    if (lang == L"pt") return { L"Raio dos cantos externos", L"Raio dos cantos internos", L"Arredondamento do realce no histórico, nas sugestões e no menu do mod" };
+    if (lang == L"it") return { L"Raggio degli angoli esterni", L"Raggio degli angoli interni", L"Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod" };
+    if (lang == L"ru") return { L"Радиус внешних углов", L"Радиус внутренних углов", L"Скругление подсветки в истории, подсказках и меню мода" };
+    if (lang == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділення в історії, підказках і меню мода" };
+    if (lang == L"pl") return { L"Promień narożników zewnętrznych", L"Promień narożników wewnętrznych", L"Zaokrąglenie podświetlenia w historii, sugestiach i menu moda" };
+    if (lang == L"nl") return { L"Buitenste hoekradius", L"Binnenste hoekradius", L"Afronding van markeringen in geschiedenis, suggesties en het modmenu" };
+    if (lang == L"tr") return { L"Dış Köşe Yarıçapı", L"İç Köşe Yarıçapı", L"Geçmişte, önerilerde ve mod menüsünde vurgulanan satırların yuvarlaklığı" };
+    if (lang == L"hi") return { L"बाहरी कोनों की त्रिज्या", L"भीतरी कोनों की त्रिज्या", L"इतिहास, सुझाव और मॉड मेनू में हाइलाइट का गोलाई स्तर" };
+    if (lang == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل" };
+    return { L"Outer Corner Radius", L"Inner Corner Radius", L"Roundness of highlights in history, suggestions, and the mod's context menu" };
+}
+
 constexpr int kHideActionRowBase = 2420;
 constexpr UINT kHiddenActionMenuBase = 810;
 constexpr std::array<FluentMenuIcon, kRunActionCount> kActionMenuIcons{
@@ -13929,7 +14059,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g2, y2] = beginGroupCard(
                 ls.gCustomTitle,
                 ls.gCustomSub,
-                5, rH);
+                6, rH);
             drawColorRowInGroup(g2, y2, rH, 2201, 2202, L"\uE790",
                 ls.bgColTitle,
                 ls.bgColSub,
@@ -13941,13 +14071,18 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             std::wstring crStr = (st->settings.customCornerRadius < 0)
                 ? ls.defBtn
                 : (std::to_wstring(st->settings.customCornerRadius) + L" px");
+            const auto cornerStrings = GetCornerRadiusStrings(st->settings.language);
             drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2210, 2211, 2212, L"\uE744",
-                ls.radiusTitle,
+                cornerStrings.outerTitle,
                 ls.radiusSub,
                 crStr);
+            std::wstring innerRadius = st->settings.customInnerCornerRadius < 0
+                ? ls.autoLbl : std::to_wstring(st->settings.customInnerCornerRadius) + L" px";
+            drawStepperRowInGroup(g2, y2 + rH * 3, rH, 2213, 2214, 2215, L"\uE744",
+                cornerStrings.innerTitle, cornerStrings.innerHint, innerRadius);
             {
-                // Row 4: Custom Background Image / Animated GIF Picker
-                float rowTop = y2 + rH * 3;
+                // Custom Background Image / Animated GIF Picker
+                float rowTop = y2 + rH * 4;
                 pRT->DrawLine(D2D1::Point2F(g2.left + 1.0f, rowTop), D2D1::Point2F(g2.right - 1.0f, rowTop), pBrDiv, 1.0f);
                 if (pFmtGlyph) pRT->DrawText(L"\uEB9F", 1, pFmtGlyph, D2D1::RectF(g2.left + S(26), rowTop, g2.left + S(56), rowTop + rH), pBrSub);
                 const wchar_t* bgTitle = ls.bgImgTitle;
@@ -13977,7 +14112,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             }
             {
                 int opPct = std::clamp(static_cast<int>(std::lround((st->settings.customBackgroundOpacity / 255.0) * 100.0)), 10, 100);
-                drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE706",
+                drawStepperRowInGroup(g2, y2 + rH * 5, rH, 2225, 2226, 2227, L"\uE706",
                     ls.bgOpTitle,
                     ls.bgOpSub,
                     std::to_wstring(opPct) + L"%");
@@ -14795,6 +14930,12 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     int next = (id == 2212) ? -1 : std::clamp(cur + (id == 2211 ? 2 : -2), 0, 28);
                     Wh_SetIntValue(GetUserOverrideKey(L"customCornerRadius").c_str(), next);
                     changed = true;
+                } else if (id == 2213 || id == 2214 || id == 2215) {
+                    const int current = st->settings.customInnerCornerRadius;
+                    const int radius = current < 0 ? 14 : current;
+                    const int next = id == 2215 ? -1 : std::clamp(radius + (id == 2214 ? 1 : -1), 0, 28);
+                    changed = next != current &&
+                        Wh_SetIntValue(GetUserOverrideKey(L"customInnerCornerRadius").c_str(), next);
                 } else if (id == 2220) {
                     wchar_t fileBuf[MAX_PATH * 2] = {};
                     std::wstring initDir;
@@ -15802,6 +15943,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                                               (float)w - rimInset, (float)(barTop + barH) - rimInset);
                         ResolvedThemeVisuals themeVis = ResolveEffectiveThemeVisuals(state->settings, isLight);
                         float maxPillCorner = DpiScaleSF(themeVis.cornerRadiusDip, state);
+                        const float backdropRadiusPx = state->settings.customCornerRadius >= 0 ? maxPillCorner : -1.0f;
                         float barCornerR   = (std::min)(maxPillCorner, (rcBarPill.bottom - rcBarPill.top) * 0.5f);
                         float adminCornerR = (adminH > 0)
                             ? (std::min)(maxPillCorner, (rcAdminPill.bottom - rcAdminPill.top) * 0.5f)
@@ -15841,7 +15983,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, glassPct, isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
-                                                           adminH, adminGapH);
+                                                           adminH, adminGapH, backdropRadiusPx);
                         } else if (surface == SurfaceTheme::Blur) {
                             // Translucent, vibrant Windows 11 Acrylic Blur controlled by Background Opacity (30..255)
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
@@ -15851,7 +15993,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, -(1000 + blurOp), isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
-                                                           adminH, adminGapH);
+                                                           adminH, adminGapH, backdropRadiusPx);
                         } else {
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
                             D2D1_COLOR_F solidCol = themeVis.hasCustomBg
@@ -16057,7 +16199,11 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     float padX = DpiScaleSF(10.0f, state);
                                     float padY = DpiScaleSF(2.0f, state);
                                     D2D1_RECT_F rcPill = D2D1::RectF(padX, rowTop + padY, (float)w - padX - sbReserve, rowTop + rowH - padY);
-                                    float rowPillRadius = (rcPill.bottom - rcPill.top) * 0.5f;
+                                    const int innerRadius = state->settings.customInnerCornerRadius;
+                                    const float innerPx = innerRadius >= 0 ? DpiScaleSF(static_cast<float>(innerRadius), state)
+                                        : (rcPill.bottom - rcPill.top) * 0.5f;
+                                    const float rowPillRadius = ClampCornerRadius(
+                                        innerPx, rcPill.right - rcPill.left, rcPill.bottom - rcPill.top);
                                     if (surface == SurfaceTheme::Glass) {
                                         D2D1_COLOR_F rowTint = isLight
                                             ? D2D1::ColorF(0.0f, 0.0f, 0.0f, isPressed ? 0.14f : (isSelected ? 0.09f : 0.055f))
