@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.1.0
+// @version         6.2.1
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs
 // ==/WindhawkMod==
-// Build: 9
+// Build: 11
 
 // ==WindhawkModReadme==
 /*
@@ -449,6 +449,138 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
   $name: 2. Layout & Sizing
   $name:vi-VN: 2. Bố cục & Kích thước
 
+- actionButtonsGroup:
+  - hideBrowse: false
+    $name: Hide the Browse button
+    $name:vi-VN: Ẩn nút Duyệt
+    $name:th-TH: ซ่อนปุ่ม เรียกดู
+    $name:id-ID: Sembunyikan tombol Telusuri
+    $name:ms-MY: Sembunyikan butang Semak imbas
+    $name:ja-JP: 「参照」ボタンを非表示にする
+    $name:zh-CN: 隐藏“浏览”按钮
+    $name:zh-TW: 隱藏「瀏覽」按鈕
+    $name:ko-KR: 찾아보기 버튼 숨기기
+    $name:fr-FR: Masquer le bouton Parcourir
+    $name:de-DE: Schaltfläche „Durchsuchen“ ausblenden
+    $name:es-ES: Ocultar el botón Examinar
+    $name:pt-BR: Ocultar o botão Procurar
+    $name:it-IT: Nascondi il pulsante Sfoglia
+    $name:ru-RU: Скрыть кнопку «Обзор»
+    $name:uk-UA: Приховати кнопку «Огляд»
+    $name:pl-PL: Ukryj przycisk „Przeglądaj”
+    $name:nl-NL: Knop Bladeren verbergen
+    $name:tr-TR: Gözat düğmesini gizle
+    $name:hi-IN: ब्राउज़ करें बटन छिपाएँ
+    $name:ar: إخفاء زر استعراض
+  - hideRun: false
+    $name: Hide the Run button
+    $name:vi-VN: Ẩn nút Chạy
+    $name:th-TH: ซ่อนปุ่ม เรียกใช้
+    $name:id-ID: Sembunyikan tombol Jalankan
+    $name:ms-MY: Sembunyikan butang Jalankan
+    $name:ja-JP: 「実行」ボタンを非表示にする
+    $name:zh-CN: 隐藏“运行”按钮
+    $name:zh-TW: 隱藏「執行」按鈕
+    $name:ko-KR: 실행 버튼 숨기기
+    $name:fr-FR: Masquer le bouton Exécuter
+    $name:de-DE: Schaltfläche „Ausführen“ ausblenden
+    $name:es-ES: Ocultar el botón Ejecutar
+    $name:pt-BR: Ocultar o botão Executar
+    $name:it-IT: Nascondi il pulsante Esegui
+    $name:ru-RU: Скрыть кнопку «Выполнить»
+    $name:uk-UA: Приховати кнопку «Виконати»
+    $name:pl-PL: Ukryj przycisk „Uruchom”
+    $name:nl-NL: Knop Uitvoeren verbergen
+    $name:tr-TR: Çalıştır düğmesini gizle
+    $name:hi-IN: चलाएँ बटन छिपाएँ
+    $name:ar: إخفاء زر تشغيل
+  - hideClose: false
+    $name: Hide the Close button
+    $name:vi-VN: Ẩn nút Đóng
+    $name:th-TH: ซ่อนปุ่ม ปิด
+    $name:id-ID: Sembunyikan tombol Tutup
+    $name:ms-MY: Sembunyikan butang Tutup
+    $name:ja-JP: 「閉じる」ボタンを非表示にする
+    $name:zh-CN: 隐藏“关闭”按钮
+    $name:zh-TW: 隱藏「關閉」按鈕
+    $name:ko-KR: 닫기 버튼 숨기기
+    $name:fr-FR: Masquer le bouton Fermer
+    $name:de-DE: Schaltfläche „Schließen“ ausblenden
+    $name:es-ES: Ocultar el botón Cerrar
+    $name:pt-BR: Ocultar o botão Fechar
+    $name:it-IT: Nascondi il pulsante Chiudi
+    $name:ru-RU: Скрыть кнопку «Закрыть»
+    $name:uk-UA: Приховати кнопку «Закрити»
+    $name:pl-PL: Ukryj przycisk „Zamknij”
+    $name:nl-NL: Knop Sluiten verbergen
+    $name:tr-TR: Kapat düğmesini gizle
+    $name:hi-IN: बंद करें बटन छिपाएँ
+    $name:ar: إخفاء زر إغلاق
+  - hideSettings: false
+    $name: Hide the Settings button
+    $name:vi-VN: Ẩn nút Cài đặt
+    $name:th-TH: ซ่อนปุ่ม การตั้งค่า
+    $name:id-ID: Sembunyikan tombol Pengaturan
+    $name:ms-MY: Sembunyikan butang Tetapan
+    $name:ja-JP: 「設定」ボタンを非表示にする
+    $name:zh-CN: 隐藏“设置”按钮
+    $name:zh-TW: 隱藏「設定」按鈕
+    $name:ko-KR: 설정 버튼 숨기기
+    $name:fr-FR: Masquer le bouton Paramètres
+    $name:de-DE: Schaltfläche „Einstellungen“ ausblenden
+    $name:es-ES: Ocultar el botón Configuración
+    $name:pt-BR: Ocultar o botão Configurações
+    $name:it-IT: Nascondi il pulsante Impostazioni
+    $name:ru-RU: Скрыть кнопку «Настройки»
+    $name:uk-UA: Приховати кнопку «Налаштування»
+    $name:pl-PL: Ukryj przycisk „Ustawienia”
+    $name:nl-NL: Knop Instellingen verbergen
+    $name:tr-TR: Ayarlar düğmesini gizle
+    $name:hi-IN: सेटिंग्स बटन छिपाएँ
+    $name:ar: إخفاء زر الإعدادات
+  $name: Window Buttons
+  $description: Hidden actions are available in the right-click menu
+  $name:vi-VN: Nút trên cửa sổ
+  $description:vi-VN: Các thao tác đã ẩn có trong menu chuột phải
+  $name:th-TH: ปุ่มหน้าต่าง
+  $description:th-TH: คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา
+  $name:id-ID: Tombol Jendela
+  $description:id-ID: Tindakan tersembunyi tersedia di menu klik kanan
+  $name:ms-MY: Butang Tetingkap
+  $description:ms-MY: Tindakan tersembunyi tersedia dalam menu klik kanan
+  $name:ja-JP: ウィンドウのボタン
+  $description:ja-JP: 非表示にした操作は右クリックメニューに表示されます
+  $name:zh-CN: 窗口按钮
+  $description:zh-CN: 隐藏按钮的操作可通过右键菜单使用
+  $name:zh-TW: 視窗按鈕
+  $description:zh-TW: 隱藏按鈕的動作仍可從右鍵選單使用
+  $name:ko-KR: 창 버튼
+  $description:ko-KR: 숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다
+  $name:fr-FR: Boutons de la fenêtre
+  $description:fr-FR: Les actions masquées restent accessibles via le menu contextuel
+  $name:de-DE: Fensterschaltflächen
+  $description:de-DE: Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung
+  $name:es-ES: Botones de la ventana
+  $description:es-ES: Las acciones ocultas están disponibles en el menú contextual
+  $name:pt-BR: Botões da janela
+  $description:pt-BR: As ações ocultas ficam disponíveis no menu de contexto
+  $name:it-IT: Pulsanti della finestra
+  $description:it-IT: Le azioni nascoste restano disponibili nel menu di scelta rapida
+  $name:ru-RU: Кнопки окна
+  $description:ru-RU: Действия скрытых кнопок доступны в контекстном меню
+  $name:uk-UA: Кнопки вікна
+  $description:uk-UA: Дії прихованих кнопок доступні в контекстному меню
+  $name:pl-PL: Przyciski okna
+  $description:pl-PL: Ukryte akcje są dostępne w menu kontekstowym
+  $name:nl-NL: Vensterknoppen
+  $description:nl-NL: Verborgen acties staan in het snelmenu
+  $name:tr-TR: Pencere düğmeleri
+  $description:tr-TR: Gizlenen eylemler sağ tıklama menüsünde bulunur
+  $name:hi-IN: विंडो बटन
+  $description:hi-IN: छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं
+  $name:ar: أزرار النافذة
+  $description:ar: تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن
+
 - historyBehaviorGroup:
   - maxHistoryItems: 20
     $name: Max Stored History Items (0 = Off, or 1–20)
@@ -537,6 +669,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 #include <string>
 #include <tuple>
 #include <string_view>
+#include <array>
 #include <vector>
 #include <optional>
 #include <algorithm>
@@ -735,6 +868,25 @@ struct CommandAlias {
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
 
+enum class RunAction : size_t { Browse, Run, Close, Settings, Count };
+constexpr size_t kRunActionCount = static_cast<size_t>(RunAction::Count);
+using HiddenActions = std::array<bool, kRunActionCount>;
+using ActionWidths = std::array<int, kRunActionCount>;
+
+constexpr ActionWidths VisibleActionWidths(DialogLayout layout,
+                                           const HiddenActions& hidden,
+                                           ActionWidths widths) {
+    if (layout == DialogLayout::Pill) widths[static_cast<size_t>(RunAction::Browse)] = 0;
+    for (size_t i = 0; i < widths.size(); ++i) {
+        if (hidden[i]) widths[i] = 0;
+    }
+    return widths;
+}
+
+constexpr std::array<const wchar_t*, kRunActionCount> kHiddenActionKeys{
+    L"hideBrowse", L"hideRun", L"hideClose", L"hideSettings"
+};
+
 constexpr DialogLayout ApplyDialogLayoutOverride(DialogLayout layout, int inAppOverride) {
     if (inAppOverride < 0 || inAppOverride > static_cast<int>(DialogLayout::Fluent)) {
         return layout;
@@ -761,6 +913,7 @@ struct ModSettings {
     int customCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
+    HiddenActions hiddenActions{};
     bool rememberPosition = false;
     int uiScalePercent = 100;
     int customDialogWidth = 0;
@@ -4645,6 +4798,7 @@ struct WindhawkRawSnapshot {
     std::wstring dialogPosition;
     std::wstring colorMode;
     DialogLayout dialogLayout = DialogLayout::Classic;
+    HiddenActions hiddenActions{};
     std::wstring uiScalePercent;
     int customDialogWidth = 0;
     int customBarHeight = 0;
@@ -4737,6 +4891,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
         curWh.dialogLayout = ResolveDialogLayout(
             value, value.empty() ? Wh_GetIntSetting(L"layoutGroup.minimalMode") : 0);
     }
+    for (size_t i = 0; i < kRunActionCount; ++i) {
+        curWh.hiddenActions[i] = Wh_GetIntSetting(L"actionButtonsGroup.%s", kHiddenActionKeys[i]) != 0;
+    }
     curWh.uiScalePercent          = ReadGroupedStringSetting(L"layoutGroup.uiScalePercent", L"uiScalePercent", L"100");
     curWh.customDialogWidth       = ReadGroupedIntSetting(L"layoutGroup.customDialogWidth", L"customDialogWidth", 0);
     curWh.customBarHeight         = ReadGroupedIntSetting(L"layoutGroup.customBarHeight", L"customBarHeight", 0);
@@ -4775,6 +4932,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.dialogPosition != g_lastWhSnapshot.dialogPosition, L"dialogPosition");
             dropIfChanged(curWh.colorMode != g_lastWhSnapshot.colorMode, L"colorMode");
             dropIfChanged(curWh.dialogLayout != g_lastWhSnapshot.dialogLayout, L"minimalModeV3");
+            for (size_t i = 0; i < kRunActionCount; ++i) {
+                dropIfChanged(curWh.hiddenActions[i] != g_lastWhSnapshot.hiddenActions[i], kHiddenActionKeys[i]);
+            }
             dropIfChanged(curWh.uiScalePercent != g_lastWhSnapshot.uiScalePercent, L"uiScalePercent");
             dropIfChanged(curWh.customDialogWidth != g_lastWhSnapshot.customDialogWidth, L"customDialogWidth");
             dropIfChanged(curWh.customBarHeight != g_lastWhSnapshot.customBarHeight, L"customBarHeight");
@@ -4875,6 +5035,10 @@ void LoadSettings(bool fromSettingsChanged = false) {
 
     int minModeOverride = Wh_GetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), -1);
     newSettings.dialogLayout = ApplyDialogLayoutOverride(curWh.dialogLayout, minModeOverride);
+    for (size_t i = 0; i < kRunActionCount; ++i) {
+        int value = Wh_GetIntValue(GetUserOverrideKey(kHiddenActionKeys[i]).c_str(), -1);
+        newSettings.hiddenActions[i] = value < 0 ? curWh.hiddenActions[i] : value != 0;
+    }
 
     std::wstring scaleStr = ReadGroupedStringSetting(L"layoutGroup.uiScalePercent", L"uiScalePercent", L"100");
     int scaleSetting = !scaleStr.empty() ? _wtoi(scaleStr.c_str()) : 100;
@@ -9807,22 +9971,29 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     int wBrowse = isFluent ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.browseBtn, 86));
     int wRun    = isCompact ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(runLabel, 80));
     int wClose  = (isCompact || isFluent) ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.exitBtn, 76));
+    const auto widths = VisibleActionWidths(state->settings.dialogLayout,
+                                            state->settings.hiddenActions,
+                                            {wBrowse, wRun, wClose, wGear});
 
     int barTop = GetInputBarTopY(state);
     int top = barTop + (barH - btnH) / 2;
     ActionButtonsLayout layout = {};
 
-    // Order from right to left: [Gear] <- [Close] <- [Run] (<- [Browse] in full mode)
-    layout.rcGear  = { dlgW - rightMargin - wGear, top, dlgW - rightMargin, top + btnH };
-    layout.rcClose = { layout.rcGear.left - gap - wClose, top, layout.rcGear.left - gap, top + btnH };
-    layout.rcRun   = { layout.rcClose.left - gap - wRun, top, layout.rcClose.left - gap, top + btnH };
-    if (isCompact) {
-        layout.rcBrowse = { 0, 0, 0, 0 };
-    } else {
-        layout.rcBrowse = { layout.rcRun.left - gap - wBrowse, top, layout.rcRun.left - gap, top + btnH };
-    }
+    int right = dlgW - rightMargin;
+    int editRightAnchor = right;
+    auto placeButton = [&](RunAction action) -> RECT {
+        int width = widths[static_cast<size_t>(action)];
+        if (width == 0) return {};
+        RECT rect{ right - width, top, right, top + btnH };
+        editRightAnchor = rect.left;
+        right = rect.left - gap;
+        return rect;
+    };
+    layout.rcGear   = placeButton(RunAction::Settings);
+    layout.rcClose  = placeButton(RunAction::Close);
+    layout.rcRun    = placeButton(RunAction::Run);
+    layout.rcBrowse = placeButton(RunAction::Browse);
 
-    int editRightAnchor = isCompact ? layout.rcRun.left : layout.rcBrowse.left;
     int editH = (std::max)(DpiScaleS(24, state), (int)std::ceil(GetFontSizeSF(13.5f, state) * 1.6f));
     editH = (std::min)(editH, barH - DpiScale(6, dpi, 100));
     int editTop = barTop + (barH - editH) / 2;
@@ -10273,7 +10444,10 @@ enum class FluentMenuIcon {
     FolderPick,
     RemoveBg,
     MinimalLayout,
-    AdminShield
+    AdminShield,
+    RunArrow,
+    Close,
+    Settings
 };
 
 void DrawD2DMenuChevronRight(ID2D1RenderTarget* pRT, ID2D1Brush* pBrush, ID2D1StrokeStyle* pStroke,
@@ -10459,6 +10633,15 @@ void DrawD2DFluentMenuIcon(ID2D1RenderTarget* pRT, ID2D1Brush* pBrush, ID2D1Stro
                            FluentMenuIcon icon, float cx, float cy, UINT dpi) {
     float sw = DpiScaleF(1.3f, dpi);
     switch (icon) {
+        case FluentMenuIcon::RunArrow:
+            DrawD2DReturnArrowVector(pRT, pBrush, pStroke, cx, cy, dpi);
+            break;
+        case FluentMenuIcon::Close:
+            DrawD2DCloseCrossVector(pRT, pBrush, pStroke, cx, cy, dpi);
+            break;
+        case FluentMenuIcon::Settings:
+            DrawD2DGearVector(pRT, pBrush, pStroke, cx, cy, dpi);
+            break;
         case FluentMenuIcon::Surface: {
             // 2x2 Fluent rounded grid icon
             float gap = DpiScaleF(1.1f, dpi);
@@ -10591,6 +10774,7 @@ struct FluentMenuItem {
     bool isSeparator = false;
     std::vector<FluentMenuItem> subItems;
     int inlineEditKind = 0; // 0 = normal, 1 = Width (px), 2 = Height (px), 3 = Font Size (pt)
+    const wchar_t* shortcut = nullptr;
 };
 
 struct FluentMenuPanelState {
@@ -10604,6 +10788,7 @@ struct FluentMenuPanelState {
     int scrollOffset = 0;
     int maxVisibleRows = 14;
     int width = 260;
+    int shortcutColumnWidth = 0;
     int height = 100;
     POINT mousePt = { -1, -1 };
     bool hasMousePt = false;
@@ -10913,7 +11098,11 @@ void ComputeFluentPanelMetrics(FluentMenuSession* s, FluentMenuPanelState* p) {
     if (hasInlineInputs) {
         extraRight += DpiScale(120, s->effectiveDpi);
     }
-    p->width = DpiScale(42, s->effectiveDpi) + (int)std::ceil(maxTextW) + extraRight;
+    p->shortcutColumnWidth = std::any_of(p->items.begin(), p->items.end(), [](const FluentMenuItem& item) {
+        return item.shortcut != nullptr;
+    }) ? DpiScale(62, s->effectiveDpi) : 0;
+    p->width = DpiScale(42, s->effectiveDpi) + (int)std::ceil(maxTextW) +
+               extraRight + p->shortcutColumnWidth;
     p->width = std::clamp(p->width, DpiScale(210, s->effectiveDpi), DpiScale(460, s->effectiveDpi));
 
     int totalH = padY * 2;
@@ -11258,12 +11447,22 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         }
                     }
 
+                    float shortcutWidth = static_cast<float>(p->shortcutColumnWidth);
                     float iconCx = DpiScaleF(22.0f, dpi);
                     float iconCy = curY + rowH * 0.5f;
                     ID2D1Brush* pItemTextBr = item.disabled ? pBrMuted : pBrText;
                     ID2D1Brush* pCheckedBr  = (item.id == 450 && pBrAmber) ? pBrAmber : pBrAccent;
                     ID2D1Brush* pItemIconBr = item.disabled ? pBrMuted : (item.checked && pCheckedBr ? pCheckedBr : pBrIcon);
 
+                    if (item.shortcut && pFmtItem && pBrSub) {
+                        const float hintRight = static_cast<float>(w) - sbReserve - DpiScaleF(16.0f, dpi);
+                        const auto hintRect = D2D1::RectF(hintRight - shortcutWidth, curY,
+                                                        hintRight, curY + rowH);
+                        pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+                        pRT->DrawText(item.shortcut, static_cast<UINT32>(wcslen(item.shortcut)),
+                                      pFmtItem, hintRect, pBrSub, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                        pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
+                    }
                     if (item.icon != FluentMenuIcon::None && pItemIconBr && pRoundStroke) {
                         DrawD2DFluentMenuIcon(pRT, pItemIconBr, pRoundStroke, item.icon, iconCx, iconCy, dpi);
                     }
@@ -11357,6 +11556,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                             ? DpiScaleF(18.0f, dpi)
                             : DpiScaleF(42.0f, dpi);
                         float rightReserve = isToggleRow ? DpiScaleF(56.0f, dpi) : DpiScaleF(30.0f, dpi);
+                        if (item.shortcut) rightReserve += shortcutWidth;
 
                         if (pFmtItem && pItemTextBr && !item.label.empty()) {
                             D2D1_RECT_F rcText = D2D1::RectF(
@@ -12130,6 +12330,47 @@ struct LayoutLocalizedStrings {
     const wchar_t* description;
     const wchar_t* options[3];
 };
+
+struct ActionButtonStrings {
+    const wchar_t* groupTitle;
+    const wchar_t* groupDescription;
+    const wchar_t* hidePattern;
+    const wchar_t* labels[kRunActionCount];
+};
+
+constexpr int kHideActionRowBase = 2420;
+constexpr UINT kHiddenActionMenuBase = 810;
+constexpr std::array<FluentMenuIcon, kRunActionCount> kActionMenuIcons{
+    FluentMenuIcon::FolderPick, FluentMenuIcon::RunArrow, FluentMenuIcon::Close, FluentMenuIcon::Settings
+};
+constexpr std::array<const wchar_t*, kRunActionCount> kActionShortcuts{
+    L"Ctrl+O", L"Enter", L"Esc", L"Ctrl+,"
+};
+
+ActionButtonStrings GetActionButtonStrings(const std::wstring& rawLang) {
+    const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
+    if (lang == L"vi") return { L"Nút trên cửa sổ", L"Các thao tác đã ẩn có trong menu chuột phải", L"Ẩn nút %s", { L"Duyệt", L"Chạy", L"Đóng", L"Cài đặt" } };
+    if (lang == L"th") return { L"ปุ่มหน้าต่าง", L"คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา", L"ซ่อนปุ่ม %s", { L"เรียกดู", L"เรียกใช้", L"ปิด", L"การตั้งค่า" } };
+    if (lang == L"id") return { L"Tombol Jendela", L"Tindakan tersembunyi tersedia di menu klik kanan", L"Sembunyikan tombol %s", { L"Telusuri", L"Jalankan", L"Tutup", L"Pengaturan" } };
+    if (lang == L"ms") return { L"Butang Tetingkap", L"Tindakan tersembunyi tersedia dalam menu klik kanan", L"Sembunyikan butang %s", { L"Semak imbas", L"Jalankan", L"Tutup", L"Tetapan" } };
+    if (lang == L"ja") return { L"ウィンドウのボタン", L"非表示にした操作は右クリックメニューに表示されます", L"「%s」ボタンを非表示にする", { L"参照", L"実行", L"閉じる", L"設定" } };
+    if (lang == L"zh_cn") return { L"窗口按钮", L"隐藏按钮的操作可通过右键菜单使用", L"隐藏“%s”按钮", { L"浏览", L"运行", L"关闭", L"设置" } };
+    if (lang == L"zh_tw") return { L"視窗按鈕", L"隱藏按鈕的動作仍可從右鍵選單使用", L"隱藏「%s」按鈕", { L"瀏覽", L"執行", L"關閉", L"設定" } };
+    if (lang == L"ko") return { L"창 버튼", L"숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다", L"%s 버튼 숨기기", { L"찾아보기", L"실행", L"닫기", L"설정" } };
+    if (lang == L"fr") return { L"Boutons de la fenêtre", L"Les actions masquées restent accessibles via le menu contextuel", L"Masquer le bouton %s", { L"Parcourir", L"Exécuter", L"Fermer", L"Paramètres" } };
+    if (lang == L"de") return { L"Fensterschaltflächen", L"Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung", L"Schaltfläche „%s“ ausblenden", { L"Durchsuchen", L"Ausführen", L"Schließen", L"Einstellungen" } };
+    if (lang == L"es") return { L"Botones de la ventana", L"Las acciones ocultas están disponibles en el menú contextual", L"Ocultar el botón %s", { L"Examinar", L"Ejecutar", L"Cerrar", L"Configuración" } };
+    if (lang == L"pt") return { L"Botões da janela", L"As ações ocultas ficam disponíveis no menu de contexto", L"Ocultar o botão %s", { L"Procurar", L"Executar", L"Fechar", L"Configurações" } };
+    if (lang == L"it") return { L"Pulsanti della finestra", L"Le azioni nascoste restano disponibili nel menu di scelta rapida", L"Nascondi il pulsante %s", { L"Sfoglia", L"Esegui", L"Chiudi", L"Impostazioni" } };
+    if (lang == L"ru") return { L"Кнопки окна", L"Действия скрытых кнопок доступны в контекстном меню", L"Скрыть кнопку «%s»", { L"Обзор", L"Выполнить", L"Закрыть", L"Настройки" } };
+    if (lang == L"uk") return { L"Кнопки вікна", L"Дії прихованих кнопок доступні в контекстному меню", L"Приховати кнопку «%s»", { L"Огляд", L"Виконати", L"Закрити", L"Налаштування" } };
+    if (lang == L"pl") return { L"Przyciski okna", L"Ukryte akcje są dostępne w menu kontekstowym", L"Ukryj przycisk „%s”", { L"Przeglądaj", L"Uruchom", L"Zamknij", L"Ustawienia" } };
+    if (lang == L"nl") return { L"Vensterknoppen", L"Verborgen acties staan in het snelmenu", L"Knop %s verbergen", { L"Bladeren", L"Uitvoeren", L"Sluiten", L"Instellingen" } };
+    if (lang == L"tr") return { L"Pencere düğmeleri", L"Gizlenen eylemler sağ tıklama menüsünde bulunur", L"%s düğmesini gizle", { L"Gözat", L"Çalıştır", L"Kapat", L"Ayarlar" } };
+    if (lang == L"hi") return { L"विंडो बटन", L"छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं", L"%s बटन छिपाएँ", { L"ब्राउज़ करें", L"चलाएँ", L"बंद करें", L"सेटिंग्स" } };
+    if (lang == L"ar") return { L"أزرار النافذة", L"تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن", L"إخفاء زر %s", { L"استعراض", L"تشغيل", L"إغلاق", L"الإعدادات" } };
+    return { L"Window Buttons", L"Hidden actions are available in the right-click menu", L"Hide the %s button", { L"Browse", L"Run", L"Close", L"Settings" } };
+}
 
 static LayoutLocalizedStrings GetLayoutLocalizedStrings(const std::wstring& rawLang) {
     const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
@@ -13309,6 +13550,19 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.scaleTitle,
                 ls.scaleSub,
                 std::to_wstring(st->settings.uiScalePercent) + L"%");
+            const auto actions = GetActionButtonStrings(st->settings.language);
+            auto [buttonGroup, rowY] = beginGroupCard(
+                actions.groupTitle, actions.groupDescription, kRunActionCount, rH);
+            constexpr std::array<const wchar_t*, kRunActionCount> glyphs{
+                L"\uE8B7", L"\uE768", L"\uE711", L"\uE713"
+            };
+            for (size_t i = 0; i < kRunActionCount; ++i) {
+                wchar_t title[128]{};
+                swprintf_s(title, actions.hidePattern, actions.labels[i]);
+                drawToggleRowInGroup(buttonGroup, rowY + rH * i, rH,
+                    kHideActionRowBase + static_cast<int>(i), glyphs[i], title, L"",
+                    st->settings.hiddenActions[i]);
+            }
         } else if (st->activeTab == 2) {
             float rH = S(60.0f);
             auto [g1, y1] = beginGroupCard(
@@ -14159,6 +14413,11 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         Wh_SetIntValue(GetUserOverrideKey(L"uiScalePercent").c_str(), sel);
                         changed = true;
                     }
+                } else if (id >= kHideActionRowBase &&
+                           id < kHideActionRowBase + static_cast<int>(kRunActionCount)) {
+                    size_t action = static_cast<size_t>(id - kHideActionRowBase);
+                    changed = Wh_SetIntValue(GetUserOverrideKey(kHiddenActionKeys[action]).c_str(),
+                                             st->settings.hiddenActions[action] ? 0 : 1);
                 } else if (id == 2501) {
                     Wh_SetIntValue(GetUserOverrideKey(L"maxHistoryItems").c_str(), (st->settings.maxHistoryItems > 0) ? 0 : 20);
                     changed = true;
@@ -14765,6 +15024,19 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
     if (uMsg == WM_KEYDOWN && state) {
         state->caretVisible = true;
+        const bool ctrlDown = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
+        const bool shiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
+        const bool altDown = (GetKeyState(VK_MENU) & 0x8000) != 0;
+        if (ctrlDown && !shiftDown && !altDown) {
+            if (wParam == 'O') {
+                OpenBrowseExecutableDialog(state);
+                return 0;
+            }
+            if (wParam == VK_OEM_COMMA) {
+                OpenModernSettingsApp(state);
+                return 0;
+            }
+        }
         if (wParam == VK_ESCAPE) {
             CloseRunDialog(state->hDlg);
             return 0;
@@ -14774,8 +15046,6 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
             return 0;
         }
         if (wParam == VK_RETURN) {
-            bool ctrlDown  = (GetKeyState(VK_CONTROL) & 0x8000) != 0;
-            bool shiftDown = (GetKeyState(VK_SHIFT)   & 0x8000) != 0;
             TriggerRunCommand(state, ctrlDown && shiftDown, !ctrlDown && shiftDown);
             return 0;
         }
@@ -14849,7 +15119,8 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
         }
     }
 
-    if (uMsg == WM_CHAR && (wParam == VK_RETURN || wParam == VK_ESCAPE || wParam == VK_TAB)) {
+    if (uMsg == WM_CHAR && (wParam == VK_RETURN || wParam == VK_ESCAPE || wParam == VK_TAB ||
+                           (wParam == 0x0F && (GetKeyState(VK_CONTROL) & 0x8000) != 0))) {
         return 0;
     }
 
@@ -15532,7 +15803,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             if (rWin.right <= rWin.left || rWin.bottom <= rWin.top) return;
                             D2D1_RECT_F rcBtn = D2D1::RectF((float)rWin.left, (float)rWin.top,
                                                             (float)rWin.right, (float)rWin.bottom);
-                            float btnRadius = isFluent ? DpiScaleSF(5.0f, state)
+                            float btnRadius = isFluent ? DpiScaleSF(4.0f, state)
                                                        : (rcBtn.bottom - rcBtn.top) * 0.5f;
                             D2D1_ROUNDED_RECT rr = D2D1::RoundedRect(rcBtn, btnRadius, btnRadius);
 
@@ -15569,21 +15840,20 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     };
                                     const bool isRun = kind == ActionBtnKind::Run;
                                     if (highContrast) {
-                                        const bool highlighted = pressed || hovered || isRun;
+                                        const bool highlighted = pressed || hovered;
                                         fillCol = systemColor(highlighted ? COLOR_HIGHLIGHT : COLOR_BTNFACE);
-                                        borderCol = systemColor(COLOR_BTNTEXT);
+                                        if (isRun) borderCol = systemColor(COLOR_BTNTEXT);
                                         contentCol = systemColor(highlighted ? COLOR_HIGHLIGHTTEXT : COLOR_BTNTEXT);
                                     } else {
-                                        float neutral = isLight ? 0.0f : 1.0f;
-                                        fillCol = D2D1::ColorF(neutral, neutral, neutral,
-                                            pressed ? 0.13f : (hovered ? 0.09f : 0.045f));
-                                        borderCol = D2D1::ColorF(neutral, neutral, neutral,
-                                            hovered ? 0.20f : 0.12f);
-                                        contentCol = D2D1::ColorF(isLight ? 0x20252c : 0xf3f5f8);
+                                        const float ink = isLight ? 0.0f : 1.0f;
+                                        contentCol = D2D1::ColorF(ink, ink, ink, pressed ? 0.62f : 0.90f);
                                         if (isRun) {
-                                            contentCol = D2D1::ColorF(isLight ? 0x00599f : 0x9bd1ff);
-                                            borderCol = D2D1::ColorF(contentCol.r, contentCol.g, contentCol.b,
-                                                                     hovered ? 0.56f : 0.32f);
+                                            fillCol = isLight
+                                                ? D2D1::ColorF(1.0f, 1.0f, 1.0f, pressed ? 0.30f : (hovered ? 0.50f : 0.70f))
+                                                : D2D1::ColorF(1.0f, 1.0f, 1.0f, pressed ? 0.03f : (hovered ? 0.085f : 0.06f));
+                                            borderCol = D2D1::ColorF(ink, ink, ink, isLight ? 0.09f : 0.07f);
+                                        } else if (pressed || hovered) {
+                                            fillCol = D2D1::ColorF(ink, ink, ink, pressed ? 0.035f : 0.065f);
                                         }
                                     }
                                 } else if (kind == ActionBtnKind::Browse || kind == ActionBtnKind::Gear) {
@@ -15606,18 +15876,18 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     contentCol = D2D1::ColorF(1.0f, 1.0f, 1.0f, 1.0f);
                                 }
 
-                                if (pressed) {
+                                if (pressed && !isFluent) {
                                     contentCol.a *= 0.86f;
                                 }
 
                                 ID2D1SolidColorBrush* pFillBr = nullptr;
-                                if (SUCCEEDED(pRT->CreateSolidColorBrush(fillCol, &pFillBr))) {
+                                if (fillCol.a > 0.0f && SUCCEEDED(pRT->CreateSolidColorBrush(fillCol, &pFillBr))) {
                                     pRT->FillRoundedRectangle(rr, pFillBr);
                                     pFillBr->Release();
                                 }
 
                                 ID2D1SolidColorBrush* pBorderBr = nullptr;
-                                if (SUCCEEDED(pRT->CreateSolidColorBrush(borderCol, &pBorderBr))) {
+                                if (borderCol.a > 0.0f && SUCCEEDED(pRT->CreateSolidColorBrush(borderCol, &pBorderBr))) {
                                     pRT->DrawRoundedRectangle(rr, pBorderBr, DpiScaleSF(1.0f, state));
                                     pBorderBr->Release();
                                 }
@@ -16601,23 +16871,23 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             const auto& activeList = state->showingSuggestions ? state->suggestions : state->history;
             POINT pt = { (short)LOWORD(lParam), (short)HIWORD(lParam) };
             int row = HitTestHistoryRow(state, pt);
-            if (row >= 0 && row < (int)activeList.size()) {
+            std::vector<FluentMenuItem> ctxItems;
+            std::wstring targetCmd;
+            std::wstring resolvedFilePath;
+            bool resolvedIsDir = false;
+            bool hasFileLoc = false;
+            if (row >= 0 && row < (int)activeList.size() &&
+                !activeList[row].isMathResult && activeList[row].webSearchKind == 0) {
                 const HistoryItem& hitItem = activeList[row];
-                if (hitItem.isMathResult || hitItem.webSearchKind != 0) {
-                    return 0;
-                }
                 state->selectedRow = row;
                 RefreshDialogVisual(hWnd, state);
-                std::wstring targetCmd = hitItem.cmd;
+                targetCmd = hitItem.cmd;
                 bool currentlyPinned   = hitItem.isPinned || IsCommandPinned(targetCmd);
                 bool canDeleteFromHistory = (!state->showingSuggestions || !hitItem.isSuggestion || !hitItem.timeStr.empty());
-                std::wstring resolvedFilePath;
-                bool resolvedIsDir = false;
-                bool hasFileLoc = TryResolveCommandFilePath(targetCmd, &resolvedFilePath, &resolvedIsDir);
+                hasFileLoc = TryResolveCommandFilePath(targetCmd, &resolvedFilePath, &resolvedIsDir);
                 ExtraLocalizedStrings ex = GetExtraLocalizedStrings(state->settings.language);
                 V53LocalizedStrings v53 = GetV53LocalizedStrings(state->settings.language);
 
-                std::vector<FluentMenuItem> ctxItems;
                 {
                     FluentMenuItem pinItem;
                     pinItem.id    = 797;
@@ -16643,49 +16913,78 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     delItem.icon  = FluentMenuIcon::ClearTrash;
                     ctxItems.push_back(std::move(delItem));
                 }
-
-                POINT ptScreen = pt;
-                ClientToScreen(hWnd, &ptScreen);
-                state->isBrowsingFile = true;
-                g_isBrowsingFile.store(true);
-                UINT cmd = RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
-                g_isBrowsingFile.store(false);
-                if (!IsWindow(hWnd) || g_hActiveRunDlg.load() != hWnd) return 0;
-                state->isBrowsingFile = false;
-                if (state->pendingUninit || g_unloading.load()) {
-                    return 0;
-                }
-
-                if (cmd == 797) {
-                    int oldH = state->totalHeight;
-                    TogglePinCommand(targetCmd);
-                    state->hoveredRow = -1;
-                    state->selectedRow = -1;
-                    LoadHistoryItems(state);
-                    if (state->showingSuggestions) {
-                        UpdateAppSuggestionsForQuery(state, GetEffectiveInputText(state->hModernEdit));
-                    }
-                    RecomputeDialogMetrics(state);
-                    ResizeDialogPreservingBottomAnchor(state, oldH);
-                    RefreshDialogVisual(hWnd, state);
-                } else if (cmd == 798 && hasFileLoc) {
-                    OpenFileLocationInExplorer(resolvedFilePath, resolvedIsDir);
-                } else if (cmd == 799) {
-                    int oldH = state->totalHeight;
-                    RemovePinnedCommand(targetCmd);
-                    RemoveCommandFromHistoryStorage(targetCmd);
-                    state->hoveredRow = -1;
-                    state->selectedRow = -1;
-                    LoadHistoryItems(state);
-                    if (state->showingSuggestions) {
-                        UpdateAppSuggestionsForQuery(state, GetEffectiveInputText(state->hModernEdit));
-                    }
-                    RecomputeDialogMetrics(state);
-                    ResizeDialogPreservingBottomAnchor(state, oldH);
-                    RefreshDialogVisual(hWnd, state);
-                }
-                ForceFocusModernEdit(hWnd, state);
             }
+
+            if (std::any_of(state->settings.hiddenActions.begin(), state->settings.hiddenActions.end(),
+                            [](bool hidden) { return hidden; })) {
+                if (!ctxItems.empty()) {
+                    FluentMenuItem separator;
+                    separator.isSeparator = true;
+                    ctxItems.push_back(std::move(separator));
+                }
+                const auto actions = GetActionButtonStrings(state->settings.language);
+                for (size_t i = 0; i < kRunActionCount; ++i) {
+                    if (!state->settings.hiddenActions[i]) continue;
+                    FluentMenuItem item;
+                    item.id = kHiddenActionMenuBase + static_cast<UINT>(i);
+                    item.label = actions.labels[i];
+                    item.icon = kActionMenuIcons[i];
+                    item.shortcut = kActionShortcuts[i];
+                    ctxItems.push_back(std::move(item));
+                }
+            }
+            if (ctxItems.empty()) return 0;
+            POINT ptScreen = pt;
+            ClientToScreen(hWnd, &ptScreen);
+            state->isBrowsingFile = true;
+            g_isBrowsingFile.store(true);
+            UINT cmd = RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
+            g_isBrowsingFile.store(false);
+            if (!IsWindow(hWnd) || g_hActiveRunDlg.load() != hWnd) return 0;
+            state->isBrowsingFile = false;
+            if (state->pendingUninit || g_unloading.load()) return 0;
+
+            if (cmd >= kHiddenActionMenuBase &&
+                cmd < kHiddenActionMenuBase + static_cast<UINT>(kRunActionCount)) {
+                switch (static_cast<RunAction>(cmd - kHiddenActionMenuBase)) {
+                    case RunAction::Browse: OpenBrowseExecutableDialog(state); break;
+                    case RunAction::Run: TriggerRunCommand(state); break;
+                    case RunAction::Close: CloseRunDialog(hWnd); break;
+                    case RunAction::Settings: OpenModernSettingsApp(state); break;
+                    case RunAction::Count: break;
+                }
+                return 0;
+            }
+
+            if (cmd == 797) {
+                int oldH = state->totalHeight;
+                TogglePinCommand(targetCmd);
+                state->hoveredRow = -1;
+                state->selectedRow = -1;
+                LoadHistoryItems(state);
+                if (state->showingSuggestions) {
+                    UpdateAppSuggestionsForQuery(state, GetEffectiveInputText(state->hModernEdit));
+                }
+                RecomputeDialogMetrics(state);
+                ResizeDialogPreservingBottomAnchor(state, oldH);
+                RefreshDialogVisual(hWnd, state);
+            } else if (cmd == 798 && hasFileLoc) {
+                OpenFileLocationInExplorer(resolvedFilePath, resolvedIsDir);
+            } else if (cmd == 799) {
+                int oldH = state->totalHeight;
+                RemovePinnedCommand(targetCmd);
+                RemoveCommandFromHistoryStorage(targetCmd);
+                state->hoveredRow = -1;
+                state->selectedRow = -1;
+                LoadHistoryItems(state);
+                if (state->showingSuggestions) {
+                    UpdateAppSuggestionsForQuery(state, GetEffectiveInputText(state->hModernEdit));
+                }
+                RecomputeDialogMetrics(state);
+                ResizeDialogPreservingBottomAnchor(state, oldH);
+                RefreshDialogVisual(hWnd, state);
+            }
+            ForceFocusModernEdit(hWnd, state);
             return 0;
         }
 
