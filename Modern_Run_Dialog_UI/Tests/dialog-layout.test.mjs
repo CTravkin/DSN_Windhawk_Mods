@@ -191,6 +191,30 @@ test('history with one row has the same height as the input panel across scales'
     `, true);
 });
 
+test('the four window border modes resolve to the expected outline', () => {
+    const mode = source.match(/enum class WindowBorderMode[^\n]*;/)?.[0];
+    const resolve = source.match(/constexpr WindowBorderMode ResolveWindowBorderMode\([\s\S]*?\n\}/)?.[0];
+    assert.ok(mode && resolve, 'The window border policy is present');
+    compileChecks(`
+        ${mode}
+        ${resolve}
+        using enum WindowBorderMode;
+        static_assert(ResolveWindowBorderMode(Mod, false, true, true) == Mod);
+        static_assert(ResolveWindowBorderMode(Windows, false, false, true) == Windows);
+        static_assert(ResolveWindowBorderMode(Windows, false, true, false) == Windows);
+        static_assert(ResolveWindowBorderMode(Windows, false, true, true) == Accent);
+        static_assert(ResolveWindowBorderMode(Accent, false, false, true) == Accent);
+        static_assert(ResolveWindowBorderMode(Accent, true, true, true) == Windows);
+        static_assert(ResolveWindowBorderMode(Off, true, true, true) == Off);
+    `);
+});
+
+test('history actions keep delete in the same group', () => {
+    const deleteItem = source.match(/if \(canDeleteFromHistory\) \{([\s\S]*?)ctxItems\.push_back\(std::move\(delItem\)\)/)?.[1];
+    assert.ok(deleteItem);
+    assert.doesNotMatch(deleteItem, /isSeparator/);
+});
+
 function compileChecks(checks, run = false) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });

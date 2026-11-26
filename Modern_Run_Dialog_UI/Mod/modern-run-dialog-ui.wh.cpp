@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.4.4
+// @version         6.5.0
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 21
+// Build: 22
 
 // ==WindhawkModReadme==
 /*
@@ -184,11 +184,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
     $description: Optional hex color (#RRGGBB) to override the Run dialog background color. Leave empty to follow the selected Theme Preset.
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu nền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
-  - customBorderColor: ""
-    $name: Custom Border Color (Hex, e.g. #4C566A)
-    $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
-    $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
-    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - customCornerRadius: -1
     $name: Outer Corner Radius
     $name:vi-VN: Bán kính góc ngoài
@@ -319,6 +314,182 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - ar: العربية (Arabic)
   $name: 1. Appearance & Visual Effects
   $name:vi-VN: 1. Giao diện & Hiệu ứng hình ảnh
+
+- windowBordersGroup:
+  - windowBorderMode: mod
+    $name: Border Mode
+    $description: Color and visibility of the panel outlines
+    $options:
+    - mod: Mod-defined
+    - windows: Windows-defined
+    - accent: Windows accent
+    - off: Off
+    $name:vi-VN: Chế độ viền
+    $description:vi-VN: Màu sắc và hiển thị viền các bảng
+    $options:vi-VN:
+    - mod: Theo mod
+    - windows: Theo Windows
+    - accent: Màu nhấn Windows
+    - off: Tắt
+    $name:th-TH: โหมดขอบ
+    $description:th-TH: สีและการแสดงขอบแผง
+    $options:th-TH:
+    - mod: ตามม็อด
+    - windows: ตาม Windows
+    - accent: สีเน้น Windows
+    - off: ปิด
+    $name:id-ID: Mode Bingkai
+    $description:id-ID: Warna dan visibilitas garis luar panel
+    $options:id-ID:
+    - mod: Sesuai mod
+    - windows: Sesuai Windows
+    - accent: Aksen Windows
+    - off: Nonaktif
+    $name:ms-MY: Mod Sempadan
+    $description:ms-MY: Warna dan keterlihatan sempadan panel
+    $options:ms-MY:
+    - mod: Mengikut mod
+    - windows: Mengikut Windows
+    - accent: Aksen Windows
+    - off: Dimatikan
+    $name:ja-JP: 境界線モード
+    $description:ja-JP: パネルの境界線の色と表示
+    $options:ja-JP:
+    - mod: Mod に従う
+    - windows: Windows に従う
+    - accent: Windows のアクセント
+    - off: 表示しない
+    $name:zh-CN: 边框模式
+    $description:zh-CN: 面板边框的颜色和可见性
+    $options:zh-CN:
+    - mod: 由模组决定
+    - windows: 由 Windows 决定
+    - accent: Windows 强调色
+    - off: 关闭
+    $name:zh-TW: 邊框模式
+    $description:zh-TW: 面板邊框的色彩和顯示
+    $options:zh-TW:
+    - mod: 由模組決定
+    - windows: 由 Windows 決定
+    - accent: Windows 輔色
+    - off: 關閉
+    $name:ko-KR: 테두리 모드
+    $description:ko-KR: 패널 테두리의 색상과 표시 여부
+    $options:ko-KR:
+    - mod: 모드 설정
+    - windows: Windows 설정
+    - accent: Windows 강조색
+    - off: 끔
+    $name:fr-FR: Mode des bordures
+    $description:fr-FR: Couleur et visibilité du contour des panneaux
+    $options:fr-FR:
+    - mod: Selon le mod
+    - windows: Selon Windows
+    - accent: Accentuation Windows
+    - off: Désactivées
+    $name:de-DE: Rahmenmodus
+    $description:de-DE: Farbe und Sichtbarkeit der Panelrahmen
+    $options:de-DE:
+    - mod: Vom Mod festgelegt
+    - windows: Von Windows festgelegt
+    - accent: Windows-Akzentfarbe
+    - off: Aus
+    $name:es-ES: Modo de borde
+    $description:es-ES: Color y visibilidad del contorno de los paneles
+    $options:es-ES:
+    - mod: Según el mod
+    - windows: Según Windows
+    - accent: Acento de Windows
+    - off: Desactivados
+    $name:pt-BR: Modo das bordas
+    $description:pt-BR: Cor e visibilidade do contorno dos painéis
+    $options:pt-BR:
+    - mod: Definido pelo mod
+    - windows: Definido pelo Windows
+    - accent: Destaque do Windows
+    - off: Desativadas
+    $name:it-IT: Modalità dei bordi
+    $description:it-IT: Colore e visibilità del contorno dei riquadri
+    $options:it-IT:
+    - mod: Secondo la mod
+    - windows: Secondo Windows
+    - accent: Colore principale di Windows
+    - off: Disattivati
+    $name:ru-RU: Режим рамок
+    $description:ru-RU: Цвет и видимость внешних контуров панелей
+    $options:ru-RU:
+    - mod: Определено модом
+    - windows: Определено Windows
+    - accent: Акцентный Windows
+    - off: Отключены
+    $name:uk-UA: Режим рамок
+    $description:uk-UA: Колір і видимість зовнішніх контурів панелей
+    $options:uk-UA:
+    - mod: Визначено модом
+    - windows: Визначено Windows
+    - accent: Акцент Windows
+    - off: Вимкнено
+    $name:pl-PL: Tryb obramowania
+    $description:pl-PL: Kolor i widoczność obramowań paneli
+    $options:pl-PL:
+    - mod: Według moda
+    - windows: Według systemu Windows
+    - accent: Akcent systemu Windows
+    - off: Wyłączone
+    $name:nl-NL: Randmodus
+    $description:nl-NL: Kleur en zichtbaarheid van paneelranden
+    $options:nl-NL:
+    - mod: Volgens de mod
+    - windows: Volgens Windows
+    - accent: Windows-accentkleur
+    - off: Uit
+    $name:tr-TR: Kenarlık Modu
+    $description:tr-TR: Panel kenarlıklarının rengi ve görünürlüğü
+    $options:tr-TR:
+    - mod: Moda göre
+    - windows: Windows’a göre
+    - accent: Windows vurgu rengi
+    - off: Kapalı
+    $name:hi-IN: सीमा मोड
+    $description:hi-IN: पैनल की बाहरी सीमाओं का रंग और दृश्यता
+    $options:hi-IN:
+    - mod: मॉड के अनुसार
+    - windows: Windows के अनुसार
+    - accent: Windows का एक्सेंट रंग
+    - off: बंद
+    $name:ar: وضع الحدود
+    $description:ar: لون وحدود ظهور الحواف الخارجية للوحات
+    $options:ar:
+    - mod: حسب التعديل
+    - windows: حسب Windows
+    - accent: لون تمييز Windows
+    - off: معطلة
+  - customBorderColor: ""
+    $name: Custom Border Color (Hex, e.g. #4C566A)
+    $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
+    $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
+    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
+  $name: Window Borders
+  $name:vi-VN: Viền cửa sổ
+  $name:th-TH: ขอบหน้าต่าง
+  $name:id-ID: Bingkai Jendela
+  $name:ms-MY: Sempadan Tetingkap
+  $name:ja-JP: ウィンドウの境界線
+  $name:zh-CN: 窗口边框
+  $name:zh-TW: 視窗邊框
+  $name:ko-KR: 창 테두리
+  $name:fr-FR: Bordures des fenêtres
+  $name:de-DE: Fensterrahmen
+  $name:es-ES: Bordes de las ventanas
+  $name:pt-BR: Bordas das janelas
+  $name:it-IT: Bordi delle finestre
+  $name:ru-RU: Рамки окон
+  $name:uk-UA: Рамки вікон
+  $name:pl-PL: Obramowania okien
+  $name:nl-NL: Vensterranden
+  $name:tr-TR: Pencere Kenarlıkları
+  $name:hi-IN: विंडो की सीमाएँ
+  $name:ar: حدود النوافذ
 
 - layoutGroup:
   - dialogPosition: auto
@@ -1048,6 +1219,17 @@ struct CommandAlias {
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
 enum class ContextMenuStyle { Mod, WindowsFluent };
+enum class WindowBorderMode { Mod, Windows, Accent, Off };
+
+constexpr WindowBorderMode ResolveWindowBorderMode(WindowBorderMode mode, bool highContrast,
+                                                    bool windowsUsesAccent, bool active) {
+    if (highContrast) {
+        return mode == WindowBorderMode::Mod || mode == WindowBorderMode::Off
+            ? WindowBorderMode::Off : WindowBorderMode::Windows;
+    }
+    return mode == WindowBorderMode::Windows && windowsUsesAccent && active
+        ? WindowBorderMode::Accent : mode;
+}
 
 enum class RunAction : size_t { Browse, Run, Close, Settings, Count };
 constexpr size_t kRunActionCount = static_cast<size_t>(RunAction::Count);
@@ -1088,6 +1270,7 @@ struct ModSettings {
     ColorMode colorMode = ColorMode::Auto;
     std::wstring customBgColor;
     std::wstring customBorderColor;
+    WindowBorderMode windowBorderMode = WindowBorderMode::Mod;
     int customCornerRadius = -1;
     int customInnerCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
@@ -1374,6 +1557,14 @@ D2D1_COLOR_F GetSystemAccentColorF() {
     return D2D1::ColorF(0.10f, 0.47f, 0.83f, 1.0f);
 }
 
+bool WindowsUsesAccentBorder() {
+    DWORD value = 0;
+    DWORD size = sizeof(value);
+    return RegGetValueW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM",
+                        L"ColorPrevalence", RRF_RT_REG_DWORD, nullptr, &value,
+                        &size) == ERROR_SUCCESS && value != 0;
+}
+
 // --- Real-Time iOS 26 Optical Liquid Glass Snapshot, Gaussian Blur & 3D Snell's-Law Lens Refraction Engine ---
 
 struct CleanDesktopSnapshot {
@@ -1421,6 +1612,7 @@ struct OpticalLensGeometryLUT {
     bool isMenu = false;
     bool anchoredTop = false;
     float cornerRadiusPx = -1.0f;
+    bool edgeHighlight = true;
     uint8_t interiorAlpha = 255;
     std::vector<int16_t> interiorDxG;
     std::vector<InteriorRowSpan> interiorSpans;
@@ -1695,7 +1887,7 @@ constexpr float ClampCornerRadius(float radius, float width, float height) {
 
 void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int topAreaH, int gapH,
                                  UINT dpi, int glassPct, bool isLight, bool isMenuPanel, bool anchoredTop,
-                                 int adminBannerH, int adminGapH, float cornerRadiusPx) {
+                                 int adminBannerH, int adminGapH, float cornerRadiusPx, bool edgeHighlight) {
     lut.w = w;
     lut.h = h;
     lut.topAreaH = topAreaH;
@@ -1708,6 +1900,7 @@ void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int 
     lut.isMenu = isMenuPanel;
     lut.anchoredTop = anchoredTop;
     lut.cornerRadiusPx = cornerRadiusPx;
+    lut.edgeHighlight = edgeHighlight;
 
     bool isWinBlurMode = (glassPct <= -1000);
     float negF = (!isWinBlurMode && glassPct < 0) ? (std::clamp(-glassPct, 0, 100) / 100.0f) : 0.0f;
@@ -1880,15 +2073,16 @@ void BuildOpticalLensGeometryLUT(OpticalLensGeometryLUT& lut, int w, int h, int 
             float lightTL = (std::max)(0.0f, -0.68f * nx - 0.73f * ny);
             float lightBR = (std::max)(0.0f,  0.68f * nx + 0.73f * ny);
 
-            // For Image 2 (History squircle), add a 3D molded inner cushion highlight ring;
-            // For Image 1 (Pill Input Bar), use a sleek specular rim glow at the curved ends.
+            // Keep the refracted surface even when the preferred border replaces its edge highlight.
             float fresnel = 0.0f;
-            if (isHistorySquircle) {
-                float rimGlow = std::pow(tBevel, 2.2f) * (0.28f + 0.36f * lightTL + 0.26f * lightBR);
-                float cushionPeak = std::exp(-std::pow((tBevel - 0.58f) / 0.22f, 2.0f)) * 0.14f;
-                fresnel = std::clamp(rimGlow + cushionPeak, 0.0f, 0.78f);
-            } else {
-                fresnel = std::clamp(std::pow(tBevel, 2.1f) * (0.18f + 0.38f * lightTL + 0.28f * lightBR), 0.0f, 0.76f);
+            if (edgeHighlight) {
+                if (isHistorySquircle) {
+                    float rimGlow = std::pow(tBevel, 2.2f) * (0.28f + 0.36f * lightTL + 0.26f * lightBR);
+                    float cushionPeak = std::exp(-std::pow((tBevel - 0.58f) / 0.22f, 2.0f)) * 0.14f;
+                    fresnel = std::clamp(rimGlow + cushionPeak, 0.0f, 0.78f);
+                } else {
+                    fresnel = std::clamp(std::pow(tBevel, 2.1f) * (0.18f + 0.38f * lightTL + 0.28f * lightBR), 0.0f, 0.76f);
+                }
             }
 
             uint32_t frU8 = (uint32_t)std::clamp((int)std::round(fresnel * 256.0f), 0, 256);
@@ -2092,7 +2286,7 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
                                     int overrideWndX = -999999, int overrideWndY = -999999,
                                     bool anchoredTop = false,
                                     int adminBannerH = 0, int adminGapH = 0,
-                                    float cornerRadiusPx = -1.0f) {
+                                    float cornerRadiusPx = -1.0f, bool edgeHighlight = true) {
     if (!pRT || !hWnd || w <= 0 || h <= 0) return;
 
     int wndX = overrideWndX;
@@ -2130,7 +2324,7 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
          cache->wndX != wndX || cache->wndY != wndY ||
          cache->glassPct != glassPct || cache->isLight != isLight || cache->isMenu != isMenuPanel ||
          cache->anchoredTop != anchoredTop ||
-         cache->lut.dpi != dpi || cache->lut.cornerRadiusPx != cornerRadiusPx ||
+         cache->lut.dpi != dpi || cache->lut.cornerRadiusPx != cornerRadiusPx || cache->lut.edgeHighlight != edgeHighlight ||
          cache->snapTick != snapTick || (int)cache->premulPixels.size() != w * h);
 
     if (needRebuildPixels) {
@@ -2139,11 +2333,11 @@ void DrawOpticalLiquidGlassBackdrop(ID2D1RenderTarget* pRT, HWND hWnd, int w, in
                                     cache->lut.adminBannerH != adminBannerH || cache->lut.adminGapH != adminGapH ||
                                     cache->lut.dpi != dpi || cache->lut.glassPct != glassPct ||
                                     cache->lut.isLight != isLight || cache->lut.isMenu != isMenuPanel ||
-                                    cache->lut.cornerRadiusPx != cornerRadiusPx ||
+                                    cache->lut.cornerRadiusPx != cornerRadiusPx || cache->lut.edgeHighlight != edgeHighlight ||
                                     cache->lut.anchoredTop != anchoredTop);
         if (shapeOrStyleChanged) {
             BuildOpticalLensGeometryLUT(cache->lut, w, h, topAreaH, gapH, dpi, glassPct, isLight, isMenuPanel, anchoredTop,
-                                        adminBannerH, adminGapH, cornerRadiusPx);
+                                        adminBannerH, adminGapH, cornerRadiusPx, edgeHighlight);
         }
 
         // At 1/4-res, softRad = 9..13 equals 36px..52px full-res Gaussian blur -> 100% blurs out any background text!
@@ -4985,6 +5179,7 @@ struct WindhawkRawSnapshot {
     std::wstring themePreset;
     std::wstring customBgColor;
     std::wstring customBorderColor;
+    std::wstring windowBorderMode;
     int customCornerRadius = -1;
     int customInnerCornerRadius = -1;
     std::wstring customBackgroundPath;
@@ -5081,7 +5276,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.language                = ReadGroupedStringSetting(L"appearanceGroup.language", L"language", L"auto");
     curWh.themePreset             = ReadGroupedStringSetting(L"appearanceGroup.themePreset", L"themePreset", L"windows_blur");
     curWh.customBgColor           = ReadGroupedStringSetting(L"appearanceGroup.customBgColor", L"customBgColor", L"");
-    curWh.customBorderColor       = ReadGroupedStringSetting(L"appearanceGroup.customBorderColor", L"customBorderColor", L"");
+    curWh.customBorderColor       = ReadGroupedStringSetting(L"windowBordersGroup.customBorderColor", L"customBorderColor", L"");
+    curWh.windowBorderMode        = ReadGroupedStringSetting(L"windowBordersGroup.windowBorderMode", L"windowBorderMode", L"mod");
     curWh.customCornerRadius      = Wh_GetIntSetting(L"appearanceGroup.customCornerRadius");
     curWh.customInnerCornerRadius = ParseInnerCornerRadius(ReadGroupedStringSetting(
         L"appearanceGroup.customInnerCornerRadius", L"customInnerCornerRadius", L"-1"));
@@ -5131,6 +5327,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.themePreset != g_lastWhSnapshot.themePreset, L"themePreset");
             dropIfChanged(curWh.customBgColor != g_lastWhSnapshot.customBgColor, L"customBgColor");
             dropIfChanged(curWh.customBorderColor != g_lastWhSnapshot.customBorderColor, L"customBorderColor");
+            dropIfChanged(curWh.windowBorderMode != g_lastWhSnapshot.windowBorderMode, L"windowBorderMode");
             dropIfChanged(curWh.customCornerRadius != g_lastWhSnapshot.customCornerRadius, L"customCornerRadius");
             dropIfChanged(curWh.customInnerCornerRadius != g_lastWhSnapshot.customInnerCornerRadius, L"customInnerCornerRadius");
             dropIfChanged(curWh.customBackgroundPath != g_lastWhSnapshot.customBackgroundPath, L"customBackgroundPath");
@@ -5186,14 +5383,38 @@ void LoadSettings(bool fromSettingsChanged = false) {
     }
     newSettings.customBgColor = bgHex;
 
-    std::wstring bdHex = ReadGroupedStringSetting(L"appearanceGroup.customBorderColor", L"customBorderColor", L"");
+    std::wstring bdHex = curWh.customBorderColor;
     {
+        const auto key = GetUserOverrideKey(L"customBorderColor");
         wchar_t ovBuf[32] = {};
-        if (Wh_GetStringValue(GetUserOverrideKey(L"customBorderColor").c_str(), ovBuf, ARRAYSIZE(ovBuf)) > 0) {
+        const bool hasOverride = Wh_GetStringValue(key.c_str(), ovBuf, ARRAYSIZE(ovBuf)) > 0;
+        if (hasOverride) {
             bdHex = (wcscmp(ovBuf, L"__NONE__") == 0) ? L"" : ovBuf;
+        }
+        const auto previous = WindhawkUtils::StringSetting::make(L"appearanceGroup.customBorderColor");
+        if (previous.get() && previous.get()[0]) {
+            const auto movedKey = GetUserOverrideKey(L"customBorderColorMoved");
+            if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
+                if (!hasOverride && bdHex.empty()) {
+                    bdHex = previous.get();
+                    if (Wh_SetStringValue(key.c_str(), bdHex.c_str())) {
+                        Wh_SetIntValue(movedKey.c_str(), 1);
+                    }
+                } else {
+                    Wh_SetIntValue(movedKey.c_str(), 1);
+                }
+            }
         }
     }
     newSettings.customBorderColor = bdHex;
+    wchar_t borderModeOverride[24]{};
+    Wh_GetStringValue(GetUserOverrideKey(L"windowBorderMode").c_str(),
+                      borderModeOverride, ARRAYSIZE(borderModeOverride));
+    const std::wstring_view borderMode = borderModeOverride[0]
+        ? std::wstring_view(borderModeOverride) : std::wstring_view(curWh.windowBorderMode);
+    if (borderMode == L"windows") newSettings.windowBorderMode = WindowBorderMode::Windows;
+    else if (borderMode == L"accent") newSettings.windowBorderMode = WindowBorderMode::Accent;
+    else if (borderMode == L"off") newSettings.windowBorderMode = WindowBorderMode::Off;
 
     int crSetting = Wh_GetIntSetting(L"appearanceGroup.customCornerRadius");
     if (crSetting == 0 && !fromSettingsChanged) {
@@ -11121,7 +11342,7 @@ int GetMenuSeparatorHeight(const FluentMenuSession* s) {
 }
 
 int GetMenuPadY(const FluentMenuSession* s) {
-    return DpiScale(10, s->effectiveDpi);
+    return DpiScale(kBasePanelInset, s->effectiveDpi) - DpiScale(kBaseRowHighlightInset, s->effectiveDpi);
 }
 
 bool PanelNeedsScroll(const FluentMenuPanelState* p) {
@@ -11357,7 +11578,9 @@ void ComputeFluentPanelMetrics(FluentMenuSession* s, FluentMenuPanelState* p) {
 }
 
 int HitTestFluentMenuRow(const FluentMenuSession* s, const FluentMenuPanelState* p, POINT pt, RECT* outRowRect = nullptr) {
-    if (pt.x < 0 || pt.x >= p->width || pt.y < 0 || pt.y >= p->height) return -1;
+    const int padX = DpiScale(kBasePanelInset, s->effectiveDpi);
+    const int scrollbar = PanelNeedsScroll(p) ? DpiScale(8, s->effectiveDpi) : 0;
+    if (pt.x < padX || pt.x >= p->width - padX - scrollbar || pt.y < 0 || pt.y >= p->height) return -1;
     int padY = GetMenuPadY(s);
     int rowH = GetMenuRowHeight(s);
     int sepH = GetMenuSeparatorHeight(s);
@@ -11632,9 +11855,10 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 int rowH = GetMenuRowHeight(s);
                 int sepH = GetMenuSeparatorHeight(s);
                 float curY = (float)padY;
-                float padX = DpiScaleF(9.0f, dpi);
+                float padX = DpiScale(kBasePanelInset, dpi);
+                float rowInset = DpiScale(kBaseRowHighlightInset, dpi);
                 bool hasScroll = PanelNeedsScroll(p);
-                float sbReserve = hasScroll ? DpiScaleF(8.0f, dpi) : 0.0f;
+                float sbReserve = hasScroll ? DpiScale(8, dpi) : 0.0f;
 
                 int startIdx = hasScroll ? p->scrollOffset : 0;
                 int endIdx = hasScroll
@@ -11649,9 +11873,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                                       : D2D1::ColorF(1.0f, 1.0f, 1.0f, 0.10f);
                         if (SUCCEEDED(pRT->CreateSolidColorBrush(divCol, &pDivBr))) {
                             float lineY = curY + sepH * 0.5f;
-                            float lineX = DpiScaleF(12.0f, dpi);
-                            pRT->DrawLine(D2D1::Point2F(lineX, lineY),
-                                          D2D1::Point2F((float)w - lineX, lineY),
+                            pRT->DrawLine(D2D1::Point2F(padX, lineY),
+                                          D2D1::Point2F((float)w - padX - sbReserve, lineY),
                                           pDivBr, DpiScaleF(1.0f, dpi));
                             pDivBr->Release();
                         }
@@ -11664,8 +11887,8 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
 
                     if (isHovered || isPressed) {
                         D2D1_RECT_F rcPill = D2D1::RectF(
-                            padX, curY + DpiScaleF(2.0f, dpi),
-                            (float)w - padX - sbReserve, curY + rowH - DpiScaleF(2.0f, dpi));
+                            padX, curY + rowInset,
+                            (float)w - padX - sbReserve, curY + rowH - rowInset);
                         const float innerPx = settings.customInnerCornerRadius >= 0
                             ? DpiScaleF(static_cast<float>(settings.customInnerCornerRadius), dpi)
                             : (rcPill.bottom - rcPill.top) * 0.5f;
@@ -12903,6 +13126,41 @@ ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) 
     return { L"Context Menu Style", L"Changes the appearance of the right-click menu", L"Mod Style" };
 }
 
+struct WindowBorderStrings {
+    const wchar_t* groupTitle;
+    const wchar_t* modeTitle;
+    const wchar_t* description;
+    const wchar_t* labels[4];
+};
+
+constexpr std::array<const wchar_t*, 4> kWindowBorderModeValues{L"mod", L"windows", L"accent", L"off"};
+
+WindowBorderStrings GetWindowBorderStrings(const std::wstring& rawLang) {
+    const auto lang = ResolveEffectiveLanguageCode(rawLang);
+    if (lang == L"vi") return { L"Viền cửa sổ", L"Chế độ viền", L"Màu sắc và hiển thị viền các bảng", { L"Theo mod", L"Theo Windows", L"Màu nhấn Windows", L"Tắt" } };
+    if (lang == L"th") return { L"ขอบหน้าต่าง", L"โหมดขอบ", L"สีและการแสดงขอบแผง", { L"ตามม็อด", L"ตาม Windows", L"สีเน้น Windows", L"ปิด" } };
+    if (lang == L"id") return { L"Bingkai Jendela", L"Mode Bingkai", L"Warna dan visibilitas garis luar panel", { L"Sesuai mod", L"Sesuai Windows", L"Aksen Windows", L"Nonaktif" } };
+    if (lang == L"ms") return { L"Sempadan Tetingkap", L"Mod Sempadan", L"Warna dan keterlihatan sempadan panel", { L"Mengikut mod", L"Mengikut Windows", L"Aksen Windows", L"Dimatikan" } };
+    if (lang == L"ja") return { L"ウィンドウの境界線", L"境界線モード", L"パネルの境界線の色と表示", { L"Mod に従う", L"Windows に従う", L"Windows のアクセント", L"表示しない" } };
+    if (lang == L"zh_cn") return { L"窗口边框", L"边框模式", L"面板边框的颜色和可见性", { L"由模组决定", L"由 Windows 决定", L"Windows 强调色", L"关闭" } };
+    if (lang == L"zh_tw") return { L"視窗邊框", L"邊框模式", L"面板邊框的色彩和顯示", { L"由模組決定", L"由 Windows 決定", L"Windows 輔色", L"關閉" } };
+    if (lang == L"ko") return { L"창 테두리", L"테두리 모드", L"패널 테두리의 색상과 표시 여부", { L"모드 설정", L"Windows 설정", L"Windows 강조색", L"끔" } };
+    if (lang == L"fr") return { L"Bordures des fenêtres", L"Mode des bordures", L"Couleur et visibilité du contour des panneaux", { L"Selon le mod", L"Selon Windows", L"Accentuation Windows", L"Désactivées" } };
+    if (lang == L"de") return { L"Fensterrahmen", L"Rahmenmodus", L"Farbe und Sichtbarkeit der Panelrahmen", { L"Vom Mod festgelegt", L"Von Windows festgelegt", L"Windows-Akzentfarbe", L"Aus" } };
+    if (lang == L"es") return { L"Bordes de las ventanas", L"Modo de borde", L"Color y visibilidad del contorno de los paneles", { L"Según el mod", L"Según Windows", L"Acento de Windows", L"Desactivados" } };
+    if (lang == L"pt") return { L"Bordas das janelas", L"Modo das bordas", L"Cor e visibilidade do contorno dos painéis", { L"Definido pelo mod", L"Definido pelo Windows", L"Destaque do Windows", L"Desativadas" } };
+    if (lang == L"it") return { L"Bordi delle finestre", L"Modalità dei bordi", L"Colore e visibilità del contorno dei riquadri", { L"Secondo la mod", L"Secondo Windows", L"Colore principale di Windows", L"Disattivati" } };
+    if (lang == L"ru") return { L"Рамки окон", L"Режим рамок", L"Цвет и видимость внешних контуров панелей", { L"Определено модом", L"Определено Windows", L"Акцентный Windows", L"Отключены" } };
+    if (lang == L"uk") return { L"Рамки вікон", L"Режим рамок", L"Колір і видимість зовнішніх контурів панелей", { L"Визначено модом", L"Визначено Windows", L"Акцент Windows", L"Вимкнено" } };
+    if (lang == L"pl") return { L"Obramowania okien", L"Tryb obramowania", L"Kolor i widoczność obramowań paneli", { L"Według moda", L"Według systemu Windows", L"Akcent systemu Windows", L"Wyłączone" } };
+    if (lang == L"nl") return { L"Vensterranden", L"Randmodus", L"Kleur en zichtbaarheid van paneelranden", { L"Volgens de mod", L"Volgens Windows", L"Windows-accentkleur", L"Uit" } };
+    if (lang == L"tr") return { L"Pencere Kenarlıkları", L"Kenarlık Modu", L"Panel kenarlıklarının rengi ve görünürlüğü", { L"Moda göre", L"Windows’a göre", L"Windows vurgu rengi", L"Kapalı" } };
+    if (lang == L"hi") return { L"विंडो की सीमाएँ", L"सीमा मोड", L"पैनल की बाहरी सीमाओं का रंग और दृश्यता", { L"मॉड के अनुसार", L"Windows के अनुसार", L"Windows का एक्सेंट रंग", L"बंद" } };
+    if (lang == L"ar") return { L"حدود النوافذ", L"وضع الحدود", L"لون وحدود ظهور الحواف الخارجية للوحات", { L"حسب التعديل", L"حسب Windows", L"لون تمييز Windows", L"معطلة" } };
+    return { L"Window Borders", L"Border Mode", L"Color and visibility of the panel outlines",
+             { L"Mod-defined", L"Windows-defined", L"Windows accent", L"Off" } };
+}
+
 struct CornerRadiusStrings {
     const wchar_t* outerTitle;
     const wchar_t* innerTitle;
@@ -14070,30 +14328,26 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g2, y2] = beginGroupCard(
                 ls.gCustomTitle,
                 ls.gCustomSub,
-                6, rH);
+                5, rH);
             drawColorRowInGroup(g2, y2, rH, 2201, 2202, L"\uE790",
                 ls.bgColTitle,
                 ls.bgColSub,
                 st->settings.customBgColor);
-            drawColorRowInGroup(g2, y2 + rH, rH, 2203, 2204, L"\uE91B",
-                ls.bdColTitle,
-                ls.bdColSub,
-                st->settings.customBorderColor);
             std::wstring crStr = (st->settings.customCornerRadius < 0)
                 ? ls.defBtn
                 : (std::to_wstring(st->settings.customCornerRadius) + L" px");
             const auto cornerStrings = GetCornerRadiusStrings(st->settings.language);
-            drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2210, 2211, 2212, L"\uE744",
+            drawStepperRowInGroup(g2, y2 + rH, rH, 2210, 2211, 2212, L"\uE744",
                 cornerStrings.outerTitle,
                 ls.radiusSub,
                 crStr);
             std::wstring innerRadius = st->settings.customInnerCornerRadius < 0
                 ? ls.autoLbl : std::to_wstring(st->settings.customInnerCornerRadius) + L" px";
-            drawStepperRowInGroup(g2, y2 + rH * 3, rH, 2213, 2214, 2215, L"\uE744",
+            drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2213, 2214, 2215, L"\uE744",
                 cornerStrings.innerTitle, cornerStrings.innerHint, innerRadius);
             {
                 // Custom Background Image / Animated GIF Picker
-                float rowTop = y2 + rH * 4;
+                float rowTop = y2 + rH * 3;
                 pRT->DrawLine(D2D1::Point2F(g2.left + 1.0f, rowTop), D2D1::Point2F(g2.right - 1.0f, rowTop), pBrDiv, 1.0f);
                 if (pFmtGlyph) pRT->DrawText(L"\uEB9F", 1, pFmtGlyph, D2D1::RectF(g2.left + S(26), rowTop, g2.left + S(56), rowTop + rH), pBrSub);
                 const wchar_t* bgTitle = ls.bgImgTitle;
@@ -14123,11 +14377,17 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             }
             {
                 int opPct = std::clamp(static_cast<int>(std::lround((st->settings.customBackgroundOpacity / 255.0) * 100.0)), 10, 100);
-                drawStepperRowInGroup(g2, y2 + rH * 5, rH, 2225, 2226, 2227, L"\uE706",
+                drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE706",
                     ls.bgOpTitle,
                     ls.bgOpSub,
                     std::to_wstring(opPct) + L"%");
             }
+            const auto borders = GetWindowBorderStrings(st->settings.language);
+            auto [borderGroup, borderY] = beginGroupCard(borders.groupTitle, borders.description, 2, rH);
+            drawDropdownRowInGroup(borderGroup, borderY, rH, 2230, L"\uE91B",
+                borders.modeTitle, L"", borders.labels[static_cast<int>(st->settings.windowBorderMode)]);
+            drawColorRowInGroup(borderGroup, borderY + rH, rH, 2203, 2204, L"\uE790",
+                ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
             float rH = S(60.0f);
@@ -14992,6 +15252,18 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     int nextOp = (id == 2227) ? 215 : std::clamp(st->settings.customBackgroundOpacity + (id == 2226 ? 25 : -25), 30, 255);
                     Wh_SetIntValue(GetUserOverrideKey(L"customBackgroundOpacity").c_str(), nextOp);
                     changed = true;
+                } else if (id == 2230) {
+                    const auto borders = GetWindowBorderStrings(st->settings.language);
+                    std::vector<std::pair<int, std::wstring>> options;
+                    for (int i = 0; i < static_cast<int>(kWindowBorderModeValues.size()); ++i) {
+                        options.emplace_back(i + 1, borders.labels[i]);
+                    }
+                    const int current = static_cast<int>(st->settings.windowBorderMode) + 1;
+                    const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
+                    if (selected >= 1 && selected <= static_cast<int>(kWindowBorderModeValues.size()) && selected != current) {
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"windowBorderMode").c_str(),
+                                                    kWindowBorderModeValues[selected - 1]);
+                    }
                 } else if (id == 2300) {
                     std::vector<std::pair<int, std::wstring>> opts = {
                         { 1, ls.autoLbl },
@@ -15960,6 +16232,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         ResolvedThemeVisuals themeVis = ResolveEffectiveThemeVisuals(state->settings, isLight);
                         float maxPillCorner = DpiScaleSF(themeVis.cornerRadiusDip, state);
                         const float backdropRadiusPx = state->settings.customCornerRadius >= 0 ? maxPillCorner : -1.0f;
+                        const bool glassEdgeHighlight = state->settings.windowBorderMode == WindowBorderMode::Mod;
                         float barCornerR   = (std::min)(maxPillCorner, (rcBarPill.bottom - rcBarPill.top) * 0.5f);
                         float adminCornerR = (adminH > 0)
                             ? (std::min)(maxPillCorner, (rcAdminPill.bottom - rcAdminPill.top) * 0.5f)
@@ -15999,7 +16272,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, glassPct, isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
-                                                           adminH, adminGapH, backdropRadiusPx);
+                                                           adminH, adminGapH, backdropRadiusPx, glassEdgeHighlight);
                         } else if (surface == SurfaceTheme::Blur) {
                             // Translucent, vibrant Windows 11 Acrylic Blur controlled by Background Opacity (30..255)
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
@@ -16009,7 +16282,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             DrawOpticalLiquidGlassBackdrop(pRT, hWnd, w, h, state->topAreaHeight, gapH,
                                                            effectiveDpi, -(1000 + blurOp), isLight, false, 0,
                                                            state->normalX, state->normalY, IsInputAboveLists(state),
-                                                           adminH, adminGapH, backdropRadiusPx);
+                                                           adminH, adminGapH, backdropRadiusPx, glassEdgeHighlight);
                         } else {
                             bool hasBgMedia = (state->bgMedia && !state->bgMedia->frames.empty());
                             D2D1_COLOR_F solidCol = themeVis.hasCustomBg
@@ -16672,12 +16945,15 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             }
                         }
 
-                        // 7. Draw Synchronized Border / Glass Rim on History Card, Admin Status Pill, and Pill Input Bar
-                        if (!highContrast) {
-                            auto drawSurfaceBorder = [&](const D2D1_RECT_F& rc, float cr, float thick) {
-                                if (themeVis.hasCustomBorder) {
+                        const auto preferredBorder = state->settings.windowBorderMode;
+                        const bool windowsAccent = preferredBorder == WindowBorderMode::Windows && WindowsUsesAccentBorder();
+                        const bool active = GetForegroundWindow() == hWnd;
+                        const auto borderMode = ResolveWindowBorderMode(preferredBorder, highContrast, windowsAccent, active);
+                        if (borderMode != WindowBorderMode::Off) {
+                            auto drawSurfaceBorder = [&](const D2D1_RECT_F& rc, float cr, float thick, const D2D1_COLOR_F* color) {
+                                if (color) {
                                     ID2D1SolidColorBrush* pBrRim = nullptr;
-                                    if (SUCCEEDED(pRT->CreateSolidColorBrush(themeVis.borderColor, &pBrRim)) && pBrRim) {
+                                    if (SUCCEEDED(pRT->CreateSolidColorBrush(*color, &pBrRim)) && pBrRim) {
                                         pRT->DrawRoundedRectangle(D2D1::RoundedRect(rc, cr, cr), pBrRim, DpiScaleSF(thick, state));
                                         pBrRim->Release();
                                     }
@@ -16685,19 +16961,23 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                     DrawD2DGlassRim(pRT, rc, cr, effectiveDpi, isLight, thick);
                                 }
                             };
-                            if (cardH > 0) {
-                                drawSurfaceBorder(rcHistCard, histCornerR, 1.25f);
+                            if (borderMode == WindowBorderMode::Mod) {
+                                const auto* custom = themeVis.hasCustomBorder ? &themeVis.borderColor : nullptr;
+                                const auto adminColor = D2D1::ColorF(1.00f, 0.65f, 0.14f, isLight ? 0.65f : 0.78f);
+                                if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.25f, custom);
+                                if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.15f, &adminColor);
+                                drawSurfaceBorder(rcBarPill, barCornerR, 1.25f, custom);
+                            } else {
+                                const COLORREF color = GetSysColor(highContrast ? COLOR_WINDOWTEXT
+                                    : (active ? COLOR_ACTIVEBORDER : COLOR_INACTIVEBORDER));
+                                const D2D1_COLOR_F outline = borderMode == WindowBorderMode::Accent
+                                    ? GetSystemAccentColorF()
+                                    : D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f,
+                                                   GetBValue(color) / 255.0f);
+                                if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.0f, &outline);
+                                if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.0f, &outline);
+                                drawSurfaceBorder(rcBarPill, barCornerR, 1.0f, &outline);
                             }
-                            if (adminH > 0) {
-                                ID2D1SolidColorBrush* pBrAdminRim = nullptr;
-                                if (SUCCEEDED(pRT->CreateSolidColorBrush(
-                                        D2D1::ColorF(1.00f, 0.65f, 0.14f, isLight ? 0.65f : 0.78f), &pBrAdminRim)) && pBrAdminRim) {
-                                    pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdminPill, adminCornerR, adminCornerR),
-                                                              pBrAdminRim, DpiScaleSF(1.15f, state));
-                                    pBrAdminRim->Release();
-                                }
-                            }
-                            drawSurfaceBorder(rcBarPill, barCornerR, 1.25f);
                         }
 
                         pRT->EndDraw();
@@ -16949,6 +17229,8 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         }
 
         case WM_SETTINGCHANGE:
+        case WM_SYSCOLORCHANGE:
+        case WM_DWMCOLORIZATIONCOLORCHANGED:
         case WM_THEMECHANGED: {
             if (state) {
                 ApplyWindowAppearance(hWnd, state);
@@ -17545,10 +17827,6 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     ctxItems.push_back(std::move(openLocItem));
                 }
                 if (canDeleteFromHistory) {
-                    FluentMenuItem sep;
-                    sep.isSeparator = true;
-                    ctxItems.push_back(std::move(sep));
-
                     FluentMenuItem delItem;
                     delItem.id    = 799;
                     delItem.label = ex.deleteHistoryItem;
