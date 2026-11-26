@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.7.0
+// @version         6.7.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 32
+// Build: 34
 
 // ==WindhawkModReadme==
 /*
@@ -16290,12 +16290,20 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
+void ShowModernRunSettingsWindow(HWND hWnd, int command) {
+    ShowWindow(hWnd, command);
+    if (!IsWindowVisible(hWnd)) {
+        // A tool process started hidden can inherit SW_HIDE for its first ShowWindow call.
+        SetWindowPos(hWnd, nullptr, 0, 0, 0, 0,
+                     SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    }
+}
+
 void ShowOrFocusWin11SettingsWindow() {
     if (g_unloading.load() || !g_win11SettingsClassRegistered) return;
     HWND hExisting = g_hWin11SettingsWnd.load();
     if (hExisting && IsWindow(hExisting)) {
-        if (IsIconic(hExisting)) ShowWindow(hExisting, SW_RESTORE);
-        ShowWindow(hExisting, SW_SHOW);
+        ShowModernRunSettingsWindow(hExisting, IsIconic(hExisting) ? SW_RESTORE : SW_SHOW);
         BringWindowToTop(hExisting);
         SetForegroundWindow(hExisting);
         return;
@@ -16336,11 +16344,12 @@ void ShowOrFocusWin11SettingsWindow() {
         posX, posY, winW, winH,
         nullptr, nullptr, GetModInstanceHandle(), st);
     if (!hWnd) {
+        Wh_Log(L"Could not create the Modern Run Settings window (err=%lu)", GetLastError());
         delete st;
         return;
     }
     g_hWin11SettingsWnd.store(hWnd);
-    ShowWindow(hWnd, SW_SHOWNORMAL);
+    ShowModernRunSettingsWindow(hWnd, SW_SHOWNORMAL);
     UpdateWindow(hWnd);
     BringWindowToTop(hWnd);
     SetForegroundWindow(hWnd);
@@ -16443,13 +16452,16 @@ void OpenModernSettingsApp(RunDialogState* state) {
     HWND hHost = FindWindowW(kSettingsHostClassName, nullptr);
     if (!hHost || !IsWindow(hHost) || g_msgOpenSettings == 0) {
         Wh_Log(L"Settings host not running");
-    } else {
-        DWORD hostPid = 0;
-        GetWindowThreadProcessId(hHost, &hostPid);
-        if (hostPid != 0) {
-            AllowSetForegroundWindow(hostPid);
-        }
-        PostMessageW(hHost, g_msgOpenSettings, 0, 0);
+        return;
+    }
+    DWORD hostPid = 0;
+    GetWindowThreadProcessId(hHost, &hostPid);
+    if (hostPid != 0) {
+        AllowSetForegroundWindow(hostPid);
+    }
+    if (!PostMessageW(hHost, g_msgOpenSettings, 0, 0)) {
+        Wh_Log(L"Could not open Modern Run Settings (err=%lu)", GetLastError());
+        return;
     }
 
     if (hRunToClose) {

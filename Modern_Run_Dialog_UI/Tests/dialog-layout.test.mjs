@@ -657,6 +657,45 @@ test('layered icon rendering preserves transparent and translucent pixels', () =
     `, true, ['-ld2d1', '-lwindowscodecs', '-lgdi32', '-luser32', '-lole32']);
 });
 
+test('the settings window is shown on the first request from a hidden tool process', () => {
+    const show = source.match(/void ShowModernRunSettingsWindow\([\s\S]*?\n\}/)?.[0];
+    assert.ok(show, 'Use the production settings-window presenter');
+    compileChecks(`
+        #include <windows.h>
+        #include <cassert>
+        #include <cwchar>
+        ${show}
+        int main(int argc, char**) {
+            if (argc > 1) {
+                HWND window = CreateWindowExW(WS_EX_TOOLWINDOW, L"STATIC", L"",
+                    WS_POPUP, -32000, -32000, 64, 64, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+                assert(window && !IsWindowVisible(window));
+                ShowModernRunSettingsWindow(window, SW_SHOWNORMAL);
+                assert(IsWindowVisible(window));
+                DestroyWindow(window);
+                return 0;
+            }
+            wchar_t executable[MAX_PATH]{};
+            assert(GetModuleFileNameW(nullptr, executable, MAX_PATH));
+            wchar_t command[MAX_PATH + 20]{};
+            swprintf_s(command, L"\\\"%ls\\\" --hidden", executable);
+            STARTUPINFOW startup{sizeof(startup)};
+            startup.dwFlags = STARTF_USESHOWWINDOW;
+            startup.wShowWindow = SW_HIDE;
+            PROCESS_INFORMATION child{};
+            assert(CreateProcessW(executable, command, nullptr, nullptr, FALSE, 0,
+                nullptr, nullptr, &startup, &child));
+            const auto wait = WaitForSingleObject(child.hProcess, 4000);
+            if (wait == WAIT_TIMEOUT) TerminateProcess(child.hProcess, 1);
+            DWORD status = 1;
+            assert(GetExitCodeProcess(child.hProcess, &status));
+            CloseHandle(child.hThread);
+            CloseHandle(child.hProcess);
+            assert(wait == WAIT_OBJECT_0 && status == 0);
+        }
+    `, true, ['-luser32']);
+});
+
 function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });
