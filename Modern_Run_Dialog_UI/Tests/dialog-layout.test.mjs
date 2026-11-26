@@ -100,7 +100,7 @@ test('history follows the Windows short date and short time formats', () => {
             assert(GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_SSHORTTIME, pattern, 128));
             assert(GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &past, pattern, time, 256));
             assert(GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &past, nullptr, date, 256, nullptr));
-            assert(FormatHistoryTimestamp(utc, L"Today") == std::wstring(time) + L" " + date);
+            assert(FormatHistoryTimestamp(utc, L"Today") == std::wstring(date) + L" " + time);
             GetSystemTimeAsFileTime(&utc);
             assert(FileTimeToSystemTime(&utc, &utcTime));
             assert(SystemTimeToTzSpecificLocalTimeEx(nullptr, &utcTime, &past));
@@ -150,6 +150,45 @@ test('vertical panel insets center controls with at most a one-pixel difference'
         static_assert(GetVerticalPanelInset(96, 46, false) == 25);
         static_assert(GetVerticalPanelInset(96, 46, true) == 25);
     `);
+});
+
+test('history with one row has the same height as the input panel across scales', () => {
+    const sizing = source.match(/int GetInputBarHeight\([\s\S]*?(?=\ninline bool HasActiveCustomBackground)/)?.[0];
+    assert.ok(sizing, 'The production layout calculations are present');
+    compileChecks(`
+        #include <algorithm>
+        #include <cassert>
+        using UINT = unsigned;
+        constexpr int kBaseInputBarHeight = 54;
+        constexpr int kBasePanelInset = 11;
+        constexpr int kBaseRowHighlightInset = 2;
+        struct RunDialogState {
+            struct { int customBarHeight; } settings;
+            UINT dpi;
+            int scale;
+        };
+        int MulDiv(int value, int numerator, int denominator) {
+            return (value * numerator + denominator / 2) / denominator;
+        }
+        int DpiScale(int value, UINT dpi, int scale = 100) {
+            return MulDiv(value, dpi * scale, 9600);
+        }
+        int DpiScaleS(int value, const RunDialogState* state) {
+            return DpiScale(value, state->dpi, state->scale);
+        }
+        ${sizing}
+        int main() {
+            const RunDialogState profiles[] = {
+                {{0}, 96, 100}, {{0}, 96, 85}, {{0}, 144, 120},
+                {{36}, 120, 100}, {{70}, 96, 100}, {{96}, 192, 85}
+            };
+            for (const auto& profile : profiles) {
+                const auto* state = &profile;
+                const auto historyHeight = GetListPadding(state) + GetRowHeight(state) + GetListPadding(state, true);
+                assert(historyHeight == GetInputBarHeight(state));
+            }
+        }
+    `, true);
 });
 
 function compileChecks(checks, run = false) {

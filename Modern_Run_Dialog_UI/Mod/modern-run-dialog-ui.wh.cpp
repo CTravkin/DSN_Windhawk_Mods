@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.4.2
+// @version         6.4.4
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 19
+// Build: 21
 
 // ==WindhawkModReadme==
 /*
@@ -1319,7 +1319,7 @@ enum ToggleAction : WPARAM {
 // Base dimensions at 96 DPI
 constexpr int kBaseDlgWidth = 636;
 constexpr int kBaseCompactDlgWidth  = 360;
-constexpr int kBaseRowHeight        = 38;
+constexpr int kLegacyRowHeight      = 38;
 constexpr int kBasePanelInset       = 11;
 constexpr int kBaseRowHighlightInset = 2;
 constexpr int kBaseScrollbarReserve = 12;
@@ -5287,7 +5287,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     int heightOverride = Wh_GetIntValue(GetUserOverrideKey(L"customBarHeight").c_str(), -1);
     int rawHeight = (heightOverride >= 0) ? heightOverride : heightSetting;
     if (rawHeight >= 150) {
-        rawHeight = MulDiv(rawHeight, kBaseInputBarHeight, kBaseInputBarHeight + 5 * kBaseRowHeight + kLegacyListPadding);
+        rawHeight = MulDiv(rawHeight, kBaseInputBarHeight, kBaseInputBarHeight + 5 * kLegacyRowHeight + kLegacyListPadding);
     }
     newSettings.customBarHeight = (rawHeight > 0) ? std::clamp(rawHeight, 36, 96) : 0;
 
@@ -6944,15 +6944,6 @@ int GetInputBarHeight(const RunDialogState* state) {
     return DpiScaleS(kBaseInputBarHeight, state);
 }
 
-int GetRowHeight(const RunDialogState* state) {
-    if (state && state->settings.customBarHeight > 0) {
-        int barDip = std::clamp(state->settings.customBarHeight, 36, 96);
-        int rowDip = std::clamp(MulDiv(kBaseRowHeight, barDip, kBaseInputBarHeight), 26, 72);
-        return DpiScale(rowDip, state->dpi, 100);
-    }
-    return DpiScaleS(kBaseRowHeight, state);
-}
-
 int GetActionButtonHeight(const RunDialogState* state, int barHeight) {
     if (state && state->settings.customBarHeight > 0) {
         UINT dpi = state->dpi;
@@ -6970,6 +6961,10 @@ int GetListPadding(const RunDialogState* state, bool bottom = false) {
     const int inset = GetVerticalPanelInset(barHeight, GetActionButtonHeight(state, barHeight), bottom);
     // The highlight itself is inset within each row to leave space between rows.
     return (std::max)(0, inset - DpiScaleS(kBaseRowHighlightInset, state));
+}
+
+int GetRowHeight(const RunDialogState* state) {
+    return GetInputBarHeight(state) - GetListPadding(state) - GetListPadding(state, true);
 }
 
 inline bool HasActiveCustomBackground(const RunDialogState*) {
@@ -8072,7 +8067,7 @@ std::wstring FormatHistoryTimestamp(const FILETIME& ftUtc, const wchar_t* todayP
         swprintf_s(date, L"%04u-%02u-%02u", static_cast<unsigned>(local.wYear),
                    static_cast<unsigned>(local.wMonth), static_cast<unsigned>(local.wDay));
     }
-    return std::wstring(time) + L" " + date;
+    return std::wstring(date) + L" " + time;
 }
 
 std::wstring LookupOrInitTimestamp(const std::wstring& cmd,
@@ -11175,7 +11170,7 @@ void ApplyInlineMenuFieldValue(FluentMenuSession* s, int kind, int val) {
     } else if (kind == 2) {
         if (val >= 150) {
             val = MulDiv(val, kBaseInputBarHeight,
-                         kBaseInputBarHeight + 5 * kBaseRowHeight + kLegacyListPadding);
+                         kBaseInputBarHeight + 5 * kLegacyRowHeight + kLegacyListPadding);
         }
         val = std::clamp(val, 36, 96);
         Wh_SetIntValue(GetUserOverrideKey(L"customBarHeight").c_str(), val);
@@ -16667,7 +16662,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                             textY = centerY - (adminH + ink.bottom - ink.top) * 0.5f;
                                         }
                                         pRT->DrawTextLayout(D2D1::Point2F(groupStartX + iconSlotW, textY),
-                                                            pFinalLayout, pBrAmberBanner, D2D1_DRAW_TEXT_OPTIONS_CLIP);
+                                                            pFinalLayout, pBrAmberBanner,
+                                                            D2D1_DRAW_TEXT_OPTIONS_CLIP | D2D1_DRAW_TEXT_OPTIONS_NO_SNAP);
                                         pFinalLayout->Release();
                                     }
                                     pFmtAdmin->Release();
