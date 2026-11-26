@@ -84,6 +84,14 @@ test('both menu styles use the separately selected icon set', () => {
     assert.match(source, /GetUserOverrideKey\(L"iconSet"\)/);
 });
 
+test('the settings window uses Fluent glyphs for either icon set', () => {
+    const painter = source.match(/void PaintWin11SettingsWindow\([\s\S]*?(?=\nstruct WinUI3ComboFlyoutSession)/)?.[0];
+    assert.ok(painter);
+    assert.match(painter, /CreateTextFormat\(GetWindowsIconFontFamily\(\)/);
+    assert.match(painter, /drawSettingsGlyph\(L"\\uE756", rBadge, pBrAccent\)/);
+    assert.doesNotMatch(painter, /FindModSettingsIcon|DrawRunUiIcon|DrawLayeredRunIcon/);
+});
+
 test('layout settings keep position and menu style directly below their related controls', () => {
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');

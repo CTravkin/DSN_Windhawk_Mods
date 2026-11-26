@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.8.1
+// @version         6.8.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 38
+// Build: 39
 
 // ==WindhawkModReadme==
 /*
@@ -11722,7 +11722,6 @@ enum class FluentMenuIcon {
     Settings,
     Pin,
     ChevronRight,
-    ChevronDown,
     Check
 };
 
@@ -11746,16 +11745,6 @@ void DrawD2DMenuCheckmark(Target* pRT, ID2D1Brush* pBrush, ID2D1StrokeStyle* pSt
     D2D1_POINT_2F p3 = D2D1::Point2F(cx + DpiScaleF(4.6f, dpi), cy - DpiScaleF(3.1f, dpi));
     pRT->DrawLine(p1, p2, pBrush, sw, pStroke);
     pRT->DrawLine(p2, p3, pBrush, sw, pStroke);
-}
-
-template <typename Target>
-void DrawD2DMenuChevronDown(Target* target, ID2D1Brush* brush, ID2D1StrokeStyle* stroke,
-                            float cx, float cy, UINT dpi) {
-    const float w = DpiScaleF(3.4f, dpi);
-    const float h = DpiScaleF(1.8f, dpi);
-    const float line = DpiScaleF(1.3f, dpi);
-    target->DrawLine(D2D1::Point2F(cx - w, cy - h), D2D1::Point2F(cx, cy + h), brush, line, stroke);
-    target->DrawLine(D2D1::Point2F(cx, cy + h), D2D1::Point2F(cx + w, cy - h), brush, line, stroke);
 }
 
 // Renders a 3D Refractive Liquid Glass ToggleSwitch for boolean on/off feature rows (e.g. Compact Mode & Command History)
@@ -11937,9 +11926,6 @@ void DrawD2DFluentMenuIcon(Target* pRT, ID2D1Brush* pBrush, ID2D1StrokeStyle* pS
         case FluentMenuIcon::ChevronRight:
             DrawD2DMenuChevronRight(pRT, pBrush, pStroke, cx, cy, dpi);
             break;
-        case FluentMenuIcon::ChevronDown:
-            DrawD2DMenuChevronDown(pRT, pBrush, pStroke, cx, cy, dpi);
-            break;
         case FluentMenuIcon::Check:
             DrawD2DMenuCheckmark(pRT, pBrush, pStroke, cx, cy, dpi);
             break;
@@ -12084,7 +12070,6 @@ constexpr const wchar_t* SystemMenuGlyph(FluentMenuIcon icon) {
         case FluentMenuIcon::Settings: return L"\uE713";
         case FluentMenuIcon::Pin: return L"\uE840";
         case FluentMenuIcon::ChevronRight: return L"\uE76C";
-        case FluentMenuIcon::ChevronDown: return L"\uE70D";
         case FluentMenuIcon::Check: return L"\uE73E";
         default: return L"";
     }
@@ -15175,31 +15160,6 @@ void DrawWin11NativeToggle(ID2D1RenderTarget* pRT, float rightX, float cy, UINT 
 
 bool EnsureGraphicsAndIconsInitialized();
 
-void DrawLayeredRunIcon(ID2D1RenderTarget* target, IWICImagingFactory* imaging, HICON icon,
-                        const D2D1_RECT_F& bounds);
-
-FluentMenuIcon FindModSettingsIcon(wchar_t glyph) {
-    switch (glyph) {
-        case L'\uE8A9':
-        case L'\uE790': return FluentMenuIcon::Surface;
-        case L'\uE706': return FluentMenuIcon::ColorMode;
-        case L'\uE740':
-        case L'\uE744': return FluentMenuIcon::Scale;
-        case L'\uEB9F': return FluentMenuIcon::Background;
-        case L'\uE718':
-        case L'\uE81C': return FluentMenuIcon::History;
-        case L'\uE774': return FluentMenuIcon::Language;
-        case L'\uE74D': return FluentMenuIcon::ClearTrash;
-        case L'\uE8B7': return FluentMenuIcon::FolderPick;
-        case L'\uE72E': return FluentMenuIcon::AdminShield;
-        case L'\uE751': return FluentMenuIcon::RunArrow;
-        case L'\uE711': return FluentMenuIcon::Close;
-        case L'\uE713': return FluentMenuIcon::Settings;
-        case L'\uE70D': return FluentMenuIcon::ChevronDown;
-        default: return FluentMenuIcon::None;
-    }
-}
-
 void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
     if (!hWnd) return;
     PAINTSTRUCT ps = {};
@@ -15297,20 +15257,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         if (pFmtCtl)   { pFmtCtl->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtCtl->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtRight) { pFmtRight->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING); pFmtRight->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtGlyph) { pFmtGlyph->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtGlyph->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
-        winrt::com_ptr<ID2D1StrokeStyle> iconStroke;
-        if (st->settings.iconSet == IconSet::Mod) {
-            g_pD2DFactory->CreateStrokeStyle(D2D1::StrokeStyleProperties(
-                D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_LINE_JOIN_ROUND),
-                nullptr, 0, iconStroke.put());
-        }
         auto drawSettingsGlyph = [&](const wchar_t* glyph, const D2D1_RECT_F& rect, ID2D1Brush* brush) {
-            const auto modIcon = FindModSettingsIcon(*glyph);
-            if (iconStroke && modIcon != FluentMenuIcon::None) {
-                DrawRunUiIcon(pRT, brush, iconStroke.get(), IconSet::Mod, modIcon,
-                              (rect.left + rect.right) * 0.5f, (rect.top + rect.bottom) * 0.5f, st->dpi, nullptr);
-            } else if (pFmtGlyph) {
-                DrawCenteredText(pRT, glyph, 1, pFmtGlyph, rect, brush);
-            }
+            DrawCenteredText(pRT, glyph, 1, pFmtGlyph, rect, brush);
         };
 
         st->hits.clear();
@@ -15348,15 +15296,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         {
             D2D1_RECT_F rBadge = D2D1::RectF(S(16), S(16), S(54), S(54));
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rBadge, S(19), S(19)), pBrChipSel);
-            winrt::com_ptr<IWICImagingFactory> imaging;
-            if (st->hAppIcon && SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory, nullptr,
-                    CLSCTX_INPROC_SERVER, IID_PPV_ARGS(imaging.put())))) {
-                const float x = (rBadge.left + rBadge.right - S(20)) * 0.5f;
-                const float y = (rBadge.top + rBadge.bottom - S(20)) * 0.5f;
-                DrawLayeredRunIcon(pRT, imaging.get(), st->hAppIcon, D2D1::RectF(x, y, x + S(20), y + S(20)));
-            } else {
-                drawSettingsGlyph(L"\uE756", rBadge, pBrAccent);
-            }
+            drawSettingsGlyph(L"\uE756", rBadge, pBrAccent);
             drawCardText(D2D1::RectF(S(64), rBadge.top, sideW - S(10), rBadge.bottom),
                          L"Modern Run", ls.version);
         }
@@ -15685,7 +15625,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [buttonGroup, rowY] = beginGroupCard(
                 actions.groupTitle, actions.groupDescription, kRunActionCount, rH);
             constexpr std::array<const wchar_t*, kRunActionCount> glyphs{
-                L"\uE8B7", L"\uE751", L"\uE711", L"\uE713"
+                L"\uE8B7", L"\uE768", L"\uE711", L"\uE713"
             };
             for (size_t i = 0; i < kRunActionCount; ++i) {
                 wchar_t title[128]{};
@@ -16328,19 +16268,9 @@ static bool ShowAddAliasDialog(HWND hOwner, bool isLight, bool isViUI, UINT dpi,
     return false;
 }
 
-void UpdateSettingsAppIcon(Win11SettingsState* state) {
-    if (HICON icon = LoadSelectedRunIcon(state->settings.iconSet, DpiScale(24, state->dpi))) {
-        SendMessageW(state->hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(icon));
-        SendMessageW(state->hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(icon));
-        if (state->hAppIcon) DestroyIcon(state->hAppIcon);
-        state->hAppIcon = icon;
-    }
-}
-
 LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     auto* st = reinterpret_cast<Win11SettingsState*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
     if (uMsg == g_msgToggle && g_msgToggle != 0 && wParam == kActionReloadSettings && st) {
-        const auto previousIconSet = st->settings.iconSet;
         LoadSettings(false);
         {
             std::lock_guard<std::mutex> lock(g_settingsMutex);
@@ -16348,7 +16278,6 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         }
         st->isLight = (st->settings.colorMode == ColorMode::Light) ? true
                     : ((st->settings.colorMode == ColorMode::Dark) ? false : IsSystemAppLightTheme());
-        if (st->settings.iconSet != previousIconSet) UpdateSettingsAppIcon(st);
         ApplyWin11SettingsWindowFrame(hWnd, st->isLight);
         InvalidateRect(hWnd, nullptr, FALSE);
         return 0;
@@ -16361,7 +16290,11 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             if (st) {
                 st->hWnd = hWnd;
                 ApplyWin11SettingsWindowFrame(hWnd, st->isLight);
-                UpdateSettingsAppIcon(st);
+                st->hAppIcon = LoadCustomRunIcon(DpiScale(24, st->dpi));
+                if (st->hAppIcon) {
+                    SendMessageW(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(st->hAppIcon));
+                    SendMessageW(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(st->hAppIcon));
+                }
             }
             return 0;
         }
@@ -16724,7 +16657,6 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 }
 
                 if (changed) {
-                    const auto previousIconSet = st->settings.iconSet;
                     LoadSettings(false);
                     {
                         std::lock_guard<std::mutex> lock(g_settingsMutex);
@@ -16732,7 +16664,6 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     }
                     st->isLight = (st->settings.colorMode == ColorMode::Light) ? true
                                 : ((st->settings.colorMode == ColorMode::Dark) ? false : IsSystemAppLightTheme());
-                    if (st->settings.iconSet != previousIconSet) UpdateSettingsAppIcon(st);
                     SetWindowTextW(hWnd, GetSettingsLocalizedStrings(st->settings.language).winTitle);
                     ApplyWin11SettingsWindowFrame(hWnd, st->isLight);
                     InvalidateRect(hWnd, nullptr, FALSE);
