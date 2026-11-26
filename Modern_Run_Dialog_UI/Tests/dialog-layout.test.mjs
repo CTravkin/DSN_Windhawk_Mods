@@ -72,6 +72,18 @@ test('the context menu retains its previous style by default', () => {
     assert.match(style, /\$description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши/);
 });
 
+test('both menu styles use the separately selected icon set', () => {
+    const schema = source.match(/  - colorMode:[\s\S]*?\n  - iconSet: mod([\s\S]*?)\n  - customBgColor:/)?.[1];
+    assert.ok(schema, 'The icon list follows Color Mode in Personalization');
+    assert.match(schema, /\$name:ru-RU: Иконки/);
+    assert.match(schema, /- mod: Иконки мода/);
+    assert.equal((schema.match(/\$options(?::[\w-]+)?:/g) ?? []).length, 21);
+    assert.match(source, /DrawRunUiIcon\(pRT, pItemIconBr, pRoundStroke, s->dlgState->settings\.iconSet/);
+    assert.match(source, /MakeWindowsMenuIcon\(request\.iconSet, item\.icon\)/);
+    assert.match(source, /id == kIconSetControl/);
+    assert.match(source, /GetUserOverrideKey\(L"iconSet"\)/);
+});
+
 test('layout settings keep position and menu style directly below their related controls', () => {
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
@@ -632,7 +644,7 @@ test('history actions keep delete in the same group', () => {
 });
 
 test('layered icon rendering preserves transparent and translucent pixels', () => {
-    const drawIcon = source.match(/void DrawLayeredRunIcon\([\s\S]*?\n\}/)?.[0];
+    const drawIcon = source.match(/void DrawLayeredRunIcon\([^;{]+\) \{[\s\S]*?\n\}/)?.[0];
     assert.ok(drawIcon, 'The Run dialog uses an alpha-aware icon renderer');
     compileChecks(`
         #include <windows.h>
