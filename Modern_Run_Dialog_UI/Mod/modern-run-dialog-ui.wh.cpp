@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.8.2
+// @version         6.8.4
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 39
+// Build: 41
 
 // ==WindhawkModReadme==
 /*
@@ -136,9 +136,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 /*
 - appearanceGroup:
   - themePreset: windows_blur
-    $name: Theme Preset
+    $description:ru-RU: "Цвета, фон и скругление углов"
+    $name:ru-RU: "Тема"
+    $name: "Theme"
     $name:vi-VN: Chủ đề giao diện (Theme Preset)
-    $description: Choose from 13 built-in visual themes (defaults to Windows 11 Blur for native readability; Liquid Glass, Mica, OLED, Nord, Catppuccin, Dracula, and Custom available).
+    $description: "Colors, background, and corner radius"
     $description:vi-VN: Chọn trong 13 chủ đề có sẵn (mặc định Windows 11 Blur dễ đọc, hài hòa; hỗ trợ Liquid Glass, Mica, OLED, Nord, Catppuccin, Dracula và Tự tùy chỉnh).
     $options:vi-VN:
     - windows_blur: Windows 11 Blur (Mặc định khuyên dùng)
@@ -169,9 +171,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - warm_paper: Warm Paper (Soft Light Ivory)
     - custom: Custom Colors & Corner Radius
   - colorMode: auto
-    $name: Color Mode (Light / Dark)
+    $description:ru-RU: "Оформление по настройкам Windows или выбранному режиму"
+    $name:ru-RU: "Цветовой режим"
+    $name: "Color Mode"
     $name:vi-VN: Chế độ màu Sáng / Tối
-    $description: Follow Windows’ Light/Dark mode and backdrop contrast automatically, or choose a fixed mode.
+    $description: "Appearance based on Windows settings or the selected mode"
     $description:vi-VN: Tự động theo giao diện Sáng/Tối của Windows và độ sáng nền, hoặc chọn cố định.
     $options:vi-VN:
     - auto: Tự động theo Windows
@@ -182,6 +186,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - dark: Dark Mode
     - light: Light Mode
   - iconSet: mod
+    $description:ru-RU: "Значки окна и контекстного меню"
+    $description: "Icons in the window and context menu"
     $name: Icons
     $options:
     - mod: Mod icons
@@ -267,9 +273,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - mod: أيقونات التعديل
     - windows_fluent: Windows (Fluent)
   - customBgColor: ""
-    $name: Custom Background Color (Hex, e.g. #1E1E24)
+    $description:ru-RU: "Собственный цвет вместо цвета из настройки «Тема»"
+    $name:ru-RU: "Цвет фона (Hex)"
+    $name: "Background Color (Hex)"
     $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
-    $description: Optional hex color (#RRGGBB) to override the Run dialog background color. Leave empty to follow the selected Theme Preset.
+    $description: "Overrides the background color from Theme"
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu nền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - customCornerRadius: -1
     $name: Outer Corner Radius
@@ -339,14 +347,18 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:ar-SA: نصف قطر الزوايا الداخلية
     $description:ar-SA: استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل (-1 = تلقائي, 0–28 px)
   - customBackgroundPath: ""
-    $name: Custom Background Image / Animated GIF
+    $description:ru-RU: "PNG, JPG, BMP, WebP или GIF до 25 МБ"
+    $name:ru-RU: "Фоновое изображение"
+    $name: "Background Image"
     $name:vi-VN: Hình nền / Ảnh động tùy chỉnh (PNG, JPG, GIF, WebP)
-    $description: Optional file path to a static image or animated GIF used as the Run dialog background.
+    $description: "PNG, JPG, BMP, WebP, or GIF up to 25 MB"
     $description:vi-VN: Đường dẫn tệp ảnh tĩnh hoặc ảnh động GIF làm nền cho hộp thoại Run.
   - customBackgroundOpacity: 215
-    $name: Background Opacity (30-255)
+    $description:ru-RU: "При отсутствии изображения регулирует непрозрачность фона окна"
+    $name:ru-RU: "Видимость фонового изображения"
+    $name: "Background Image Opacity"
     $name:vi-VN: Độ đậm nền hộp thoại & hình nền (30-255)
-    $description: Adjusts dialog surface opacity (Windows 11 Blur, Liquid Glass, and Solid themes) as well as custom image/GIF opacity. Default is 215 (~85%).
+    $description: "Controls window background opacity when no image is set"
     $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 215 (~85%).
   - language: auto
     $name: Display Language
@@ -404,9 +416,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - windowBordersGroup:
   - customBorderColor: ""
-    $name: Custom Border Color (Hex, e.g. #4C566A)
+    $description:ru-RU: "Собственный цвет для рамок в режиме «Определено модом»"
+    $name:ru-RU: "Цвет рамок (Hex)"
+    $name: "Border Color (Hex)"
     $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
-    $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
+    $description: "Color for borders in the Defined by the mod mode"
     $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - windowBorderMode: mod
     $name: Border Mode
@@ -731,10 +745,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - top_right: Top Right
     - center: Screen Center (Spotlight)
   - rememberPosition: false
+    $description:ru-RU: "Открывается в последней позиции. Ctrl + 0 сбрасывает ее"
     $name: Remember Last Window Position
     $name:vi-VN: Nhớ vị trí cửa sổ lần cuối
-    $name:ru-RU: Запоминать позицию окна
-    $description: Remember where you dragged the Run pill and open new Win + R dialogs at that saved position.
+    $name:ru-RU: "Запоминать позицию окна"
+    $description: "Opens at the last position. Ctrl + 0 resets it"
     $description:vi-VN: Ghi nhớ vị trí bạn đã kéo thả hộp thoại Run và tự động mở lại ở đúng vị trí đó cho các lần Win + R tiếp theo.
   - minimalMode: "0"
     $name: Dialog Layout
@@ -971,13 +986,13 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - windows_fluent: Windows (Fluent)
   - dialogWidthPreset: layout
     $name: "Window width"
-    $description: "Set the width of the Run window"
+    $description: "The window expands to fit its controls"
     $options:
     - layout: "Layout default"
     - narrow: "Narrower"
     - wide: "Wider"
     $name:ru-RU: "Ширина окна"
-    $description:ru-RU: "Задает ширину окна «Выполнить»"
+    $description:ru-RU: "Окно расширяется, если элементам управления не хватает места"
     $options:ru-RU:
     - layout: "Определено макетом"
     - narrow: "Уже"
@@ -1097,9 +1112,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - narrow: "أضيق"
     - wide: "أعرض"
   - uiScalePercent: "100"
+    $description:ru-RU: "Размер текста и элементов интерфейса"
+    $name:ru-RU: "Масштаб интерфейса"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
-    $description: Adjust the overall size of the Run dialog (85% Compact, 100% Default, 110% Medium, 120% Large).
+    $description: "Size of text and interface elements"
     $description:vi-VN: Điều chỉnh tỷ lệ kích thước tổng thể của hộp thoại Run (85% Nhỏ gọn, 100% Mặc định, 110% Vừa, 120% Lớn).
     $options:vi-VN:
     - "85": 85% – Nhỏ gọn (Compact)
@@ -1134,6 +1151,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - actionButtonsGroup:
   - hideBrowse: false
+    $description:ru-RU: "Ctrl + O"
+    $description: "Ctrl + O"
     $name: Hide the Browse button
     $name:vi-VN: Ẩn nút Duyệt
     $name:th-TH: ซ่อนปุ่ม เรียกดู
@@ -1156,6 +1175,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:hi-IN: ब्राउज़ करें बटन छिपाएँ
     $name:ar: إخفاء زر استعراض
   - hideRun: false
+    $description:ru-RU: "Enter"
+    $description: "Enter"
     $name: Hide the Run button
     $name:vi-VN: Ẩn nút Chạy
     $name:th-TH: ซ่อนปุ่ม เรียกใช้
@@ -1178,6 +1199,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:hi-IN: चलाएँ बटन छिपाएँ
     $name:ar: إخفاء زر تشغيل
   - hideClose: false
+    $description:ru-RU: "Esc"
+    $description: "Esc"
     $name: Hide the Close button
     $name:vi-VN: Ẩn nút Đóng
     $name:th-TH: ซ่อนปุ่ม ปิด
@@ -1200,6 +1223,8 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:hi-IN: बंद करें बटन छिपाएँ
     $name:ar: إخفاء زر إغلاق
   - hideSettings: false
+    $description:ru-RU: "Ctrl + ,"
+    $description: "Ctrl + ,"
     $name: Hide the Settings button
     $name:vi-VN: Ẩn nút Cài đặt
     $name:th-TH: ซ่อนปุ่ม การตั้งค่า
@@ -1266,34 +1291,46 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - historyBehaviorGroup:
   - maxHistoryItems: 20
-    $name: Max Stored History Items (0 = Off, or 1–20)
+    $description:ru-RU: "Максимум недавних команд в истории. Ноль скрывает список"
+    $name:ru-RU: "Лимит истории"
+    $name: "History Limit"
     $name:vi-VN: Số mục lịch sử lưu tối đa (0 = Tắt lịch sử, hoặc 1–20)
-    $description: Maximum number of recent commands or suggestions stored and scrollable in the list (0–20, default 20 for lighter memory).
+    $description: "Maximum number of recent commands in history. Zero hides the list"
     $description:vi-VN: Số lượng lệnh lịch sử hoặc gợi ý tối đa được lưu (0–20, mặc định 20 mục giúp nhẹ bộ nhớ).
   - visibleHistoryRows: 5
-    $name: Visible Rows Before Scrolling (3–10)
+    $description:ru-RU: "Количество строк истории без прокрутки"
+    $name:ru-RU: "Строки истории на экране"
+    $name: "Visible History Rows"
     $name:vi-VN: Số dòng lịch sử hiển thị cùng lúc trước khi cuộn (3–10)
-    $description: Maximum number of rows visible at once before showing the scrollbar (default 5 rows).
+    $description: "Number of rows visible without scrolling"
     $description:vi-VN: Số dòng hiển thị tối đa cùng lúc trước khi hiện thanh cuộn (mặc định 5 dòng).
   - showTimestamp: true
-    $name: Show Execution Timestamp on History Rows
+    $description:ru-RU: "Дата и время рядом с ранее запущенными командами"
+    $name:ru-RU: "Показывать дату и время запуска"
+    $name: "Show Command Timestamps"
     $name:vi-VN: Hiển thị thời gian thực thi ở mỗi dòng lịch sử
-    $description: Display the execution timestamp and clock icon on each history row.
+    $description: "Date and time beside each previously run command"
     $description:vi-VN: Hiển thị thời gian chạy lệnh gần nhất và biểu tượng đồng hồ ở mỗi dòng lịch sử.
   - clearInitialInput: false
-    $name: Clear Input Box on Open
+    $description:ru-RU: "При открытии поле ввода пустое"
+    $name:ru-RU: "Очищать поле при открытии"
+    $name: "Clear Input on Open"
     $name:vi-VN: Để trống ô nhập khi mới mở
-    $description: Show placeholder text on open instead of pre-filling the last executed command.
+    $description: "The input field is empty on open"
     $description:vi-VN: Để trống ô nhập (hiển thị dòng gợi ý) khi mới mở thay vì điền sẵn lệnh cũ.
   - clearStoredHistory: false
-    $name: Clear Stored History Now
+    $description:ru-RU: "При сохранении скрывает недавние команды из истории мода"
+    $name:ru-RU: "Очистка истории"
+    $name: "Clear History"
     $name:vi-VN: Xóa toàn bộ lịch sử đã lưu
-    $description: Turn on and save to clear stored history, or click "Clear History" in the Gear menu.
+    $description: "Hides recent commands from the mod history when saved"
     $description:vi-VN: Bật và bấm Lưu để xóa lịch sử đã lưu, hoặc bấm trực tiếp trong menu Bánh răng.
   - taskbarClickAction: minimize
+    $description:ru-RU: "Клик по значку сворачивает или закрывает открытое окно"
+    $name:ru-RU: "Действие при клике по значку на панели задач"
     $name: Taskbar Icon Click Action
     $name:vi-VN: Hành vi khi bấm biểu tượng Run trên Taskbar
-    $description: Action when clicking the Run icon on the Taskbar while open — minimize/restore or close.
+    $description: "Action when clicking the taskbar icon while the window is open"
     $description:vi-VN: Hành động khi bấm vào biểu tượng Run dưới Taskbar lúc cửa sổ đang mở.
     $options:vi-VN:
     - minimize: Ẩn & Mở lại cửa sổ Run
@@ -1302,54 +1339,58 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - minimize: Minimize – Restore
     - close: Close Window
   - closeOnClickOutside: false
+    $description:ru-RU: "Клик за пределами окна закрывает его"
+    $name:ru-RU: "Закрывать при клике вне окна"
     $name: Close on Click Outside
     $name:vi-VN: Tự động đóng khi bấm ra ngoài cửa sổ
-    $description: Automatically close the Run dialog when clicking outside the window.
+    $description: "A click outside the window dismisses it"
     $description:vi-VN: Tự động đóng hộp thoại Run khi click chuột ra ngoài cửa sổ.
   - runAsAdmin: false
     $name: "Elevate by default"
-    $description: "Ctrl+Shift+Enter switches privileges for the current command"
+    $description: "Ctrl + Shift + Enter switches privileges for the current command"
     $name:ru-RU: "Повышать права по умолчанию"
-    $description:ru-RU: "Ctrl+Shift+Enter меняет права для текущей команды"
+    $description:ru-RU: "Ctrl + Shift + Enter меняет права для текущей команды"
     $name:vi-VN: "Nâng quyền theo mặc định"
-    $description:vi-VN: "Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại"
+    $description:vi-VN: "Ctrl + Shift + Enter đổi quyền cho lệnh hiện tại"
     $name:th-TH: "ยกระดับสิทธิ์ตามค่าเริ่มต้น"
-    $description:th-TH: "Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน"
+    $description:th-TH: "Ctrl + Shift + Enter สลับสิทธิ์ของคำสั่งปัจจุบัน"
     $name:id-ID: "Tingkatkan hak akses secara default"
-    $description:id-ID: "Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini"
+    $description:id-ID: "Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini"
     $name:ms-MY: "Tingkatkan keistimewaan secara lalai"
-    $description:ms-MY: "Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa"
+    $description:ms-MY: "Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa"
     $name:ja-JP: "既定で管理者権限で実行"
-    $description:ja-JP: "Ctrl+Shift+Enter で現在のコマンドの権限を切り替え"
+    $description:ja-JP: "Ctrl + Shift + Enter で現在のコマンドの権限を切り替え"
     $name:zh-CN: "默认提升权限"
-    $description:zh-CN: "Ctrl+Shift+Enter 切换当前命令的权限"
+    $description:zh-CN: "Ctrl + Shift + Enter 切换当前命令的权限"
     $name:zh-TW: "預設提高權限"
-    $description:zh-TW: "Ctrl+Shift+Enter 切換目前命令的權限"
+    $description:zh-TW: "Ctrl + Shift + Enter 切換目前命令的權限"
     $name:ko-KR: "기본적으로 권한 상승"
-    $description:ko-KR: "Ctrl+Shift+Enter로 현재 명령의 권한을 전환"
+    $description:ko-KR: "Ctrl + Shift + Enter로 현재 명령의 권한을 전환"
     $name:fr-FR: "Élever les privilèges par défaut"
-    $description:fr-FR: "Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle"
+    $description:fr-FR: "Ctrl + Maj + Entrée inverse les privilèges de la commande actuelle"
     $name:de-DE: "Standardmäßig mit erhöhten Rechten"
-    $description:de-DE: "Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl"
+    $description:de-DE: "Strg + Umschalt + Eingabe wechselt die Rechte für den aktuellen Befehl"
     $name:es-ES: "Elevar los permisos de forma predeterminada"
-    $description:es-ES: "Ctrl+Mayús+Entrar cambia los permisos del comando actual"
+    $description:es-ES: "Ctrl + Mayús + Entrar cambia los permisos del comando actual"
     $name:pt-BR: "Elevar privilégios por padrão"
-    $description:pt-BR: "Ctrl+Shift+Enter alterna os privilégios do comando atual"
+    $description:pt-BR: "Ctrl + Shift + Enter alterna os privilégios do comando atual"
     $name:it-IT: "Eleva i privilegi per impostazione predefinita"
-    $description:it-IT: "Ctrl+Maiusc+Invio cambia i privilegi del comando corrente"
+    $description:it-IT: "Ctrl + Maiusc + Invio cambia i privilegi del comando corrente"
     $name:uk-UA: "Підвищувати права за замовчуванням"
-    $description:uk-UA: "Ctrl+Shift+Enter змінює права для поточної команди"
+    $description:uk-UA: "Ctrl + Shift + Enter змінює права для поточної команди"
     $name:pl-PL: "Domyślnie podnoś uprawnienia"
-    $description:pl-PL: "Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia"
+    $description:pl-PL: "Ctrl + Shift + Enter przełącza uprawnienia bieżącego polecenia"
     $name:nl-NL: "Standaard met verhoogde rechten"
-    $description:nl-NL: "Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht"
+    $description:nl-NL: "Ctrl + Shift + Enter wisselt de rechten voor de huidige opdracht"
     $name:tr-TR: "Varsayılan olarak yetkileri yükselt"
-    $description:tr-TR: "Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir"
+    $description:tr-TR: "Ctrl + Shift + Enter geçerli komutun yetkilerini değiştirir"
     $name:hi-IN: "डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ"
-    $description:hi-IN: "Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है"
+    $description:hi-IN: "Ctrl + Shift + Enter मौजूदा कमांड के विशेषाधिकार बदलता है"
     $name:ar: "رفع الامتيازات افتراضيًا"
-    $description:ar: "يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي"
+    $description:ar: "يبدّل Ctrl + Shift + Enter امتيازات الأمر الحالي"
   - adminIndicator: panel
+    $description:ru-RU: "Показывает, что команда запустится с повышенными правами"
+    $description: "Shows elevated privileges for the current command"
     $name: "Indicator placement"
     $options:
     - panel: "Separate panel"
@@ -1435,48 +1476,48 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - panel: "لوحة منفصلة"
     - field: "مؤشر في حقل الإدخال"
   - shiftEnterSwitchesPrivileges: false
-    $name: "Switch privileges with Shift+Enter"
-    $description: "When off, Shift+Enter runs the command in a terminal"
-    $name:ru-RU: "Менять права по Shift+Enter"
-    $description:ru-RU: "Если выключено, Shift+Enter запускает команду в терминале"
-    $name:vi-VN: "Đổi quyền bằng Shift+Enter"
-    $description:vi-VN: "Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"
-    $name:th-TH: "สลับสิทธิ์ด้วย Shift+Enter"
-    $description:th-TH: "เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"
-    $name:id-ID: "Ganti hak akses dengan Shift+Enter"
-    $description:id-ID: "Jika nonaktif, Shift+Enter menjalankan perintah di terminal"
-    $name:ms-MY: "Tukar keistimewaan dengan Shift+Enter"
-    $description:ms-MY: "Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"
-    $name:ja-JP: "Shift+Enter で権限を切り替え"
-    $description:ja-JP: "オフの場合、Shift+Enter でターミナル内でコマンドを実行"
-    $name:zh-CN: "用 Shift+Enter 切换权限"
-    $description:zh-CN: "关闭后，Shift+Enter 在终端中运行命令"
-    $name:zh-TW: "用 Shift+Enter 切換權限"
-    $description:zh-TW: "關閉時，Shift+Enter 會在終端機中執行命令"
-    $name:ko-KR: "Shift+Enter로 권한 전환"
-    $description:ko-KR: "끄면 Shift+Enter로 터미널에서 명령을 실행"
-    $name:fr-FR: "Changer les privilèges avec Maj+Entrée"
-    $description:fr-FR: "Si désactivé, Maj+Entrée lance la commande dans un terminal"
-    $name:de-DE: "Rechte mit Umschalt+Eingabe wechseln"
-    $description:de-DE: "Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"
-    $name:es-ES: "Cambiar permisos con Mayús+Entrar"
-    $description:es-ES: "Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"
-    $name:pt-BR: "Alternar privilégios com Shift+Enter"
-    $description:pt-BR: "Desativado, Shift+Enter executa o comando em um terminal"
-    $name:it-IT: "Cambia privilegi con Maiusc+Invio"
-    $description:it-IT: "Se disattivato, Maiusc+Invio esegue il comando in un terminale"
-    $name:uk-UA: "Змінювати права через Shift+Enter"
-    $description:uk-UA: "Якщо вимкнено, Shift+Enter запускає команду в терміналі"
-    $name:pl-PL: "Przełączaj uprawnienia klawiszami Shift+Enter"
-    $description:pl-PL: "Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"
-    $name:nl-NL: "Rechten wisselen met Shift+Enter"
-    $description:nl-NL: "Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"
-    $name:tr-TR: "Shift+Enter ile yetkileri değiştir"
-    $description:tr-TR: "Kapalıyken Shift+Enter komutu terminalde çalıştırır"
-    $name:hi-IN: "Shift+Enter से विशेषाधिकार बदलें"
-    $description:hi-IN: "बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"
-    $name:ar: "تبديل الامتيازات باستخدام Shift+Enter"
-    $description:ar: "عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"
+    $name: "Switch privileges with Shift + Enter"
+    $description: "Uses the same privilege switch as Ctrl + Shift + Enter"
+    $name:ru-RU: "Менять права по Shift + Enter"
+    $description:ru-RU: "Меняет права так же, как Ctrl + Shift + Enter"
+    $name:vi-VN: "Đổi quyền bằng Shift + Enter"
+    $description:vi-VN: "Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"
+    $name:th-TH: "สลับสิทธิ์ด้วย Shift + Enter"
+    $description:th-TH: "เมื่อปิด Shift + Enter จะเรียกใช้คำสั่งในเทอร์มินัล"
+    $name:id-ID: "Ganti hak akses dengan Shift + Enter"
+    $description:id-ID: "Jika nonaktif, Shift + Enter menjalankan perintah di terminal"
+    $name:ms-MY: "Tukar keistimewaan dengan Shift + Enter"
+    $description:ms-MY: "Apabila dimatikan, Shift + Enter menjalankan arahan dalam terminal"
+    $name:ja-JP: "Shift + Enter で権限を切り替え"
+    $description:ja-JP: "オフの場合、Shift + Enter でターミナル内でコマンドを実行"
+    $name:zh-CN: "用 Shift + Enter 切换权限"
+    $description:zh-CN: "关闭后，Shift + Enter 在终端中运行命令"
+    $name:zh-TW: "用 Shift + Enter 切換權限"
+    $description:zh-TW: "關閉時，Shift + Enter 會在終端機中執行命令"
+    $name:ko-KR: "Shift + Enter로 권한 전환"
+    $description:ko-KR: "끄면 Shift + Enter로 터미널에서 명령을 실행"
+    $name:fr-FR: "Changer les privilèges avec Maj + Entrée"
+    $description:fr-FR: "Si désactivé, Maj + Entrée lance la commande dans un terminal"
+    $name:de-DE: "Rechte mit Umschalt + Eingabe wechseln"
+    $description:de-DE: "Wenn deaktiviert, führt Umschalt + Eingabe den Befehl in einem Terminal aus"
+    $name:es-ES: "Cambiar permisos con Mayús + Entrar"
+    $description:es-ES: "Si se desactiva, Mayús + Entrar ejecuta el comando en un terminal"
+    $name:pt-BR: "Alternar privilégios com Shift + Enter"
+    $description:pt-BR: "Desativado, Shift + Enter executa o comando em um terminal"
+    $name:it-IT: "Cambia privilegi con Maiusc + Invio"
+    $description:it-IT: "Se disattivato, Maiusc + Invio esegue il comando in un terminale"
+    $name:uk-UA: "Змінювати права через Shift + Enter"
+    $description:uk-UA: "Якщо вимкнено, Shift + Enter запускає команду в терміналі"
+    $name:pl-PL: "Przełączaj uprawnienia klawiszami Shift + Enter"
+    $description:pl-PL: "Po wyłączeniu Shift + Enter uruchamia polecenie w terminalu"
+    $name:nl-NL: "Rechten wisselen met Shift + Enter"
+    $description:nl-NL: "Uitgeschakeld voert Shift + Enter de opdracht uit in een terminal"
+    $name:tr-TR: "Shift + Enter ile yetkileri değiştir"
+    $description:tr-TR: "Kapalıyken Shift + Enter komutu terminalde çalıştırır"
+    $name:hi-IN: "Shift + Enter से विशेषाधिकार बदलें"
+    $description:hi-IN: "बंद होने पर Shift + Enter कमांड को टर्मिनल में चलाता है"
+    $name:ar: "تبديل الامتيازات باستخدام Shift + Enter"
+    $description:ar: "عند إيقاف الخيار، يشغّل Shift + Enter الأمر في الطرفية"
   $name: "3. Behavior"
   $name:ru-RU: "3. Поведение"
   $name:vi-VN: "3. Hành vi"
@@ -2083,6 +2124,7 @@ constexpr int kLegacyListPadding   = 20;
 constexpr int kBaseDetachedGap      = 12;
 constexpr int kBaseAdminBannerHeight = 32;
 constexpr int kBaseInputBarHeight   = 54;
+constexpr int kRunEmblemSize       = 24;
 constexpr int kSettingsControlHeight = 32;
 constexpr int kSettingsCardInset = 18;
 constexpr UINT_PTR kTimerCaret              = 9010;
@@ -7441,28 +7483,9 @@ HICON LoadCustomRunIcon(int sizePx) {
     return CreateCustomRunIconInMemory(sizePx);
 }
 
-std::wstring GetWindowsRunIconPath() {
-    wchar_t directory[MAX_PATH]{};
-    const auto length = GetSystemDirectoryW(directory, ARRAYSIZE(directory));
-    if (!length || length >= ARRAYSIZE(directory)) return {};
-    return std::wstring(directory, length) + L"\\shell32.dll";
-}
-
 constexpr int kWindowsRunIconIndex = 24;
 
-HICON LoadSelectedRunIcon(IconSet set, int size) {
-    if (set == IconSet::WindowsFluent) {
-        const auto path = GetWindowsRunIconPath();
-        HICON icon = nullptr;
-        if (!path.empty() &&
-            PrivateExtractIconsW(path.c_str(), kWindowsRunIconIndex, size, size, &icon, nullptr, 1, 0) == 1) {
-            return icon;
-        }
-    }
-    return LoadCustomRunIcon(size);
-}
-
-void ApplyWindowTaskbarIconIdentity(HWND hDlg, bool restoreDefault = false, IconSet set = IconSet::Mod) {
+void ApplyWindowTaskbarIconIdentity(HWND hDlg, bool restoreDefault = false) {
     if (!hDlg || !IsWindow(hDlg)) return;
 
     IPropertyStore* pps = nullptr;
@@ -7489,10 +7512,7 @@ void ApplyWindowTaskbarIconIdentity(HWND hDlg, bool restoreDefault = false, Icon
     }
 
     std::wstring iconRes;
-    if (set == IconSet::WindowsFluent) {
-        const auto path = GetWindowsRunIconPath();
-        if (!path.empty()) iconRes = path + L"," + std::to_wstring(kWindowsRunIconIndex);
-    } else {
+    {
         std::lock_guard<std::mutex> lock(g_runIconMutex);
         if (!g_cachedRunIcoPath.empty()) iconRes = g_cachedRunIcoPath + L",0";
     }
@@ -7598,7 +7618,6 @@ struct RunDialogState {
 
     HFONT hFontEditCtl = nullptr;
     HICON hRunIcon = nullptr;
-    IconSet loadedIconSet = IconSet::Mod;
     int runIconLoadedSize = 0;
     int taskbarIconLoadedDpi = 0;
     HICON hTaskbarIconSmall = nullptr;
@@ -7780,7 +7799,7 @@ bool ShouldMinimizeOnTaskbarClick(HWND hWnd, ULONGLONG now) {
 // std::thread::~thread() (which calls std::terminate() if joinable) when Explorer
 // exits while the Run dialog is still open and Wh_ModUninit is skipped.
 void StartKeyHookThread() {
-    // Handled natively via Explorer's Win+R hotkey routing into ShowWindow_Hook / SetForegroundWindow_Hook.
+    // Handled natively via Explorer's Win + R hotkey routing into ShowWindow_Hook / SetForegroundWindow_Hook.
 }
 
 void StopKeyHookThread() {
@@ -9999,7 +10018,7 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
         }
     }
 
-    // Shift+Enter: Run command inside Windows Terminal (wt.exe) or CMD/PowerShell keeping window open for logs.
+    // Shift + Enter: Run command inside Windows Terminal (wt.exe) or CMD/PowerShell keeping window open for logs.
     // In elevated Task Manager when not requesting admin, delegate the composed command line to Task Manager's native Run box.
     if (action == RunEnterAction::Terminal) {
         const std::wstring& termTarget = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
@@ -10022,7 +10041,7 @@ void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& it
         }
     }
 
-    // When Run-as-Admin (or Ctrl+Shift+Enter) is active and not delegating to Task Manager's native checkbox,
+    // When Run-as-Admin (or Ctrl + Shift + Enter) is active and not delegating to Task Manager's native checkbox,
     // elevate directly via ShellExecuteExW("runas")
     if (wantAdmin && !hasNativeAdminCheckbox) {
         const std::wstring& elevTarget = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
@@ -12138,6 +12157,7 @@ struct FluentMenuPanelState {
     int maxVisibleRows = 14;
     int width = 260;
     int shortcutColumnWidth = 0;
+    bool hasIcons = false;
     int height = 100;
     POINT mousePt = { -1, -1 };
     bool hasMousePt = false;
@@ -12205,7 +12225,10 @@ constexpr UINT_PTR kTimerMenuSubHover = 9501;
 constexpr UINT_PTR kTimerMenuWatchdog = 9502;
 constexpr wchar_t kFluentMenuClassName[] = L"WindhawkModernRunFluentMenuWnd";
 constexpr int kMenuTextInset = 12;
-constexpr int kMenuIconColumn = 18;
+constexpr int kMenuIconSize = 16;
+constexpr int kMenuIconColumn = kMenuIconSize + 12;
+constexpr int kMenuGroupHeight = 3;
+constexpr int kWindowsMenuRowHeight = 32;
 constexpr int kMenuControlInset = 6;
 
 
@@ -12229,7 +12252,7 @@ int GetMenuRowHeight(const FluentMenuSession* s) {
 }
 
 int GetMenuSeparatorHeight(const FluentMenuSession* s) {
-    return DpiScale(9, s->effectiveDpi);
+    return DpiScale(kMenuGroupHeight, s->effectiveDpi);
 }
 
 int GetMenuPadY(const FluentMenuSession* s) {
@@ -12451,7 +12474,11 @@ void ComputeFluentPanelMetrics(FluentMenuSession* s, FluentMenuPanelState* p) {
     p->shortcutColumnWidth = std::any_of(p->items.begin(), p->items.end(), [](const FluentMenuItem& item) {
         return item.shortcut != nullptr;
     }) ? DpiScale(62, s->effectiveDpi) : 0;
-    p->width = DpiScale(kBasePanelInset + kMenuTextInset + kMenuIconColumn, s->effectiveDpi) + (int)std::ceil(maxTextW) +
+    p->hasIcons = std::any_of(p->items.begin(), p->items.end(), [](const FluentMenuItem& item) {
+        return item.icon != FluentMenuIcon::None;
+    });
+    const int labelIndent = kMenuTextInset + (p->hasIcons ? kMenuIconColumn : 0);
+    p->width = DpiScale(kBasePanelInset + labelIndent, s->effectiveDpi) + (int)std::ceil(maxTextW) +
                extraRight + p->shortcutColumnWidth;
     p->width = std::clamp(p->width, DpiScale(210, s->effectiveDpi), DpiScale(460, s->effectiveDpi));
 
@@ -12736,7 +12763,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_LINE_JOIN_ROUND);
                 g_pD2DFactory->CreateStrokeStyle(strokeProps, nullptr, 0, &pRoundStroke);
                 const auto iconFormat = s->dlgState->settings.iconSet == IconSet::WindowsFluent
-                    ? CreateUiIconFormat(DpiScaleF(16.0f, dpi)) : nullptr;
+                    ? CreateUiIconFormat(DpiScaleF(kMenuIconSize, dpi)) : nullptr;
 
                 IDWriteTextFormat* pFmtItem = nullptr;
                 g_pDWriteFactory->CreateTextFormat(
@@ -12760,6 +12787,10 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                 int endIdx = hasScroll
                     ? (std::min)((int)p->items.size(), startIdx + p->maxVisibleRows)
                     : (int)p->items.size();
+                const float textInset = DpiScaleF(kMenuTextInset, dpi);
+                const float contentLeft = padX + textInset;
+                const float iconCx = contentLeft + DpiScaleF(kMenuIconSize, dpi) * 0.5f;
+                const float labelLeft = contentLeft + (p->hasIcons ? DpiScaleF(kMenuIconColumn, dpi) : 0.0f);
 
                 for (int i = startIdx; i < endIdx; ++i) {
                     const auto& item = p->items[i];
@@ -12817,11 +12848,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     }
 
                     const float right = static_cast<float>(w) - padX - sbReserve;
-                    const float textInset = DpiScaleF(kMenuTextInset, dpi);
-                    const float textLeft = padX + textInset;
-                    const float iconTextLeft = textLeft + DpiScaleF(kMenuIconColumn, dpi);
                     const float shortcutWidth = static_cast<float>(p->shortcutColumnWidth);
-                    const float iconCx = textLeft;
                     float iconCy = curY + rowH * 0.5f;
                     ID2D1Brush* pItemTextBr = item.disabled ? pBrMuted : pBrText;
                     ID2D1Brush* pCheckedBr  = (item.id == 450 && pBrAmber) ? pBrAmber : pBrAccent;
@@ -12838,7 +12865,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
 
                         if (pFmtItem && pItemTextBr && !item.label.empty()) {
                             D2D1_RECT_F rcText = D2D1::RectF(
-                                iconTextLeft,
+                                labelLeft,
                                 curY,
                                 rcMinus.left - DpiScaleF(6.0f, dpi),
                                 curY + rowH);
@@ -12917,14 +12944,13 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         // Boolean on/off switches (Compact Mode = 350, Command History = 400, Run as Admin = 450) use a Toggle Switch;
                         // single-choice selection options in submenus/popups use a Checkmark (✓).
                         bool isToggleRow = (item.id == 350 || item.id == 355 || item.id == 400 || item.id == 450 || item.id == 460);
-                        const float leftTextX = item.icon == FluentMenuIcon::None ? textLeft : iconTextLeft;
                         float rightReserve = isToggleRow ? DpiScaleF(48.0f, dpi) : textInset;
                         if (item.shortcut) rightReserve += shortcutWidth + DpiScaleF(8.0f, dpi);
                         else if (!item.subItems.empty() || item.checked) rightReserve += DpiScaleF(10.0f, dpi);
 
                         if (pFmtItem && pItemTextBr && !item.label.empty()) {
                             D2D1_RECT_F rcText = D2D1::RectF(
-                                leftTextX,
+                                labelLeft,
                                 curY,
                                 right - rightReserve,
                                 curY + rowH);
@@ -13481,7 +13507,7 @@ WindowsMenu::Controls::IconElement MakeWindowsMenuIcon(IconSet set, FluentMenuIc
     if (set == IconSet::WindowsFluent) {
         WindowsMenu::Controls::FontIcon result;
         result.FontFamily(WindowsMenu::Media::FontFamily(GetWindowsIconFontFamily()));
-        result.FontSize(16);
+        result.FontSize(kMenuIconSize);
         result.Glyph(SystemMenuGlyph(icon));
         return result;
     }
@@ -13494,15 +13520,15 @@ WindowsMenu::Controls::IconElement MakeWindowsMenuIcon(IconSet set, FluentMenuIc
         D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_CAP_STYLE_ROUND, D2D1_LINE_JOIN_ROUND),
         nullptr, 0, stroke.put()));
     MenuIconGeometryTarget target{factory.get()};
-    DrawD2DFluentMenuIcon(&target, nullptr, stroke.get(), icon, 8.0f, 8.0f, 96);
+    DrawD2DFluentMenuIcon(&target, nullptr, stroke.get(), icon, kMenuIconSize * 0.5f, kMenuIconSize * 0.5f, 96);
     if (!target.outline) return nullptr;
     auto sink = winrt::make_self<MenuIconPathSink>();
     winrt::check_hresult(target.outline->Simplify(D2D1_GEOMETRY_SIMPLIFICATION_OPTION_CUBICS_AND_LINES,
                                                  nullptr, 0.05f, sink.get()));
     winrt::check_hresult(sink->Close());
     WindowsMenu::Controls::PathIcon result;
-    result.Width(16);
-    result.Height(16);
+    result.Width(kMenuIconSize);
+    result.Height(kMenuIconSize);
     result.Data(sink->path);
     return result;
 }
@@ -13579,12 +13605,18 @@ struct WindowsFluentMenuHost {
         std::vector<WindowsMenu::Controls::MenuFlyoutItem::Click_revoker> clicks;
         for (const auto& item : request.items) {
             if (item.isSeparator) {
-                menu.Items().Append(WindowsMenu::Controls::MenuFlyoutSeparator());
+                WindowsMenu::Controls::MenuFlyoutSeparator separator;
+                separator.Height(kMenuGroupHeight);
+                separator.Padding(WindowsMenu::Thickness{0, 1, 0, 1});
+                menu.Items().Append(separator);
                 continue;
             }
             WindowsMenu::Controls::MenuFlyoutItem leaf;
             leaf.Text(item.label);
             leaf.IsEnabled(!item.disabled);
+            leaf.MinHeight(kWindowsMenuRowHeight);
+            leaf.Margin(WindowsMenu::Thickness{});
+            leaf.Padding(WindowsMenu::Thickness{12, 4, 12, 4});
             if (item.shortcut) leaf.KeyboardAcceleratorTextOverride(item.shortcut);
             if (const auto icon = MakeWindowsMenuIcon(request.iconSet, item.icon)) {
                 leaf.Icon(icon);
@@ -14312,7 +14344,7 @@ constexpr std::array<FluentMenuIcon, kRunActionCount> kActionMenuIcons{
     FluentMenuIcon::FolderPick, FluentMenuIcon::RunArrow, FluentMenuIcon::Close, FluentMenuIcon::Settings
 };
 constexpr std::array<const wchar_t*, kRunActionCount> kActionShortcuts{
-    L"Ctrl+O", L"Enter", L"Esc", L"Ctrl+,"
+    L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ,"
 };
 
 ActionButtonStrings GetActionButtonStrings(const std::wstring& rawLang) {
@@ -14385,27 +14417,27 @@ struct RunDisplaySettingStrings {
 
 const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& language) {
     static constexpr RunDisplaySettingStrings strings[] = {
-        {L"en", L"Window width", L"Set the width of the Run window", L"Layout default", L"Narrower", L"Wider", L"Behavior", L"Run as administrator", L"Elevate by default", L"Ctrl+Shift+Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift+Enter", L"When off, Shift+Enter runs the command in a terminal"},
-        {L"ru", L"Ширина окна", L"Задает ширину окна «Выполнить»", L"Определено макетом", L"Уже", L"Шире", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Ctrl+Shift+Enter меняет права для текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift+Enter", L"Если выключено, Shift+Enter запускает команду в терминале"},
-        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp hơn", L"Rộng hơn", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl+Shift+Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift+Enter", L"Khi tắt, Shift+Enter chạy lệnh trong cửa sổ dòng lệnh"},
-        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบลง", L"กว้างขึ้น", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl+Shift+Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift+Enter", L"เมื่อปิด Shift+Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
-        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Lebih sempit", L"Lebih lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl+Shift+Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift+Enter", L"Jika nonaktif, Shift+Enter menjalankan perintah di terminal"},
-        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Lebih sempit", L"Lebih lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl+Shift+Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift+Enter", L"Apabila dimatikan, Shift+Enter menjalankan arahan dalam terminal"},
-        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"より狭く", L"より広く", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl+Shift+Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift+Enter で権限を切り替え", L"オフの場合、Shift+Enter でターミナル内でコマンドを実行"},
-        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"更窄", L"更宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl+Shift+Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift+Enter 切换权限", L"关闭后，Shift+Enter 在终端中运行命令"},
-        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"較窄", L"較寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl+Shift+Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift+Enter 切換權限", L"關閉時，Shift+Enter 會在終端機中執行命令"},
-        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"더 좁게", L"더 넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl+Shift+Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift+Enter로 권한 전환", L"끄면 Shift+Enter로 터미널에서 명령을 실행"},
-        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Plus étroite", L"Plus large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl+Maj+Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj+Entrée", L"Si désactivé, Maj+Entrée lance la commande dans un terminal"},
-        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmaler", L"Breiter", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg+Umschalt+Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt+Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt+Eingabe den Befehl in einem Terminal aus"},
-        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Más estrecha", L"Más ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl+Mayús+Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús+Entrar", L"Si se desactiva, Mayús+Entrar ejecuta el comando en un terminal"},
-        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Mais estreita", L"Mais larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl+Shift+Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift+Enter", L"Desativado, Shift+Enter executa o comando em um terminal"},
-        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Più stretta", L"Più larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl+Maiusc+Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc+Invio", L"Se disattivato, Maiusc+Invio esegue il comando in un terminale"},
-        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вужче", L"Ширше", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl+Shift+Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift+Enter", L"Якщо вимкнено, Shift+Enter запускає команду в терміналі"},
-        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Węższe", L"Szersze", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl+Shift+Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift+Enter", L"Po wyłączeniu Shift+Enter uruchamia polecenie w terminalu"},
-        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smaller", L"Breder", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl+Shift+Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift+Enter", L"Uitgeschakeld voert Shift+Enter de opdracht uit in een terminal"},
-        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Daha dar", L"Daha geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl+Shift+Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift+Enter ile yetkileri değiştir", L"Kapalıyken Shift+Enter komutu terminalde çalıştırır"},
-        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"और संकरा", L"और चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl+Shift+Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift+Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift+Enter कमांड को टर्मिनल में चलाता है"},
-        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"أضيق", L"أعرض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl+Shift+Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift+Enter", L"عند إيقاف الخيار، يشغّل Shift+Enter الأمر في الطرفية"},
+        {L"en", L"Window width", L"The window expands to fit its controls", L"Layout default", L"Narrower", L"Wider", L"Behavior", L"Run as administrator", L"Elevate by default", L"Ctrl + Shift + Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift + Enter", L"Uses the same privilege switch as Ctrl + Shift + Enter"},
+        {L"ru", L"Ширина окна", L"Окно расширяется, если элементам управления не хватает места", L"Определено макетом", L"Уже", L"Шире", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Ctrl + Shift + Enter меняет права для текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift + Enter", L"Меняет права так же, как Ctrl + Shift + Enter"},
+        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp hơn", L"Rộng hơn", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl + Shift + Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift + Enter", L"Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"},
+        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบลง", L"กว้างขึ้น", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl + Shift + Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift + Enter", L"เมื่อปิด Shift + Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
+        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Lebih sempit", L"Lebih lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift + Enter", L"Jika nonaktif, Shift + Enter menjalankan perintah di terminal"},
+        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Lebih sempit", L"Lebih lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift + Enter", L"Apabila dimatikan, Shift + Enter menjalankan arahan dalam terminal"},
+        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"より狭く", L"より広く", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl + Shift + Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift + Enter で権限を切り替え", L"オフの場合、Shift + Enter でターミナル内でコマンドを実行"},
+        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"更窄", L"更宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl + Shift + Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift + Enter 切换权限", L"关闭后，Shift + Enter 在终端中运行命令"},
+        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"較窄", L"較寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl + Shift + Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift + Enter 切換權限", L"關閉時，Shift + Enter 會在終端機中執行命令"},
+        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"더 좁게", L"더 넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl + Shift + Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift + Enter로 권한 전환", L"끄면 Shift + Enter로 터미널에서 명령을 실행"},
+        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Plus étroite", L"Plus large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl + Maj + Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj + Entrée", L"Si désactivé, Maj + Entrée lance la commande dans un terminal"},
+        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmaler", L"Breiter", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg + Umschalt + Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt + Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt + Eingabe den Befehl in einem Terminal aus"},
+        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Más estrecha", L"Más ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl + Mayús + Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús + Entrar", L"Si se desactiva, Mayús + Entrar ejecuta el comando en un terminal"},
+        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Mais estreita", L"Mais larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl + Shift + Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift + Enter", L"Desativado, Shift + Enter executa o comando em um terminal"},
+        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Più stretta", L"Più larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl + Maiusc + Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc + Invio", L"Se disattivato, Maiusc + Invio esegue il comando in un terminale"},
+        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вужче", L"Ширше", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl + Shift + Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift + Enter", L"Якщо вимкнено, Shift + Enter запускає команду в терміналі"},
+        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Węższe", L"Szersze", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl + Shift + Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift + Enter", L"Po wyłączeniu Shift + Enter uruchamia polecenie w terminalu"},
+        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smaller", L"Breder", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl + Shift + Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift + Enter", L"Uitgeschakeld voert Shift + Enter de opdracht uit in een terminal"},
+        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Daha dar", L"Daha geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl + Shift + Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift + Enter ile yetkileri değiştir", L"Kapalıyken Shift + Enter komutu terminalde çalıştırır"},
+        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"और संकरा", L"और चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl + Shift + Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift + Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift + Enter कमांड को टर्मिनल में चलाता है"},
+        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"أضيق", L"أعرض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl + Shift + Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift + Enter", L"عند إيقاف الخيار، يشغّل Shift + Enter الأمر في الطرفية"},
     };
     const auto code = ResolveEffectiveLanguageCode(language);
     for (const auto& value : strings) {
@@ -14414,9 +14446,10 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 41)";
+
 struct SettingsLocalizedStrings {
     const wchar_t* winTitle;
-    const wchar_t* version;
     const wchar_t* nav0;
     const wchar_t* nav1;
     const wchar_t* nav2;
@@ -14492,66 +14525,66 @@ struct SettingsLocalizedStrings {
 static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& rawLang) {
     std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
     if (lang == L"vi") {
-        return { L"Cài đặt Modern Run", L"Phiên bản " WH_MOD_VERSION, L"Cá nhân hoá", L"Bố cục & Vị trí", L"Lịch sử & Hành vi", L"Ngôn ngữ (21)", L"Bật", L"Tắt", L"Mặc định", L"Tự động", L"Chọn màu...", L"Chọn ảnh...", L"Xóa", L"Xóa ngay", L"Tự tùy chỉnh", L"Windows 11 Blur (Mặc định)", L"Tự động theo Windows", L"Tối (Dark)", L"Sáng (Light)", L"Dưới – Trái", L"Dưới – Giữa", L"Dưới – Phải", L"Trên – Trái", L"Trên – Giữa", L"Trên – Phải", L"Giữa màn hình", L"Chủ đề & Giao diện bề mặt", L"Chọn chủ đề mặc định (Windows 11 Blur và Liquid Glass đã tinh chỉnh sẵn)", L"Chủ đề mặc định (Theme Preset)", L"Chọn nhanh 13 bộ giao diện có sẵn (mặc định Windows 11 Blur)", L"Chế độ Sáng / Tối", L"Tự động theo Windows hoặc chọn cố định", L"Màu sắc, Hình nền & Bo góc tùy chỉnh", L"Cá nhân hóa màu nền, màu viền, ảnh/GIF động và độ bo góc", L"Màu nền hộp thoại", L"Để Mặc định nếu dùng theo Theme Preset", L"Màu viền hộp thoại", L"Đổi màu viền quanh thanh nhập & thẻ lịch sử", L"Bán kính bo góc (Border Radius)", L"0 px = vuông, 14 px = Win11, 27 px = viên thuốc", L"Hình nền / Ảnh động (PNG, JPG, GIF)", L"Chưa chọn tệp — hỗ trợ ảnh tĩnh & GIF động (tối đa 25 MB)", L"Đang dùng: ", L"Độ đậm nền hộp thoại & hình nền", L"Chỉnh độ mờ đục của nền hộp thoại hoặc ảnh/GIF (mặc định 85%)", L"Vị trí & Chế độ hiển thị", L"Điều chỉnh vị trí mở Win + R và kiểu bố cục quen thuộc", L"Vị trí hiển thị hộp thoại", L"Chọn cố định góc màn hình hoặc để Tự động", L"Ghi nhớ vị trí cửa sổ lần cuối", L"Mở lại đúng tọa độ kéo thả cuối (nhấn Ctrl+0 để đặt lại)", L"Tỷ lệ kích thước (UI Scale)", L"Phóng to hoặc thu nhỏ toàn bộ hộp thoại", L"Lịch sử & Quyền thực thi", L"Quản lý lịch sử lệnh, điền sẵn lệnh cũ và quyền Quản trị viên", L"Hiển thị danh sách lịch sử lệnh", L"Hiện các lệnh chạy gần đây cùng danh sách ghim", L"Để trống ô nhập khi mới mở", L"Tắt để giữ sẵn lệnh vừa chạy (Win+R → Enter)", L"Cho phép chạy với quyền quản trị (Admin)", L"Mặc định nâng quyền Admin (luôn hỗ trợ Ctrl+Shift+Enter)", L"Xóa toàn bộ lịch sử đã lưu", L"Xóa danh sách lệnh trong Windows RunMRU", L"Ngôn ngữ hiển thị (21 ngôn ngữ)", L"Áp dụng ngay cho cả hộp thoại Run và cửa sổ Cài đặt", L"Chọn màu (WinUI 3)", L"Bảng màu nhanh Fluent", L"Áp dụng", L"Hủy", L"Chọn hình nền hoặc ảnh động GIF", L"Khi bật tùy chọn này, các lệnh thực thi sẽ chạy với quyền Quản trị viên (Administrator). Bạn có cho phép bật không?", L"Cảnh báo quyền quản trị" };
+        return { L"Cài đặt Modern Run", L"Cá nhân hoá", L"Bố cục & Vị trí", L"Lịch sử & Hành vi", L"Ngôn ngữ (21)", L"Bật", L"Tắt", L"Mặc định", L"Tự động", L"Chọn màu...", L"Chọn ảnh...", L"Xóa", L"Xóa ngay", L"Tự tùy chỉnh", L"Windows 11 Blur (Mặc định)", L"Tự động theo Windows", L"Tối (Dark)", L"Sáng (Light)", L"Dưới – Trái", L"Dưới – Giữa", L"Dưới – Phải", L"Trên – Trái", L"Trên – Giữa", L"Trên – Phải", L"Giữa màn hình", L"Chủ đề & Giao diện bề mặt", L"Chọn chủ đề mặc định (Windows 11 Blur và Liquid Glass đã tinh chỉnh sẵn)", L"Chủ đề mặc định (Theme Preset)", L"Chọn nhanh 13 bộ giao diện có sẵn (mặc định Windows 11 Blur)", L"Chế độ Sáng / Tối", L"Tự động theo Windows hoặc chọn cố định", L"Màu sắc, Hình nền & Bo góc tùy chỉnh", L"Cá nhân hóa màu nền, màu viền, ảnh/GIF động và độ bo góc", L"Màu nền hộp thoại", L"Để Mặc định nếu dùng theo Theme Preset", L"Màu viền hộp thoại", L"Đổi màu viền quanh thanh nhập & thẻ lịch sử", L"Bán kính bo góc (Border Radius)", L"0 px = vuông, 14 px = Win11, 27 px = viên thuốc", L"Hình nền / Ảnh động (PNG, JPG, GIF)", L"Chưa chọn tệp — hỗ trợ ảnh tĩnh & GIF động (tối đa 25 MB)", L"Đang dùng: ", L"Độ đậm nền hộp thoại & hình nền", L"Chỉnh độ mờ đục của nền hộp thoại hoặc ảnh/GIF (mặc định 85%)", L"Vị trí & Chế độ hiển thị", L"Điều chỉnh vị trí mở Win + R và kiểu bố cục quen thuộc", L"Vị trí hiển thị hộp thoại", L"Chọn cố định góc màn hình hoặc để Tự động", L"Ghi nhớ vị trí cửa sổ lần cuối", L"Mở lại đúng tọa độ kéo thả cuối (nhấn Ctrl + 0 để đặt lại)", L"Tỷ lệ kích thước (UI Scale)", L"Phóng to hoặc thu nhỏ toàn bộ hộp thoại", L"Lịch sử & Quyền thực thi", L"Quản lý lịch sử lệnh, điền sẵn lệnh cũ và quyền Quản trị viên", L"Hiển thị danh sách lịch sử lệnh", L"Hiện các lệnh chạy gần đây cùng danh sách ghim", L"Để trống ô nhập khi mới mở", L"Tắt để giữ sẵn lệnh vừa chạy (Win + R → Enter)", L"Cho phép chạy với quyền quản trị (Admin)", L"Mặc định nâng quyền Admin (luôn hỗ trợ Ctrl + Shift + Enter)", L"Xóa toàn bộ lịch sử đã lưu", L"Xóa danh sách lệnh trong Windows RunMRU", L"Ngôn ngữ hiển thị (21 ngôn ngữ)", L"Áp dụng ngay cho cả hộp thoại Run và cửa sổ Cài đặt", L"Chọn màu (WinUI 3)", L"Bảng màu nhanh Fluent", L"Áp dụng", L"Hủy", L"Chọn hình nền hoặc ảnh động GIF", L"Khi bật tùy chọn này, các lệnh thực thi sẽ chạy với quyền Quản trị viên (Administrator). Bạn có cho phép bật không?", L"Cảnh báo quyền quản trị" };
     }
     else if (lang == L"zh-cn") {
-        return { L"Modern Run 设置", L"版本 " WH_MOD_VERSION, L"个性化", L"布局与位置", L"历史与行为", L"语言 (21)", L"开", L"关", L"默认", L"自动", L"选择颜色...", L"浏览...", L"清除", L"立即清除", L"自定义", L"Windows 11 Blur (默认)", L"跟随系统", L"深色", L"浅色", L"左下角", L"底部居中", L"右下角", L"左上角", L"顶部居中", L"右上角", L"屏幕居中", L"主题与表面效果", L"选择内置视觉主题（Windows 11 模糊与液态玻璃已优化）", L"主题预设", L"在 13 套内置主题间切换（默认 Windows 11 Blur）", L"颜色模式", L"跟随 Windows 或固定深色 / 浅色", L"自定义颜色、背景与圆角", L"自定义背景色、边框色、静态/GIF 动态背景和圆角", L"对话框背景色", L"保持默认以跟随主题预设", L"对话框边框色", L"覆盖输入框与历史卡片边框颜色", L"圆角半径", L"0 px = 直角，14 px = Win11，27 px = 胶囊", L"背景图片 / 动态 GIF", L"未选择 — 支持 PNG、JPG、WebP、动态 GIF（最大 25 MB）", L"当前：", L"背景不透明度", L"调整图片/GIF 显示清晰度（默认 85%）", L"位置与显示模式", L"配置 Win + R 弹出位置和布局风格", L"对话框位置", L"固定到屏幕边缘/居中或设为自动", L"记住上次窗口位置", L"在最后拖动的位置重新打开（按 Ctrl+0 重置）", L"界面缩放比例", L"缩放运行对话框整体尺寸", L"历史记录与执行行为", L"管理命令历史、初始输入和管理员权限", L"显示命令历史列表", L"显示最近运行的命令和置顶项", L"打开时清空输入框", L"关闭以保留上次命令（Win+R → 回车）", L"以管理员身份运行命令", L"默认提权运行（始终支持 Ctrl+Shift+Enter）", L"清除所有已保存历史", L"清空 Windows RunMRU 中的最近记录", L"显示语言（21 种语言）", L"立即应用于运行对话框和设置窗口", L"选择颜色", L"快捷 Fluent 色板", L"应用", L"取消", L"选择背景图片或动态 GIF", L"启用后，命令将以管理员权限运行。是否允许？", L"管理员权限警告" };
+        return { L"Modern Run 设置", L"个性化", L"布局与位置", L"历史与行为", L"语言 (21)", L"开", L"关", L"默认", L"自动", L"选择颜色...", L"浏览...", L"清除", L"立即清除", L"自定义", L"Windows 11 Blur (默认)", L"跟随系统", L"深色", L"浅色", L"左下角", L"底部居中", L"右下角", L"左上角", L"顶部居中", L"右上角", L"屏幕居中", L"主题与表面效果", L"选择内置视觉主题（Windows 11 模糊与液态玻璃已优化）", L"主题预设", L"在 13 套内置主题间切换（默认 Windows 11 Blur）", L"颜色模式", L"跟随 Windows 或固定深色 / 浅色", L"自定义颜色、背景与圆角", L"自定义背景色、边框色、静态/GIF 动态背景和圆角", L"对话框背景色", L"保持默认以跟随主题预设", L"对话框边框色", L"覆盖输入框与历史卡片边框颜色", L"圆角半径", L"0 px = 直角，14 px = Win11，27 px = 胶囊", L"背景图片 / 动态 GIF", L"未选择 — 支持 PNG、JPG、WebP、动态 GIF（最大 25 MB）", L"当前：", L"背景不透明度", L"调整图片/GIF 显示清晰度（默认 85%）", L"位置与显示模式", L"配置 Win + R 弹出位置和布局风格", L"对话框位置", L"固定到屏幕边缘/居中或设为自动", L"记住上次窗口位置", L"在最后拖动的位置重新打开（按 Ctrl + 0 重置）", L"界面缩放比例", L"缩放运行对话框整体尺寸", L"历史记录与执行行为", L"管理命令历史、初始输入和管理员权限", L"显示命令历史列表", L"显示最近运行的命令和置顶项", L"打开时清空输入框", L"关闭以保留上次命令（Win + R → 回车）", L"以管理员身份运行命令", L"默认提权运行（始终支持 Ctrl + Shift + Enter）", L"清除所有已保存历史", L"清空 Windows RunMRU 中的最近记录", L"显示语言（21 种语言）", L"立即应用于运行对话框和设置窗口", L"选择颜色", L"快捷 Fluent 色板", L"应用", L"取消", L"选择背景图片或动态 GIF", L"启用后，命令将以管理员权限运行。是否允许？", L"管理员权限警告" };
     }
     else if (lang == L"zh-tw") {
-        return { L"Modern Run 設定", L"版本 " WH_MOD_VERSION, L"個人化", L"版面與位置", L"歷史與行為", L"語言 (21)", L"開", L"關", L"預設", L"自動", L"選擇顏色...", L"瀏覽...", L"清除", L"立即清除", L"自訂", L"Windows 11 Blur (預設)", L"跟隨系統", L"深色", L"淺色", L"左下角", L"底部置中", L"右下角", L"左上角", L"頂部置中", L"右上角", L"螢幕置中", L"主題與表面效果", L"選擇內建視覺主題（Windows 11 模糊與液態玻璃已最佳化）", L"主題預設", L"在 13 套內建主題間切換（預設 Windows 11 Blur）", L"色彩模式", L"跟隨 Windows 或固定深色 / 淺色", L"自訂色彩、背景與圓角", L"自訂背景色、邊框色、靜態/GIF 動態背景與圓角", L"對話方塊背景色", L"保持預設以跟隨主題", L"對話方塊邊框色", L"自訂輸入列與歷史卡片邊框顏色", L"圓角半徑", L"0 px = 直角，14 px = Win11，27 px = 膠囊", L"背景圖片 / 動態 GIF", L"未選擇 — 支援 PNG、JPG、WebP、動態 GIF（上限 25 MB）", L"使用中：", L"背景不透明度", L"調整圖片/GIF 顯示清晰度（預設 85%）", L"位置與顯示模式", L"設定 Win + R 彈出位置與版面風格", L"對話方塊位置", L"固定於螢幕角落/置中或設為自動", L"記住上次視窗位置", L"在最後拖曳位置重新開啟（按 Ctrl+0 重設）", L"介面縮放比例", L"縮放執行對話方塊整體大小", L"歷史紀錄與執行行為", L"管理指令歷史、初始輸入與系統管理員權限", L"顯示指令歷史清單", L"顯示最近執行的指令與釘選項目", L"開啟時清空輸入欄", L"關閉以保留上次指令（Win+R → Enter）", L"以系統管理員身分執行", L"預設以管理員權限執行（始終支援 Ctrl+Shift+Enter）", L"清除所有已儲存歷史", L"清除 Windows RunMRU 中的最近紀錄", L"顯示語言（21 種語言）", L"立即套用於執行對話方塊與設定視窗", L"選擇顏色", L"快速 Fluent 色票", L"套用", L"取消", L"選擇背景圖片或動態 GIF", L"啟用後，指令將以系統管理員權限執行。是否允許？", L"系統管理員權限警告" };
+        return { L"Modern Run 設定", L"個人化", L"版面與位置", L"歷史與行為", L"語言 (21)", L"開", L"關", L"預設", L"自動", L"選擇顏色...", L"瀏覽...", L"清除", L"立即清除", L"自訂", L"Windows 11 Blur (預設)", L"跟隨系統", L"深色", L"淺色", L"左下角", L"底部置中", L"右下角", L"左上角", L"頂部置中", L"右上角", L"螢幕置中", L"主題與表面效果", L"選擇內建視覺主題（Windows 11 模糊與液態玻璃已最佳化）", L"主題預設", L"在 13 套內建主題間切換（預設 Windows 11 Blur）", L"色彩模式", L"跟隨 Windows 或固定深色 / 淺色", L"自訂色彩、背景與圓角", L"自訂背景色、邊框色、靜態/GIF 動態背景與圓角", L"對話方塊背景色", L"保持預設以跟隨主題", L"對話方塊邊框色", L"自訂輸入列與歷史卡片邊框顏色", L"圓角半徑", L"0 px = 直角，14 px = Win11，27 px = 膠囊", L"背景圖片 / 動態 GIF", L"未選擇 — 支援 PNG、JPG、WebP、動態 GIF（上限 25 MB）", L"使用中：", L"背景不透明度", L"調整圖片/GIF 顯示清晰度（預設 85%）", L"位置與顯示模式", L"設定 Win + R 彈出位置與版面風格", L"對話方塊位置", L"固定於螢幕角落/置中或設為自動", L"記住上次視窗位置", L"在最後拖曳位置重新開啟（按 Ctrl + 0 重設）", L"介面縮放比例", L"縮放執行對話方塊整體大小", L"歷史紀錄與執行行為", L"管理指令歷史、初始輸入與系統管理員權限", L"顯示指令歷史清單", L"顯示最近執行的指令與釘選項目", L"開啟時清空輸入欄", L"關閉以保留上次指令（Win + R → Enter）", L"以系統管理員身分執行", L"預設以管理員權限執行（始終支援 Ctrl + Shift + Enter）", L"清除所有已儲存歷史", L"清除 Windows RunMRU 中的最近紀錄", L"顯示語言（21 種語言）", L"立即套用於執行對話方塊與設定視窗", L"選擇顏色", L"快速 Fluent 色票", L"套用", L"取消", L"選擇背景圖片或動態 GIF", L"啟用後，指令將以系統管理員權限執行。是否允許？", L"系統管理員權限警告" };
     }
     else if (lang == L"ja") {
-        return { L"Modern Run 設定", L"バージョン " WH_MOD_VERSION, L"個人用設定", L"レイアウトと位置", L"履歴と動作", L"言語 (21)", L"オン", L"オフ", L"既定", L"自動", L"色を選択...", L"参照...", L"クリア", L"今すぐ削除", L"カスタム", L"Windows 11 Blur (既定)", L"自動 (Windows に合わせる)", L"ダーク", L"ライト", L"左下", L"下中央", L"右下", L"左上", L"上中央", L"右上", L"画面中央", L"テーマとサーフェス", L"組み込みテーマを選択（Windows 11 Blur と Liquid Glass は最適化済み）", L"テーマプリセット", L"13 種類のテーマから選択（既定は Windows 11 Blur）", L"カラーモード", L"Windows に合わせるか、ダーク / ライトを固定", L"カスタムカラー・背景・角丸", L"背景色、枠線色、静止画/GIF 背景、角丸半径をカスタマイズ", L"背景色", L"既定のままにするとテーマに従います", L"枠線の色", L"入力バーと履歴カードの枠線色を変更", L"角丸半径", L"0 px = 角張る、14 px = Win11、27 px = ピル", L"背景画像 / アニメーション GIF", L"未選択 — PNG、JPG、WebP、GIF 対応（最大 25 MB）", L"適用中: ", L"背景の不透明度", L"画像/GIF の透明度を調整（既定 85%）", L"位置と表示モード", L"Win + R の表示位置とレイアウトを設定", L"ダイアログの位置", L"画面の端・中央に固定するか自動を選択", L"前回のウィンドウ位置を記憶", L"最後にドラッグした位置で開く（Ctrl+0 でリセット）", L"UI スケール", L"ダイアログ全体の表示サイズを変更", L"履歴と実行動作", L"コマンド履歴、初期入力、管理者権限を管理", L"コマンド履歴を表示", L"最近実行したコマンドとピン留めを表示", L"起動時に入力欄をクリア", L"オフにすると前回のコマンドを保持します", L"管理者として実行", L"既定で管理者権限で実行（Ctrl+Shift+Enter は常に有効）", L"保存済み履歴をすべて削除", L"Windows RunMRU の履歴を消去します", L"表示言語（21 言語）", L"実行ダイアログと設定ウィンドウに即時反映されます", L"色を選択", L"クイック Fluent スウォッチ", L"適用", L"キャンセル", L"背景画像またはアニメーション GIF を選択", L"有効にするとコマンドは管理者権限で実行されます。許可しますか？", L"管理者権限の警告" };
+        return { L"Modern Run 設定", L"個人用設定", L"レイアウトと位置", L"履歴と動作", L"言語 (21)", L"オン", L"オフ", L"既定", L"自動", L"色を選択...", L"参照...", L"クリア", L"今すぐ削除", L"カスタム", L"Windows 11 Blur (既定)", L"自動 (Windows に合わせる)", L"ダーク", L"ライト", L"左下", L"下中央", L"右下", L"左上", L"上中央", L"右上", L"画面中央", L"テーマとサーフェス", L"組み込みテーマを選択（Windows 11 Blur と Liquid Glass は最適化済み）", L"テーマプリセット", L"13 種類のテーマから選択（既定は Windows 11 Blur）", L"カラーモード", L"Windows に合わせるか、ダーク / ライトを固定", L"カスタムカラー・背景・角丸", L"背景色、枠線色、静止画/GIF 背景、角丸半径をカスタマイズ", L"背景色", L"既定のままにするとテーマに従います", L"枠線の色", L"入力バーと履歴カードの枠線色を変更", L"角丸半径", L"0 px = 角張る、14 px = Win11、27 px = ピル", L"背景画像 / アニメーション GIF", L"未選択 — PNG、JPG、WebP、GIF 対応（最大 25 MB）", L"適用中: ", L"背景の不透明度", L"画像/GIF の透明度を調整（既定 85%）", L"位置と表示モード", L"Win + R の表示位置とレイアウトを設定", L"ダイアログの位置", L"画面の端・中央に固定するか自動を選択", L"前回のウィンドウ位置を記憶", L"最後にドラッグした位置で開く（Ctrl + 0 でリセット）", L"UI スケール", L"ダイアログ全体の表示サイズを変更", L"履歴と実行動作", L"コマンド履歴、初期入力、管理者権限を管理", L"コマンド履歴を表示", L"最近実行したコマンドとピン留めを表示", L"起動時に入力欄をクリア", L"オフにすると前回のコマンドを保持します", L"管理者として実行", L"既定で管理者権限で実行（Ctrl + Shift + Enter は常に有効）", L"保存済み履歴をすべて削除", L"Windows RunMRU の履歴を消去します", L"表示言語（21 言語）", L"実行ダイアログと設定ウィンドウに即時反映されます", L"色を選択", L"クイック Fluent スウォッチ", L"適用", L"キャンセル", L"背景画像またはアニメーション GIF を選択", L"有効にするとコマンドは管理者権限で実行されます。許可しますか？", L"管理者権限の警告" };
     }
     else if (lang == L"ko") {
-        return { L"Modern Run 설정", L"버전 " WH_MOD_VERSION, L"개인 설정", L"레이아웃 및 위치", L"기록 및 동작", L"언어 (21)", L"켬", L"끔", L"기본값", L"자동", L"색상 선택...", L"찾아보기...", L"지우기", L"지금 지우기", L"사용자 지정", L"Windows 11 Blur (기본값)", L"자동 (Windows 따름)", L"다크", L"라이트", L"왼쪽 아래", L"아래 가운데", L"오른쪽 아래", L"왼쪽 위", L"위 가운데", L"오른쪽 위", L"화면 중앙", L"테마 및 표면", L"기본 제공 테마 선택 (Windows 11 Blur 및 Liquid Glass 최적화)", L"테마 프리셋", L"13가지 기본 테마 중 선택 (기본값: Windows 11 Blur)", L"색상 모드", L"Windows 테마 따르기 또는 다크/라이트 고정", L"사용자 지정 색상, 배경 및 모서리", L"배경색, 테두리색, 이미지/움직이는 GIF 배경 및 둥글기 설정", L"배경 색상", L"기본값으로 두면 테마 색상을 따릅니다", L"테두리 색상", L"입력창 및 기록 카드 테두리 색상 지정", L"모서리 반경", L"0 px = 직각, 14 px = Win11, 27 px = 알약형", L"배경 이미지 / 움직이는 GIF", L"선택 안 됨 — PNG, JPG, WebP, GIF 지원 (최대 25 MB)", L"적용됨: ", L"배경 불투명도", L"이미지/GIF 선명도 조절 (기본 85%)", L"위치 및 표시 모드", L"Win + R 표시 위치와 레이아웃 스타일 설정", L"대화 상자 위치", L"화면 모서리/중앙 고정 또는 자동", L"마지막 창 위치 기억", L"마지막으로 드래그한 위치에서 열기 (Ctrl+0 초기화)", L"UI 크기 배율", L"실행 대화 상자 전체 크기 조절", L"기록 및 실행 동작", L"명령 기록, 초기 입력 및 관리자 권한 관리", L"명령 기록 표시", L"최근 실행 명령 및 고정 항목 표시", L"열 때 입력창 비우기", L"끄면 마지막 명령이 유지됩니다", L"관리자 권한으로 실행", L"기본적으로 관리자 권한 실행 (Ctrl+Shift+Enter 항상 지원)", L"저장된 기록 모두 지우기", L"Windows RunMRU의 최근 기록 삭제", L"표시 언어 (21개 언어)", L"실행 창과 설정 창에 즉시 적용됩니다", L"색상 선택", L"빠른 Fluent 색상", L"적용", L"취소", L"배경 이미지 또는 GIF 선택", L"활성화하면 명령이 관리자 권한으로 실행됩니다. 허용하시겠습니까?", L"관리자 권한 경고" };
+        return { L"Modern Run 설정", L"개인 설정", L"레이아웃 및 위치", L"기록 및 동작", L"언어 (21)", L"켬", L"끔", L"기본값", L"자동", L"색상 선택...", L"찾아보기...", L"지우기", L"지금 지우기", L"사용자 지정", L"Windows 11 Blur (기본값)", L"자동 (Windows 따름)", L"다크", L"라이트", L"왼쪽 아래", L"아래 가운데", L"오른쪽 아래", L"왼쪽 위", L"위 가운데", L"오른쪽 위", L"화면 중앙", L"테마 및 표면", L"기본 제공 테마 선택 (Windows 11 Blur 및 Liquid Glass 최적화)", L"테마 프리셋", L"13가지 기본 테마 중 선택 (기본값: Windows 11 Blur)", L"색상 모드", L"Windows 테마 따르기 또는 다크/라이트 고정", L"사용자 지정 색상, 배경 및 모서리", L"배경색, 테두리색, 이미지/움직이는 GIF 배경 및 둥글기 설정", L"배경 색상", L"기본값으로 두면 테마 색상을 따릅니다", L"테두리 색상", L"입력창 및 기록 카드 테두리 색상 지정", L"모서리 반경", L"0 px = 직각, 14 px = Win11, 27 px = 알약형", L"배경 이미지 / 움직이는 GIF", L"선택 안 됨 — PNG, JPG, WebP, GIF 지원 (최대 25 MB)", L"적용됨: ", L"배경 불투명도", L"이미지/GIF 선명도 조절 (기본 85%)", L"위치 및 표시 모드", L"Win + R 표시 위치와 레이아웃 스타일 설정", L"대화 상자 위치", L"화면 모서리/중앙 고정 또는 자동", L"마지막 창 위치 기억", L"마지막으로 드래그한 위치에서 열기 (Ctrl + 0 초기화)", L"UI 크기 배율", L"실행 대화 상자 전체 크기 조절", L"기록 및 실행 동작", L"명령 기록, 초기 입력 및 관리자 권한 관리", L"명령 기록 표시", L"최근 실행 명령 및 고정 항목 표시", L"열 때 입력창 비우기", L"끄면 마지막 명령이 유지됩니다", L"관리자 권한으로 실행", L"기본적으로 관리자 권한 실행 (Ctrl + Shift + Enter 항상 지원)", L"저장된 기록 모두 지우기", L"Windows RunMRU의 최근 기록 삭제", L"표시 언어 (21개 언어)", L"실행 창과 설정 창에 즉시 적용됩니다", L"색상 선택", L"빠른 Fluent 색상", L"적용", L"취소", L"배경 이미지 또는 GIF 선택", L"활성화하면 명령이 관리자 권한으로 실행됩니다. 허용하시겠습니까?", L"관리자 권한 경고" };
     }
     else if (lang == L"th") {
-        return { L"การตั้งค่า Modern Run", L"เวอร์ชัน " WH_MOD_VERSION, L"การปรับแต่ง", L"เค้าโครงและตำแหน่ง", L"ประวัติและพฤติกรรม", L"ภาษา (21)", L"เปิด", L"ปิด", L"ค่าเริ่มต้น", L"อัตโนมัติ", L"เลือกสี...", L"เลือกไฟล์...", L"ล้าง", L"ล้างตอนนี้", L"กำหนดเอง", L"Windows 11 Blur (ค่าเริ่มต้น)", L"อัตโนมัติตาม Windows", L"มืด", L"สว่าง", L"ล่างซ้าย", L"ล่างกลาง", L"ล่างขวา", L"บนซ้าย", L"บนกลาง", L"บนขวา", L"กลางหน้าจอ", L"ธีมและพื้นผิว", L"เลือกธีมในตัว (Windows 11 Blur และ Liquid Glass ปรับแต่งมาให้แล้ว)", L"ชุดธีมเริ่มต้น", L"เลือกจาก 13 ธีมในตัว (ค่าเริ่มต้น Windows 11 Blur)", L"โหมดสี", L"ตามระบบ Windows หรือเลือกมืด / สว่าง", L"สี พื้นหลัง และความโค้งมน", L"ปรับแต่งสีพื้นหลัง สีขอบ รูปภาพ/GIF และความโค้งมุม", L"สีพื้นหลัง", L"เว้นเป็นค่าเริ่มต้นเพื่อใช้ตามธีม", L"สีขอบ", L"เปลี่ยนสีขอบรอบกล่องป้อนคำสั่งและการ์ดประวัติ", L"รัศมีมุมโค้ง", L"0 px = เหลี่ยม, 14 px = Win11, 27 px = แคปซูล", L"รูปพื้นหลัง / GIF เคลื่อนไหว", L"ยังไม่ได้เลือก — รองรับ PNG, JPG, WebP, GIF (สูงสุด 25 MB)", L"กำลังใช้: ", L"ความทึบของภาพพื้นหลัง", L"ปรับความชัดเจนของภาพ/GIF (ค่าเริ่มต้น 85%)", L"ตำแหน่งและโหมดแสดงผล", L"กำหนดตำแหน่งเปิด Win + R และรูปแบบหน้าต่าง", L"ตำแหน่งหน้าต่าง", L"ปักหมุดตามมุมหน้าจอหรือใช้อัตโนมัติ", L"จำตำแหน่งหน้าต่างล่าสุด", L"เปิดซ้ำที่ตำแหน่งที่ลากไว้ล่าสุด (กด Ctrl+0 เพื่อรีเซ็ต)", L"ขนาดอินเทอร์เฟซ", L"ปรับขนาดกล่อง Run โดยรวม", L"ประวัติและสิทธิ์การทำงาน", L"จัดการประวัติคำสั่ง ข้อความเริ่มต้น และสิทธิ์ผู้ดูแลระบบ", L"แสดงประวัติคำสั่ง", L"แสดงคำสั่งล่าสุดและรายการที่ปักหมุด", L"ล้างช่องพิมพ์เมื่อเปิด", L"ปิดเพื่อคงคำสั่งล่าสุดไว้เหมือน Run ดั้งเดิม", L"รันคำสั่งในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์อัตโนมัติ (ใช้ Ctrl+Shift+Enter ได้เสมอ)", L"ล้างประวัติทั้งหมด", L"ลบรายการล่าสุดออกจาก Windows RunMRU", L"ภาษาที่แสดง (21 ภาษา)", L"มีผลทันทีทั้งกล่อง Run และหน้าต่างตั้งค่า", L"เลือกสี", L"จานสีด่วน Fluent", L"ใช้งาน", L"ยกเลิก", L"เลือกรูปพื้นหลังหรือ GIF เคลื่อนไหว", L"เมื่อเปิดใช้งาน คำสั่งจะรันด้วยสิทธิ์ผู้ดูแลระบบ ต้องการอนุญาตหรือไม่?", L"คำเตือนสิทธิ์ผู้ดูแลระบบ" };
+        return { L"การตั้งค่า Modern Run", L"การปรับแต่ง", L"เค้าโครงและตำแหน่ง", L"ประวัติและพฤติกรรม", L"ภาษา (21)", L"เปิด", L"ปิด", L"ค่าเริ่มต้น", L"อัตโนมัติ", L"เลือกสี...", L"เลือกไฟล์...", L"ล้าง", L"ล้างตอนนี้", L"กำหนดเอง", L"Windows 11 Blur (ค่าเริ่มต้น)", L"อัตโนมัติตาม Windows", L"มืด", L"สว่าง", L"ล่างซ้าย", L"ล่างกลาง", L"ล่างขวา", L"บนซ้าย", L"บนกลาง", L"บนขวา", L"กลางหน้าจอ", L"ธีมและพื้นผิว", L"เลือกธีมในตัว (Windows 11 Blur และ Liquid Glass ปรับแต่งมาให้แล้ว)", L"ชุดธีมเริ่มต้น", L"เลือกจาก 13 ธีมในตัว (ค่าเริ่มต้น Windows 11 Blur)", L"โหมดสี", L"ตามระบบ Windows หรือเลือกมืด / สว่าง", L"สี พื้นหลัง และความโค้งมน", L"ปรับแต่งสีพื้นหลัง สีขอบ รูปภาพ/GIF และความโค้งมุม", L"สีพื้นหลัง", L"เว้นเป็นค่าเริ่มต้นเพื่อใช้ตามธีม", L"สีขอบ", L"เปลี่ยนสีขอบรอบกล่องป้อนคำสั่งและการ์ดประวัติ", L"รัศมีมุมโค้ง", L"0 px = เหลี่ยม, 14 px = Win11, 27 px = แคปซูล", L"รูปพื้นหลัง / GIF เคลื่อนไหว", L"ยังไม่ได้เลือก — รองรับ PNG, JPG, WebP, GIF (สูงสุด 25 MB)", L"กำลังใช้: ", L"ความทึบของภาพพื้นหลัง", L"ปรับความชัดเจนของภาพ/GIF (ค่าเริ่มต้น 85%)", L"ตำแหน่งและโหมดแสดงผล", L"กำหนดตำแหน่งเปิด Win + R และรูปแบบหน้าต่าง", L"ตำแหน่งหน้าต่าง", L"ปักหมุดตามมุมหน้าจอหรือใช้อัตโนมัติ", L"จำตำแหน่งหน้าต่างล่าสุด", L"เปิดซ้ำที่ตำแหน่งที่ลากไว้ล่าสุด (กด Ctrl + 0 เพื่อรีเซ็ต)", L"ขนาดอินเทอร์เฟซ", L"ปรับขนาดกล่อง Run โดยรวม", L"ประวัติและสิทธิ์การทำงาน", L"จัดการประวัติคำสั่ง ข้อความเริ่มต้น และสิทธิ์ผู้ดูแลระบบ", L"แสดงประวัติคำสั่ง", L"แสดงคำสั่งล่าสุดและรายการที่ปักหมุด", L"ล้างช่องพิมพ์เมื่อเปิด", L"ปิดเพื่อคงคำสั่งล่าสุดไว้เหมือน Run ดั้งเดิม", L"รันคำสั่งในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์อัตโนมัติ (ใช้ Ctrl + Shift + Enter ได้เสมอ)", L"ล้างประวัติทั้งหมด", L"ลบรายการล่าสุดออกจาก Windows RunMRU", L"ภาษาที่แสดง (21 ภาษา)", L"มีผลทันทีทั้งกล่อง Run และหน้าต่างตั้งค่า", L"เลือกสี", L"จานสีด่วน Fluent", L"ใช้งาน", L"ยกเลิก", L"เลือกรูปพื้นหลังหรือ GIF เคลื่อนไหว", L"เมื่อเปิดใช้งาน คำสั่งจะรันด้วยสิทธิ์ผู้ดูแลระบบ ต้องการอนุญาตหรือไม่?", L"คำเตือนสิทธิ์ผู้ดูแลระบบ" };
     }
     else if (lang == L"id") {
-        return { L"Pengaturan Modern Run", L"Versi " WH_MOD_VERSION, L"Personalisasi", L"Tata Letak & Posisi", L"Riwayat & Perilaku", L"Bahasa (21)", L"Aktif", L"Mati", L"Bawaan", L"Otomatis", L"Pilih warna...", L"Pilih...", L"Hapus", L"Hapus sekarang", L"Kustom", L"Windows 11 Blur (Bawaan)", L"Otomatis (Ikuti Windows)", L"Gelap", L"Terang", L"Kiri Bawah", L"Tengah Bawah", L"Kanan Bawah", L"Kiri Atas", L"Tengah Atas", L"Kanan Atas", L"Tengah Layar", L"Tema & Permukaan", L"Pilih tema bawaan (Windows 11 Blur & Liquid Glass telah dioptimalkan)", L"Preset Tema", L"Pilih dari 13 tema bawaan (bawaan Windows 11 Blur)", L"Mode Warna", L"Ikuti tema Windows atau pilih Gelap / Terang", L"Warna, Latar Belakang & Sudut Kustom", L"Sesuaikan warna, gambar/GIF animasi, dan radius sudut", L"Warna Latar", L"Biarkan Bawaan untuk mengikuti Tema", L"Warna Bingkai", L"Ubah warna garis tepi dialog & kartu riwayat", L"Radius Sudut", L"0 px = kotak, 14 px = Win11, 27 px = pil", L"Gambar Latar / GIF Animasi", L"Belum dipilih — mendukung PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Opasitas Latar Kustom", L"Atur kejelasan gambar/GIF (bawaan 85%)", L"Posisi & Mode Tampilan", L"Atur posisi buka Win + R dan gaya tata letak", L"Posisi Dialog", L"Sematkan ke tepi/tengah layar atau Otomatis", L"Ingat Posisi Jendela Terakhir", L"Buka kembali di posisi terakhir diseret (Ctrl+0 untuk reset)", L"Skala Ukuran UI", L"Ubah ukuran keseluruhan dialog Run", L"Riwayat & Perilaku Eksekusi", L"Kelola riwayat perintah, input awal, dan hak Administrator", L"Tampilkan Riwayat Perintah", L"Tampilkan perintah terbaru & item disematkan", L"Kosongkan Input Saat Dibuka", L"Matikan untuk mempertahankan perintah terakhir", L"Jalankan sebagai Administrator", L"Jalankan dengan hak admin secara bawaan (Ctrl+Shift+Enter selalu aktif)", L"Hapus Semua Riwayat Tersimpan", L"Bersihkan riwayat terbaru dari Windows RunMRU", L"Bahasa Tampilan (21 Bahasa)", L"Langsung berlaku untuk dialog Run dan jendela Pengaturan", L"Pilih Warna", L"Palet Cepat Fluent", L"Terapkan", L"Batal", L"Pilih Gambar Latar atau GIF Animasi", L"Saat aktif, perintah akan dijalankan sebagai Administrator. Izinkan?", L"Peringatan Hak Administrator" };
+        return { L"Pengaturan Modern Run", L"Personalisasi", L"Tata Letak & Posisi", L"Riwayat & Perilaku", L"Bahasa (21)", L"Aktif", L"Mati", L"Bawaan", L"Otomatis", L"Pilih warna...", L"Pilih...", L"Hapus", L"Hapus sekarang", L"Kustom", L"Windows 11 Blur (Bawaan)", L"Otomatis (Ikuti Windows)", L"Gelap", L"Terang", L"Kiri Bawah", L"Tengah Bawah", L"Kanan Bawah", L"Kiri Atas", L"Tengah Atas", L"Kanan Atas", L"Tengah Layar", L"Tema & Permukaan", L"Pilih tema bawaan (Windows 11 Blur & Liquid Glass telah dioptimalkan)", L"Preset Tema", L"Pilih dari 13 tema bawaan (bawaan Windows 11 Blur)", L"Mode Warna", L"Ikuti tema Windows atau pilih Gelap / Terang", L"Warna, Latar Belakang & Sudut Kustom", L"Sesuaikan warna, gambar/GIF animasi, dan radius sudut", L"Warna Latar", L"Biarkan Bawaan untuk mengikuti Tema", L"Warna Bingkai", L"Ubah warna garis tepi dialog & kartu riwayat", L"Radius Sudut", L"0 px = kotak, 14 px = Win11, 27 px = pil", L"Gambar Latar / GIF Animasi", L"Belum dipilih — mendukung PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Opasitas Latar Kustom", L"Atur kejelasan gambar/GIF (bawaan 85%)", L"Posisi & Mode Tampilan", L"Atur posisi buka Win + R dan gaya tata letak", L"Posisi Dialog", L"Sematkan ke tepi/tengah layar atau Otomatis", L"Ingat Posisi Jendela Terakhir", L"Buka kembali di posisi terakhir diseret (Ctrl + 0 untuk reset)", L"Skala Ukuran UI", L"Ubah ukuran keseluruhan dialog Run", L"Riwayat & Perilaku Eksekusi", L"Kelola riwayat perintah, input awal, dan hak Administrator", L"Tampilkan Riwayat Perintah", L"Tampilkan perintah terbaru & item disematkan", L"Kosongkan Input Saat Dibuka", L"Matikan untuk mempertahankan perintah terakhir", L"Jalankan sebagai Administrator", L"Jalankan dengan hak admin secara bawaan (Ctrl + Shift + Enter selalu aktif)", L"Hapus Semua Riwayat Tersimpan", L"Bersihkan riwayat terbaru dari Windows RunMRU", L"Bahasa Tampilan (21 Bahasa)", L"Langsung berlaku untuk dialog Run dan jendela Pengaturan", L"Pilih Warna", L"Palet Cepat Fluent", L"Terapkan", L"Batal", L"Pilih Gambar Latar atau GIF Animasi", L"Saat aktif, perintah akan dijalankan sebagai Administrator. Izinkan?", L"Peringatan Hak Administrator" };
     }
     else if (lang == L"ms") {
-        return { L"Tetapan Modern Run", L"Versi " WH_MOD_VERSION, L"Pemperibadian", L"Susun Atur & Kedudukan", L"Sejarah & Kelakuan", L"Bahasa (21)", L"Hidup", L"Mati", L"Lalai", L"Auto", L"Pilih warna...", L"Semak imbas...", L"Kosongkan", L"Kosongkan kini", L"Tersuai", L"Windows 11 Blur (Lalai)", L"Auto (Ikut Windows)", L"Gelap", L"Cerah", L"Bawah Kiri", L"Bawah Tengah", L"Bawah Kanan", L"Atas Kiri", L"Atas Tengah", L"Atas Kanan", L"Tengah Skrin", L"Tema & Permukaan", L"Pilih tema terbina dalam (Windows 11 Blur & Liquid Glass dioptimumkan)", L"Pratetap Tema", L"Pilih daripada 13 tema terbina (lalai Windows 11 Blur)", L"Mod Warna", L"Ikut Windows atau pilih Gelap / Cerah", L"Warna, Latar Belakang & Jejari Tersuai", L"Sesuaikan warna, imej/GIF animasi dan jejari bucu", L"Warna Latar Belakang", L"Biarkan Lalai untuk ikut Tema", L"Warna Sempadan", L"Tukar warna bingkai dialog & kad sejarah", L"Jejari Bucu", L"0 px = segi empat, 14 px = Win11, 27 px = pil", L"Imej Latar / GIF Animasi", L"Tiada dipilih — sokong PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Kelegapan Latar Tersuai", L"Laras kejelasan imej/GIF (lalai 85%)", L"Kedudukan & Mod Paparan", L"Tetapkan lokasi Win + R dan gaya susun atur", L"Kedudukan Dialog", L"Semat ke tepi/tengah skrin atau Auto", L"Ingat Kedudukan Tetingkap Terakhir", L"Buka semula di lokasi seretan terakhir (Ctrl+0 untuk set semula)", L"Skala Saiz UI", L"Skalakan saiz keseluruhan dialog Run", L"Sejarah & Kelakuan Pelaksanaan", L"Urus sejarah arahan, input awal dan keistimewaan Pentadbir", L"Papar Sejarah Arahan", L"Papar arahan terkini dan item disemat", L"Kosongkan Input Apabila Dibuka", L"Matikan untuk kekalkan arahan terakhir", L"Jalankan sebagai Pentadbir", L"Jalankan dengan hak pentadbir secara lalai (Ctrl+Shift+Enter sentiasa aktif)", L"Padam Semua Sejarah Tersimpan", L"Kosongkan sejarah terkini dari Windows RunMRU", L"Bahasa Paparan (21 Bahasa)", L"Digunakan serta-merta pada dialog Run dan tetingkap Tetapan", L"Pilih Warna", L"Warna Pantas Fluent", L"Guna", L"Batal", L"Pilih Imej Latar atau GIF Animasi", L"Apabila diaktifkan, arahan akan dijalankan sebagai Pentadbir. Benarkan?", L"Amaran Keistimewaan Pentadbir" };
+        return { L"Tetapan Modern Run", L"Pemperibadian", L"Susun Atur & Kedudukan", L"Sejarah & Kelakuan", L"Bahasa (21)", L"Hidup", L"Mati", L"Lalai", L"Auto", L"Pilih warna...", L"Semak imbas...", L"Kosongkan", L"Kosongkan kini", L"Tersuai", L"Windows 11 Blur (Lalai)", L"Auto (Ikut Windows)", L"Gelap", L"Cerah", L"Bawah Kiri", L"Bawah Tengah", L"Bawah Kanan", L"Atas Kiri", L"Atas Tengah", L"Atas Kanan", L"Tengah Skrin", L"Tema & Permukaan", L"Pilih tema terbina dalam (Windows 11 Blur & Liquid Glass dioptimumkan)", L"Pratetap Tema", L"Pilih daripada 13 tema terbina (lalai Windows 11 Blur)", L"Mod Warna", L"Ikut Windows atau pilih Gelap / Cerah", L"Warna, Latar Belakang & Jejari Tersuai", L"Sesuaikan warna, imej/GIF animasi dan jejari bucu", L"Warna Latar Belakang", L"Biarkan Lalai untuk ikut Tema", L"Warna Sempadan", L"Tukar warna bingkai dialog & kad sejarah", L"Jejari Bucu", L"0 px = segi empat, 14 px = Win11, 27 px = pil", L"Imej Latar / GIF Animasi", L"Tiada dipilih — sokong PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Kelegapan Latar Tersuai", L"Laras kejelasan imej/GIF (lalai 85%)", L"Kedudukan & Mod Paparan", L"Tetapkan lokasi Win + R dan gaya susun atur", L"Kedudukan Dialog", L"Semat ke tepi/tengah skrin atau Auto", L"Ingat Kedudukan Tetingkap Terakhir", L"Buka semula di lokasi seretan terakhir (Ctrl + 0 untuk set semula)", L"Skala Saiz UI", L"Skalakan saiz keseluruhan dialog Run", L"Sejarah & Kelakuan Pelaksanaan", L"Urus sejarah arahan, input awal dan keistimewaan Pentadbir", L"Papar Sejarah Arahan", L"Papar arahan terkini dan item disemat", L"Kosongkan Input Apabila Dibuka", L"Matikan untuk kekalkan arahan terakhir", L"Jalankan sebagai Pentadbir", L"Jalankan dengan hak pentadbir secara lalai (Ctrl + Shift + Enter sentiasa aktif)", L"Padam Semua Sejarah Tersimpan", L"Kosongkan sejarah terkini dari Windows RunMRU", L"Bahasa Paparan (21 Bahasa)", L"Digunakan serta-merta pada dialog Run dan tetingkap Tetapan", L"Pilih Warna", L"Warna Pantas Fluent", L"Guna", L"Batal", L"Pilih Imej Latar atau GIF Animasi", L"Apabila diaktifkan, arahan akan dijalankan sebagai Pentadbir. Benarkan?", L"Amaran Keistimewaan Pentadbir" };
     }
     else if (lang == L"fr") {
-        return { L"Paramètres Modern Run", L"Version " WH_MOD_VERSION, L"Personnalisation", L"Disposition et position", L"Historique et comportement", L"Langue (21)", L"Activé", L"Désactivé", L"Défaut", L"Auto", L"Couleur...", L"Parcourir...", L"Effacer", L"Effacer", L"Personnalisé", L"Windows 11 Blur (Défaut)", L"Auto (Suivre Windows)", L"Sombre", L"Clair", L"Bas gauche", L"Bas centre", L"Bas droite", L"Haut gauche", L"Haut centre", L"Haut droite", L"Centre de l'écran", L"Thème et surface", L"Choisissez un thème intégré (Windows 11 Blur et Liquid Glass optimisés)", L"Préréglage du thème", L"13 thèmes intégrés (Windows 11 Blur par défaut)", L"Mode de couleur", L"Suivre Windows ou fixer Sombre / Clair", L"Couleurs, fond et arrondi personnalisés", L"Personnalisez les couleurs, l'image/GIF animé et le rayon des coins", L"Couleur d'arrière-plan", L"Laisser par défaut pour suivre le thème", L"Couleur de bordure", L"Modifier la bordure de la barre et de l'historique", L"Rayon des coins", L"0 px = carré, 14 px = Win11, 27 px = pilule", L"Image de fond / GIF animé", L"Aucun fichier — PNG, JPG, WebP, GIF animé (max 25 Mo)", L"Actif : ", L"Opacité du fond personnalisé", L"Ajuster la visibilité de l'image/GIF (85 % par défaut)", L"Position et mode d'affichage", L"Configurez où Win + R s'ouvre et votre disposition", L"Position de la boîte", L"Épingler à un bord/centre ou Auto", L"Mémoriser la dernière position", L"Rouvrir au dernier emplacement déplacé (Ctrl+0 pour réinitialiser)", L"Échelle de l'interface", L"Ajuster la taille globale de la boîte Run", L"Historique et exécution", L"Gérer l'historique, la saisie initiale et les droits Administrateur", L"Afficher l'historique", L"Afficher les commandes récentes et épinglées", L"Vider le champ à l'ouverture", L"Désactiver pour garder la dernière commande", L"Exécuter en administrateur", L"Élever par défaut (Ctrl+Maj+Entrée fonctionne toujours)", L"Effacer tout l'historique", L"Supprimer l'historique récent de Windows RunMRU", L"Langue d'affichage (21 langues)", L"S'applique immédiatement à Run et aux Paramètres", L"Choisir une couleur", L"Nuancier rapide Fluent", L"Appliquer", L"Annuler", L"Sélectionner une image de fond ou un GIF animé", L"Une fois activé, les commandes s'exécuteront en tant qu'administrateur. Autoriser ?", L"Avertissement Administrateur" };
+        return { L"Paramètres Modern Run", L"Personnalisation", L"Disposition et position", L"Historique et comportement", L"Langue (21)", L"Activé", L"Désactivé", L"Défaut", L"Auto", L"Couleur...", L"Parcourir...", L"Effacer", L"Effacer", L"Personnalisé", L"Windows 11 Blur (Défaut)", L"Auto (Suivre Windows)", L"Sombre", L"Clair", L"Bas gauche", L"Bas centre", L"Bas droite", L"Haut gauche", L"Haut centre", L"Haut droite", L"Centre de l'écran", L"Thème et surface", L"Choisissez un thème intégré (Windows 11 Blur et Liquid Glass optimisés)", L"Préréglage du thème", L"13 thèmes intégrés (Windows 11 Blur par défaut)", L"Mode de couleur", L"Suivre Windows ou fixer Sombre / Clair", L"Couleurs, fond et arrondi personnalisés", L"Personnalisez les couleurs, l'image/GIF animé et le rayon des coins", L"Couleur d'arrière-plan", L"Laisser par défaut pour suivre le thème", L"Couleur de bordure", L"Modifier la bordure de la barre et de l'historique", L"Rayon des coins", L"0 px = carré, 14 px = Win11, 27 px = pilule", L"Image de fond / GIF animé", L"Aucun fichier — PNG, JPG, WebP, GIF animé (max 25 Mo)", L"Actif : ", L"Opacité du fond personnalisé", L"Ajuster la visibilité de l'image/GIF (85 % par défaut)", L"Position et mode d'affichage", L"Configurez où Win + R s'ouvre et votre disposition", L"Position de la boîte", L"Épingler à un bord/centre ou Auto", L"Mémoriser la dernière position", L"Rouvrir au dernier emplacement déplacé (Ctrl + 0 pour réinitialiser)", L"Échelle de l'interface", L"Ajuster la taille globale de la boîte Run", L"Historique et exécution", L"Gérer l'historique, la saisie initiale et les droits Administrateur", L"Afficher l'historique", L"Afficher les commandes récentes et épinglées", L"Vider le champ à l'ouverture", L"Désactiver pour garder la dernière commande", L"Exécuter en administrateur", L"Élever par défaut (Ctrl + Maj + Entrée fonctionne toujours)", L"Effacer tout l'historique", L"Supprimer l'historique récent de Windows RunMRU", L"Langue d'affichage (21 langues)", L"S'applique immédiatement à Run et aux Paramètres", L"Choisir une couleur", L"Nuancier rapide Fluent", L"Appliquer", L"Annuler", L"Sélectionner une image de fond ou un GIF animé", L"Une fois activé, les commandes s'exécuteront en tant qu'administrateur. Autoriser ?", L"Avertissement Administrateur" };
     }
     else if (lang == L"de") {
-        return { L"Modern Run Einstellungen", L"Version " WH_MOD_VERSION, L"Personalisierung", L"Layout & Position", L"Verlauf & Verhalten", L"Sprache (21)", L"Ein", L"Aus", L"Standard", L"Auto", L"Farbe...", L"Durchsuchen...", L"Löschen", L"Jetzt löschen", L"Benutzerdefiniert", L"Windows 11 Blur (Standard)", L"Auto (Windows folgen)", L"Dunkel", L"Hell", L"Unten links", L"Unten Mitte", L"Unten rechts", L"Oben links", L"Oben Mitte", L"Oben rechts", L"Bildschirmmitte", L"Design & Oberfläche", L"Integriertes Design wählen (Windows 11 Blur & Liquid Glass optimiert)", L"Design-Vorlage", L"Zwischen 13 Designs wechseln (Standard: Windows 11 Blur)", L"Farbmodus", L"Windows folgen oder Dunkel / Hell festlegen", L"Farben, Hintergrund & Eckenradius", L"Farben, Bild/animiertes GIF und Eckenradius anpassen", L"Hintergrundfarbe", L"Standard lassen, um dem Design zu folgen", L"Rahmenfarbe", L"Rahmenfarbe von Eingabeleiste & Verlauf ändern", L"Eckenradius", L"0 px = eckig, 14 px = Win11, 27 px = Pille", L"Hintergrundbild / Animiertes GIF", L"Keins gewählt — PNG, JPG, WebP, GIF (max. 25 MB)", L"Aktiv: ", L"Deckkraft des Hintergrunds", L"Sichtbarkeit von Bild/GIF anpassen (Standard 85 %)", L"Position & Anzeigemodus", L"Position von Win + R und Layout-Stil festlegen", L"Dialog-Position", L"An Bildschirmrand/-mitte anheften oder Auto", L"Letzte Fensterposition merken", L"An letzter Position öffnen (Strg+0 zum Zurücksetzen)", L"UI-Skalierung", L"Gesamtgröße des Ausführen-Dialogs skalieren", L"Verlauf & Ausführungsverhalten", L"Befehlsverlauf, Eingabe und Administratorrechte verwalten", L"Befehlsverlauf anzeigen", L"Letzte Befehle und angeheftete Einträge anzeigen", L"Eingabefeld beim Öffnen leeren", L"Ausschalten, um letzten Befehl zu behalten", L"Als Administrator ausführen", L"Standardmäßig erhöht starten (Strg+Umschalt+Enter geht immer)", L"Gesamten Verlauf löschen", L"Verlauf aus Windows RunMRU entfernen", L"Anzeigesprache (21 Sprachen)", L"Gilt sofort für Run-Dialog und Einstellungen", L"Farbe wählen", L"Fluent-Schnellfarben", L"Anwenden", L"Abbrechen", L"Hintergrundbild oder animiertes GIF wählen", L"Wenn aktiviert, werden Befehle mit Administratorrechten gestartet. Zulassen?", L"Administrator-Warnung" };
+        return { L"Modern Run Einstellungen", L"Personalisierung", L"Layout & Position", L"Verlauf & Verhalten", L"Sprache (21)", L"Ein", L"Aus", L"Standard", L"Auto", L"Farbe...", L"Durchsuchen...", L"Löschen", L"Jetzt löschen", L"Benutzerdefiniert", L"Windows 11 Blur (Standard)", L"Auto (Windows folgen)", L"Dunkel", L"Hell", L"Unten links", L"Unten Mitte", L"Unten rechts", L"Oben links", L"Oben Mitte", L"Oben rechts", L"Bildschirmmitte", L"Design & Oberfläche", L"Integriertes Design wählen (Windows 11 Blur & Liquid Glass optimiert)", L"Design-Vorlage", L"Zwischen 13 Designs wechseln (Standard: Windows 11 Blur)", L"Farbmodus", L"Windows folgen oder Dunkel / Hell festlegen", L"Farben, Hintergrund & Eckenradius", L"Farben, Bild/animiertes GIF und Eckenradius anpassen", L"Hintergrundfarbe", L"Standard lassen, um dem Design zu folgen", L"Rahmenfarbe", L"Rahmenfarbe von Eingabeleiste & Verlauf ändern", L"Eckenradius", L"0 px = eckig, 14 px = Win11, 27 px = Pille", L"Hintergrundbild / Animiertes GIF", L"Keins gewählt — PNG, JPG, WebP, GIF (max. 25 MB)", L"Aktiv: ", L"Deckkraft des Hintergrunds", L"Sichtbarkeit von Bild/GIF anpassen (Standard 85 %)", L"Position & Anzeigemodus", L"Position von Win + R und Layout-Stil festlegen", L"Dialog-Position", L"An Bildschirmrand/-mitte anheften oder Auto", L"Letzte Fensterposition merken", L"An letzter Position öffnen (Strg + 0 zum Zurücksetzen)", L"UI-Skalierung", L"Gesamtgröße des Ausführen-Dialogs skalieren", L"Verlauf & Ausführungsverhalten", L"Befehlsverlauf, Eingabe und Administratorrechte verwalten", L"Befehlsverlauf anzeigen", L"Letzte Befehle und angeheftete Einträge anzeigen", L"Eingabefeld beim Öffnen leeren", L"Ausschalten, um letzten Befehl zu behalten", L"Als Administrator ausführen", L"Standardmäßig erhöht starten (Strg + Umschalt + Enter geht immer)", L"Gesamten Verlauf löschen", L"Verlauf aus Windows RunMRU entfernen", L"Anzeigesprache (21 Sprachen)", L"Gilt sofort für Run-Dialog und Einstellungen", L"Farbe wählen", L"Fluent-Schnellfarben", L"Anwenden", L"Abbrechen", L"Hintergrundbild oder animiertes GIF wählen", L"Wenn aktiviert, werden Befehle mit Administratorrechten gestartet. Zulassen?", L"Administrator-Warnung" };
     }
     else if (lang == L"es") {
-        return { L"Configuración de Modern Run", L"Versión " WH_MOD_VERSION, L"Personalización", L"Diseño y posición", L"Historial y comportamiento", L"Idioma (21)", L"Activado", L"Desactivado", L"Predet.", L"Auto", L"Elegir color...", L"Examinar...", L"Quitar", L"Borrar ahora", L"Personalizado", L"Windows 11 Blur (Predet.)", L"Auto (Seguir a Windows)", L"Oscuro", L"Claro", L"Abajo izquierda", L"Abajo centro", L"Abajo derecha", L"Arriba izquierda", L"Arriba centro", L"Arriba derecha", L"Centro de pantalla", L"Tema y superficie", L"Elige un tema integrado (Windows 11 Blur y Liquid Glass optimizados)", L"Tema predefinido", L"Cambia entre 13 temas integrados (predeterminado: Windows 11 Blur)", L"Modo de color", L"Seguir el tema de Windows o fijar Oscuro / Claro", L"Colores, fondo y esquinas personalizados", L"Personaliza colores, imagen/GIF animado y radio de esquinas", L"Color de fondo", L"Deja en Predet. para seguir el tema", L"Color del borde", L"Cambiar el color del borde de la barra e historial", L"Radio de esquinas", L"0 px = cuadrado, 14 px = Win11, 27 px = cápsula", L"Imagen de fondo / GIF animado", L"Sin archivo — admite PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Activo: ", L"Opacidad del fondo", L"Ajusta la visibilidad de la imagen/GIF (85 % por defecto)", L"Posición y modo de visualización", L"Configura dónde se abre Win + R y el estilo de diseño", L"Posición del diálogo", L"Fijar en un borde/centro o usar Auto", L"Recordar última posición", L"Reabrir en la última posición arrastrada (Ctrl+0 para restablecer)", L"Escala de interfaz", L"Escalar el tamaño general del diálogo Run", L"Historial y ejecución", L"Controla el historial, el texto inicial y los permisos de Administrador", L"Mostrar historial de comandos", L"Mostrar comandos recientes y fijados", L"Vaciar campo al abrir", L"Desactívalo para mantener el último comando", L"Ejecutar como Administrador", L"Elevar por defecto (Ctrl+Mayús+Entrar siempre funciona)", L"Borrar todo el historial", L"Eliminar el historial reciente de Windows RunMRU", L"Idioma de visualización (21 idiomas)", L"Se aplica al instante al diálogo Run y a Configuración", L"Elegir color", L"Colores rápidos Fluent", L"Aplicar", L"Cancelar", L"Seleccionar imagen de fondo o GIF animado", L"Al activarlo, los comandos se ejecutarán como Administrador. ¿Permitir?", L"Aviso de Administrador" };
+        return { L"Configuración de Modern Run", L"Personalización", L"Diseño y posición", L"Historial y comportamiento", L"Idioma (21)", L"Activado", L"Desactivado", L"Predet.", L"Auto", L"Elegir color...", L"Examinar...", L"Quitar", L"Borrar ahora", L"Personalizado", L"Windows 11 Blur (Predet.)", L"Auto (Seguir a Windows)", L"Oscuro", L"Claro", L"Abajo izquierda", L"Abajo centro", L"Abajo derecha", L"Arriba izquierda", L"Arriba centro", L"Arriba derecha", L"Centro de pantalla", L"Tema y superficie", L"Elige un tema integrado (Windows 11 Blur y Liquid Glass optimizados)", L"Tema predefinido", L"Cambia entre 13 temas integrados (predeterminado: Windows 11 Blur)", L"Modo de color", L"Seguir el tema de Windows o fijar Oscuro / Claro", L"Colores, fondo y esquinas personalizados", L"Personaliza colores, imagen/GIF animado y radio de esquinas", L"Color de fondo", L"Deja en Predet. para seguir el tema", L"Color del borde", L"Cambiar el color del borde de la barra e historial", L"Radio de esquinas", L"0 px = cuadrado, 14 px = Win11, 27 px = cápsula", L"Imagen de fondo / GIF animado", L"Sin archivo — admite PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Activo: ", L"Opacidad del fondo", L"Ajusta la visibilidad de la imagen/GIF (85 % por defecto)", L"Posición y modo de visualización", L"Configura dónde se abre Win + R y el estilo de diseño", L"Posición del diálogo", L"Fijar en un borde/centro o usar Auto", L"Recordar última posición", L"Reabrir en la última posición arrastrada (Ctrl + 0 para restablecer)", L"Escala de interfaz", L"Escalar el tamaño general del diálogo Run", L"Historial y ejecución", L"Controla el historial, el texto inicial y los permisos de Administrador", L"Mostrar historial de comandos", L"Mostrar comandos recientes y fijados", L"Vaciar campo al abrir", L"Desactívalo para mantener el último comando", L"Ejecutar como Administrador", L"Elevar por defecto (Ctrl + Mayús + Entrar siempre funciona)", L"Borrar todo el historial", L"Eliminar el historial reciente de Windows RunMRU", L"Idioma de visualización (21 idiomas)", L"Se aplica al instante al diálogo Run y a Configuración", L"Elegir color", L"Colores rápidos Fluent", L"Aplicar", L"Cancelar", L"Seleccionar imagen de fondo o GIF animado", L"Al activarlo, los comandos se ejecutarán como Administrador. ¿Permitir?", L"Aviso de Administrador" };
     }
     else if (lang == L"pt") {
-        return { L"Configurações do Modern Run", L"Versão " WH_MOD_VERSION, L"Personalização", L"Layout e posição", L"Histórico e comportamento", L"Idioma (21)", L"Ativado", L"Desativado", L"Padrão", L"Auto", L"Escolher cor...", L"Procurar...", L"Limpar", L"Limpar agora", L"Personalizado", L"Windows 11 Blur (Padrão)", L"Auto (Seguir Windows)", L"Escuro", L"Claro", L"Inferior esquerdo", L"Inferior centro", L"Inferior direito", L"Superior esquerdo", L"Superior centro", L"Superior direito", L"Centro da tela", L"Tema e superfície", L"Escolha um tema integrado (Windows 11 Blur e Liquid Glass otimizados)", L"Predefinição de tema", L"Alterne entre 13 temas (padrão: Windows 11 Blur)", L"Modo de cor", L"Seguir o Windows ou fixar Escuro / Claro", L"Cores, fundo e cantos personalizados", L"Personalize cores, imagem/GIF animado e raio dos cantos", L"Cor de fundo", L"Deixe em Padrão para seguir o tema", L"Cor da borda", L"Alterar a cor da borda da barra e do histórico", L"Raio dos cantos", L"0 px = quadrado, 14 px = Win11, 27 px = pílula", L"Imagem de fundo / GIF animado", L"Nenhum arquivo — PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Ativo: ", L"Opacidade do fundo", L"Ajuste a visibilidade da imagem/GIF (padrão 85%)", L"Posição e modo de exibição", L"Configure onde o Win + R abre e o estilo do layout", L"Posição da caixa", L"Fixar em uma borda/centro ou usar Auto", L"Lembrar última posição", L"Reabrir na última posição arrastada (Ctrl+0 para redefinir)", L"Escala da interface", L"Redimensionar o tamanho geral da caixa Run", L"Histórico e execução", L"Gerencie histórico, entrada inicial e privilégios de Administrador", L"Mostrar histórico de comandos", L"Exibir comandos recentes e fixados", L"Limpar campo ao abrir", L"Desative para manter o último comando", L"Executar como Administrador", L"Elevar por padrão (Ctrl+Shift+Enter sempre funciona)", L"Limpar todo o histórico", L"Remover histórico recente do Windows RunMRU", L"Idioma de exibição (21 idiomas)", L"Aplica imediatamente na caixa Run e nas Configurações", L"Escolher cor", L"Paleta rápida Fluent", L"Aplicar", L"Cancelar", L"Selecionar imagem de fundo ou GIF animado", L"Quando ativado, os comandos serão executados como Administrador. Permitir?", L"Aviso de Administrador" };
+        return { L"Configurações do Modern Run", L"Personalização", L"Layout e posição", L"Histórico e comportamento", L"Idioma (21)", L"Ativado", L"Desativado", L"Padrão", L"Auto", L"Escolher cor...", L"Procurar...", L"Limpar", L"Limpar agora", L"Personalizado", L"Windows 11 Blur (Padrão)", L"Auto (Seguir Windows)", L"Escuro", L"Claro", L"Inferior esquerdo", L"Inferior centro", L"Inferior direito", L"Superior esquerdo", L"Superior centro", L"Superior direito", L"Centro da tela", L"Tema e superfície", L"Escolha um tema integrado (Windows 11 Blur e Liquid Glass otimizados)", L"Predefinição de tema", L"Alterne entre 13 temas (padrão: Windows 11 Blur)", L"Modo de cor", L"Seguir o Windows ou fixar Escuro / Claro", L"Cores, fundo e cantos personalizados", L"Personalize cores, imagem/GIF animado e raio dos cantos", L"Cor de fundo", L"Deixe em Padrão para seguir o tema", L"Cor da borda", L"Alterar a cor da borda da barra e do histórico", L"Raio dos cantos", L"0 px = quadrado, 14 px = Win11, 27 px = pílula", L"Imagem de fundo / GIF animado", L"Nenhum arquivo — PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Ativo: ", L"Opacidade do fundo", L"Ajuste a visibilidade da imagem/GIF (padrão 85%)", L"Posição e modo de exibição", L"Configure onde o Win + R abre e o estilo do layout", L"Posição da caixa", L"Fixar em uma borda/centro ou usar Auto", L"Lembrar última posição", L"Reabrir na última posição arrastada (Ctrl + 0 para redefinir)", L"Escala da interface", L"Redimensionar o tamanho geral da caixa Run", L"Histórico e execução", L"Gerencie histórico, entrada inicial e privilégios de Administrador", L"Mostrar histórico de comandos", L"Exibir comandos recentes e fixados", L"Limpar campo ao abrir", L"Desative para manter o último comando", L"Executar como Administrador", L"Elevar por padrão (Ctrl + Shift + Enter sempre funciona)", L"Limpar todo o histórico", L"Remover histórico recente do Windows RunMRU", L"Idioma de exibição (21 idiomas)", L"Aplica imediatamente na caixa Run e nas Configurações", L"Escolher cor", L"Paleta rápida Fluent", L"Aplicar", L"Cancelar", L"Selecionar imagem de fundo ou GIF animado", L"Quando ativado, os comandos serão executados como Administrador. Permitir?", L"Aviso de Administrador" };
     }
     else if (lang == L"it") {
-        return { L"Impostazioni Modern Run", L"Versione " WH_MOD_VERSION, L"Personalizzazione", L"Layout e posizione", L"Cronologia e comportamento", L"Lingua (21)", L"Attivo", L"Disattivo", L"Predef.", L"Auto", L"Scegli colore...", L"Sfoglia...", L"Rimuovi", L"Cancella ora", L"Personalizzato", L"Windows 11 Blur (Predef.)", L"Auto (Segui Windows)", L"Scuro", L"Chiaro", L"In basso a sinistra", L"In basso al centro", L"In basso a destra", L"In alto a sinistra", L"In alto al centro", L"In alto a destra", L"Centro schermo", L"Tema e superficie", L"Scegli un tema integrato (Windows 11 Blur e Liquid Glass ottimizzati)", L"Tema predefinito", L"Scegli tra 13 temi integrati (predefinito: Windows 11 Blur)", L"Modalità colore", L"Segui Windows o fissa Scuro / Chiaro", L"Colori, sfondo e angoli personalizzati", L"Personalizza colori, immagine/GIF animata e raggio angoli", L"Colore di sfondo", L"Lascia Predef. per seguire il tema", L"Colore del bordo", L"Modifica il bordo della barra e della cronologia", L"Raggio angoli", L"0 px = quadrato, 14 px = Win11, 27 px = pillola", L"Immagine di sfondo / GIF animata", L"Nessun file — PNG, JPG, WebP, GIF animata (max 25 MB)", L"Attivo: ", L"Opacità sfondo personalizzato", L"Regola la visibilità di immagine/GIF (predefinito 85%)", L"Posizione e modalità", L"Configura dove aprire Win + R e lo stile del layout", L"Posizione finestra", L"Fissa a un bordo/centro o usa Auto", L"Ricorda ultima posizione", L"Riapri nell'ultima posizione trascinata (Ctrl+0 per ripristinare)", L"Scala interfaccia", L"Ridimensiona l'intera finestra Esegui", L"Cronologia ed esecuzione", L"Gestisci cronologia, input iniziale e privilegi Amministratore", L"Mostra cronologia comandi", L"Mostra comandi recenti ed elementi fissati", L"Svuota campo all'apertura", L"Disattiva per mantenere l'ultimo comando", L"Esegui come Amministratore", L"Avvia elevato per impostazione predefinita (Ctrl+Maiusc+Invio sempre attivo)", L"Cancella tutta la cronologia", L"Pulisci la cronologia recente da Windows RunMRU", L"Lingua interfaccia (21 lingue)", L"Applicata subito alla finestra Esegui e alle Impostazioni", L"Scegli un colore", L"Tavolozza rapida Fluent", L"Applica", L"Annulla", L"Seleziona immagine di sfondo o GIF animata", L"Se attivo, i comandi verranno eseguiti come Amministratore. Consentire?", L"Avviso Amministratore" };
+        return { L"Impostazioni Modern Run", L"Personalizzazione", L"Layout e posizione", L"Cronologia e comportamento", L"Lingua (21)", L"Attivo", L"Disattivo", L"Predef.", L"Auto", L"Scegli colore...", L"Sfoglia...", L"Rimuovi", L"Cancella ora", L"Personalizzato", L"Windows 11 Blur (Predef.)", L"Auto (Segui Windows)", L"Scuro", L"Chiaro", L"In basso a sinistra", L"In basso al centro", L"In basso a destra", L"In alto a sinistra", L"In alto al centro", L"In alto a destra", L"Centro schermo", L"Tema e superficie", L"Scegli un tema integrato (Windows 11 Blur e Liquid Glass ottimizzati)", L"Tema predefinito", L"Scegli tra 13 temi integrati (predefinito: Windows 11 Blur)", L"Modalità colore", L"Segui Windows o fissa Scuro / Chiaro", L"Colori, sfondo e angoli personalizzati", L"Personalizza colori, immagine/GIF animata e raggio angoli", L"Colore di sfondo", L"Lascia Predef. per seguire il tema", L"Colore del bordo", L"Modifica il bordo della barra e della cronologia", L"Raggio angoli", L"0 px = quadrato, 14 px = Win11, 27 px = pillola", L"Immagine di sfondo / GIF animata", L"Nessun file — PNG, JPG, WebP, GIF animata (max 25 MB)", L"Attivo: ", L"Opacità sfondo personalizzato", L"Regola la visibilità di immagine/GIF (predefinito 85%)", L"Posizione e modalità", L"Configura dove aprire Win + R e lo stile del layout", L"Posizione finestra", L"Fissa a un bordo/centro o usa Auto", L"Ricorda ultima posizione", L"Riapri nell'ultima posizione trascinata (Ctrl + 0 per ripristinare)", L"Scala interfaccia", L"Ridimensiona l'intera finestra Esegui", L"Cronologia ed esecuzione", L"Gestisci cronologia, input iniziale e privilegi Amministratore", L"Mostra cronologia comandi", L"Mostra comandi recenti ed elementi fissati", L"Svuota campo all'apertura", L"Disattiva per mantenere l'ultimo comando", L"Esegui come Amministratore", L"Avvia elevato per impostazione predefinita (Ctrl + Maiusc + Invio sempre attivo)", L"Cancella tutta la cronologia", L"Pulisci la cronologia recente da Windows RunMRU", L"Lingua interfaccia (21 lingue)", L"Applicata subito alla finestra Esegui e alle Impostazioni", L"Scegli un colore", L"Tavolozza rapida Fluent", L"Applica", L"Annulla", L"Seleziona immagine di sfondo o GIF animata", L"Se attivo, i comandi verranno eseguiti come Amministratore. Consentire?", L"Avviso Amministratore" };
     }
     else if (lang == L"ru") {
-        return { L"Настройки Modern Run", L"Версия " WH_MOD_VERSION, L"Персонализация", L"Макет и позиция", L"История и поведение", L"Язык (21)", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Цвет...", L"Обзор...", L"Убрать", L"Очистить", L"Своя тема", L"Windows 11 Blur (По умолч.)", L"Авто (как в Windows)", L"Тёмная", L"Светлая", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и поверхность", L"Выберите встроенную тему (Windows 11 Blur и Liquid Glass настроены)", L"Пресет темы", L"13 встроенных тем (по умолчанию Windows 11 Blur)", L"Цветовой режим", L"Следовать системе или выбрать Тёмный / Светлый", L"Свои цвета, фон и скругление", L"Настройте цвета, картинку/GIF-фон и радиус углов", L"Цвет фона", L"Оставьте по умолчанию для цвета темы", L"Цвет рамки", L"Изменить цвет рамки панели и истории", L"Радиус углов", L"0 px = прямой, 14 px = Win11, 27 px = капсула", L"Фоновое изображение / GIF", L"Не выбрано — PNG, JPG, WebP, аним. GIF (до 25 МБ)", L"Активно: ", L"Прозрачность фона", L"Видимость изображения/GIF (по умолч. 85%)", L"Позиция и режим отображения", L"Настройте место появления Win + R и стиль макета", L"Позиция окна", L"Закрепить у края/центра экрана или Авто", L"Запоминать позицию окна", L"Открывать в последнем месте (Ctrl+0 для сброса)", L"Масштаб интерфейса", L"Изменить общий размер окна Выполнить", L"История и запуск", L"Управление историей, начальным текстом и правами администратора", L"Показывать историю команд", L"Показывать недавние и закреплённые команды", L"Очищать поле при открытии", L"Выключите, чтобы сохранять последнюю команду", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl+Shift+Enter работает всегда)", L"Очистить всю историю", L"Удалить недавние команды из Windows RunMRU", L"Язык интерфейса (21 язык)", L"Применяется сразу к окну Выполнить и Настройкам", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Выберите фоновое изображение или GIF", L"При включении команды будут запускаться с правами администратора. Разрешить?", L"Предупреждение прав администратора" };
+        return { L"Настройки Modern Run", L"Персонализация", L"Макет и позиция", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Цвет...", L"Обзор...", L"Убрать", L"Очистить", L"Своя тема", L"Windows 11 Blur (По умолч.)", L"Авто (как в Windows)", L"Тёмная", L"Светлая", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и поверхность", L"Базовое оформление окна и меню", L"Тема", L"Цвета, фон и скругление углов", L"Цветовой режим", L"Оформление по настройкам Windows или выбранному режиму", L"Свои цвета, фон и скругление", L"Цвета и скругление поверх выбранной темы", L"Цвет фона", L"Собственный цвет вместо цвета из настройки «Тема»", L"Цвет рамки", L"Собственный цвет для рамок в режиме «Определено модом»", L"Радиус углов", L"0 px = прямой, 14 px = Win11, 27 px = капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"При отсутствии изображения регулирует непрозрачность фона окна", L"Позиция и режим отображения", L"Позиция и компоновка при открытии по Win + R", L"Позиция окна", L"Открывается у выбранного края или в центре экрана", L"Запоминать позицию окна", L"Открывается в последней позиции. Ctrl + 0 сбрасывает ее", L"Масштаб интерфейса", L"Размер текста и элементов интерфейса", L"История и запуск", L"Управление историей, начальным текстом и правами администратора", L"Показывать историю команд", L"Недавние и закрепленные команды в списке истории", L"Очищать поле при открытии", L"При открытии поле ввода пустое", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Скрывает недавние команды из истории мода", L"Язык интерфейса", L"Применяется к окну «Выполнить» и настройкам", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"При включении команды будут запускаться с правами администратора. Разрешить?", L"Предупреждение прав администратора" };
     }
     else if (lang == L"uk") {
-        return { L"Налаштування Modern Run", L"Версія " WH_MOD_VERSION, L"Персоналізація", L"Макет і позиція", L"Історія та поведінка", L"Мова (21)", L"Увімк.", L"Вимк.", L"Скинути", L"Авто", L"Колір...", L"Огляд...", L"Прибрати", L"Очистити", L"Власна", L"Windows 11 Blur (За замовч.)", L"Авто (як у Windows)", L"Темна", L"Світла", L"Знизу зліва", L"Знизу по центру", L"Знизу справа", L"Зверху зліва", L"Зверху по центру", L"Зверху справа", L"По центру екрана", L"Тема та поверхня", L"Оберіть вбудовану тему (Windows 11 Blur і Liquid Glass оптимізовано)", L"Пресет теми", L"13 вбудованих тем (за замовчуванням Windows 11 Blur)", L"Режим кольору", L"Слідувати Windows або обрати Темний / Світлий", L"Власні кольори, фон і заокруглення", L"Налаштуйте кольори, зображення/GIF-фон і радіус кутів", L"Колір фону", L"Залиште за замовчуванням для кольору теми", L"Колір рамки", L"Змінити колір рамки панелі та історії", L"Радіус кутів", L"0 px = прямі, 14 px = Win11, 27 px = капсула", L"Фонове зображення / GIF", L"Не обрано — PNG, JPG, WebP, анім. GIF (до 25 МБ)", L"Активно: ", L"Непрозорість фону", L"Видимість зображення/GIF (за замовч. 85%)", L"Позиція та режим показу", L"Налаштуйте розташування Win + R і стиль макета", L"Позиція вікна", L"Закріпити біля краю/центру або Авто", L"Запам'ятовувати позицію вікна", L"Відкривати в останньому місці (Ctrl+0 для скидання)", L"Масштаб інтерфейсу", L"Змінити загальний розмір вікна Виконати", L"Історія та виконання", L"Керування історією, початковим полем і правами адміністратора", L"Показувати історію команд", L"Показувати останні та закріплені команди", L"Очищати поле при відкритті", L"Вимкніть, щоб зберігати останню команду", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням (Ctrl+Shift+Enter завжди працює)", L"Очистити всю історію", L"Видалити останні команди з Windows RunMRU", L"Мова інтерфейсу (21 мова)", L"Застосовується миттєво до вікна Виконати та Налаштувань", L"Вибір кольору", L"Швидка палітра Fluent", L"Застосувати", L"Скасувати", L"Оберіть фонове зображення або GIF", L"Якщо увімкнено, команди запускатимуться з правами адміністратора. Дозволити?", L"Попередження прав адміністратора" };
+        return { L"Налаштування Modern Run", L"Персоналізація", L"Макет і позиція", L"Історія та поведінка", L"Мова (21)", L"Увімк.", L"Вимк.", L"Скинути", L"Авто", L"Колір...", L"Огляд...", L"Прибрати", L"Очистити", L"Власна", L"Windows 11 Blur (За замовч.)", L"Авто (як у Windows)", L"Темна", L"Світла", L"Знизу зліва", L"Знизу по центру", L"Знизу справа", L"Зверху зліва", L"Зверху по центру", L"Зверху справа", L"По центру екрана", L"Тема та поверхня", L"Оберіть вбудовану тему (Windows 11 Blur і Liquid Glass оптимізовано)", L"Пресет теми", L"13 вбудованих тем (за замовчуванням Windows 11 Blur)", L"Режим кольору", L"Слідувати Windows або обрати Темний / Світлий", L"Власні кольори, фон і заокруглення", L"Налаштуйте кольори, зображення/GIF-фон і радіус кутів", L"Колір фону", L"Залиште за замовчуванням для кольору теми", L"Колір рамки", L"Змінити колір рамки панелі та історії", L"Радіус кутів", L"0 px = прямі, 14 px = Win11, 27 px = капсула", L"Фонове зображення / GIF", L"Не обрано — PNG, JPG, WebP, анім. GIF (до 25 МБ)", L"Активно: ", L"Непрозорість фону", L"Видимість зображення/GIF (за замовч. 85%)", L"Позиція та режим показу", L"Налаштуйте розташування Win + R і стиль макета", L"Позиція вікна", L"Закріпити біля краю/центру або Авто", L"Запам'ятовувати позицію вікна", L"Відкривати в останньому місці (Ctrl + 0 для скидання)", L"Масштаб інтерфейсу", L"Змінити загальний розмір вікна Виконати", L"Історія та виконання", L"Керування історією, початковим полем і правами адміністратора", L"Показувати історію команд", L"Показувати останні та закріплені команди", L"Очищати поле при відкритті", L"Вимкніть, щоб зберігати останню команду", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням (Ctrl + Shift + Enter завжди працює)", L"Очистити всю історію", L"Видалити останні команди з Windows RunMRU", L"Мова інтерфейсу (21 мова)", L"Застосовується миттєво до вікна Виконати та Налаштувань", L"Вибір кольору", L"Швидка палітра Fluent", L"Застосувати", L"Скасувати", L"Оберіть фонове зображення або GIF", L"Якщо увімкнено, команди запускатимуться з правами адміністратора. Дозволити?", L"Попередження прав адміністратора" };
     }
     else if (lang == L"pl") {
-        return { L"Ustawienia Modern Run", L"Wersja " WH_MOD_VERSION, L"Personalizacja", L"Układ i pozycja", L"Historia i działanie", L"Język (21)", L"Wł.", L"Wył.", L"Domyślne", L"Auto", L"Kolor...", L"Przeglądaj...", L"Usuń", L"Wyczyść teraz", L"Własny", L"Windows 11 Blur (Domyślny)", L"Auto (jak Windows)", L"Ciemny", L"Jasny", L"Dół lewo", L"Dół środek", L"Dół prawo", L"Góra lewo", L"Góra środek", L"Góra prawo", L"Środek ekranu", L"Motyw i powierzchnia", L"Wybierz wbudowany motyw (Windows 11 Blur i Liquid Glass zoptymalizowane)", L"Motyw", L"Wybierz spośród 13 motywów (domyślnie Windows 11 Blur)", L"Tryb kolorów", L"Zgodnie z Windows lub na stałe Ciemny / Jasny", L"Własne kolory, tło i zaokrąglenie", L"Dostosuj kolory, obraz/animowany GIF i promień narożników", L"Kolor tła", L"Pozostaw Domyślne, aby użyć koloru motywu", L"Kolor obramowania", L"Zmień kolor ramki paska i karty historii", L"Zaokrąglenie rogów", L"0 px = kąt prosty, 14 px = Win11, 27 px = kapsułka", L"Obraz tła / Animowany GIF", L"Nie wybrano — PNG, JPG, WebP, animowany GIF (maks. 25 MB)", L"Aktywny: ", L"Krycie własnego tła", L"Dostosuj widoczność obrazu/GIF (domyślnie 85%)", L"Pozycja i tryb widoku", L"Skonfiguruj miejsce otwierania Win + R i układ", L"Pozycja okna", L"Przypnij do krawędzi/środka ekranu lub Auto", L"Zapamiętaj ostatnią pozycję", L"Otwieraj w ostatnim miejscu (Ctrl+0 resetuje)", L"Skala interfejsu", L"Skaluj ogólny rozmiar okna Uruchamianie", L"Historia i uruchamianie", L"Zarządzaj historią, polem początkowym i uprawnieniami Administratora", L"Pokaż historię poleceń", L"Wyświetlaj ostatnie i przypięte polecenia", L"Wyczyść pole przy otwarciu", L"Wyłącz, aby zachować ostatnie polecenie", L"Uruchamiaj jako Administrator", L"Domyślnie z podwyższonymi uprawnieniami (Ctrl+Shift+Enter działa zawsze)", L"Wyczyść całą historię", L"Usuń ostatnie wpisy z Windows RunMRU", L"Język wyświetlania (21 języków)", L"Działa natychmiast w oknie Uruchamianie i Ustawieniach", L"Wybierz kolor", L"Szybkie kolory Fluent", L"Zastosuj", L"Anuluj", L"Wybierz obraz tła lub animowany GIF", L"Po włączeniu polecenia będą uruchamiane jako Administrator. Zezwolić?", L"Ostrzeżenie Administratora" };
+        return { L"Ustawienia Modern Run", L"Personalizacja", L"Układ i pozycja", L"Historia i działanie", L"Język (21)", L"Wł.", L"Wył.", L"Domyślne", L"Auto", L"Kolor...", L"Przeglądaj...", L"Usuń", L"Wyczyść teraz", L"Własny", L"Windows 11 Blur (Domyślny)", L"Auto (jak Windows)", L"Ciemny", L"Jasny", L"Dół lewo", L"Dół środek", L"Dół prawo", L"Góra lewo", L"Góra środek", L"Góra prawo", L"Środek ekranu", L"Motyw i powierzchnia", L"Wybierz wbudowany motyw (Windows 11 Blur i Liquid Glass zoptymalizowane)", L"Motyw", L"Wybierz spośród 13 motywów (domyślnie Windows 11 Blur)", L"Tryb kolorów", L"Zgodnie z Windows lub na stałe Ciemny / Jasny", L"Własne kolory, tło i zaokrąglenie", L"Dostosuj kolory, obraz/animowany GIF i promień narożników", L"Kolor tła", L"Pozostaw Domyślne, aby użyć koloru motywu", L"Kolor obramowania", L"Zmień kolor ramki paska i karty historii", L"Zaokrąglenie rogów", L"0 px = kąt prosty, 14 px = Win11, 27 px = kapsułka", L"Obraz tła / Animowany GIF", L"Nie wybrano — PNG, JPG, WebP, animowany GIF (maks. 25 MB)", L"Aktywny: ", L"Krycie własnego tła", L"Dostosuj widoczność obrazu/GIF (domyślnie 85%)", L"Pozycja i tryb widoku", L"Skonfiguruj miejsce otwierania Win + R i układ", L"Pozycja okna", L"Przypnij do krawędzi/środka ekranu lub Auto", L"Zapamiętaj ostatnią pozycję", L"Otwieraj w ostatnim miejscu (Ctrl + 0 resetuje)", L"Skala interfejsu", L"Skaluj ogólny rozmiar okna Uruchamianie", L"Historia i uruchamianie", L"Zarządzaj historią, polem początkowym i uprawnieniami Administratora", L"Pokaż historię poleceń", L"Wyświetlaj ostatnie i przypięte polecenia", L"Wyczyść pole przy otwarciu", L"Wyłącz, aby zachować ostatnie polecenie", L"Uruchamiaj jako Administrator", L"Domyślnie z podwyższonymi uprawnieniami (Ctrl + Shift + Enter działa zawsze)", L"Wyczyść całą historię", L"Usuń ostatnie wpisy z Windows RunMRU", L"Język wyświetlania (21 języków)", L"Działa natychmiast w oknie Uruchamianie i Ustawieniach", L"Wybierz kolor", L"Szybkie kolory Fluent", L"Zastosuj", L"Anuluj", L"Wybierz obraz tła lub animowany GIF", L"Po włączeniu polecenia będą uruchamiane jako Administrator. Zezwolić?", L"Ostrzeżenie Administratora" };
     }
     else if (lang == L"nl") {
-        return { L"Modern Run Instellingen", L"Versie " WH_MOD_VERSION, L"Personalisatie", L"Indeling en positie", L"Geschiedenis en gedrag", L"Taal (21)", L"Aan", L"Uit", L"Standaard", L"Auto", L"Kleur...", L"Bladeren...", L"Wissen", L"Nu wissen", L"Aangepast", L"Windows 11 Blur (Standaard)", L"Auto (Volg Windows)", L"Donker", L"Licht", L"Linksonder", L"Middenonder", L"Rechtsonder", L"Linksboven", L"Middenboven", L"Rechtsboven", L"Midden scherm", L"Thema en oppervlak", L"Kies een ingebouwd thema (Windows 11 Blur & Liquid Glass geoptimaliseerd)", L"Thema-voorinstelling", L"Kies uit 13 thema's (standaard Windows 11 Blur)", L"Kleurmodus", L"Volg Windows of kies vast Donker / Licht", L"Aangepaste kleuren, achtergrond & afronding", L"Pas kleuren, afbeelding/GIF en hoekradius aan", L"Achtergrondkleur", L"Laat op Standaard om het thema te volgen", L"Randkleur", L"Wijzig de randkleur van balk en geschiedeniskaart", L"Hoekradius", L"0 px = vierkant, 14 px = Win11, 27 px = pil", L"Achtergrondafbeelding / Geanimeerde GIF", L"Geen gekozen — PNG, JPG, WebP, GIF (max 25 MB)", L"Actief: ", L"Dekking achtergrond", L"Pas zichtbaarheid van afbeelding/GIF aan (standaard 85%)", L"Positie en weergavemodus", L"Bepaal waar Win + R opent en je indeling", L"Dialoogpositie", L"Vastzetten aan rand/midden of Auto", L"Laatste vensterpositie onthouden", L"Heropenen op laatst gesleepte positie (Ctrl+0 om te resetten)", L"UI-schaal", L"Algemene grootte van het Uitvoeren-venster schalen", L"Geschiedenis en uitvoering", L"Beheer geschiedenis, begininvoer en Administratorrechten", L"Opdrachtgeschiedenis tonen", L"Recente en vastgezette opdrachten weergeven", L"Invoerveld legen bij openen", L"Uitschakelen om laatste opdracht te behouden", L"Uitvoeren als Administrator", L"Standaard verhoogd starten (Ctrl+Shift+Enter werkt altijd)", L"Alle geschiedenis wissen", L"Recente geschiedenis uit Windows RunMRU wissen", L"Weergavetaal (21 talen)", L"Direct van toepassing op Uitvoeren en Instellingen", L"Kleur kiezen", L"Snelle Fluent-kleuren", L"Toepassen", L"Annuleren", L"Kies een achtergrondafbeelding of geanimeerde GIF", L"Indien ingeschakeld starten opdrachten als Administrator. Toestaan?", L"Administrator-waarschuwing" };
+        return { L"Modern Run Instellingen", L"Personalisatie", L"Indeling en positie", L"Geschiedenis en gedrag", L"Taal (21)", L"Aan", L"Uit", L"Standaard", L"Auto", L"Kleur...", L"Bladeren...", L"Wissen", L"Nu wissen", L"Aangepast", L"Windows 11 Blur (Standaard)", L"Auto (Volg Windows)", L"Donker", L"Licht", L"Linksonder", L"Middenonder", L"Rechtsonder", L"Linksboven", L"Middenboven", L"Rechtsboven", L"Midden scherm", L"Thema en oppervlak", L"Kies een ingebouwd thema (Windows 11 Blur & Liquid Glass geoptimaliseerd)", L"Thema-voorinstelling", L"Kies uit 13 thema's (standaard Windows 11 Blur)", L"Kleurmodus", L"Volg Windows of kies vast Donker / Licht", L"Aangepaste kleuren, achtergrond & afronding", L"Pas kleuren, afbeelding/GIF en hoekradius aan", L"Achtergrondkleur", L"Laat op Standaard om het thema te volgen", L"Randkleur", L"Wijzig de randkleur van balk en geschiedeniskaart", L"Hoekradius", L"0 px = vierkant, 14 px = Win11, 27 px = pil", L"Achtergrondafbeelding / Geanimeerde GIF", L"Geen gekozen — PNG, JPG, WebP, GIF (max 25 MB)", L"Actief: ", L"Dekking achtergrond", L"Pas zichtbaarheid van afbeelding/GIF aan (standaard 85%)", L"Positie en weergavemodus", L"Bepaal waar Win + R opent en je indeling", L"Dialoogpositie", L"Vastzetten aan rand/midden of Auto", L"Laatste vensterpositie onthouden", L"Heropenen op laatst gesleepte positie (Ctrl + 0 om te resetten)", L"UI-schaal", L"Algemene grootte van het Uitvoeren-venster schalen", L"Geschiedenis en uitvoering", L"Beheer geschiedenis, begininvoer en Administratorrechten", L"Opdrachtgeschiedenis tonen", L"Recente en vastgezette opdrachten weergeven", L"Invoerveld legen bij openen", L"Uitschakelen om laatste opdracht te behouden", L"Uitvoeren als Administrator", L"Standaard verhoogd starten (Ctrl + Shift + Enter werkt altijd)", L"Alle geschiedenis wissen", L"Recente geschiedenis uit Windows RunMRU wissen", L"Weergavetaal (21 talen)", L"Direct van toepassing op Uitvoeren en Instellingen", L"Kleur kiezen", L"Snelle Fluent-kleuren", L"Toepassen", L"Annuleren", L"Kies een achtergrondafbeelding of geanimeerde GIF", L"Indien ingeschakeld starten opdrachten als Administrator. Toestaan?", L"Administrator-waarschuwing" };
     }
     else if (lang == L"tr") {
-        return { L"Modern Run Ayarları", L"Sürüm " WH_MOD_VERSION, L"Kişiselleştirme", L"Düzen ve Konum", L"Geçmiş ve Davranış", L"Dil (21)", L"Açık", L"Kapalı", L"Varsayılan", L"Otomatik", L"Renk seç...", L"Gözat...", L"Temizle", L"Şimdi temizle", L"Özel", L"Windows 11 Blur (Varsayılan)", L"Otomatik (Windows'u izle)", L"Koyu", L"Açık", L"Sol Alt", L"Orta Alt", L"Sağ Alt", L"Sol Üst", L"Orta Üst", L"Sağ Üst", L"Ekran Ortası", L"Tema ve Yüzey", L"Yerleşik bir tema seçin (Windows 11 Blur ve Liquid Glass optimize edildi)", L"Tema Ön Ayarı", L"13 yerleşik tema arasında geçiş yapın (varsayılan Windows 11 Blur)", L"Renk Modu", L"Windows temasını izle veya Koyu / Açık sabitle", L"Özel Renkler, Arka Plan ve Köşe", L"Renkleri, resim/hareketli GIF arka planını ve köşe yarıçapını özelleştirin", L"Arka Plan Rengi", L"Temayı izlemek için Varsayılan bırakın", L"Kenarlık Rengi", L"Giriş çubuğu ve geçmiş kartı kenarlığını değiştirin", L"Köşe Yarıçapı", L"0 px = kare, 14 px = Win11, 27 px = kapsül", L"Arka Plan Resmi / Hareketli GIF", L"Seçilmedi — PNG, JPG, WebP, GIF destekler (maks. 25 MB)", L"Etkin: ", L"Arka Plan Opaklığı", L"Resim/GIF görünürlüğünü ayarlayın (varsayılan %85)", L"Konum ve Görünüm Modu", L"Win + R açılış konumunu ve düzen stilini yapılandırın", L"Pencere Konumu", L"Ekran kenarına/ortasına sabitle veya Otomatik", L"Son Pencere Konumunu Hatırla", L"Son sürüklenen konumda aç (sıfırlamak için Ctrl+0)", L"Arayüz Ölçeği", L"Çalıştır penceresinin genel boyutunu ölçeklendir", L"Geçmiş ve Çalıştırma", L"Komut geçmişi, başlangıç metni ve Yönetici izinlerini yönetin", L"Komut Geçmişini Göster", L"Son komutları ve sabitlenenleri göster", L"Açılışta Giriş Kutusunu Temizle", L"Son komutu korumak için kapatın", L"Yönetici Olarak Çalıştır", L"Varsayılan olarak yönetici izniyle aç (Ctrl+Shift+Enter her zaman çalışır)", L"Tüm Kayıtlı Geçmişi Sil", L"Windows RunMRU geçmişini temizle", L"Görüntüleme Dili (21 Dil)", L"Çalıştır penceresi ve Ayarlara anında uygulanır", L"Renk Seç", L"Hızlı Fluent Renkleri", L"Uygula", L"İptal", L"Arka Plan Resmi veya Hareketli GIF Seç", L"Etkinleştirildiğinde komutlar Yönetici ayrıcalıklarıyla çalışır. İzin veriyor musunuz?", L"Yönetici İzni Uyarısı" };
+        return { L"Modern Run Ayarları", L"Kişiselleştirme", L"Düzen ve Konum", L"Geçmiş ve Davranış", L"Dil (21)", L"Açık", L"Kapalı", L"Varsayılan", L"Otomatik", L"Renk seç...", L"Gözat...", L"Temizle", L"Şimdi temizle", L"Özel", L"Windows 11 Blur (Varsayılan)", L"Otomatik (Windows'u izle)", L"Koyu", L"Açık", L"Sol Alt", L"Orta Alt", L"Sağ Alt", L"Sol Üst", L"Orta Üst", L"Sağ Üst", L"Ekran Ortası", L"Tema ve Yüzey", L"Yerleşik bir tema seçin (Windows 11 Blur ve Liquid Glass optimize edildi)", L"Tema Ön Ayarı", L"13 yerleşik tema arasında geçiş yapın (varsayılan Windows 11 Blur)", L"Renk Modu", L"Windows temasını izle veya Koyu / Açık sabitle", L"Özel Renkler, Arka Plan ve Köşe", L"Renkleri, resim/hareketli GIF arka planını ve köşe yarıçapını özelleştirin", L"Arka Plan Rengi", L"Temayı izlemek için Varsayılan bırakın", L"Kenarlık Rengi", L"Giriş çubuğu ve geçmiş kartı kenarlığını değiştirin", L"Köşe Yarıçapı", L"0 px = kare, 14 px = Win11, 27 px = kapsül", L"Arka Plan Resmi / Hareketli GIF", L"Seçilmedi — PNG, JPG, WebP, GIF destekler (maks. 25 MB)", L"Etkin: ", L"Arka Plan Opaklığı", L"Resim/GIF görünürlüğünü ayarlayın (varsayılan %85)", L"Konum ve Görünüm Modu", L"Win + R açılış konumunu ve düzen stilini yapılandırın", L"Pencere Konumu", L"Ekran kenarına/ortasına sabitle veya Otomatik", L"Son Pencere Konumunu Hatırla", L"Son sürüklenen konumda aç (sıfırlamak için Ctrl + 0)", L"Arayüz Ölçeği", L"Çalıştır penceresinin genel boyutunu ölçeklendir", L"Geçmiş ve Çalıştırma", L"Komut geçmişi, başlangıç metni ve Yönetici izinlerini yönetin", L"Komut Geçmişini Göster", L"Son komutları ve sabitlenenleri göster", L"Açılışta Giriş Kutusunu Temizle", L"Son komutu korumak için kapatın", L"Yönetici Olarak Çalıştır", L"Varsayılan olarak yönetici izniyle aç (Ctrl + Shift + Enter her zaman çalışır)", L"Tüm Kayıtlı Geçmişi Sil", L"Windows RunMRU geçmişini temizle", L"Görüntüleme Dili (21 Dil)", L"Çalıştır penceresi ve Ayarlara anında uygulanır", L"Renk Seç", L"Hızlı Fluent Renkleri", L"Uygula", L"İptal", L"Arka Plan Resmi veya Hareketli GIF Seç", L"Etkinleştirildiğinde komutlar Yönetici ayrıcalıklarıyla çalışır. İzin veriyor musunuz?", L"Yönetici İzni Uyarısı" };
     }
     else if (lang == L"hi") {
-        return { L"Modern Run सेटिंग्स", L"संस्करण " WH_MOD_VERSION, L"वैयक्तिकरण", L"लेआउट और स्थिति", L"इतिहास और व्यवहार", L"भाषा (21)", L"चालू", L"बंद", L"डिफ़ॉल्ट", L"ऑटो", L"रंग चुनें...", L"ब्राउज़...", L"हटाएं", L"अभी साफ़ करें", L"कस्टम", L"Windows 11 Blur (डिफ़ॉल्ट)", L"ऑटो (Windows अनुसार)", L"डार्क", L"लाइट", L"नीचे बाएँ", L"नीचे मध्य", L"नीचे दाएँ", L"ऊपर बाएँ", L"ऊपर मध्य", L"ऊपर दाएँ", L"स्क्रीन मध्य", L"थीम और सतह", L"बिल्ट-इन थीम चुनें (Windows 11 Blur और Liquid Glass अनुकूलित हैं)", L"थीम प्रीसेट", L"13 बिल्ट-इन थीम में से चुनें (डिफ़ॉल्ट Windows 11 Blur)", L"रंग मोड", L"Windows थीम का पालन करें या डार्क / लाइट चुनें", L"कस्टम रंग, बैकग्राउंड और कोने", L"रंग, छवि/एनिमेटेड GIF बैकग्राउंड और कोनों की गोलाई बदलें", L"बैकग्राउंड रंग", L"थीम के अनुसार रखने के लिए डिफ़ॉल्ट छोड़ें", L"बॉर्डर रंग", L"डायलॉग और इतिहास कार्ड का बॉर्डर रंग बदलें", L"कॉर्नर रेडियस", L"0 px = चौकोर, 14 px = Win11, 27 px = पिल", L"बैकग्राउंड छवि / एनिमेटेड GIF", L"कोई फ़ाइल नहीं — PNG, JPG, WebP, GIF समर्थित (अधिकतम 25 MB)", L"सक्रिय: ", L"बैकग्राउंड अस्पष्टता", L"छवि/GIF की स्पष्टता बदलें (डिफ़ॉल्ट 85%)", L"स्थिति और डिस्प्ले मोड", L"Win + R की स्थिति और लेआउट शैली कॉन्फ़िगर करें", L"डायलॉग स्थिति", L"स्क्रीन के किनारे/मध्य में पिन करें या ऑटो चुनें", L"अंतिम विंडो स्थिति याद रखें", L"अंतिम खींची गई स्थिति पर खोलें (रीसेट के लिए Ctrl+0)", L"UI आकार स्केल", L"Run डायलॉग का कुल आकार बदलें", L"इतिहास और निष्पादन", L"कमांड इतिहास, प्रारंभिक इनपुट और एडमिन अधिकार प्रबंधित करें", L"कमांड इतिहास दिखाएं", L"हाल की और पिन की गई कमांड दिखाएं", L"खुलने पर इनपुट खाली करें", L"पिछली कमांड बनाए रखने के लिए बंद करें", L"एडमिनिस्ट्रेटर के रूप में चलाएं", L"डिफ़ॉल्ट रूप से एडमिन अधिकार से चलाएं (Ctrl+Shift+Enter हमेशा काम करता है)", L"सभी सहेजा गया इतिहास मिटाएं", L"Windows RunMRU से हाल का इतिहास हटाएं", L"प्रदर्शन भाषा (21 भाषाएं)", L"Run डायलॉग और सेटिंग्स दोनों पर तुरंत लागू होता है", L"रंग चुनें", L"त्वरित Fluent रंग", L"लागू करें", L"रद्द करें", L"बैकग्राउंड छवि या एनिमेटेड GIF चुनें", L"सक्रिय होने पर कमांड एडमिनिस्ट्रेटर अधिकारों के साथ चलेंगी। अनुमति दें?", L"एडमिनिस्ट्रेटर चेतावनी" };
+        return { L"Modern Run सेटिंग्स", L"वैयक्तिकरण", L"लेआउट और स्थिति", L"इतिहास और व्यवहार", L"भाषा (21)", L"चालू", L"बंद", L"डिफ़ॉल्ट", L"ऑटो", L"रंग चुनें...", L"ब्राउज़...", L"हटाएं", L"अभी साफ़ करें", L"कस्टम", L"Windows 11 Blur (डिफ़ॉल्ट)", L"ऑटो (Windows अनुसार)", L"डार्क", L"लाइट", L"नीचे बाएँ", L"नीचे मध्य", L"नीचे दाएँ", L"ऊपर बाएँ", L"ऊपर मध्य", L"ऊपर दाएँ", L"स्क्रीन मध्य", L"थीम और सतह", L"बिल्ट-इन थीम चुनें (Windows 11 Blur और Liquid Glass अनुकूलित हैं)", L"थीम प्रीसेट", L"13 बिल्ट-इन थीम में से चुनें (डिफ़ॉल्ट Windows 11 Blur)", L"रंग मोड", L"Windows थीम का पालन करें या डार्क / लाइट चुनें", L"कस्टम रंग, बैकग्राउंड और कोने", L"रंग, छवि/एनिमेटेड GIF बैकग्राउंड और कोनों की गोलाई बदलें", L"बैकग्राउंड रंग", L"थीम के अनुसार रखने के लिए डिफ़ॉल्ट छोड़ें", L"बॉर्डर रंग", L"डायलॉग और इतिहास कार्ड का बॉर्डर रंग बदलें", L"कॉर्नर रेडियस", L"0 px = चौकोर, 14 px = Win11, 27 px = पिल", L"बैकग्राउंड छवि / एनिमेटेड GIF", L"कोई फ़ाइल नहीं — PNG, JPG, WebP, GIF समर्थित (अधिकतम 25 MB)", L"सक्रिय: ", L"बैकग्राउंड अस्पष्टता", L"छवि/GIF की स्पष्टता बदलें (डिफ़ॉल्ट 85%)", L"स्थिति और डिस्प्ले मोड", L"Win + R की स्थिति और लेआउट शैली कॉन्फ़िगर करें", L"डायलॉग स्थिति", L"स्क्रीन के किनारे/मध्य में पिन करें या ऑटो चुनें", L"अंतिम विंडो स्थिति याद रखें", L"अंतिम खींची गई स्थिति पर खोलें (रीसेट के लिए Ctrl + 0)", L"UI आकार स्केल", L"Run डायलॉग का कुल आकार बदलें", L"इतिहास और निष्पादन", L"कमांड इतिहास, प्रारंभिक इनपुट और एडमिन अधिकार प्रबंधित करें", L"कमांड इतिहास दिखाएं", L"हाल की और पिन की गई कमांड दिखाएं", L"खुलने पर इनपुट खाली करें", L"पिछली कमांड बनाए रखने के लिए बंद करें", L"एडमिनिस्ट्रेटर के रूप में चलाएं", L"डिफ़ॉल्ट रूप से एडमिन अधिकार से चलाएं (Ctrl + Shift + Enter हमेशा काम करता है)", L"सभी सहेजा गया इतिहास मिटाएं", L"Windows RunMRU से हाल का इतिहास हटाएं", L"प्रदर्शन भाषा (21 भाषाएं)", L"Run डायलॉग और सेटिंग्स दोनों पर तुरंत लागू होता है", L"रंग चुनें", L"त्वरित Fluent रंग", L"लागू करें", L"रद्द करें", L"बैकग्राउंड छवि या एनिमेटेड GIF चुनें", L"सक्रिय होने पर कमांड एडमिनिस्ट्रेटर अधिकारों के साथ चलेंगी। अनुमति दें?", L"एडमिनिस्ट्रेटर चेतावनी" };
     }
     else if (lang == L"ar") {
-        return { L"إعدادات Modern Run", L"الإصدار " WH_MOD_VERSION, L"التخصيص", L"التخطيط والموضع", L"السجل والسلوك", L"اللغة (21)", L"تشغيل", L"إيقاف", L"افتراضي", L"تلقائي", L"اختر لوناً...", L"استعراض...", L"مسح", L"مسح الآن", L"مخصص", L"Windows 11 Blur (افتراضي)", L"تلقائي (حسب Windows)", L"داكن", L"فاتح", L"أسفل اليسار", L"أسفل الوسط", L"أسفل اليمين", L"أعلى اليسار", L"أعلى الوسط", L"أعلى اليمين", L"وسط الشاشة", L"السمة والمظهر", L"اختر سمة جاهزة (Windows 11 Blur و Liquid Glass مضبوطان تلقائياً)", L"السمة الجاهزة", L"اختر من بين 13 سمة مدمجة (الافتراضي Windows 11 Blur)", L"وضع الألوان", L"اتبع سمة Windows أو اختر داكن / فاتح", L"الألوان والخلفية والزوايا المخصصة", L"خصّص الألوان وصورة/GIF المتحركة واستدارة الزوايا", L"لون الخلفية", L"اتركه افتراضياً ليتبع السمة", L"لون الإطار", L"تغيير لون إطار مربع التشغيل وبطاقة السجل", L"استدارة الزوايا", L"0 px = مربع، 14 px = Win11، 27 px = كبسولة", L"صورة خلفية / GIF متحرك", L"لم يتم الاختيار — يدعم PNG و JPG و WebP و GIF (حد 25 MB)", L"نشط: ", L"شفافية الخلفية المخصصة", L"اضبط وضوح الصورة/GIF (الافتراضي 85%)", L"الموضع ووضع العرض", L"اضبط مكان فتح Win + R ونمط التخطيط", L"موضع النافذة", L"ثبّت عند حافة/وسط الشاشة أو تلقائي", L"تذكّر آخر موضع للنافذة", L"إعادة الفتح في آخر مكان سحب (Ctrl+0 لإعادة الضبط)", L"مقياس الواجهة", L"تكبير أو تصغير حجم نافذة التشغيل", L"السجل وسلوك التشغيل", L"إدارة سجل الأوامر والإدخال الأولي وصلاحيات المسؤول", L"إظهار سجل الأوامر", L"عرض الأوامر الأخيرة والمثبتة", L"تفريغ مربع الإدخال عند الفتح", L"أوقفه للإبقاء على آخر أمر كما في Run الكلاسيكي", L"التشغيل كمسؤول (Admin)", L"التشغيل بصلاحيات المسؤول افتراضياً (Ctrl+Shift+Enter يعمل دائماً)", L"مسح كل السجل المحفوظ", L"حذف الأوامر الأخيرة من Windows RunMRU", L"لغة العرض (21 لغة)", L"تُطبّق فوراً على نافذة Run ونافذة الإعدادات", L"اختر لوناً", L"ألوان Fluent السريعة", L"تطبيق", L"إلغاء", L"اختر صورة خلفية أو GIF متحرك", L"عند التفعيل، ستعمل الأوامر بصلاحيات المسؤول. هل توافق؟", L"تحذير صلاحيات المسؤول" };
+        return { L"إعدادات Modern Run", L"التخصيص", L"التخطيط والموضع", L"السجل والسلوك", L"اللغة (21)", L"تشغيل", L"إيقاف", L"افتراضي", L"تلقائي", L"اختر لوناً...", L"استعراض...", L"مسح", L"مسح الآن", L"مخصص", L"Windows 11 Blur (افتراضي)", L"تلقائي (حسب Windows)", L"داكن", L"فاتح", L"أسفل اليسار", L"أسفل الوسط", L"أسفل اليمين", L"أعلى اليسار", L"أعلى الوسط", L"أعلى اليمين", L"وسط الشاشة", L"السمة والمظهر", L"اختر سمة جاهزة (Windows 11 Blur و Liquid Glass مضبوطان تلقائياً)", L"السمة الجاهزة", L"اختر من بين 13 سمة مدمجة (الافتراضي Windows 11 Blur)", L"وضع الألوان", L"اتبع سمة Windows أو اختر داكن / فاتح", L"الألوان والخلفية والزوايا المخصصة", L"خصّص الألوان وصورة/GIF المتحركة واستدارة الزوايا", L"لون الخلفية", L"اتركه افتراضياً ليتبع السمة", L"لون الإطار", L"تغيير لون إطار مربع التشغيل وبطاقة السجل", L"استدارة الزوايا", L"0 px = مربع، 14 px = Win11، 27 px = كبسولة", L"صورة خلفية / GIF متحرك", L"لم يتم الاختيار — يدعم PNG و JPG و WebP و GIF (حد 25 MB)", L"نشط: ", L"شفافية الخلفية المخصصة", L"اضبط وضوح الصورة/GIF (الافتراضي 85%)", L"الموضع ووضع العرض", L"اضبط مكان فتح Win + R ونمط التخطيط", L"موضع النافذة", L"ثبّت عند حافة/وسط الشاشة أو تلقائي", L"تذكّر آخر موضع للنافذة", L"إعادة الفتح في آخر مكان سحب (Ctrl + 0 لإعادة الضبط)", L"مقياس الواجهة", L"تكبير أو تصغير حجم نافذة التشغيل", L"السجل وسلوك التشغيل", L"إدارة سجل الأوامر والإدخال الأولي وصلاحيات المسؤول", L"إظهار سجل الأوامر", L"عرض الأوامر الأخيرة والمثبتة", L"تفريغ مربع الإدخال عند الفتح", L"أوقفه للإبقاء على آخر أمر كما في Run الكلاسيكي", L"التشغيل كمسؤول (Admin)", L"التشغيل بصلاحيات المسؤول افتراضياً (Ctrl + Shift + Enter يعمل دائماً)", L"مسح كل السجل المحفوظ", L"حذف الأوامر الأخيرة من Windows RunMRU", L"لغة العرض (21 لغة)", L"تُطبّق فوراً على نافذة Run ونافذة الإعدادات", L"اختر لوناً", L"ألوان Fluent السريعة", L"تطبيق", L"إلغاء", L"اختر صورة خلفية أو GIF متحرك", L"عند التفعيل، ستعمل الأوامر بصلاحيات المسؤول. هل توافق؟", L"تحذير صلاحيات المسؤول" };
     }
-    return { L"Modern Run Settings", L"Version " WH_MOD_VERSION, L"Personalization", L"Layout & Position", L"History & Behavior", L"Language (21)", L"On", L"Off", L"Default", L"Auto", L"Pick color...", L"Browse...", L"Clear", L"Clear now", L"Custom", L"Windows 11 Blur (Default)", L"Auto (Follow Windows)", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Surface", L"Choose a built-in theme preset (Windows 11 Blur & Liquid Glass use tuned defaults)", L"Theme Preset", L"Switch between 13 built-in themes (defaults to Windows 11 Blur)", L"Color Mode", L"Follow Windows theme or pick fixed Dark / Light", L"Custom Colors, Background & Radius", L"Customize colors, static/animated GIF background, and corner radius", L"Background Color", L"Leave Default to follow Theme Preset", L"Border Color", L"Override border rim color on dialog & history card", L"Border Radius", L"0 px = square, 14 px = Win11, 27 px = pill", L"Background Image / Animated GIF", L"None selected — supports PNG, JPG, WebP, animated GIF (max 25 MB)", L"Active: ", L"Background Opacity", L"Adjust dialog surface & image/GIF opacity (default 85%)", L"Position & Display Mode", L"Configure where Win + R opens and your preferred layout style", L"Dialog Position", L"Pin to a screen edge/center or use Auto", L"Remember Last Window Position", L"Reopen at last dragged position (press Ctrl+0 to reset)", L"UI Size Scale", L"Scale overall Run dialog dimensions", L"History & Execution Behavior", L"Control command history, initial input, and Administrator elevation", L"Show Command History", L"Show recent MRU commands and pinned entries", L"Clear Input Box on Open", L"Turn off to keep last command pre-filled like classic Run", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl+Shift+Enter always works)", L"Clear All Stored History", L"Clear recent history from Windows RunMRU", L"Display Language (21 Languages)", L"Applies immediately to both the Run dialog and Settings window", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Select Background Image or Animated GIF", L"When enabled, commands will launch with Administrator privileges. Do you want to allow this?", L"Administrator Privileges Warning" };
+    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Pick color...", L"Browse...", L"Clear", L"Clear now", L"Custom", L"Windows 11 Blur (Default)", L"Auto (Follow Windows)", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Surface", L"Appearance of the window and menus", L"Theme", L"Colors, background, and corner radius", L"Color Mode", L"Appearance based on Windows settings or the selected mode", L"Custom Colors, Background & Radius", L"Overrides for the selected theme", L"Background Color", L"Overrides the background color from Theme", L"Border Color", L"Color for borders in the Defined by the mod mode", L"Border Radius", L"0 px = square, 14 px = Win11, 27 px = pill", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Controls window background opacity when no image is set", L"Position & Display Mode", L"Position and layout when opened with Win + R", L"Dialog Position", L"Opens at the selected edge or in the center of the screen", L"Remember Last Window Position", L"Opens at the last position. Ctrl + 0 resets it", L"UI Size Scale", L"Size of text and interface elements", L"History & Execution Behavior", L"Control command history, initial input, and Administrator elevation", L"Show Command History", L"Recent and pinned commands in the history list", L"Clear Input Box on Open", L"The input field is empty on open", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Hides recent commands from the mod history", L"Display Language", L"Applies to the Run dialog and Settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"When enabled, commands will launch with Administrator privileges. Do you want to allow this?", L"Administrator Privileges Warning" };
 }
 
 struct Win11SettingsState {
@@ -15159,6 +15192,8 @@ void DrawWin11NativeToggle(ID2D1RenderTarget* pRT, float rightX, float cy, UINT 
 }
 
 bool EnsureGraphicsAndIconsInitialized();
+void DrawLayeredRunIcon(ID2D1RenderTarget* target, IWICImagingFactory* imaging, HICON icon,
+                        const D2D1_RECT_F& bounds);
 
 void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
     if (!hWnd) return;
@@ -15296,13 +15331,24 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         {
             D2D1_RECT_F rBadge = D2D1::RectF(S(16), S(16), S(54), S(54));
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rBadge, S(19), S(19)), pBrChipSel);
-            drawSettingsGlyph(L"\uE756", rBadge, pBrAccent);
+            winrt::com_ptr<IWICImagingFactory> imaging;
+            if (st->hAppIcon && SUCCEEDED(CoCreateInstance(CLSID_WICImagingFactory, nullptr,
+                    CLSCTX_INPROC_SERVER, IID_PPV_ARGS(imaging.put())))) {
+                const float size = S(kRunEmblemSize);
+                const float x = (rBadge.left + rBadge.right - size) * 0.5f;
+                const float y = (rBadge.top + rBadge.bottom - size) * 0.5f;
+                DrawLayeredRunIcon(pRT, imaging.get(), st->hAppIcon, D2D1::RectF(x, y, x + size, y + size));
+            } else {
+                drawSettingsGlyph(L"\uE756", rBadge, pBrAccent);
+            }
             drawCardText(D2D1::RectF(S(64), rBadge.top, sideW - S(10), rBadge.bottom),
-                         L"Modern Run", ls.version);
+                         L"Modern Run", kSettingsVersion);
         }
 
         struct NavDef { int tab; const wchar_t* glyph; const wchar_t* label; };
-        bool isViNav = (ResolveEffectiveLanguageCode(st->settings.language) == L"vi");
+        const auto languageCode = ResolveEffectiveLanguageCode(st->settings.language);
+        const bool isViNav = languageCode == L"vi";
+        const bool isRuNav = languageCode == L"ru";
         NavDef kNavs[] = {
             { 0, L"\uE790", ls.nav0 },
             { 1, L"\uE740", ls.nav1 },
@@ -15518,7 +15564,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 cmLbl);
             const auto& icons = GetIconSetStrings(st->settings.language);
             drawDropdownRowInGroup(g1, y1 + 2 * rH, rH, kIconSetControl, L"\uE8A9",
-                icons.title, nullptr,
+                icons.title, isRuNav ? L"Значки окна и контекстного меню"
+                    : languageCode == L"en" ? L"Icons in the window and context menu" : nullptr,
                 st->settings.iconSet == IconSet::WindowsFluent ? kWindowsFluentMenuLabel : icons.modLabel);
 
             // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
@@ -15631,7 +15678,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 wchar_t title[128]{};
                 swprintf_s(title, actions.hidePattern, actions.labels[i]);
                 drawToggleRowInGroup(buttonGroup, rowY + rH * i, rH,
-                    kHideActionRowBase + static_cast<int>(i), glyphs[i], title, L"",
+                    kHideActionRowBase + static_cast<int>(i), glyphs[i], title, kActionShortcuts[i],
                     st->settings.hiddenActions[i]);
             }
         } else if (st->activeTab == 2) {
@@ -15645,20 +15692,24 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.showHistSub,
                 st->settings.maxHistoryItems > 0);
             drawToggleRowInGroup(g1, y1 + rH, rH, 2504, L"\uE823",
-                isViNav ? L"Hiển thị thời gian chạy lệnh" : L"Show Command Timestamps",
-                isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : L"Show execution timestamp on each history row",
+                isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Показывать дату и время запуска" : L"Show Command Timestamps",
+                isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : isRuNav
+                    ? L"Дата и время рядом с ранее запущенными командами" : L"Date and time beside each previously run command",
                 st->settings.showTimestamp);
             drawToggleRowInGroup(g1, y1 + rH * 2, rH, 2502, L"\uE750",
                 ls.clearInitTitle,
                 ls.clearInitSub,
                 st->settings.clearInitialInput);
             drawToggleRowInGroup(g1, y1 + rH * 3, rH, 2505, L"\uE711",
-                isViNav ? L"Tự động đóng khi bấm ra ngoài cửa sổ" : L"Auto-Close on Click Outside",
-                isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : L"Automatically dismiss Run when clicking outside",
+                isViNav ? L"Tự động đóng khi bấm ra ngoài cửa sổ" : isRuNav ? L"Закрывать при клике вне окна" : L"Close on Click Outside",
+                isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : isRuNav
+                    ? L"Клик за пределами окна закрывает его" : L"A click outside the window dismisses it",
                 st->settings.closeOnClickOutside);
             drawToggleRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE75C",
-                isViNav ? L"Bấm icon Taskbar để đóng hẳn (thay vì thu nhỏ)" : L"Taskbar Click Closes Dialog",
-                isViNav ? L"Tắt = thu nhỏ bình thường, Bật = đóng hẳn hộp thoại Run" : L"Off = minimize normally, On = close Run dialog",
+                isViNav ? L"Bấm icon Taskbar để đóng hẳn (thay vì thu nhỏ)" : isRuNav
+                    ? L"Закрывать по клику на панели задач" : L"Close on Taskbar Icon Click",
+                isViNav ? L"Tắt = thu nhỏ bình thường, Bật = đóng hẳn hộp thoại Run" : isRuNav
+                    ? L"Клик по значку на панели задач закрывает открытое окно" : L"A click on the taskbar icon closes the open window",
                 st->settings.taskbarCloseInsteadOfMinimize);
             // Clear history row
             float clrY = y1 + rH * 5;
@@ -15673,7 +15724,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             drawToggleRowInGroup(adminGroup, adminY, rH, 2503, L"\uE72E",
                 displaySettings.adminDefault, displaySettings.adminDefaultDescription, st->settings.runAsAdmin, true);
             drawDropdownRowInGroup(adminGroup, adminY + rH, rH, 2507, L"\uE72E",
-                displaySettings.indicatorTitle, L"",
+                displaySettings.indicatorTitle, isRuNav ? L"Показывает, что команда запустится с повышенными правами"
+                    : languageCode == L"en" ? L"Shows elevated privileges for the current command" : nullptr,
                 st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel, 210.0f);
             drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uE765",
                 displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
@@ -16290,7 +16342,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             if (st) {
                 st->hWnd = hWnd;
                 ApplyWin11SettingsWindowFrame(hWnd, st->isLight);
-                st->hAppIcon = LoadCustomRunIcon(DpiScale(24, st->dpi));
+                st->hAppIcon = LoadCustomRunIcon(DpiScale(kRunEmblemSize, st->dpi));
                 if (st->hAppIcon) {
                     SendMessageW(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(st->hAppIcon));
                     SendMessageW(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(st->hAppIcon));
@@ -17046,21 +17098,18 @@ void UpdateDialogEditFont(RunDialogState* state) {
 
 void RefreshDialogRunIcons(RunDialogState* state) {
     if (!state) return;
-    const auto set = state->settings.iconSet;
-    const bool iconSetChanged = state->loadedIconSet != set;
-    state->loadedIconSet = set;
-    int barIconSize = DpiScaleS(20, state);
-    if (iconSetChanged || !state->hRunIcon || state->runIconLoadedSize != barIconSize) {
+    const int barIconSize = DpiScaleS(kRunEmblemSize, state);
+    if (!state->hRunIcon || state->runIconLoadedSize != barIconSize) {
         if (state->hRunIcon) {
             DestroyIcon(state->hRunIcon);
             state->hRunIcon = nullptr;
         }
-        state->hRunIcon = LoadSelectedRunIcon(set, barIconSize);
+        state->hRunIcon = LoadCustomRunIcon(barIconSize);
         state->runIconLoadedSize = barIconSize;
     }
 
     if (state->hDlg && IsWindow(state->hDlg)) {
-        if (iconSetChanged || !state->hTaskbarIconSmall || !state->hTaskbarIconBig || state->taskbarIconLoadedDpi != (int)state->dpi) {
+        if (!state->hTaskbarIconSmall || !state->hTaskbarIconBig || state->taskbarIconLoadedDpi != (int)state->dpi) {
             int smPx = DpiScale(24, state->dpi);
             int bigPx = DpiScale(48, state->dpi);
             if (state->hTaskbarIconSmall) {
@@ -17071,11 +17120,11 @@ void RefreshDialogRunIcons(RunDialogState* state) {
                 DestroyIcon(state->hTaskbarIconBig);
                 state->hTaskbarIconBig = nullptr;
             }
-            state->hTaskbarIconSmall = LoadSelectedRunIcon(set, smPx);
-            state->hTaskbarIconBig = LoadSelectedRunIcon(set, bigPx);
+            state->hTaskbarIconSmall = LoadCustomRunIcon(smPx);
+            state->hTaskbarIconBig = LoadCustomRunIcon(bigPx);
             state->taskbarIconLoadedDpi = (int)state->dpi;
 
-            ApplyWindowTaskbarIconIdentity(state->hDlg, false, set);
+            ApplyWindowTaskbarIconIdentity(state->hDlg);
 
             // Never add WS_CAPTION here! Adding WS_CAPTION on a visible dialog triggers win32kfull!xxxRedrawTitle
             // / WM_NCUAHDRAWCAPTION to paint the classic Aero Basic titlebar over the top of the window.
@@ -17614,7 +17663,7 @@ void DrawRunDialogIcons(ID2D1RenderTarget* target, RunDialogState* state, int vi
             }
 
             if (state->hRunIcon) {
-                const int size = state->runIconLoadedSize > 0 ? state->runIconLoadedSize : DpiScaleS(20, state);
+                const int size = state->runIconLoadedSize > 0 ? state->runIconLoadedSize : DpiScaleS(kRunEmblemSize, state);
                 const int x = (DpiScaleS(kBaseInputBarHeight, state) - size) / 2 + DpiScaleS(4, state);
                 const int y = barTop + (barHeight - size) / 2;
                 drawIcon(x, y, state->hRunIcon, size);
@@ -18817,7 +18866,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
         case WM_SHOWWINDOW:
             if (wParam == TRUE && state) {
-                ApplyWindowTaskbarIconIdentity(hWnd, false, state->settings.iconSet);
+                ApplyWindowTaskbarIconIdentity(hWnd);
                 NotifyTaskbarRedrawWindowIcon(hWnd);
                 SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
                 ForceFocusModernEdit(hWnd, state);

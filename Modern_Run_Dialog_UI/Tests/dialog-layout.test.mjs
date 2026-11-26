@@ -88,8 +88,37 @@ test('the settings window uses Fluent glyphs for either icon set', () => {
     const painter = source.match(/void PaintWin11SettingsWindow\([\s\S]*?(?=\nstruct WinUI3ComboFlyoutSession)/)?.[0];
     assert.ok(painter);
     assert.match(painter, /CreateTextFormat\(GetWindowsIconFontFamily\(\)/);
-    assert.match(painter, /drawSettingsGlyph\(L"\\uE756", rBadge, pBrAccent\)/);
-    assert.doesNotMatch(painter, /FindModSettingsIcon|DrawRunUiIcon|DrawLayeredRunIcon/);
+    assert.doesNotMatch(painter, /FindModSettingsIcon|DrawRunUiIcon/);
+    assert.match(painter, /DrawLayeredRunIcon\(pRT, imaging\.get\(\), st->hAppIcon/);
+});
+
+test('the larger Run emblem uses the same asset in both icon modes and on the taskbar', () => {
+    assert.match(source, /constexpr int kRunEmblemSize\s*=\s*24;/);
+    const refresh = source.match(/void RefreshDialogRunIcons\(RunDialogState\* state\) \{[\s\S]*?\n\}/)?.[0];
+    assert.ok(refresh);
+    assert.match(refresh, /const int barIconSize = DpiScaleS\(kRunEmblemSize, state\)/);
+    for (const size of ['barIconSize', 'smPx', 'bigPx']) {
+        assert.ok(refresh.includes('LoadCustomRunIcon(' + size + ')'));
+    }
+    assert.doesNotMatch(refresh, /settings\.iconSet/);
+});
+
+test('settings show the current version and build number without a prefix', () => {
+    const build = source.match(/^\/\/ Build: (\d+)$/m)?.[1];
+    assert.ok(build);
+    assert.ok(source.includes('kSettingsVersion[] = WH_MOD_VERSION L" (build ' + build + ')"'));
+    assert.match(source, /L"Modern Run", kSettingsVersion/);
+});
+
+test('the menu icon slot starts inside the hover and group dividers stay compact', () => {
+    assert.match(source, /constexpr int kMenuIconSize = 16;/);
+    assert.match(source, /constexpr int kMenuGroupHeight = 3;/);
+    assert.match(source, /constexpr int kWindowsMenuRowHeight = 32;/);
+    assert.match(source, /const float contentLeft = padX \+ textInset;/);
+    assert.match(source, /const float iconCx = contentLeft \+ DpiScaleF\(kMenuIconSize, dpi\) \* 0\.5f;/);
+    assert.match(source, /separator\.Height\(kMenuGroupHeight\)/);
+    assert.match(source, /separator\.Padding\(WindowsMenu::Thickness\{0, 1, 0, 1\}\)/);
+    assert.match(source, /leaf\.MinHeight\(kWindowsMenuRowHeight\)/);
 });
 
 test('layout settings keep position and menu style directly below their related controls', () => {
