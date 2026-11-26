@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.7.3
+// @version         6.7.4
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 35
+// Build: 36
 
 // ==WindhawkModReadme==
 /*
@@ -1951,8 +1951,11 @@ ResolvedThemeVisuals ResolveEffectiveThemeVisuals(const ModSettings& s, bool isL
 bool g_isExplorerOrTaskmgr = false;
 bool g_isTaskManagerProcess = false;
 UINT g_msgOpenSettings = 0;
-static constexpr const wchar_t* kSettingsHostClassName  = L"WindhawkModernRunSettingsHost_v6";
+static constexpr const wchar_t* kSettingsHostClassName  = L"WindhawkModernRunSettingsHost_v7";
 static constexpr const wchar_t* kWin11SettingsClassName = L"WindhawkModernRunWin11Settings_v6";
+constexpr UINT kCheckSettingsHostIdle = WM_APP + 0x61;
+constexpr UINT_PTR kTimerSettingsHostIdle = 1;
+constexpr UINT kSettingsStartupTimeoutMs = 8000;
 bool g_settingsHostClassRegistered = false;
 bool g_win11SettingsClassRegistered = false;
 std::atomic<HWND> g_hSettingsHostWnd{nullptr};
@@ -1998,6 +2001,7 @@ constexpr int kSettingsCardInset = 18;
 constexpr UINT_PTR kTimerCaret              = 9010;
 constexpr UINT_PTR kTimerLuminance          = 9011;
 constexpr UINT_PTR kTimerOpenAnim           = 9014;
+constexpr UINT_PTR kTimerOpenSettings       = 9016;
 constexpr UINT_PTR kTimerBgMedia            = 9012;
 constexpr int kModernEditId         = 9901;
 constexpr size_t kMaxMruEntries     = 20;
@@ -7468,6 +7472,11 @@ struct RunDialogState {
     mutable std::array<int, 3> actionWidthsAt96Dpi{};
     RunEnterAction enterPreview = RunEnterAction::Normal;
     HWND hAdminCheck = nullptr;
+    ULONGLONG settingsOpenDeadline = 0;
+    HANDLE hSettingsLaunchProcess = nullptr;
+    HWND hRequestedSettingsHost = nullptr;
+    DWORD requestedSettingsHostPid = 0;
+    int settingsLaunchAttempts = 0;
 
     HFONT hFontEditCtl = nullptr;
     HICON hRunIcon = nullptr;
@@ -16271,7 +16280,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             return 0;
         case WM_NCDESTROY: {
             HWND expected = hWnd;
-            g_hWin11SettingsWnd.compare_exchange_strong(expected, nullptr);
+            const bool wasSettingsWindow = g_hWin11SettingsWnd.compare_exchange_strong(expected, nullptr);
             if (st && st->pHwndRT) {
                 st->pHwndRT->Release();
                 st->pHwndRT = nullptr;
@@ -16280,7 +16289,12 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 DestroyIcon(st->hAppIcon);
                 st->hAppIcon = nullptr;
             }
-            delete st;
+            if (wasSettingsWindow) {
+                delete st;
+                if (HWND hHost = g_hSettingsHostWnd.load()) {
+                    PostMessageW(hHost, kCheckSettingsHostIdle, 0, 0);
+                }
+            }
             SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
             return 0;
         }
@@ -16356,7 +16370,17 @@ void ShowOrFocusWin11SettingsWindow() {
 LRESULT CALLBACK SettingsHostWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     if (uMsg == g_msgOpenSettings && g_msgOpenSettings != 0) {
         ShowOrFocusWin11SettingsWindow();
+        if (g_hWin11SettingsWnd.load()) {
+            KillTimer(hWnd, kTimerSettingsHostIdle);
+        }
         return 1;
+    }
+    if (uMsg == kCheckSettingsHostIdle ||
+        (uMsg == WM_TIMER && wParam == kTimerSettingsHostIdle)) {
+        if (!g_hWin11SettingsWnd.load()) {
+            DestroyWindow(hWnd);
+        }
+        return 0;
     }
     if (uMsg == WM_CLOSE) {
         if (HWND hSet = g_hWin11SettingsWnd.load(); hSet && IsWindow(hSet)) {
@@ -16372,14 +16396,12 @@ LRESULT CALLBACK SettingsHostWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-DWORD WINAPI SettingsHostThreadProc(LPVOID param) {
-    HANDLE hReadyEvent = static_cast<HANDLE>(param);
-
-    // Ensure thread message queue exists before registering classes or creating windows (matching mac-island-dock)
+DWORD WINAPI SettingsHostThreadProc(LPVOID) {
+    // Create the queue before publishing the host window.
     MSG initMsg = {};
     PeekMessageW(&initMsg, nullptr, WM_USER, WM_USER, PM_NOREMOVE);
     SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-    CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+    const HRESULT com = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
     HINSTANCE hInst = GetModInstanceHandle();
 
@@ -16410,7 +16432,7 @@ DWORD WINAPI SettingsHostThreadProc(LPVOID param) {
     }
 
     HWND hHost = nullptr;
-    if (g_settingsHostClassRegistered) {
+    if (g_settingsHostClassRegistered && g_win11SettingsClassRegistered && !g_unloading.load()) {
         hHost = CreateWindowExW(
             WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, kSettingsHostClassName, L"",
             WS_POPUP, -32000, -32000, 0, 0,
@@ -16418,17 +16440,17 @@ DWORD WINAPI SettingsHostThreadProc(LPVOID param) {
     }
 
     if (hHost) {
-        g_hSettingsHostWnd.store(hHost);
-        Wh_Log(L"Modern Run Settings IPC host window ready (HWND=%p, PID=%lu)", hHost, GetCurrentProcessId());
-    } else {
-        Wh_Log(L"Modern Run Settings IPC host CreateWindowExW failed (err=%lu)", GetLastError());
+        // Task Manager can start the host elevated. Only the argument-free open
+        // request may cross from the unelevated Explorer process.
+        ChangeWindowMessageFilterEx(hHost, g_msgOpenSettings, MSGFLT_ALLOW, nullptr);
+        if (!SetTimer(hHost, kTimerSettingsHostIdle, kSettingsStartupTimeoutMs, nullptr)) {
+            Wh_Log(L"Could not start the settings host idle timer (err=%lu)", GetLastError());
+            DestroyWindow(hHost);
+            hHost = nullptr;
+        }
     }
-
-    if (hReadyEvent) {
-        SetEvent(hReadyEvent);
-    }
-
     if (hHost) {
+        g_hSettingsHostWnd.store(hHost);
         MSG msg = {};
         while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
             TranslateMessage(&msg);
@@ -16436,35 +16458,125 @@ DWORD WINAPI SettingsHostThreadProc(LPVOID param) {
         }
         HWND expected = hHost;
         g_hSettingsHostWnd.compare_exchange_strong(expected, nullptr);
+    } else {
+        Wh_Log(L"Could not initialize the Modern Run Settings host (err=%lu)", GetLastError());
     }
 
-    CoUninitialize();
+    if (SUCCEEDED(com)) {
+        CoUninitialize();
+    }
+    if (!g_unloading.load()) {
+        ExitProcess(hHost ? 0 : 1);
+    }
     return 0;
 }
 
+std::wstring GetSettingsToolExecutablePath() {
+    HMODULE engine = GetModuleHandleW(L"windhawk.dll");
+    if (!engine) return {};
+
+    std::wstring path(32768, L'\0');
+    const DWORD size = GetModuleFileNameW(engine, path.data(), static_cast<DWORD>(path.size()));
+    if (size == 0 || size >= path.size()) return {};
+    path.resize(size);
+
+    // The loaded engine is under <Windhawk>/Engine/<version>/<arch>/windhawk.dll.
+    for (int level = 0; level < 3; ++level) {
+        const auto separator = path.find_last_of(L"\\/");
+        if (separator == std::wstring::npos) return {};
+        path.resize(separator);
+    }
+    const auto separator = path.find_last_of(L"\\/");
+    if (separator == std::wstring::npos || _wcsicmp(path.c_str() + separator + 1, L"Engine") != 0) {
+        return {};
+    }
+    path.replace(separator + 1, std::wstring::npos, L"windhawk.exe");
+    const DWORD attributes = GetFileAttributesW(path.c_str());
+    if (attributes == INVALID_FILE_ATTRIBUTES || (attributes & FILE_ATTRIBUTE_DIRECTORY)) return {};
+    return path;
+}
+
+HANDLE LaunchSettingsTool() {
+    const std::wstring executable = GetSettingsToolExecutablePath();
+    if (executable.empty()) {
+        Wh_Log(L"Could not locate windhawk.exe next to the loaded Windhawk engine");
+        return nullptr;
+    }
+    std::wstring command = L"\"" + executable + L"\" -tool-mod \"" WH_MOD_ID L"\"";
+    STARTUPINFOW startup{sizeof(startup)};
+    startup.dwFlags = STARTF_USESHOWWINDOW | STARTF_FORCEOFFFEEDBACK;
+    startup.wShowWindow = SW_HIDE;
+    PROCESS_INFORMATION process{};
+    if (!CreateProcessW(executable.c_str(), command.data(), nullptr, nullptr, FALSE, 0,
+                        nullptr, nullptr, &startup, &process)) {
+        Wh_Log(L"Could not start the Modern Run Settings tool (err=%lu)", GetLastError());
+        return nullptr;
+    }
+    CloseHandle(process.hThread);
+    return process.hProcess;
+}
+
+void FinishSettingsOpenRequest(RunDialogState* state) {
+    KillTimer(state->hDlg, kTimerOpenSettings);
+    if (state->hSettingsLaunchProcess) {
+        CloseHandle(state->hSettingsLaunchProcess);
+        state->hSettingsLaunchProcess = nullptr;
+    }
+    state->settingsOpenDeadline = 0;
+    state->hRequestedSettingsHost = nullptr;
+    state->requestedSettingsHostPid = 0;
+    state->settingsLaunchAttempts = 0;
+}
+
+void AdvanceSettingsOpenRequest(RunDialogState* state) {
+    if (!state->settingsOpenDeadline) return;
+    if (GetTickCount64() >= state->settingsOpenDeadline || g_unloading.load()) {
+        Wh_Log(L"Modern Run Settings did not open before the request expired");
+        FinishSettingsOpenRequest(state);
+        return;
+    }
+
+    if (HWND hHost = FindWindowW(kSettingsHostClassName, nullptr)) {
+        DWORD pid = 0;
+        if (!GetWindowThreadProcessId(hHost, &pid)) return;
+
+        if (hHost != state->hRequestedSettingsHost || pid != state->requestedSettingsHostPid) {
+            AllowSetForegroundWindow(pid);
+            if (!PostMessageW(hHost, g_msgOpenSettings, 0, 0)) return;
+            state->hRequestedSettingsHost = hHost;
+            state->requestedSettingsHostPid = pid;
+        }
+
+        HWND hSettings = FindWindowW(kWin11SettingsClassName, nullptr);
+        DWORD settingsPid = 0;
+        if (hSettings && GetWindowThreadProcessId(hSettings, &settingsPid) &&
+            settingsPid == pid && IsWindowVisible(hSettings) && !IsIconic(hSettings)) {
+            FinishSettingsOpenRequest(state);
+            CloseRunDialog(state->hDlg);
+        }
+        return;
+    }
+
+    if (state->hSettingsLaunchProcess) {
+        if (WaitForSingleObject(state->hSettingsLaunchProcess, 0) == WAIT_TIMEOUT) return;
+        CloseHandle(state->hSettingsLaunchProcess);
+        state->hSettingsLaunchProcess = nullptr;
+    }
+    // The previous host may be finishing while a new request arrives.
+    if (state->settingsLaunchAttempts < 2) {
+        ++state->settingsLaunchAttempts;
+        state->hSettingsLaunchProcess = LaunchSettingsTool();
+    }
+}
+
 void OpenModernSettingsApp(RunDialogState* state) {
-    if (g_unloading.load()) return;
-
-    HWND hRunToClose = (state && state->hDlg && IsWindow(state->hDlg)) ? state->hDlg : nullptr;
-
-    HWND hHost = FindWindowW(kSettingsHostClassName, nullptr);
-    if (!hHost || !IsWindow(hHost) || g_msgOpenSettings == 0) {
-        Wh_Log(L"Settings host not running");
+    if (!state || g_unloading.load() || !g_msgOpenSettings || state->settingsOpenDeadline) return;
+    if (!SetTimer(state->hDlg, kTimerOpenSettings, 60, nullptr)) {
+        Wh_Log(L"Could not schedule the Modern Run Settings request (err=%lu)", GetLastError());
         return;
     }
-    DWORD hostPid = 0;
-    GetWindowThreadProcessId(hHost, &hostPid);
-    if (hostPid != 0) {
-        AllowSetForegroundWindow(hostPid);
-    }
-    if (!PostMessageW(hHost, g_msgOpenSettings, 0, 0)) {
-        Wh_Log(L"Could not open Modern Run Settings (err=%lu)", GetLastError());
-        return;
-    }
-
-    if (hRunToClose) {
-        CloseRunDialog(hRunToClose);
-    }
+    state->settingsOpenDeadline = GetTickCount64() + kSettingsStartupTimeoutMs;
+    AdvanceSettingsOpenRequest(state);
 }
 void ApplyReloadedSettingsToDialog(RunDialogState* state) {
     if (!state || !state->hDlg || !IsWindow(state->hDlg)) return;
@@ -16946,6 +17058,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 void CleanupDialogState(HWND hWnd, RunDialogState* state) {
     RemoveWindowSubclass(hWnd, RunDlgSubclassProc, 1);
+    if (state) FinishSettingsOpenRequest(state);
     CloseActiveGearMenu();
     KillTimer(hWnd, kTimerCaret);
     KillTimer(hWnd, kTimerLuminance);
@@ -18322,6 +18435,10 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             return 0;
 
         case WM_TIMER: {
+            if (wParam == kTimerOpenSettings && state) {
+                AdvanceSettingsOpenRequest(state);
+                return 0;
+            }
             if (wParam == kTimerCaret && state) {
                 if (!IsIconic(hWnd)) {
                     state->caretVisible = !state->caretVisible;
@@ -19479,23 +19596,7 @@ BOOL WhTool_ModInit() {
     LoadSettings(false);
     g_msgToggle       = RegisterWindowMessageW(L"Windhawk_Toggle_" WH_MOD_ID);
     g_msgOpenSettings = RegisterWindowMessageW(L"Windhawk_OpenRunSettings_" WH_MOD_ID);
-
-    HANDLE hReadyEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-    g_hSettingsHostThread = CreateThread(nullptr, 0, SettingsHostThreadProc, hReadyEvent, 0, &g_settingsHostThreadId);
-    if (!g_hSettingsHostThread) {
-        if (hReadyEvent) CloseHandle(hReadyEvent);
-        Wh_Log(L"Warning: CreateThread(SettingsHostThreadProc) failed with error %lu", GetLastError());
-        return FALSE;
-    }
-
-    if (hReadyEvent) {
-        WaitForSingleObject(hReadyEvent, 3000);
-        CloseHandle(hReadyEvent);
-    }
-
-    Wh_Log(L"Modern Run Settings tool-mod host started (PID=%lu, hHost=%p)",
-           GetCurrentProcessId(), g_hSettingsHostWnd.load());
-    return TRUE;
+    return g_msgOpenSettings != 0;
 }
 
 void WhTool_ModSettingsChanged() {
@@ -19517,25 +19618,18 @@ void Wh_ModBeforeUninit() {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// Windhawk tool mod implementation for mods which don't need to inject to other
-// processes or hook other functions. Context:
+// Use Windhawk's dedicated tool mode without starting the host in ordinary
+// windhawk.exe processes.
 // https://github.com/ramensoftware/windhawk/wiki/Mods-as-tools:-Running-mods-in-a-dedicated-process
-//
-// The mod will load and run in a dedicated windhawk.exe process.
-//
-// Paste the code below as part of the mod code, and use these callbacks:
-// * WhTool_ModInit
-// * WhTool_ModSettingsChanged
-// * WhTool_ModUninit
-//
-// Currently, other callbacks are not supported.
 
-bool g_isToolModProcessLauncher;
-HANDLE g_toolModProcessMutex;
+HANDLE g_toolModProcessMutex = nullptr;
+
+constexpr bool IsSettingsToolInvocation(int argc, const wchar_t* const* argv) {
+    return argc == 3 && std::wstring_view(argv[1]) == L"-tool-mod" &&
+           std::wstring_view(argv[2]) == WH_MOD_ID;
+}
 
 void WINAPI EntryPoint_Hook() {
-    Wh_Log(L">");
     ExitThread(0);
 }
 
@@ -19545,81 +19639,34 @@ BOOL Wh_ModInit() {
         return RunDialogModInit();
     }
 
-    DWORD sessionId;
-    if (ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) &&
-        sessionId == 0) {
+    DWORD sessionId = 0;
+    if (!ProcessIdToSessionId(GetCurrentProcessId(), &sessionId) || sessionId == 0) {
         return FALSE;
     }
 
-    bool isExcluded = false;
-    bool isToolModProcess = false;
-    bool isCurrentToolModProcess = false;
-    int argc;
-    LPWSTR* argv = CommandLineToArgvW(GetCommandLine(), &argc);
-    if (!argv) {
-        Wh_Log(L"CommandLineToArgvW failed");
-        return FALSE;
-    }
-
-    for (int i = 1; i < argc; i++) {
-        if (wcscmp(argv[i], L"-service") == 0 ||
-            wcscmp(argv[i], L"-service-start") == 0 ||
-            wcscmp(argv[i], L"-service-stop") == 0) {
-            isExcluded = true;
-            break;
-        }
-    }
-
-    for (int i = 1; i < argc - 1; i++) {
-        if (wcscmp(argv[i], L"-tool-mod") == 0) {
-            isToolModProcess = true;
-            if (wcscmp(argv[i + 1], WH_MOD_ID) == 0) {
-                isCurrentToolModProcess = true;
-            }
-            break;
-        }
-    }
-
+    int argc = 0;
+    LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (!argv) return FALSE;
+    const bool isSettingsTool = IsSettingsToolInvocation(argc, argv);
     LocalFree(argv);
+    if (!isSettingsTool) return FALSE;
 
-    if (isExcluded) {
-        return FALSE;
+    g_toolModProcessMutex = CreateMutexW(nullptr, FALSE, L"windhawk-tool-mod-settings-v7_" WH_MOD_ID);
+    if (!g_toolModProcessMutex || GetLastError() == ERROR_ALREADY_EXISTS) {
+        ExitProcess(1);
     }
 
-    if (isCurrentToolModProcess) {
-        g_toolModProcessMutex =
-            CreateMutex(nullptr, TRUE, L"windhawk-tool-mod_" WH_MOD_ID);
-        if (!g_toolModProcessMutex) {
-            Wh_Log(L"CreateMutex failed");
-            ExitProcess(1);
-        }
-
-        if (GetLastError() == ERROR_ALREADY_EXISTS) {
-            Wh_Log(L"Tool mod already running (%s)", WH_MOD_ID);
-            ExitProcess(1);
-        }
-
-        if (!WhTool_ModInit()) {
-            ExitProcess(1);
-        }
-
-        IMAGE_DOS_HEADER* dosHeader =
-            (IMAGE_DOS_HEADER*)GetModuleHandle(nullptr);
-        IMAGE_NT_HEADERS* ntHeaders =
-            (IMAGE_NT_HEADERS*)((BYTE*)dosHeader + dosHeader->e_lfanew);
-
-        DWORD entryPointRVA = ntHeaders->OptionalHeader.AddressOfEntryPoint;
-        void* entryPoint = (BYTE*)dosHeader + entryPointRVA;
-
-        Wh_SetFunctionHook(entryPoint, (void*)EntryPoint_Hook, nullptr);
-        return TRUE;
+    if (!WhTool_ModInit()) {
+        ExitProcess(1);
     }
 
-    if (isToolModProcess) {
-        return FALSE;
+    auto* exeBase = reinterpret_cast<BYTE*>(GetModuleHandleW(nullptr));
+    auto* dosHeader = reinterpret_cast<IMAGE_DOS_HEADER*>(exeBase);
+    auto* ntHeaders = reinterpret_cast<IMAGE_NT_HEADERS*>(exeBase + dosHeader->e_lfanew);
+    void* entryPoint = exeBase + ntHeaders->OptionalHeader.AddressOfEntryPoint;
+    if (!Wh_SetFunctionHook(entryPoint, reinterpret_cast<void*>(EntryPoint_Hook), nullptr)) {
+        ExitProcess(1);
     }
-
-    g_isToolModProcessLauncher = true;
     return TRUE;
 }
 
@@ -19629,87 +19676,24 @@ void Wh_ModAfterInit() {
         return;
     }
 
-    if (!g_isToolModProcessLauncher) {
-        return;
+    g_hSettingsHostThread = CreateThread(nullptr, 0, SettingsHostThreadProc, nullptr, 0, &g_settingsHostThreadId);
+    if (!g_hSettingsHostThread) {
+        Wh_Log(L"Could not start the Modern Run Settings host thread (err=%lu)", GetLastError());
+        ExitProcess(1);
     }
-
-    WCHAR currentProcessPath[MAX_PATH];
-    switch (GetModuleFileName(nullptr, currentProcessPath,
-                              ARRAYSIZE(currentProcessPath))) {
-        case 0:
-        case ARRAYSIZE(currentProcessPath):
-            Wh_Log(L"GetModuleFileName failed");
-            return;
-    }
-
-    WCHAR commandLine[MAX_PATH + 2 +
-                      (sizeof(L" -tool-mod \"" WH_MOD_ID "\"") /
-                       sizeof(WCHAR)) -
-                      1];
-    swprintf_s(commandLine, L"\"%s\" -tool-mod \"%s\"", currentProcessPath,
-               WH_MOD_ID);
-
-    HMODULE kernelModule = GetModuleHandle(L"kernelbase.dll");
-    if (!kernelModule) {
-        kernelModule = GetModuleHandle(L"kernel32.dll");
-        if (!kernelModule) {
-            Wh_Log(L"No kernelbase.dll/kernel32.dll");
-            return;
-        }
-    }
-
-    using CreateProcessInternalW_t = BOOL(WINAPI*)(
-        HANDLE hUserToken, LPCWSTR lpApplicationName, LPWSTR lpCommandLine,
-        LPSECURITY_ATTRIBUTES lpProcessAttributes,
-        LPSECURITY_ATTRIBUTES lpThreadAttributes, WINBOOL bInheritHandles,
-        DWORD dwCreationFlags, LPVOID lpEnvironment, LPCWSTR lpCurrentDirectory,
-        LPSTARTUPINFOW lpStartupInfo,
-        LPPROCESS_INFORMATION lpProcessInformation,
-        PHANDLE hRestrictedUserToken);
-    CreateProcessInternalW_t pCreateProcessInternalW =
-        (CreateProcessInternalW_t)GetProcAddress(kernelModule,
-                                                 "CreateProcessInternalW");
-    if (!pCreateProcessInternalW) {
-        Wh_Log(L"No CreateProcessInternalW");
-        return;
-    }
-
-    STARTUPINFO si{
-        .cb = sizeof(STARTUPINFO),
-        .dwFlags = STARTF_FORCEOFFFEEDBACK,
-    };
-    PROCESS_INFORMATION pi;
-    if (!pCreateProcessInternalW(nullptr, currentProcessPath, commandLine,
-                                 nullptr, nullptr, FALSE, NORMAL_PRIORITY_CLASS,
-                                 nullptr, nullptr, &si, &pi, nullptr)) {
-        Wh_Log(L"CreateProcess failed");
-        return;
-    }
-
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
 }
 
 void Wh_ModSettingsChanged() {
     if (g_isExplorerOrTaskmgr) {
         RunDialogModSettingsChanged();
-        return;
+    } else {
+        WhTool_ModSettingsChanged();
     }
-
-    if (g_isToolModProcessLauncher) {
-        return;
-    }
-
-    WhTool_ModSettingsChanged();
 }
 
 void Wh_ModUninit() {
     if (g_isExplorerOrTaskmgr) {
         RunDialogModUninit();
-        return;
-    }
-
-    if (g_isToolModProcessLauncher) {
         return;
     }
 

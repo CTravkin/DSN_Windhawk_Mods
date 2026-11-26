@@ -721,6 +721,26 @@ test('layered icon rendering preserves transparent and translucent pixels', () =
     `, true, ['-ld2d1', '-lwindowscodecs', '-lgdi32', '-luser32', '-lole32']);
 });
 
+test('only the dedicated settings invocation starts the settings host', () => {
+    const isTool = source.match(/constexpr bool IsSettingsToolInvocation\([\s\S]*?\n\}/)?.[0];
+    assert.ok(isTool, 'Use the production check for the settings process invocation');
+    compileChecks(`
+        #include <string_view>
+        #define WH_MOD_ID L"modern-run-dialog-ui"
+        ${isTool}
+        constexpr const wchar_t* launcher[] = {L"windhawk.exe"};
+        constexpr const wchar_t* service[] = {L"windhawk.exe", L"-service"};
+        constexpr const wchar_t* otherTool[] = {L"windhawk.exe", L"-tool-mod", L"another-mod"};
+        constexpr const wchar_t* settings[] = {L"windhawk.exe", L"-tool-mod", WH_MOD_ID};
+        constexpr const wchar_t* mixed[] = {L"windhawk.exe", L"-service", L"-tool-mod", WH_MOD_ID};
+        static_assert(!IsSettingsToolInvocation(1, launcher));
+        static_assert(!IsSettingsToolInvocation(2, service));
+        static_assert(!IsSettingsToolInvocation(3, otherTool));
+        static_assert(IsSettingsToolInvocation(3, settings));
+        static_assert(!IsSettingsToolInvocation(4, mixed));
+    `);
+});
+
 test('the settings window is shown on the first request from a hidden tool process', () => {
     const show = source.match(/void ShowModernRunSettingsWindow\([\s\S]*?\n\}/)?.[0];
     assert.ok(show, 'Use the production settings-window presenter');
