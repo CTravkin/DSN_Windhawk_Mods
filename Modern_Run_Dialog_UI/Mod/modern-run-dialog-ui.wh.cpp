@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.9.2
+// @version         6.10.1
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 49
+// Build: 51
 
 // ==WindhawkModReadme==
 /*
@@ -366,14 +366,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:vi-VN: Độ đậm nền hộp thoại & hình nền (12–100%)
     $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 84%.
   - language: auto
-    $description:ru-RU: "Применяется к окну запуска и настройкам мода"
     $name:ru-RU: "Язык интерфейса"
     $name: "Display Language"
     $name:vi-VN: Ngôn ngữ hiển thị
-    $description: "Applies to Run and its settings"
-    $description:vi-VN: Tự động theo hệ điều hành hoặc chọn ngôn ngữ cố định.
     $options:vi-VN:
-    - auto: Tự động theo Windows
+    - auto: Tự động
     - en: English (Tiếng Anh)
     - vi: Tiếng Việt
     - th: ไทย (Tiếng Thái)
@@ -396,7 +393,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - hi: हिन्दी (Tiếng Hindi)
     - ar: العربية (Tiếng Ả Rập)
     $options:
-    - auto: Auto – System Default
+    - auto: Automatically
     - en: English
     - vi: Tiếng Việt (Vietnamese)
     - th: ไทย (Thai)
@@ -419,7 +416,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - hi: हिन्दी (Hindi)
     - ar: العربية (Arabic)
     $options:ru-RU:
-    - auto: Определено Windows
+    - auto: Автоматически
     - en: English
     - vi: Tiếng Việt (Vietnamese)
     - th: ไทย (Thai)
@@ -2195,6 +2192,36 @@ constexpr int kRunEmblemSize       = 20;
 constexpr int kSettingsEmblemSize  = 24;
 constexpr int kSettingsControlHeight = 32;
 constexpr int kSettingsCardInset = 18;
+namespace SettingsStyle {
+constexpr int windowWidth = 928;
+constexpr int windowHeight = 808;
+constexpr int minWidth = 808;
+constexpr int minHeight = 460;
+constexpr int sidebarWidth = 238;
+constexpr int compactSidebarWidth = 196;
+constexpr int pageInset = 26;
+constexpr int headingHeight = 72;
+constexpr int groupHeaderHeight = 64;
+constexpr int rowHeight = 68;
+constexpr int groupGap = 12;
+constexpr int controlWidth = 210;
+constexpr int controlGap = 8;
+constexpr int toggleWidth = 40;
+constexpr int toggleHeight = 20;
+constexpr int textGap = 12;
+constexpr int cardRadius = 6;
+constexpr int controlRadius = 4;
+constexpr int textInset = 6;
+constexpr int titleBandHeight = 24;
+constexpr int dialogWidth = 448;
+constexpr int dialogButtonWidth = 106;
+constexpr int dialogFieldInset = 10;
+constexpr int floatingButtonSize = 48;
+constexpr int floatingButtonInset = 16;
+constexpr float labelSize = 13.5f;
+constexpr float controlTextSize = 12.5f;
+constexpr float descriptionSize = 11.5f;
+}
 constexpr UINT_PTR kTimerCaret              = 9010;
 constexpr UINT_PTR kTimerLuminance          = 9011;
 constexpr UINT_PTR kTimerOpenAnim           = 9014;
@@ -3473,7 +3500,7 @@ V53LocalizedStrings GetV53LocalizedStrings(std::wstring lang) {
         L"Классический режим (сохранить тему)",
         L"Запоминать позицию окна",
         L"Закрепить сверху",
-        L"Открепить сверху",
+        L"Открепить",
         L"Открыть расположение файла"
     };
     if (lang == L"uk") return {
@@ -3819,7 +3846,7 @@ ExtraLocalizedStrings GetExtraLocalizedStrings(std::wstring lang) {
         return {
             L"Компактный режим мини-капсулы",
             L"Показывать историю команд",
-            L"Удалить этот элемент из истории",
+            L"Удалить из истории",
             L"Введите команду",
             L"Введите текст для перевода и нажмите Enter...",
             L"Текст для перевода...",
@@ -14525,7 +14552,7 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 49)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 51)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -14667,14 +14694,23 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
     return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"From -1 to 28\u00A0px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 12–100% (default 84%)", L"Layout & Position", L"", L"Window Position", L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
 }
 
+enum class SettingsGroup : size_t {
+    Theme, Appearance, Borders, Layout, ActionButtons, History, Administrator, Commands, Language, Count
+};
+constexpr int kSettingsGroupHitBase = 3000;
+constexpr int kCommandEditHitBase = 3100;
+constexpr int kCommandAddHit = 2700;
+constexpr size_t kMaxSettingsCommands = 64;
+
 struct Win11SettingsState {
     HWND hWnd = nullptr;
     UINT dpi = 96;
     bool isLight = false;
-    int activeTab = 0; // 0 = Appearance & Themes, 1 = Layout & Position, 2 = History & Behavior, 3 = Language
+    int activeTab = 0;
     int scrollY = 0;
     int maxScrollY = 0;
     int hoveredId = 0;
+    std::array<bool, static_cast<size_t>(SettingsGroup::Count)> collapsedGroups{};
     HICON hAppIcon = nullptr;
     ID2D1HwndRenderTarget* pHwndRT = nullptr;
     ModSettings settings;
@@ -14747,6 +14783,41 @@ D2D1_COLOR_F GetWindowsSystemAccentColor(bool isLight) {
     }
     return isLight ? D2D1::ColorF(0.000f, 0.404f, 0.753f, 1.0f)
                    : D2D1::ColorF(0.376f, 0.804f, 1.000f, 1.0f);
+}
+
+struct SettingsPalette {
+    D2D1_COLOR_F colBg;
+    D2D1_COLOR_F colSide;
+    D2D1_COLOR_F colCard;
+    D2D1_COLOR_F colCardHover;
+    D2D1_COLOR_F colBorder;
+    D2D1_COLOR_F colDivider;
+    D2D1_COLOR_F colText;
+    D2D1_COLOR_F colSub;
+    D2D1_COLOR_F colAccent;
+    D2D1_COLOR_F colNavSel;
+    D2D1_COLOR_F colCtlBg;
+    D2D1_COLOR_F colChipSel;
+};
+
+SettingsPalette GetSettingsPalette(bool isLight) {
+    D2D1_COLOR_F colBg        = isLight ? D2D1::ColorF(0.953f, 0.957f, 0.969f, 1.0f) : D2D1::ColorF(0.125f, 0.125f, 0.133f, 1.0f);
+    D2D1_COLOR_F colSide      = isLight ? D2D1::ColorF(0.945f, 0.949f, 0.963f, 1.0f) : D2D1::ColorF(0.114f, 0.114f, 0.122f, 1.0f);
+    D2D1_COLOR_F colCard      = isLight ? D2D1::ColorF(0.992f, 0.993f, 0.996f, 1.0f) : D2D1::ColorF(0.172f, 0.174f, 0.184f, 1.0f);
+    D2D1_COLOR_F colCardHover = isLight ? D2D1::ColorF(0.968f, 0.971f, 0.980f, 1.0f) : D2D1::ColorF(0.208f, 0.212f, 0.224f, 1.0f);
+    D2D1_COLOR_F colBorder    = isLight ? D2D1::ColorF(0.890f, 0.896f, 0.912f, 1.0f) : D2D1::ColorF(0.235f, 0.239f, 0.255f, 1.0f);
+    D2D1_COLOR_F colDivider   = isLight ? D2D1::ColorF(0.915f, 0.920f, 0.935f, 1.0f) : D2D1::ColorF(0.225f, 0.229f, 0.242f, 1.0f);
+    D2D1_COLOR_F colText      = isLight ? D2D1::ColorF(0.100f, 0.105f, 0.120f, 1.0f) : D2D1::ColorF(0.960f, 0.965f, 0.975f, 1.0f);
+    D2D1_COLOR_F colSub       = isLight ? D2D1::ColorF(0.380f, 0.395f, 0.425f, 1.0f) : D2D1::ColorF(0.680f, 0.695f, 0.725f, 1.0f);
+    D2D1_COLOR_F colAccent    = GetWindowsSystemAccentColor(isLight);
+    D2D1_COLOR_F colNavSel    = isLight ? D2D1::ColorF(0.902f, 0.910f, 0.930f, 1.0f) : D2D1::ColorF(0.200f, 0.204f, 0.220f, 1.0f);
+    D2D1_COLOR_F colCtlBg     = isLight ? D2D1::ColorF(1.000f, 1.000f, 1.000f, 1.0f) : D2D1::ColorF(0.218f, 0.222f, 0.236f, 1.0f);
+    D2D1_COLOR_F colChipSel   = D2D1::ColorF(colAccent.r, colAccent.g, colAccent.b, isLight ? 0.13f : 0.20f);
+    return {colBg, colSide, colCard, colCardHover, colBorder, colDivider, colText, colSub, colAccent, colNavSel, colCtlBg, colChipSel};
+}
+
+COLORREF SettingsColorRef(const D2D1_COLOR_F& color) {
+    return RGB(std::lround(color.r * 255), std::lround(color.g * 255), std::lround(color.b * 255));
 }
 
 static BOOL CALLBACK BroadcastReloadEnumProc(HWND hWnd, LPARAM) {
@@ -14895,12 +14966,13 @@ static void PaintWinUI3ColorPicker(HWND hWnd, WinUI3ColorPickerSession* s) {
     auto S = [&](float v) { return DpiScaleF(v, s->dpi); };
     bool isLight = s->isLight;
     COLORREF curRgb = HsvToRgb(s->hue, s->sat, s->val);
-    D2D1_COLOR_F colBg     = isLight ? D2D1::ColorF(0.965f, 0.968f, 0.978f, 1.0f) : D2D1::ColorF(0.145f, 0.148f, 0.160f, 1.0f);
-    D2D1_COLOR_F colCard   = isLight ? D2D1::ColorF(1.000f, 1.000f, 1.000f, 1.0f) : D2D1::ColorF(0.195f, 0.198f, 0.214f, 1.0f);
-    D2D1_COLOR_F colBorder = isLight ? D2D1::ColorF(0.840f, 0.850f, 0.875f, 1.0f) : D2D1::ColorF(0.280f, 0.285f, 0.310f, 1.0f);
-    D2D1_COLOR_F colText   = isLight ? D2D1::ColorF(0.100f, 0.105f, 0.120f, 1.0f) : D2D1::ColorF(0.960f, 0.965f, 0.978f, 1.0f);
-    D2D1_COLOR_F colSub    = isLight ? D2D1::ColorF(0.380f, 0.395f, 0.430f, 1.0f) : D2D1::ColorF(0.680f, 0.695f, 0.730f, 1.0f);
-    D2D1_COLOR_F colAccent = GetWindowsSystemAccentColor(isLight);
+    const auto palette = GetSettingsPalette(isLight);
+    const auto colBg = palette.colBg;
+    const auto colCard = palette.colCard;
+    const auto colBorder = palette.colBorder;
+    const auto colText = palette.colText;
+    const auto colSub = palette.colSub;
+    const auto colAccent = palette.colAccent;
     D2D1_COLOR_F colCur    = D2D1::ColorF(GetRValue(curRgb) / 255.0f, GetGValue(curRgb) / 255.0f, GetBValue(curRgb) / 255.0f, 1.0f);
 
     ID2D1HwndRenderTarget* pRT = s->pRT;
@@ -15274,14 +15346,14 @@ void ApplyWin11SettingsWindowFrame(HWND hWnd, bool isLight) {
     DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
     DWORD corner = 2; // DWMWCP_ROUND
     DwmSetWindowAttribute(hWnd, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner));
-    COLORREF captionCol = isLight ? RGB(243, 244, 247) : RGB(32, 32, 34);
+    COLORREF captionCol = SettingsColorRef(GetSettingsPalette(isLight).colBg);
     DwmSetWindowAttribute(hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &captionCol, sizeof(captionCol));
 }
 
 void DrawWin11NativeToggle(ID2D1RenderTarget* pRT, float rightX, float cy, UINT dpi,
                            bool checked, bool isLight, bool hovered, D2D1_COLOR_F accentCol, bool amber) {
-    float swW = DpiScaleF(40.0f, dpi);
-    float swH = DpiScaleF(20.0f, dpi);
+    float swW = DpiScaleF(SettingsStyle::toggleWidth, dpi);
+    float swH = DpiScaleF(SettingsStyle::toggleHeight, dpi);
     float leftX = rightX - swW;
     D2D1_RECT_F rc = D2D1::RectF(leftX, cy - swH * 0.5f, rightX, cy + swH * 0.5f);
     float r = swH * 0.5f;
@@ -15321,8 +15393,10 @@ struct AliasSettingsStrings {
     const wchar_t* title;
     const wchar_t* description;
     const wchar_t* newAlias;
-    const wchar_t* newAliasDescription;
     const wchar_t* add;
+    const wchar_t* edit;
+    const wchar_t* save;
+    const wchar_t* duplicate;
     const wchar_t* administrator;
     const wchar_t* remove;
     const wchar_t* keyword;
@@ -15333,20 +15407,20 @@ struct AliasSettingsStrings {
 AliasSettingsStrings GetAliasSettingsStrings(const std::wstring& code) {
     if (code == L"ru") return {
         L"Команды", L"Собственные команды для запуска программ и файлов по коротким именам",
-        L"Новая команда", L"Короткое имя, команда и права запуска",
-        L"Добавить", L"Запуск от имени администратора", L"Удалить", L"Короткое имя",
+        L"Новая команда", L"Добавить", L"Редактировать команду", L"Сохранить", L"Команда с таким именем уже есть",
+        L"Запуск от имени администратора", L"Удалить", L"Короткое имя",
         L"Команда или путь", L"Запуск от имени администратора"
     };
     if (code == L"vi") return {
         L"Bí danh lệnh tùy chỉnh", L"Khai báo từ khóa gõ tắt để mở nhanh tệp hoặc chạy quyền Admin",
-        L"Thêm bí danh mới", L"Tên tắt, lệnh đích và quyền Quản trị",
-        L"Thêm", L"Chạy với quyền quản trị", L"Xóa", L"Lệnh tắt", L"Lệnh hoặc đường dẫn đích",
+        L"Thêm bí danh mới", L"Thêm", L"Chỉnh sửa lệnh", L"Lưu", L"Tên này đã được sử dụng",
+        L"Chạy với quyền quản trị", L"Xóa", L"Lệnh tắt", L"Lệnh hoặc đường dẫn đích",
         L"Chạy với quyền Quản trị viên (Admin)"
     };
     return {
         L"Commands", L"Set up custom commands to launch programs and files by short name",
-        L"New Command", L"Short name, command, and launch privileges",
-        L"Add", L"Run as administrator", L"Remove", L"Short name", L"Command or path", L"Run as Administrator"
+        L"New Command", L"Add", L"Edit Command", L"Save", L"A command with this name already exists",
+        L"Run as administrator", L"Remove", L"Short name", L"Command or path", L"Run as Administrator"
     };
 }
 
@@ -15404,19 +15478,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         SettingsLocalizedStrings ls = GetSettingsLocalizedStrings(st->settings.language);
         const auto& displaySettings = GetRunDisplaySettingStrings(st->settings.language);
 
-        // Authentic Windows 11 Settings Palette (matching Image 2: Cá nhân hóa > Thanh tác vụ)
-        D2D1_COLOR_F colBg        = isLight ? D2D1::ColorF(0.953f, 0.957f, 0.969f, 1.0f) : D2D1::ColorF(0.125f, 0.125f, 0.133f, 1.0f);
-        D2D1_COLOR_F colSide      = isLight ? D2D1::ColorF(0.945f, 0.949f, 0.963f, 1.0f) : D2D1::ColorF(0.114f, 0.114f, 0.122f, 1.0f);
-        D2D1_COLOR_F colCard      = isLight ? D2D1::ColorF(0.992f, 0.993f, 0.996f, 1.0f) : D2D1::ColorF(0.172f, 0.174f, 0.184f, 1.0f);
-        D2D1_COLOR_F colCardHover = isLight ? D2D1::ColorF(0.968f, 0.971f, 0.980f, 1.0f) : D2D1::ColorF(0.208f, 0.212f, 0.224f, 1.0f);
-        D2D1_COLOR_F colBorder    = isLight ? D2D1::ColorF(0.890f, 0.896f, 0.912f, 1.0f) : D2D1::ColorF(0.235f, 0.239f, 0.255f, 1.0f);
-        D2D1_COLOR_F colDivider   = isLight ? D2D1::ColorF(0.915f, 0.920f, 0.935f, 1.0f) : D2D1::ColorF(0.225f, 0.229f, 0.242f, 1.0f);
-        D2D1_COLOR_F colText      = isLight ? D2D1::ColorF(0.100f, 0.105f, 0.120f, 1.0f) : D2D1::ColorF(0.960f, 0.965f, 0.975f, 1.0f);
-        D2D1_COLOR_F colSub       = isLight ? D2D1::ColorF(0.380f, 0.395f, 0.425f, 1.0f) : D2D1::ColorF(0.680f, 0.695f, 0.725f, 1.0f);
-        D2D1_COLOR_F colAccent    = GetWindowsSystemAccentColor(isLight);
-        D2D1_COLOR_F colNavSel    = isLight ? D2D1::ColorF(0.902f, 0.910f, 0.930f, 1.0f) : D2D1::ColorF(0.200f, 0.204f, 0.220f, 1.0f);
-        D2D1_COLOR_F colCtlBg     = isLight ? D2D1::ColorF(1.000f, 1.000f, 1.000f, 1.0f) : D2D1::ColorF(0.218f, 0.222f, 0.236f, 1.0f);
-        D2D1_COLOR_F colChipSel   = D2D1::ColorF(colAccent.r, colAccent.g, colAccent.b, isLight ? 0.13f : 0.20f);
+        const auto [colBg, colSide, colCard, colCardHover, colBorder, colDivider, colText, colSub, colAccent, colNavSel, colCtlBg, colChipSel] = GetSettingsPalette(isLight);
 
         pRT->Clear(colBg);
 
@@ -15439,8 +15501,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         IDWriteTextFormat* pFmtHeader = nullptr;
         IDWriteTextFormat *pFmtNav = nullptr, *pFmtCtl = nullptr, *pFmtRight = nullptr, *pFmtGlyph = nullptr;
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_SEMI_BOLD, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(24.0f), L"", &pFmtHeader);
-        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.5f), L"", &pFmtNav);
-        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(12.5f), L"", &pFmtCtl);
+        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(SettingsStyle::labelSize), L"", &pFmtNav);
+        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(SettingsStyle::controlTextSize), L"", &pFmtCtl);
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,   DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(13.0f), L"", &pFmtRight);
         const wchar_t* iconFont = GetWindowsIconFontFamily();
         g_pDWriteFactory->CreateTextFormat(iconFont, nullptr, DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(16.0f), L"", &pFmtGlyph);
@@ -15448,6 +15510,9 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         if (pFmtCtl)   { pFmtCtl->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtCtl->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtRight) { pFmtRight->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING); pFmtRight->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
         if (pFmtGlyph) { pFmtGlyph->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_CENTER); pFmtGlyph->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER); }
+        winrt::com_ptr<IDWriteTextFormat> descriptionFormat;
+        g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,
+            DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(SettingsStyle::descriptionSize), L"", descriptionFormat.put());
         winrt::com_ptr<IDWriteTextFormat> colorModeFormat;
         if (st->activeTab == 0 &&
             SUCCEEDED(g_pDWriteFactory->CreateTextFormat(L"Segoe UI Symbol", nullptr,
@@ -15472,34 +15537,39 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         };
 
         st->hits.clear();
+        RECT hitClip = rcClient;
         auto addHit = [&](int id, const D2D1_RECT_F& r, const std::wstring& sv = L"", int iv = 0) {
             RECT ri = { (LONG)r.left, (LONG)r.top, (LONG)r.right, (LONG)r.bottom };
-            st->hits.push_back({ id, ri, sv, iv });
+            RECT clipped{};
+            if (IntersectRect(&clipped, &ri, &hitClip)) st->hits.push_back({id, clipped, sv, iv});
+            return clipped;
         };
 
         auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description) {
             if (!pFmtNav || bounds.right <= bounds.left || bounds.bottom <= bounds.top ||
                 bounds.bottom <= 0.0f || bounds.top >= static_cast<float>(h)) return;
-            std::wstring text(title);
-            if (!description.empty()) {
-                text += L'\n';
-                text += description;
+            const float titleHeight = S(SettingsStyle::titleBandHeight);
+            const float descriptionSpace = bounds.bottom - bounds.top - titleHeight;
+            winrt::com_ptr<IDWriteTextLayout> descriptionLayout;
+            DWRITE_TEXT_METRICS metrics{};
+            if (descriptionFormat && !description.empty() && descriptionSpace > 0 &&
+                SUCCEEDED(g_pDWriteFactory->CreateTextLayout(description.data(), static_cast<UINT32>(description.size()),
+                    descriptionFormat.get(), bounds.right - bounds.left, descriptionSpace, descriptionLayout.put())) &&
+                SUCCEEDED(descriptionLayout->GetMetrics(&metrics))) {
+                const float descriptionHeight = (std::min)(metrics.height, descriptionSpace);
+                const auto textBand = CenterVertically(bounds, titleHeight + descriptionHeight);
+                const auto titleBand = D2D1::RectF(textBand.left, textBand.top, textBand.right, textBand.top + titleHeight);
+                DrawCenteredText(pRT, title.data(), static_cast<UINT32>(title.size()), pFmtNav, titleBand, pBrText);
+                pRT->DrawTextLayout(D2D1::Point2F(textBand.left, titleBand.bottom), descriptionLayout.get(), pBrSub,
+                                    D2D1_DRAW_TEXT_OPTIONS_CLIP);
+            } else {
+                DrawCenteredText(pRT, title.data(), static_cast<UINT32>(title.size()), pFmtNav, bounds, pBrText);
             }
-            IDWriteTextLayout* layout = nullptr;
-            if (FAILED(g_pDWriteFactory->CreateTextLayout(text.c_str(), static_cast<UINT32>(text.size()), pFmtNav,
-                    bounds.right - bounds.left, bounds.bottom - bounds.top, &layout))) return;
-
-            if (!description.empty()) {
-                const DWRITE_TEXT_RANGE range{static_cast<UINT32>(title.size() + 1), static_cast<UINT32>(description.size())};
-                layout->SetFontSize(S(11.5f), range);
-                layout->SetDrawingEffect(pBrSub, range);
-            }
-            DrawCenteredTextLayout(pRT, layout, bounds, pBrText);
-            layout->Release();
         };
 
         // 1. Left Navigation Sidebar (Win11 Settings style)
-        float sideW = S(238.0f);
+        const float sideW = S(w < S(SettingsStyle::windowWidth - 24)
+            ? SettingsStyle::compactSidebarWidth : SettingsStyle::sidebarWidth);
         pRT->FillRectangle(D2D1::RectF(0, 0, sideW, (float)h), pBrSide);
 
         // App Header Badge on Sidebar
@@ -15554,49 +15624,83 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             navY += S(42.0f);
         }
 
-        // 2. Right Content Area (Authentic Win11 Breadcrumb Header + Grouped Expander Cards)
-        float contentX = sideW + S(26.0f);
-        float contentW = (std::max)(S(360.0f), (float)w - contentX - S(30.0f));
-        pRT->PushAxisAlignedClip(D2D1::RectF(sideW, 0, (float)w, (float)h), D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
-
-        float curY = S(20.0f) - (float)st->scrollY;
-        // Breadcrumb title: "Modern Run  >  Cá nhân hoá"
-        std::wstring fullHeader = std::wstring(L"Modern Run  ›  ") + kNavs[st->activeTab].label;
+        const float contentX = sideW + S(SettingsStyle::pageInset);
+        const float contentRight = w - S(SettingsStyle::pageInset);
+        const float contentTop = S(SettingsStyle::headingHeight);
+        const bool commandsPage = st->activeTab == 3;
+        const float footer = commandsPage ? S(SettingsStyle::floatingButtonSize + 2 * SettingsStyle::floatingButtonInset) : 0;
+        const float contentBottom = (std::max)(contentTop, h - footer);
+        const wchar_t* pageTitle = kNavs[st->activeTab].label;
         if (pFmtHeader && pBrText) {
-            DrawCenteredText(pRT, fullHeader.c_str(), (UINT32)fullHeader.size(), pFmtHeader,
-                          D2D1::RectF(contentX, curY, contentX + contentW, curY + S(38)), pBrText);
+            DrawCenteredText(pRT, pageTitle, static_cast<UINT32>(wcslen(pageTitle)), pFmtHeader,
+                D2D1::RectF(contentX, 0, contentRight, contentTop), pBrText);
         }
-        curY += S(52.0f);
+        hitClip = {static_cast<LONG>(sideW), static_cast<LONG>(contentTop), w, static_cast<LONG>(contentBottom)};
+        pRT->PushAxisAlignedClip(D2D1::RectF(sideW, contentTop, static_cast<float>(w), contentBottom),
+                                 D2D1_ANTIALIAS_MODE_PER_PRIMITIVE);
+        float curY = contentTop + S(1) - st->scrollY;
 
-        const float rowHeight = S(68.0f);
+        const float rowHeight = S(SettingsStyle::rowHeight);
         const float cardInset = S(kSettingsCardInset);
         const float controlHeight = S(kSettingsControlHeight);
+        const float controlGap = S(SettingsStyle::controlGap);
         std::vector<Win11SettingsState::ActionTooltip> actionTooltips;
         auto controlRect = [&](float left, float right, float top, float height) {
             return CenterVertically(D2D1::RectF(left, top, right, top + height), controlHeight);
         };
+        auto settingsControl = [&](const D2D1_RECT_F& card, float top, float height) {
+            const float right = card.right - cardInset;
+            return controlRect(right - S(SettingsStyle::controlWidth), right, top, height);
+        };
+        auto drawControl = [&](const D2D1_RECT_F& rect, int id, bool selected = false) {
+            const auto corners = D2D1::RoundedRect(rect, S(SettingsStyle::controlRadius), S(SettingsStyle::controlRadius));
+            pRT->FillRoundedRectangle(corners, selected ? pBrChipSel : (st->hoveredId == id ? pBrCardHov : pBrCtlBg));
+            pRT->DrawRoundedRectangle(corners, selected ? pBrAccent : pBrBorder, 1.0f);
+        };
+        auto drawIconButton = [&](const D2D1_RECT_F& rect, int id, const wchar_t* glyph,
+                                  const wchar_t* tooltip, bool selected = false, int index = 0) {
+            drawControl(rect, id, selected);
+            drawSettingsGlyph(glyph, rect, selected ? pBrAccent : pBrText);
+            const RECT hit = addHit(id, rect, L"", index);
+            if (!IsRectEmpty(&hit)) actionTooltips.push_back({static_cast<UINT_PTR>(id), hit, tooltip});
+        };
 
-        auto drawSettingRowHeader = [&](const D2D1_RECT_F& card, float top, float height, float textRight,
+        auto drawSettingRowHeader = [&](const D2D1_RECT_F& card, float top, float height,
                                         const wchar_t* glyph, const wchar_t* title, const wchar_t* description,
                                         ID2D1Brush* iconBrush, bool rotateGlyph = false) {
             pRT->DrawLine(D2D1::Point2F(card.left + 1.0f, top), D2D1::Point2F(card.right - 1.0f, top), pBrDiv, 1.0f);
-            drawSettingsGlyph(glyph, D2D1::RectF(card.left + S(26), top, card.left + S(56), top + height), iconBrush, rotateGlyph);
-            drawCardText(D2D1::RectF(card.left + S(64), top + S(6), textRight, top + height - S(6)),
+            const float iconLeft = card.left + cardInset;
+            drawSettingsGlyph(glyph, D2D1::RectF(iconLeft, top, iconLeft + controlHeight, top + height), iconBrush, rotateGlyph);
+            const float textRight = settingsControl(card, top, height).left - S(SettingsStyle::textGap);
+            drawCardText(D2D1::RectF(iconLeft + controlHeight + S(SettingsStyle::textGap),
+                                    top + S(SettingsStyle::textInset), textRight, top + height - S(SettingsStyle::textInset)),
                          title, description ? std::wstring_view(description) : std::wstring_view{});
         };
 
-        auto beginGroupCard = [&](const wchar_t* groupTitle, const wchar_t* groupSub, int rowCount, float rowH) -> std::pair<D2D1_RECT_F, float> {
-            const float headerH = rowHeight;
-            float totalH = headerH + rowCount * rowH;
-            D2D1_RECT_F rc = D2D1::RectF(contentX, curY, contentX + contentW, curY + totalH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rc, S(6), S(6)), pBrCard);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rc, S(6), S(6)), pBrBorder, 1.0f);
-            drawCardText(D2D1::RectF(rc.left + cardInset, rc.top + S(6), rc.right - S(42), rc.top + headerH - S(6)),
-                         groupTitle, groupSub);
-            // Subtle chevron-up indicator on the right (matching Win11 SettingsExpander in Image 2)
-            drawSettingsGlyph(L"\uE70E", D2D1::RectF(rc.right - S(40), rc.top, rc.right - S(14), rc.top + headerH), pBrSub);
-            curY += totalH + S(12.0f);
-            return { rc, rc.top + headerH };
+        struct GroupCard { D2D1_RECT_F rect; float rowsTop; bool expanded; };
+        auto beginGroupCard = [&](SettingsGroup group, const wchar_t* title, const wchar_t* description, float bodyHeight) {
+            const auto index = static_cast<size_t>(group);
+            const int id = kSettingsGroupHitBase + static_cast<int>(index);
+            const bool expanded = !st->collapsedGroups[index];
+            const float headerH = S(SettingsStyle::groupHeaderHeight);
+            const float rowsTop = curY + headerH;
+            const auto rect = D2D1::RectF(contentX, curY, contentRight, rowsTop + (expanded ? bodyHeight : 0));
+            const float radius = S(SettingsStyle::cardRadius);
+            const auto card = D2D1::RoundedRect(rect, radius, radius);
+            pRT->FillRoundedRectangle(card, pBrCard);
+            const auto header = D2D1::RectF(rect.left, rect.top, rect.right, rowsTop);
+            if (bodyHeight > 0) {
+                const auto button = controlRect(header.right - cardInset - controlHeight, header.right - cardInset, header.top, headerH);
+                if (st->hoveredId == id) drawControl(button, id);
+                drawSettingsGlyph(expanded ? L"\uE70E" : L"\uE70D", button, pBrSub);
+                addHit(id, header);
+            }
+            pRT->DrawRoundedRectangle(card, pBrBorder, 1.0f);
+            drawCardText(D2D1::RectF(rect.left + cardInset, rect.top + S(SettingsStyle::textInset),
+                                    rect.right - cardInset - controlHeight - controlGap, rowsTop - S(SettingsStyle::textInset)),
+                         title, description);
+            curY = rect.bottom + S(SettingsStyle::groupGap);
+            return GroupCard{rect, rowsTop, expanded};
         };
 
         auto drawToggleRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int id,
@@ -15606,14 +15710,16 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             bool hov = (st->hoveredId == id);
             if (hov) {
                 const auto highlight = D2D1::RectF(grpRc.left + S(2), rowTop + S(2), grpRc.right - S(2), rowTop + rowH - S(2));
-                pRT->FillRoundedRectangle(D2D1::RoundedRect(highlight, S(4), S(4)), pBrCardHov);
+                pRT->FillRoundedRectangle(D2D1::RoundedRect(highlight,
+                    S(SettingsStyle::controlRadius), S(SettingsStyle::controlRadius)), pBrCardHov);
             }
             float cy = rowTop + rowH * 0.5f;
-            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(124), glyph, title, desc, pBrSub);
+            drawSettingRowHeader(grpRc, rowTop, rowH, glyph, title, desc, pBrSub);
             const wchar_t* stateTxt = checked ? ls.on : ls.off;
             if (pFmtRight) {
                 DrawCenteredText(pRT, stateTxt, (UINT32)wcslen(stateTxt), pFmtRight,
-                              D2D1::RectF(grpRc.right - S(118), rowTop, grpRc.right - S(68), rowTop + rowH), pBrText);
+                              D2D1::RectF(settingsControl(grpRc, rowTop, rowH).left, rowTop,
+                                          grpRc.right - cardInset - S(SettingsStyle::toggleWidth) - controlGap, rowTop + rowH), pBrText);
             }
             DrawWin11NativeToggle(pRT, grpRc.right - cardInset, cy, dpi, checked, isLight, hov, colAccent, amber);
             addHit(id, rRow);
@@ -15621,14 +15727,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         auto drawDropdownRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int id,
                                           const wchar_t* glyph, const wchar_t* title, const wchar_t* desc,
-                                          const std::wstring& curValueLabel, float comboWidth = 178.0f) {
-            const float textRight = grpRc.right - S(comboWidth + 37.0f);
-            drawSettingRowHeader(grpRc, rowTop, rowH, textRight, glyph, title, desc, pBrSub);
-            // Win11 ComboBox pill on the right (matching Image 2: "[ Ẩn  ⌄ ]")
-            const auto rcCombo = controlRect(grpRc.right - S(comboWidth) - cardInset, grpRc.right - cardInset, rowTop, rowH);
-            bool hov = (st->hoveredId == id);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), hov ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcCombo, S(4), S(4)), pBrBorder, 1.0f);
+                                          const std::wstring& curValueLabel) {
+            drawSettingRowHeader(grpRc, rowTop, rowH, glyph, title, desc, pBrSub);
+            const auto rcCombo = settingsControl(grpRc, rowTop, rowH);
+            drawControl(rcCombo, id);
             if (pFmtNav) {
                 DrawCenteredText(pRT, curValueLabel.c_str(), (UINT32)curValueLabel.size(), pFmtNav,
                               D2D1::RectF(rcCombo.left + S(12), rcCombo.top, rcCombo.right - S(28), rcCombo.bottom), pBrText);
@@ -15639,18 +15741,12 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
 
         auto drawColorRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int pickId, int resetId,
                                        const wchar_t* glyph, const wchar_t* title, const wchar_t* desc, const std::wstring& hexVal) {
-            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(215), glyph, title, desc, pBrSub);
-
-            const auto rcReset = controlRect(grpRc.right - S(86), grpRc.right - cardInset, rowTop, rowH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
-            const wchar_t* rstTxt = ls.defBtn;
-            if (pFmtCtl) DrawCenteredText(pRT, rstTxt, (UINT32)wcslen(rstTxt), pFmtCtl, rcReset, pBrText);
-            addHit(resetId, rcReset);
-
-            const auto rcPick = controlRect(rcReset.left - S(106), rcReset.left - S(8), rowTop, rowH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), st->hoveredId == pickId ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), pBrBorder, 1.0f);
+            drawSettingRowHeader(grpRc, rowTop, rowH, glyph, title, desc, pBrSub);
+            const auto controls = settingsControl(grpRc, rowTop, rowH);
+            const auto rcReset = controlRect(controls.right - controlHeight, controls.right, rowTop, rowH);
+            const auto rcPick = controlRect(controls.left, rcReset.left - controlGap, rowTop, rowH);
+            drawIconButton(rcReset, resetId, L"\uE894", ls.defBtn);
+            drawControl(rcPick, pickId);
             COLORREF parsedRgb = 0;
             if (!hexVal.empty() && TryParseHexColor(hexVal, &parsedRgb)) {
                 ID2D1SolidColorBrush* pSw = nullptr;
@@ -15672,22 +15768,15 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         auto drawStepperRowInGroup = [&](const D2D1_RECT_F& grpRc, float rowTop, float rowH, int minusId, int plusId, int resetId,
                                          const wchar_t* glyph, const wchar_t* title, const wchar_t* desc,
                                          const std::wstring& valStr, bool rotateGlyph = false) {
-            drawSettingRowHeader(grpRc, rowTop, rowH, grpRc.right - S(215), glyph, title, desc, pBrSub, rotateGlyph);
-
-            const auto rcReset = controlRect(grpRc.right - S(72), grpRc.right - cardInset, rowTop, rowH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), st->hoveredId == resetId ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcReset, S(4), S(4)), pBrBorder, 1.0f);
-            const wchar_t* resetLabel = resetId == 2227 ? ls.defBtn : ls.autoLbl;
-            if (pFmtCtl) DrawCenteredText(pRT, resetLabel, static_cast<UINT32>(wcslen(resetLabel)), pFmtCtl, rcReset, pBrText);
-            addHit(resetId, rcReset);
-
-            const auto rcPlus = controlRect(rcReset.left - S(36), rcReset.left - S(8), rowTop, rowH);
-            const auto rcVal  = controlRect(rcPlus.left - S(62), rcPlus.left - S(8), rowTop, rowH);
-            const auto rcMin  = controlRect(rcVal.left - S(36), rcVal.left - S(8), rowTop, rowH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcMin, S(4), S(4)), st->hoveredId == minusId ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcMin, S(4), S(4)), pBrBorder, 1.0f);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPlus, S(4), S(4)), st->hoveredId == plusId ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPlus, S(4), S(4)), pBrBorder, 1.0f);
+            drawSettingRowHeader(grpRc, rowTop, rowH, glyph, title, desc, pBrSub, rotateGlyph);
+            const auto controls = settingsControl(grpRc, rowTop, rowH);
+            const auto rcReset = controlRect(controls.right - controlHeight, controls.right, rowTop, rowH);
+            const auto rcPlus = controlRect(rcReset.left - controlGap - controlHeight, rcReset.left - controlGap, rowTop, rowH);
+            const auto rcMin = controlRect(controls.left, controls.left + controlHeight, rowTop, rowH);
+            const auto rcVal = controlRect(rcMin.right + controlGap, rcPlus.left - controlGap, rowTop, rowH);
+            drawIconButton(rcReset, resetId, L"\uE894", resetId == 2227 ? ls.defBtn : ls.autoLbl);
+            drawControl(rcMin, minusId);
+            drawControl(rcPlus, plusId);
             if (pFmtCtl) {
                 DrawCenteredText(pRT, L"−", 1, pFmtCtl, rcMin, pBrText);
                 DrawCenteredText(pRT, valStr.c_str(), (UINT32)valStr.size(), pFmtCtl, rcVal, pBrText);
@@ -15726,233 +15815,204 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         if (st->activeTab == 0) {
             // Group 1: Chủ đề & Chế độ màu (matching Win11 SettingsExpander!)
             const float rH = rowHeight;
-            auto [g1, y1] = beginGroupCard(
-                ls.gThemeTitle,
-                ls.gThemeSub,
-                3, rH);
-            drawDropdownRowInGroup(g1, y1, rH, 2000, L"\uE790",
-                ls.themeTitle,
-                ls.themeSub,
-                getPresetLabel(st->settings.themePreset));
-            std::wstring cmLbl = (st->settings.colorMode == ColorMode::Dark) ? ls.colorDark
-                               : ((st->settings.colorMode == ColorMode::Light) ? ls.colorLight
-                                                                               : ls.colorAuto);
-            drawDropdownRowInGroup(g1, y1 + rH, rH, 2100, kColorModeSettingsGlyph,
-                ls.colorTitle,
-                ls.colorSub,
-                cmLbl);
-            const auto& icons = GetIconSetStrings(st->settings.language);
-            drawDropdownRowInGroup(g1, y1 + 2 * rH, rH, kIconSetControl, L"\uE8A9",
-                icons.title, isRuNav ? L"Набор значков для окна и контекстного меню"
-                    : languageCode == L"en" ? L"Icon set for the window and context menu" : nullptr,
-                st->settings.iconSet == IconSet::WindowsFluent ? kWindowsFluentMenuLabel : icons.modLabel);
-
-            // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
-            auto [g2, y2] = beginGroupCard(
-                ls.gCustomTitle,
-                ls.gCustomSub,
-                5, rH);
-            drawColorRowInGroup(g2, y2, rH, 2201, 2202, L"\uE771",
-                ls.bgColTitle,
-                ls.bgColSub,
-                st->settings.customBgColor);
-            std::wstring crStr = (st->settings.customCornerRadius < 0)
-                ? (isRuNav ? L"По теме" : languageCode == L"en" ? L"Theme default" : ls.defBtn)
-                : (std::to_wstring(st->settings.customCornerRadius) + L" px");
-            const auto cornerStrings = GetCornerRadiusStrings(st->settings.language);
-            drawStepperRowInGroup(g2, y2 + rH, rH, 2210, 2211, 2212, L"\uE744",
-                cornerStrings.outerTitle,
-                ls.radiusSub,
-                crStr, true);
-            std::wstring innerRadius = st->settings.innerCornerRadius < 0
-                ? ls.autoLbl : std::to_wstring(st->settings.innerCornerRadius) + L" px";
-            drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2213, 2214, 2215, L"\uE744",
-                cornerStrings.innerTitle, cornerStrings.innerHint, innerRadius);
-            {
-                // Custom Background Image / Animated GIF Picker
-                float rowTop = y2 + rH * 3;
-                std::wstring bgSub;
-                if (st->settings.customBackgroundPath.empty()) {
-                    bgSub = ls.bgImgNone;
-                } else {
-                    const wchar_t* fn = PathFindFileNameW(st->settings.customBackgroundPath.c_str());
-                    bgSub = std::wstring(ls.bgImgActive) + (fn ? fn : st->settings.customBackgroundPath.c_str());
-                }
-                drawSettingRowHeader(g2, rowTop, rH, g2.right - S(215), L"\uEB9F", ls.bgImgTitle, bgSub.c_str(), pBrSub);
-
-                const auto rcPick = controlRect(g2.right - S(196), g2.right - S(94), rowTop, rH);
-                const auto rcClr = controlRect(g2.right - S(86), g2.right - cardInset, rowTop, rH);
-                pRT->FillRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), (st->hoveredId == 2220) ? pBrCardHov : pBrCtlBg);
-                pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcPick, S(4), S(4)), pBrBorder, 1.0f);
-                const wchar_t* pickLbl = ls.browse;
-                if (pFmtCtl) DrawCenteredText(pRT, pickLbl, (UINT32)wcslen(pickLbl), pFmtCtl, rcPick, pBrText);
-                addHit(2220, rcPick);
-
-                pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2221) ? pBrCardHov : pBrCtlBg);
-                pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), pBrBorder, 1.0f);
-                const wchar_t* clrLbl = ls.clear;
-                if (pFmtCtl) DrawCenteredText(pRT, clrLbl, (UINT32)wcslen(clrLbl), pFmtCtl, rcClr, pBrText);
-                addHit(2221, rcClr);
+            auto [g1, y1, themeExpanded] = beginGroupCard(SettingsGroup::Theme,
+                ls.gThemeTitle, ls.gThemeSub, 3 * rH);
+            if (themeExpanded) {
+                drawDropdownRowInGroup(g1, y1, rH, 2000, L"\uE790",
+                    ls.themeTitle,
+                    ls.themeSub,
+                    getPresetLabel(st->settings.themePreset));
+                std::wstring cmLbl = (st->settings.colorMode == ColorMode::Dark) ? ls.colorDark
+                                   : ((st->settings.colorMode == ColorMode::Light) ? ls.colorLight
+                                                                                   : ls.colorAuto);
+                drawDropdownRowInGroup(g1, y1 + rH, rH, 2100, kColorModeSettingsGlyph,
+                    ls.colorTitle,
+                    ls.colorSub,
+                    cmLbl);
+                const auto& icons = GetIconSetStrings(st->settings.language);
+                drawDropdownRowInGroup(g1, y1 + 2 * rH, rH, kIconSetControl, L"\uE8A9",
+                    icons.title, isRuNav ? L"Набор значков для окна и контекстного меню"
+                        : languageCode == L"en" ? L"Icon set for the window and context menu" : nullptr,
+                    st->settings.iconSet == IconSet::WindowsFluent ? kWindowsFluentMenuLabel : icons.modLabel);
             }
-            {
-                drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE890",
-                    ls.bgOpTitle,
-                    ls.bgOpSub,
-                    std::to_wstring(st->settings.backgroundOpacityPercent) + L"%");
+            // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
+            auto [g2, y2, appearanceExpanded] = beginGroupCard(SettingsGroup::Appearance,
+                ls.gCustomTitle, ls.gCustomSub, 5 * rH);
+            if (appearanceExpanded) {
+                drawColorRowInGroup(g2, y2, rH, 2201, 2202, L"\uE771",
+                    ls.bgColTitle,
+                    ls.bgColSub,
+                    st->settings.customBgColor);
+                std::wstring crStr = (st->settings.customCornerRadius < 0)
+                    ? (isRuNav ? L"По теме" : languageCode == L"en" ? L"Theme default" : ls.defBtn)
+                    : (std::to_wstring(st->settings.customCornerRadius) + L" px");
+                const auto cornerStrings = GetCornerRadiusStrings(st->settings.language);
+                drawStepperRowInGroup(g2, y2 + rH, rH, 2210, 2211, 2212, L"\uE744",
+                    cornerStrings.outerTitle,
+                    ls.radiusSub,
+                    crStr, true);
+                std::wstring innerRadius = st->settings.innerCornerRadius < 0
+                    ? ls.autoLbl : std::to_wstring(st->settings.innerCornerRadius) + L" px";
+                drawStepperRowInGroup(g2, y2 + rH * 2, rH, 2213, 2214, 2215, L"\uE744",
+                    cornerStrings.innerTitle, cornerStrings.innerHint, innerRadius);
+                {
+                    // Custom Background Image / Animated GIF Picker
+                    float rowTop = y2 + rH * 3;
+                    std::wstring bgSub;
+                    if (st->settings.customBackgroundPath.empty()) {
+                        bgSub = ls.bgImgNone;
+                    } else {
+                        const wchar_t* fn = PathFindFileNameW(st->settings.customBackgroundPath.c_str());
+                        bgSub = std::wstring(ls.bgImgActive) + (fn ? fn : st->settings.customBackgroundPath.c_str());
+                    }
+                    drawSettingRowHeader(g2, rowTop, rH, L"\uEB9F", ls.bgImgTitle, bgSub.c_str(), pBrSub);
+                    const auto controls = settingsControl(g2, rowTop, rH);
+                    const auto rcClear = controlRect(controls.right - controlHeight, controls.right, rowTop, rH);
+                    const auto rcOpen = controlRect(controls.left, rcClear.left - controlGap, rowTop, rH);
+                    drawControl(rcOpen, 2220);
+                    const wchar_t* openLabel = isRuNav ? L"Открыть" : isViNav ? L"Mở"
+                        : languageCode == L"en" ? L"Open" : ls.browse;
+                    DrawCenteredText(pRT, openLabel, static_cast<UINT32>(wcslen(openLabel)), pFmtCtl, rcOpen, pBrText);
+                    addHit(2220, rcOpen);
+                    drawIconButton(rcClear, 2221, L"\uE894", ls.clear);
+                }
+                {
+                    drawStepperRowInGroup(g2, y2 + rH * 4, rH, 2225, 2226, 2227, L"\uE890",
+                        ls.bgOpTitle,
+                        ls.bgOpSub,
+                        std::to_wstring(st->settings.backgroundOpacityPercent) + L"%");
+                }
             }
             const auto borders = GetWindowBorderStrings(st->settings.language);
             const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Standard;
-            auto [borderGroup, borderY] = beginGroupCard(borders.groupTitle, L"", showMenuBorder ? 3 : 2, rH);
-            drawColorRowInGroup(borderGroup, borderY, rH, 2203, 2204, L"\uED66",
-                ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
-            drawDropdownRowInGroup(borderGroup, borderY + rH, rH, 2230, L"\uE739",
-                borders.modeTitle, borders.description, borders.labels[static_cast<int>(st->settings.windowBorderMode)]);
-            if (showMenuBorder) {
-                const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
-                drawDropdownRowInGroup(borderGroup, borderY + rH * 2, rH, 2111, L"\uEDE3",
-                    borderStrings.title, borderStrings.description,
-                    borderStrings.labels[static_cast<int>(st->settings.menuBorderMode)], 248.0f);
+            auto [borderGroup, borderY, bordersExpanded] = beginGroupCard(SettingsGroup::Borders,
+                borders.groupTitle, L"", (showMenuBorder ? 3 : 2) * rH);
+            if (bordersExpanded) {
+                drawColorRowInGroup(borderGroup, borderY, rH, 2203, 2204, L"\uED66",
+                    ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
+                drawDropdownRowInGroup(borderGroup, borderY + rH, rH, 2230, L"\uE739",
+                    borders.modeTitle, borders.description, borders.labels[static_cast<int>(st->settings.windowBorderMode)]);
+                if (showMenuBorder) {
+                    const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
+                    drawDropdownRowInGroup(borderGroup, borderY + rH * 2, rH, 2111, L"\uEDE3",
+                        borderStrings.title, borderStrings.description,
+                        borderStrings.labels[static_cast<int>(st->settings.menuBorderMode)]);
+                }
             }
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
             const float rH = rowHeight;
-            auto [g1, y1] = beginGroupCard(
-                ls.gPosTitle,
-                ls.gPosSub,
-                6, rH);
-            drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE7C2",
-                ls.posTitle,
-                ls.posSub,
-                getPosLabel(st->settings.dialogPosition));
-            drawToggleRowInGroup(g1, y1 + rH, rH, 2403, L"\uE718",
-                ls.remPosTitle,
-                ls.remPosSub,
-                st->settings.rememberPosition);
-            drawDropdownRowInGroup(g1, y1 + rH * 2, rH, 2401, L"\uE7C4",
-                layoutStrings.title,
-                layoutStrings.description,
-                layoutStrings.options[static_cast<int>(st->settings.dialogLayout)]);
-            const auto menuStrings = GetContextMenuStyleStrings(st->settings.language);
-            drawDropdownRowInGroup(g1, y1 + rH * 3, rH, 2110, L"\uEDE3",
-                menuStrings.title, menuStrings.description,
-                st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
-                    ? kWindowsFluentMenuLabel : menuStrings.modLabel);
-            const std::array widthLabels{displaySettings.widthOptions0, displaySettings.widthOptions1,
-                                         displaySettings.widthOptions2};
-            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2411, L"\uE799",
-                displaySettings.widthTitle, displaySettings.widthDescription,
-                widthLabels[static_cast<size_t>(st->settings.dialogWidthPreset)]);
-            drawDropdownRowInGroup(g1, y1 + rH * 5, rH, 2410, L"\uE71E",
-                ls.scaleTitle,
-                ls.scaleSub,
-                std::to_wstring(st->settings.uiScalePercent) + L"%");
+            auto [g1, y1, layoutExpanded] = beginGroupCard(SettingsGroup::Layout,
+                ls.gPosTitle, ls.gPosSub, 6 * rH);
+            if (layoutExpanded) {
+                drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE7C2",
+                    ls.posTitle,
+                    ls.posSub,
+                    getPosLabel(st->settings.dialogPosition));
+                drawToggleRowInGroup(g1, y1 + rH, rH, 2403, L"\uE718",
+                    ls.remPosTitle,
+                    ls.remPosSub,
+                    st->settings.rememberPosition);
+                drawDropdownRowInGroup(g1, y1 + rH * 2, rH, 2401, L"\uE7C4",
+                    layoutStrings.title,
+                    layoutStrings.description,
+                    layoutStrings.options[static_cast<int>(st->settings.dialogLayout)]);
+                const auto menuStrings = GetContextMenuStyleStrings(st->settings.language);
+                drawDropdownRowInGroup(g1, y1 + rH * 3, rH, 2110, L"\uEDE3",
+                    menuStrings.title, menuStrings.description,
+                    st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
+                        ? kWindowsFluentMenuLabel : menuStrings.modLabel);
+                const std::array widthLabels{displaySettings.widthOptions0, displaySettings.widthOptions1,
+                                             displaySettings.widthOptions2};
+                drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2411, L"\uE799",
+                    displaySettings.widthTitle, displaySettings.widthDescription,
+                    widthLabels[static_cast<size_t>(st->settings.dialogWidthPreset)]);
+                drawDropdownRowInGroup(g1, y1 + rH * 5, rH, 2410, L"\uE71E",
+                    ls.scaleTitle,
+                    ls.scaleSub,
+                    std::to_wstring(st->settings.uiScalePercent) + L"%");
+            }
             const auto actions = GetActionButtonStrings(st->settings.language);
-            auto [buttonGroup, rowY] = beginGroupCard(
-                actions.groupTitle, actions.groupDescription, kRunActionCount, rH);
-            constexpr std::array<const wchar_t*, kRunActionCount> glyphs{
-                L"\uE8B7", L"\uE751", L"\uE8BB", L"\uE713"
-            };
-            for (size_t i = 0; i < kRunActionCount; ++i) {
-                wchar_t title[128]{};
-                swprintf_s(title, actions.hidePattern, actions.labels[i]);
-                drawToggleRowInGroup(buttonGroup, rowY + rH * i, rH,
-                    kHideActionRowBase + static_cast<int>(i), glyphs[i], title, kActionShortcuts[i],
-                    st->settings.hiddenActions[i]);
+            auto [buttonGroup, rowY, actionbuttonsExpanded] = beginGroupCard(SettingsGroup::ActionButtons,
+                actions.groupTitle, actions.groupDescription, kRunActionCount * rH);
+            if (actionbuttonsExpanded) {
+                constexpr std::array<const wchar_t*, kRunActionCount> glyphs{
+                    L"\uE8B7", L"\uE751", L"\uE8BB", L"\uE713"
+                };
+                for (size_t i = 0; i < kRunActionCount; ++i) {
+                    wchar_t title[128]{};
+                    swprintf_s(title, actions.hidePattern, actions.labels[i]);
+                    drawToggleRowInGroup(buttonGroup, rowY + rH * i, rH,
+                        kHideActionRowBase + static_cast<int>(i), glyphs[i], title, kActionShortcuts[i],
+                        st->settings.hiddenActions[i]);
+                }
             }
         } else if (st->activeTab == 2) {
             const float rH = rowHeight;
-            auto [g1, y1] = beginGroupCard(
-                ls.gHistTitle,
-                ls.gHistSub,
-                6, rH);
-            drawToggleRowInGroup(g1, y1, rH, 2501, L"\uE81C",
-                ls.showHistTitle,
-                ls.showHistSub,
-                st->settings.maxHistoryItems > 0);
-            drawToggleRowInGroup(g1, y1 + rH, rH, 2504, L"\uEC92",
-                isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Дата и время в истории" : L"Date and Time in History",
-                isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : isRuNav
-                    ? L"Короткие форматы даты и времени в строках истории" : L"Short date and time formats in history",
-                st->settings.showTimestamp);
-            drawToggleRowInGroup(g1, y1 + rH * 2, rH, 2502, L"\uE75C",
-                ls.clearInitTitle,
-                ls.clearInitSub,
-                st->settings.clearInitialInput);
-            drawToggleRowInGroup(g1, y1 + rH * 3, rH, 2505, L"\uE7C9",
-                isViNav ? L"Tự động đóng khi bấm ra ngoài cửa sổ" : isRuNav ? L"Закрывать при нажатии вне окна" : L"Close on Click Outside",
-                isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : isRuNav
-                    ? L"Нажатие за пределами окна закрывает его" : L"Clicking outside closes the window",
-                st->settings.closeOnClickOutside);
-            const auto taskbar = GetTaskbarIconStrings(st->settings.language);
-            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE90E",
-                taskbar.title, taskbar.description,
-                taskbar.options[static_cast<size_t>(st->settings.taskbarIconMode)], 210.0f);
-            // Clear history row
-            float clrY = y1 + rH * 5;
-            drawSettingRowHeader(g1, clrY, rH, g1.right - S(130), L"\uE74D", ls.clearHistTitle, ls.clearHistSub, pBrSub);
-            const auto rcClr = controlRect(g1.right - S(118), g1.right - cardInset, clrY, rH);
-            pRT->FillRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), (st->hoveredId == 2510) ? pBrCardHov : pBrCtlBg);
-            pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcClr, S(4), S(4)), pBrBorder, 1.0f);
-            const wchar_t* btnTxt = ls.clearNow;
-            if (pFmtCtl) DrawCenteredText(pRT, btnTxt, (UINT32)wcslen(btnTxt), pFmtCtl, rcClr, pBrText);
-            addHit(2510, rcClr);
-            auto [adminGroup, adminY] = beginGroupCard(displaySettings.adminTitle, L"", 3, rH);
-            drawToggleRowInGroup(adminGroup, adminY, rH, 2503, L"\uEA18",
-                displaySettings.adminDefault, displaySettings.adminDefaultDescription, st->settings.runAsAdmin, true);
-            drawDropdownRowInGroup(adminGroup, adminY + rH, rH, 2507, L"\uE7EF",
-                displaySettings.indicatorTitle, isRuNav ? L"Где отображается статус запуска от имени администратора"
-                    : languageCode == L"en" ? L"Where the administrator launch status appears" : nullptr,
-                st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel, 210.0f);
-            drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uEDA7",
-                displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
-        } else if (st->activeTab == 3) {
-            // Custom commands
-            const float rH = rowHeight;
-            const int aliasCnt = static_cast<int>((std::min)(st->settings.customAliases.size(), size_t{32}));
-            auto [g1, y1] = beginGroupCard(
-                aliases.title,
-                aliases.description,
-                aliasCnt + 1, rH);
-            // Top action row: + Add Alias
-            {
-                drawSettingRowHeader(g1, y1, rH, g1.right - S(146), L"\uE710", aliases.newAlias, aliases.newAliasDescription, pBrAccent);
-                const auto rcAdd = controlRect(g1.right - S(132), g1.right - cardInset, y1, rH);
-                pRT->FillRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), (st->hoveredId == 2700) ? pBrCardHov : pBrChipSel);
-                pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcAdd, S(4), S(4)), pBrAccent, 1.0f);
-                const wchar_t* addLbl = aliases.add;
-                if (pFmtCtl) DrawCenteredText(pRT, addLbl, (UINT32)wcslen(addLbl), pFmtCtl, rcAdd, pBrAccent);
-                addHit(2700, rcAdd);
+            auto [g1, y1, historyExpanded] = beginGroupCard(SettingsGroup::History,
+                ls.gHistTitle, ls.gHistSub, 6 * rH);
+            if (historyExpanded) {
+                drawToggleRowInGroup(g1, y1, rH, 2501, L"\uE81C",
+                    ls.showHistTitle,
+                    ls.showHistSub,
+                    st->settings.maxHistoryItems > 0);
+                drawToggleRowInGroup(g1, y1 + rH, rH, 2504, L"\uEC92",
+                    isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Дата и время в истории" : L"Date and Time in History",
+                    isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : isRuNav
+                        ? L"Короткие форматы даты и времени в строках истории" : L"Short date and time formats in history",
+                    st->settings.showTimestamp);
+                drawToggleRowInGroup(g1, y1 + rH * 2, rH, 2502, L"\uE75C",
+                    ls.clearInitTitle,
+                    ls.clearInitSub,
+                    st->settings.clearInitialInput);
+                drawToggleRowInGroup(g1, y1 + rH * 3, rH, 2505, L"\uE7C9",
+                    isViNav ? L"Tự động đóng khi bấm ra ngoài cửa sổ" : isRuNav ? L"Закрывать при нажатии вне окна" : L"Close on Click Outside",
+                    isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : isRuNav
+                        ? L"Нажатие за пределами окна закрывает его" : L"Clicking outside closes the window",
+                    st->settings.closeOnClickOutside);
+                const auto taskbar = GetTaskbarIconStrings(st->settings.language);
+                drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE90E",
+                    taskbar.title, taskbar.description,
+                    taskbar.options[static_cast<size_t>(st->settings.taskbarIconMode)]);
+                // Clear history row
+                float clrY = y1 + rH * 5;
+                drawSettingRowHeader(g1, clrY, rH, L"\uE74D", ls.clearHistTitle, ls.clearHistSub, pBrSub);
+                const auto rcClr = settingsControl(g1, clrY, rH);
+                drawControl(rcClr, 2510);
+                const wchar_t* btnTxt = ls.clearNow;
+                if (pFmtCtl) DrawCenteredText(pRT, btnTxt, (UINT32)wcslen(btnTxt), pFmtCtl, rcClr, pBrText);
+                addHit(2510, rcClr);
             }
-            const RECT contentBounds{static_cast<LONG>(sideW), 0, w, h};
-            auto drawAliasButton = [&](const D2D1_RECT_F& rect, int id, int index, const wchar_t* glyph,
-                                       const wchar_t* tooltip, bool selected) {
-                const auto rounded = D2D1::RoundedRect(rect, S(4), S(4));
-                const auto ink = selected ? pBrAccent : pBrText;
-                pRT->FillRoundedRectangle(rounded, selected ? pBrChipSel : (st->hoveredId == id ? pBrCardHov : pBrCtlBg));
-                pRT->DrawRoundedRectangle(rounded, selected ? pBrAccent : pBrBorder, 1.0f);
-                drawSettingsGlyph(glyph, rect, ink);
-
-                addHit(id, rect, L"", index);
-                RECT visible{};
-                if (IntersectRect(&visible, &st->hits.back().rc, &contentBounds)) {
-                    actionTooltips.push_back({static_cast<UINT_PTR>(id), visible, tooltip});
+            auto [adminGroup, adminY, administratorExpanded] = beginGroupCard(SettingsGroup::Administrator,
+                displaySettings.adminTitle, L"", 3 * rH);
+            if (administratorExpanded) {
+                drawToggleRowInGroup(adminGroup, adminY, rH, 2503, L"\uEA18",
+                    displaySettings.adminDefault, displaySettings.adminDefaultDescription, st->settings.runAsAdmin, true);
+                drawDropdownRowInGroup(adminGroup, adminY + rH, rH, 2507, L"\uE7EF",
+                    displaySettings.indicatorTitle, isRuNav ? L"Где отображается статус запуска от имени администратора"
+                        : languageCode == L"en" ? L"Where the administrator launch status appears" : nullptr,
+                    st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel);
+                drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uEDA7",
+                    displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
+            }
+        } else if (commandsPage) {
+            const int count = static_cast<int>((std::min)(st->settings.customAliases.size(), kMaxSettingsCommands));
+            const auto [card, rowsTop, expanded] = beginGroupCard(SettingsGroup::Commands,
+                aliases.title, aliases.description, count * rowHeight);
+            if (expanded) {
+                for (int i = 0; i < count; ++i) {
+                    const auto& command = st->settings.customAliases[i];
+                    const float top = rowsTop + i * rowHeight;
+                    drawSettingRowHeader(card, top, rowHeight, L"\uE8EC",
+                        command.alias.c_str(), command.command.c_str(), pBrSub);
+                    const auto controls = settingsControl(card, top, rowHeight);
+                    const auto remove = controlRect(controls.right - controlHeight, controls.right, top, rowHeight);
+                    const auto edit = controlRect(remove.left - controlGap - controlHeight, remove.left - controlGap, top, rowHeight);
+                    const auto admin = controlRect(edit.left - controlGap - controlHeight, edit.left - controlGap, top, rowHeight);
+                    drawIconButton(admin, 2800 + i, L"\uEA18", aliases.administrator, command.runAsAdmin, i);
+                    drawIconButton(edit, kCommandEditHitBase + i, L"\uE70F", aliases.edit, false, i);
+                    drawIconButton(remove, 2900 + i, L"\uE894", aliases.remove, false, i);
                 }
-            };
-            const float deleteRight = g1.right - cardInset;
-            const float deleteLeft = deleteRight - controlHeight;
-            const float adminRight = deleteLeft - S(8);
-            const float adminLeft = adminRight - controlHeight;
-            for (int i = 0; i < aliasCnt; ++i) {
-                const auto& ca = st->settings.customAliases[i];
-                float ry = y1 + rH * (i + 1);
-                drawSettingRowHeader(g1, ry, rH, adminLeft - S(12), ca.runAsAdmin ? L"\uEA18" : L"\uE8EC",
-                                     ca.alias.c_str(), ca.command.c_str(), ca.runAsAdmin ? pBrAccent : pBrSub);
-
-                const auto rcAdm = controlRect(adminLeft, adminRight, ry, rH);
-                drawAliasButton(rcAdm, 2800 + i, i, L"\uEA18", aliases.administrator, ca.runAsAdmin);
-
-                const auto rcDel = controlRect(deleteLeft, deleteRight, ry, rH);
-                drawAliasButton(rcDel, 2900 + i, i, L"\uE894", aliases.remove, false);
             }
         } else {
             // TAB 3: Language dropdown + quick grid
@@ -15969,39 +16029,51 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             };
             int cols = 3;
             int rows = (ARRAYSIZE(kLangs) + cols - 1) / cols;
-            const float gap = S(8.0f);
+            const float gap = controlGap;
             const float ch = controlHeight;
             const float gridH = 2 * cardInset + rows * ch + (rows - 1) * gap;
-            auto [g1, y1] = beginGroupCard(
-                ls.gLangTitle,
-                ls.gLangSub,
-                1, gridH);
-            pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, y1), D2D1::Point2F(g1.right - 1.0f, y1), pBrDiv, 1.0f);
-            const float gx = g1.left + cardInset;
-            const float gw = (g1.right - g1.left) - 2 * cardInset;
-            const float cw = (gw - gap * (cols - 1)) / (float)cols;
-            for (int i = 0; i < (int)ARRAYSIZE(kLangs); ++i) {
-                int r = i / cols, c = i % cols;
-                const float left = gx + c * (cw + gap);
-                const float top = y1 + cardInset + r * (ch + gap);
-                const auto rcChip = D2D1::RectF(left, top, left + cw, top + ch);
-                bool sel = (st->settings.language == kLangs[i].code);
-                bool hov = (st->hoveredId == kLangs[i].id);
-                pRT->FillRoundedRectangle(D2D1::RoundedRect(rcChip, S(4), S(4)), sel ? pBrChipSel : (hov ? pBrCardHov : pBrCtlBg));
-                pRT->DrawRoundedRectangle(D2D1::RoundedRect(rcChip, S(4), S(4)), sel ? pBrAccent : pBrBorder, sel ? 1.5f : 1.0f);
-                const wchar_t* systemLanguageLabel = isRuNav ? L"Определено Windows"
-                    : languageCode == L"en" ? L"Defined by Windows" : ls.colorAuto;
-                const wchar_t* label = kLangs[i].label ? kLangs[i].label : systemLanguageLabel;
-                if (pFmtCtl) DrawCenteredText(pRT, label, static_cast<UINT32>(wcslen(label)), pFmtCtl, rcChip, sel ? pBrAccent : pBrText);
-                addHit(kLangs[i].id, rcChip, kLangs[i].code);
+            const auto [g1, y1, expanded] = beginGroupCard(SettingsGroup::Language, ls.gLangTitle, L"", gridH);
+            if (expanded) {
+                pRT->DrawLine(D2D1::Point2F(g1.left + 1.0f, y1), D2D1::Point2F(g1.right - 1.0f, y1), pBrDiv, 1.0f);
+                const float gx = g1.left + cardInset;
+                const float gw = (g1.right - g1.left) - 2 * cardInset;
+                const float cw = (gw - gap * (cols - 1)) / (float)cols;
+                for (int i = 0; i < (int)ARRAYSIZE(kLangs); ++i) {
+                    int r = i / cols, c = i % cols;
+                    const float left = gx + c * (cw + gap);
+                    const float top = y1 + cardInset + r * (ch + gap);
+                    const auto rcChip = D2D1::RectF(left, top, left + cw, top + ch);
+                    bool sel = (st->settings.language == kLangs[i].code);
+                    drawControl(rcChip, kLangs[i].id, sel);
+                    const wchar_t* systemLanguageLabel = isRuNav ? L"Автоматически"
+                        : languageCode == L"en" ? L"Automatically" : ls.autoLbl;
+                    const wchar_t* label = kLangs[i].label ? kLangs[i].label : systemLanguageLabel;
+                    if (pFmtCtl) DrawCenteredText(pRT, label, static_cast<UINT32>(wcslen(label)), pFmtCtl, rcChip, sel ? pBrAccent : pBrText);
+                    addHit(kLangs[i].id, rcChip, kLangs[i].code);
+                }
             }
         }
 
-        float totalContentH = (curY + (float)st->scrollY) + S(24.0f);
-        st->maxScrollY = (std::max)(0, (int)std::ceil(totalContentH - (float)h));
-        st->scrollY = std::clamp(st->scrollY, 0, st->maxScrollY);
-
+        const float totalContentHeight = curY + st->scrollY + S(SettingsStyle::groupGap);
+        st->maxScrollY = (std::max)(0, static_cast<int>(std::ceil(totalContentHeight - contentBottom)));
+        if (st->scrollY > st->maxScrollY) {
+            st->scrollY = st->maxScrollY;
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
         pRT->PopAxisAlignedClip();
+        if (commandsPage) {
+            hitClip = {static_cast<LONG>(sideW), static_cast<LONG>(contentBottom), w, h};
+            const float size = S(SettingsStyle::floatingButtonSize);
+            const float bottom = h - S(SettingsStyle::floatingButtonInset);
+            const auto button = D2D1::RectF(contentRight - size, bottom - size, contentRight, bottom);
+            const auto center = D2D1::Point2F(button.left + size * 0.5f, button.top + size * 0.5f);
+            const auto circle = D2D1::Ellipse(center, size * 0.5f, size * 0.5f);
+            pRT->FillEllipse(circle, pBrChipSel);
+            pRT->DrawEllipse(circle, pBrAccent, st->hoveredId == kCommandAddHit ? S(2) : S(1));
+            drawSettingsGlyph(L"\uE710", button, pBrAccent);
+            const RECT hit = addHit(kCommandAddHit, button);
+            if (!IsRectEmpty(&hit)) actionTooltips.push_back({kCommandAddHit, hit, aliases.newAlias});
+        }
         HRESULT hrEnd = pRT->EndDraw();
         UpdateSettingsActionTooltips(st, std::move(actionTooltips));
 
@@ -16091,12 +16163,13 @@ static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
 
     auto S = [&](float v) { return DpiScaleF(v, s->dpi); };
     bool isLight = s->isLight;
-    D2D1_COLOR_F colBg     = isLight ? D2D1::ColorF(0.985f, 0.986f, 0.992f, 1.0f) : D2D1::ColorF(0.172f, 0.175f, 0.190f, 1.0f);
-    D2D1_COLOR_F colBorder = isLight ? D2D1::ColorF(0.865f, 0.872f, 0.895f, 1.0f) : D2D1::ColorF(0.270f, 0.276f, 0.300f, 1.0f);
-    D2D1_COLOR_F colRowHov = isLight ? D2D1::ColorF(0.928f, 0.934f, 0.950f, 1.0f) : D2D1::ColorF(0.238f, 0.242f, 0.262f, 1.0f);
-    D2D1_COLOR_F colRowSel = isLight ? D2D1::ColorF(0.936f, 0.942f, 0.958f, 1.0f) : D2D1::ColorF(0.222f, 0.226f, 0.246f, 1.0f);
-    D2D1_COLOR_F colText   = isLight ? D2D1::ColorF(0.100f, 0.105f, 0.120f, 1.0f) : D2D1::ColorF(0.960f, 0.965f, 0.978f, 1.0f);
-    D2D1_COLOR_F colAccent = GetWindowsSystemAccentColor(isLight);
+    const auto palette = GetSettingsPalette(isLight);
+    const auto colBg = palette.colCard;
+    const auto colBorder = palette.colBorder;
+    const auto colRowHov = palette.colCardHover;
+    const auto colRowSel = palette.colNavSel;
+    const auto colText = palette.colText;
+    const auto colAccent = palette.colAccent;
 
     ID2D1HwndRenderTarget* pRT = s->pRT;
     pRT->BeginDraw();
@@ -16332,185 +16405,305 @@ int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<st
     return session.chosenId;
 }
 
-struct AddAliasDialogSession {
-    HWND hWnd = nullptr;
-    HWND hEditAlias = nullptr;
-    HWND hEditCmd = nullptr;
-    HWND hChkAdmin = nullptr;
+struct CommandEditorSession {
+    SettingsPalette palette;
+    AliasSettingsStrings strings;
+    UINT dpi;
+    const std::vector<CommandAlias>& commands;
+    int editIndex;
+    HWND name = nullptr;
+    HWND target = nullptr;
+    HWND admin = nullptr;
+    HWND status = nullptr;
+    HBRUSH background = nullptr;
+    HBRUSH field = nullptr;
     bool confirmed = false;
     bool done = false;
     CommandAlias result;
 };
 
-static LRESULT CALLBACK AddAliasDialogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-    auto* s = reinterpret_cast<AddAliasDialogSession*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+static std::wstring ReadCommandEditorField(HWND edit) {
+    std::wstring value(GetWindowTextLengthW(edit) + 1, L'\0');
+    GetWindowTextW(edit, value.data(), static_cast<int>(value.size()));
+    return TrimWsLocal(value.c_str());
+}
+
+static void DrawSettingsRoundedBox(HDC dc, const RECT& bounds, int radius, COLORREF fill, COLORREF border) {
+    HBRUSH brush = CreateSolidBrush(fill);
+    HPEN pen = CreatePen(PS_SOLID, 1, border);
+    auto oldBrush = SelectObject(dc, brush);
+    auto oldPen = SelectObject(dc, pen);
+    RoundRect(dc, bounds.left, bounds.top, bounds.right, bounds.bottom, 2 * radius, 2 * radius);
+    SelectObject(dc, oldPen);
+    SelectObject(dc, oldBrush);
+    DeleteObject(pen);
+    DeleteObject(brush);
+}
+
+static LRESULT CALLBACK CommandEditorWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+    auto* s = reinterpret_cast<CommandEditorSession*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
+    if (uMsg == WM_NCCREATE) {
+        const auto* create = reinterpret_cast<const CREATESTRUCTW*>(lParam);
+        SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(create->lpCreateParams));
+        return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+    }
+    if (!s) return DefWindowProcW(hWnd, uMsg, wParam, lParam);
+
+    const auto& palette = s->palette;
+    const auto radius = DpiScale(SettingsStyle::controlRadius, s->dpi);
     switch (uMsg) {
-        case WM_CREATE: {
-            auto* cs = reinterpret_cast<CREATESTRUCTW*>(lParam);
-            s = reinterpret_cast<AddAliasDialogSession*>(cs->lpCreateParams);
-            SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(s));
-            if (s) s->hWnd = hWnd;
+        case WM_ERASEBKGND: {
+            RECT area{};
+            GetClientRect(hWnd, &area);
+            FillRect(reinterpret_cast<HDC>(wParam), &area, s->background);
+            return TRUE;
+        }
+        case WM_PAINT: {
+            PAINTSTRUCT paint{};
+            HDC dc = BeginPaint(hWnd, &paint);
+            const int xPad = DpiScale(SettingsStyle::dialogFieldInset, s->dpi);
+            for (HWND edit : {s->name, s->target}) {
+                if (!edit) continue;
+                RECT bounds{};
+                GetWindowRect(edit, &bounds);
+                MapWindowPoints(nullptr, hWnd, reinterpret_cast<POINT*>(&bounds), 2);
+                InflateRect(&bounds, xPad, DpiScale(SettingsStyle::textInset, s->dpi));
+                DrawSettingsRoundedBox(dc, bounds, radius, SettingsColorRef(palette.colCtlBg),
+                    SettingsColorRef(GetFocus() == edit ? palette.colAccent : palette.colBorder));
+            }
+            EndPaint(hWnd, &paint);
             return 0;
         }
-        case WM_CTLCOLORSTATIC: {
+        case WM_CTLCOLORSTATIC:
+        case WM_CTLCOLOREDIT: {
             const auto dc = reinterpret_cast<HDC>(wParam);
-            SetBkMode(dc, TRANSPARENT);
-            SetTextColor(dc, GetSysColor(COLOR_WINDOWTEXT));
-            return reinterpret_cast<LRESULT>(GetSysColorBrush(COLOR_WINDOW));
+            const bool field = uMsg == WM_CTLCOLOREDIT;
+            if (field) SetBkColor(dc, SettingsColorRef(palette.colCtlBg));
+            else SetBkMode(dc, TRANSPARENT);
+            SetTextColor(dc, SettingsColorRef(reinterpret_cast<HWND>(lParam) == s->status ? palette.colAccent : palette.colText));
+            return reinterpret_cast<LRESULT>(field ? s->field : s->background);
+        }
+        case WM_DRAWITEM: {
+            const auto& item = *reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
+            const bool primary = item.CtlID == IDOK;
+            const bool pressed = (item.itemState & ODS_SELECTED) != 0;
+            const bool focused = (item.itemState & ODS_FOCUS) != 0;
+            FillRect(item.hDC, &item.rcItem, s->background);
+            DrawSettingsRoundedBox(item.hDC, item.rcItem, radius,
+                SettingsColorRef(pressed || primary ? palette.colCardHover : palette.colCtlBg),
+                SettingsColorRef(primary || focused ? palette.colAccent : palette.colBorder));
+            const auto label = ReadCommandEditorField(item.hwndItem);
+            const auto font = reinterpret_cast<HFONT>(SendMessageW(item.hwndItem, WM_GETFONT, 0, 0));
+            auto oldFont = SelectObject(item.hDC, font);
+            SetBkMode(item.hDC, TRANSPARENT);
+            SetTextColor(item.hDC, SettingsColorRef(primary ? palette.colAccent : palette.colText));
+            auto bounds = item.rcItem;
+            DrawTextW(item.hDC, label.c_str(), static_cast<int>(label.size()), &bounds, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+            SelectObject(item.hDC, oldFont);
+            return TRUE;
+        }
+        case WM_NOTIFY: {
+            const auto* hdr = reinterpret_cast<const NMHDR*>(lParam);
+            if (!hdr || hdr->hwndFrom != s->admin || hdr->code != NM_CUSTOMDRAW) break;
+            auto& draw = *reinterpret_cast<NMCUSTOMDRAW*>(lParam);
+            if (draw.dwDrawStage != CDDS_PREPAINT) break;
+            const bool checked = SendMessageW(s->admin, BM_GETCHECK, 0, 0) == BST_CHECKED;
+            FillRect(draw.hdc, &draw.rc, s->background);
+            const int size = DpiScale(16, s->dpi);
+            const int y = draw.rc.top + (draw.rc.bottom - draw.rc.top - size) / 2;
+            const RECT square{draw.rc.left, y, draw.rc.left + size, y + size};
+            DrawSettingsRoundedBox(draw.hdc, square, radius,
+                SettingsColorRef(checked ? palette.colAccent : palette.colCtlBg),
+                SettingsColorRef(checked ? palette.colAccent : palette.colBorder));
+            if (checked) {
+                const auto color = palette.colAccent;
+                const bool bright = color.r * 0.2126f + color.g * 0.7152f + color.b * 0.0722f > 0.55f;
+                HPEN pen = CreatePen(PS_SOLID, DpiScale(2, s->dpi), bright ? RGB(0, 0, 0) : RGB(255, 255, 255));
+                const auto old = SelectObject(draw.hdc, pen);
+                MoveToEx(draw.hdc, square.left + size / 4, square.top + size / 2, nullptr);
+                LineTo(draw.hdc, square.left + size / 2 - 1, square.bottom - size / 4 - 1);
+                LineTo(draw.hdc, square.right - size / 4, square.top + size / 4);
+                SelectObject(draw.hdc, old);
+                DeleteObject(pen);
+            }
+            RECT label = draw.rc;
+            label.left = square.right + DpiScale(SettingsStyle::controlGap, s->dpi);
+            const auto oldFont = SelectObject(draw.hdc, reinterpret_cast<HFONT>(SendMessageW(s->admin, WM_GETFONT, 0, 0)));
+            SetBkMode(draw.hdc, TRANSPARENT);
+            SetTextColor(draw.hdc, SettingsColorRef(palette.colText));
+            DrawTextW(draw.hdc, s->strings.elevate, -1, &label, DT_SINGLELINE | DT_VCENTER);
+            if (draw.uItemState & CDIS_FOCUS) DrawFocusRect(draw.hdc, &draw.rc);
+            SelectObject(draw.hdc, oldFont);
+            return CDRF_SKIPDEFAULT;
         }
         case WM_COMMAND: {
-            if (!s) break;
-            int id = LOWORD(wParam);
-            if (id == IDOK) {
-                wchar_t aBuf[128] = {}, cBuf[MAX_PATH * 2] = {};
-                if (s->hEditAlias) GetWindowTextW(s->hEditAlias, aBuf, ARRAYSIZE(aBuf));
-                if (s->hEditCmd)   GetWindowTextW(s->hEditCmd, cBuf, ARRAYSIZE(cBuf));
-                std::wstring a = TrimWsLocal(aBuf);
-                std::wstring c = TrimWsLocal(cBuf);
-                if (!a.empty() && !c.empty()) {
-                    s->result.alias = a;
-                    s->result.command = c;
-                    s->result.runAsAdmin = (s->hChkAdmin && SendMessageW(s->hChkAdmin, BM_GETCHECK, 0, 0) == BST_CHECKED);
-                    s->confirmed = true;
-                    s->done = true;
-                    DestroyWindow(hWnd);
+            const int id = LOWORD(wParam);
+            const auto control = reinterpret_cast<HWND>(lParam);
+            if (control == s->name || control == s->target) {
+                if (HIWORD(wParam) == EN_SETFOCUS || HIWORD(wParam) == EN_KILLFOCUS) {
+                    InvalidateRect(hWnd, nullptr, FALSE);
                 }
+                if (HIWORD(wParam) == EN_CHANGE) SetWindowTextW(s->status, L"");
+            }
+            if (id == IDOK) {
+                auto name = ReadCommandEditorField(s->name);
+                auto target = ReadCommandEditorField(s->target);
+                if (name.empty() || target.empty()) {
+                    SetFocus(name.empty() ? s->name : s->target);
+                    return 0;
+                }
+                if (s->editIndex >= 0) {
+                    for (size_t i = 0; i < s->commands.size(); ++i) {
+                        if (i != static_cast<size_t>(s->editIndex) &&
+                            _wcsicmp(s->commands[i].alias.c_str(), name.c_str()) == 0) {
+                            SetWindowTextW(s->status, s->strings.duplicate);
+                            SetFocus(s->name);
+                            return 0;
+                        }
+                    }
+                }
+                const bool elevated = SendMessageW(s->admin, BM_GETCHECK, 0, 0) == BST_CHECKED;
+                s->result = {std::move(name), std::move(target), elevated};
+                s->confirmed = true;
+                DestroyWindow(hWnd);
                 return 0;
             }
             if (id == IDCANCEL) {
-                s->confirmed = false;
-                s->done = true;
                 DestroyWindow(hWnd);
                 return 0;
             }
             break;
         }
         case WM_CLOSE:
-            if (s) { s->confirmed = false; s->done = true; }
             DestroyWindow(hWnd);
             return 0;
         case WM_NCDESTROY:
-            if (s) s->done = true;
+            s->done = true;
             SetWindowLongPtrW(hWnd, GWLP_USERDATA, 0);
-            return 0;
+            break;
     }
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
-static bool ShowAddAliasDialog(HWND hOwner, bool isLight, const std::wstring& language, UINT dpi, CommandAlias* outAlias) {
-    const auto languageCode = ResolveEffectiveLanguageCode(language);
-    const auto labels = GetAliasSettingsStrings(languageCode);
+static std::optional<CommandAlias> ShowCommandEditor(HWND owner, bool light, const std::wstring& language, UINT dpi,
+                                                     const std::vector<CommandAlias>& commands, int editIndex) {
+    const auto code = ResolveEffectiveLanguageCode(language);
+    CommandEditorSession session{GetSettingsPalette(light), GetAliasSettingsStrings(code), dpi, commands, editIndex};
+    const auto& strings = session.strings;
     const auto settingsText = GetSettingsLocalizedStrings(language);
-    static constexpr const wchar_t* kAliasDlgClass = L"WindhawkModernRunAddAlias_v6";
-    WNDCLASSEXW wc = { sizeof(wc) };
-    wc.lpfnWndProc = AddAliasDialogWndProc;
+    const auto* existing = editIndex >= 0 ? &commands[editIndex] : nullptr;
+
+    static constexpr const wchar_t* windowClass = L"WindhawkModernRunAddAlias_v6";
+    WNDCLASSEXW wc{sizeof(wc)};
+    wc.lpfnWndProc = CommandEditorWndProc;
     wc.hInstance = GetModInstanceHandle();
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
-    wc.hbrBackground = reinterpret_cast<HBRUSH>(COLOR_WINDOW + 1);
-    wc.lpszClassName = kAliasDlgClass;
+    wc.lpszClassName = windowClass;
     RegisterClassExW(&wc);
 
-    AddAliasDialogSession sess;
-    constexpr int contentWidth = 420;
+    constexpr int width = SettingsStyle::dialogWidth;
     constexpr int inset = kSettingsCardInset;
-    constexpr int labelHeight = 20;
-    constexpr int labelGap = 4;
-    constexpr int fieldHeight = 26;
-    constexpr int groupGap = 12;
-    constexpr int checkboxHeight = 22;
-    constexpr int fieldWidth = contentWidth - 2 * inset;
+    constexpr int fieldWindowHeight = kSettingsControlHeight - 2 * SettingsStyle::textInset;
+    constexpr int labelHeight = SettingsStyle::titleBandHeight;
+    constexpr int labelGap = SettingsStyle::controlGap / 2;
+    constexpr int groupGap = SettingsStyle::groupGap;
+    constexpr int fieldHeight = kSettingsControlHeight;
     constexpr int targetTop = inset + labelHeight + labelGap + fieldHeight + groupGap;
-    constexpr int checkboxTop = targetTop + labelHeight + labelGap + fieldHeight + groupGap;
-    constexpr int buttonTop = checkboxTop + checkboxHeight + groupGap;
-    constexpr int buttonWidth = 82;
-    constexpr int buttonGap = 8;
-    constexpr int cancelLeft = contentWidth - inset - buttonWidth;
-    const int cw = DpiScale(contentWidth, dpi);
-    const int ch = DpiScale(buttonTop + kSettingsControlHeight + inset, dpi);
-    DWORD style = WS_POPUP | WS_CAPTION | WS_SYSMENU;
-    RECT rcAdj = { 0, 0, cw, ch };
-    AdjustWindowRectEx(&rcAdj, style, FALSE, WS_EX_DLGMODALFRAME);
-    int ww = rcAdj.right - rcAdj.left, wh = rcAdj.bottom - rcAdj.top;
-    RECT rcOwn = {};
-    int px = 180, py = 140;
-    if (hOwner && GetWindowRect(hOwner, &rcOwn)) {
-        px = rcOwn.left + ((rcOwn.right - rcOwn.left) - ww) / 2;
-        py = rcOwn.top + ((rcOwn.bottom - rcOwn.top) - wh) / 2;
+    constexpr int checkTop = targetTop + labelHeight + labelGap + fieldHeight + groupGap;
+    constexpr int statusTop = checkTop + kSettingsControlHeight;
+    constexpr int buttonsTop = statusTop + labelHeight + labelGap;
+    constexpr int buttonWidth = SettingsStyle::dialogButtonWidth;
+    constexpr int cancelLeft = width - inset - buttonWidth;
+    const auto scale = [dpi](int value) { return DpiScale(value, dpi); };
+    RECT frame{0, 0, scale(width), scale(buttonsTop + kSettingsControlHeight + inset)};
+    const DWORD style = WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_CLIPCHILDREN;
+    AdjustWindowRectExForDpi(&frame, style, FALSE, WS_EX_DLGMODALFRAME, dpi);
+    RECT ownerRect{};
+    GetWindowRect(owner, &ownerRect);
+    MONITORINFO monitor{sizeof(monitor)};
+    const int windowWidth = frame.right - frame.left;
+    const int windowHeight = frame.bottom - frame.top;
+    int x = ownerRect.left + (ownerRect.right - ownerRect.left - windowWidth) / 2;
+    int y = ownerRect.top + (ownerRect.bottom - ownerRect.top - windowHeight) / 2;
+    if (GetMonitorInfoW(MonitorFromWindow(owner, MONITOR_DEFAULTTONEAREST), &monitor)) {
+        x = std::clamp(x, static_cast<int>(monitor.rcWork.left),
+                       (std::max)(static_cast<int>(monitor.rcWork.left), static_cast<int>(monitor.rcWork.right) - windowWidth));
+        y = std::clamp(y, static_cast<int>(monitor.rcWork.top),
+                       (std::max)(static_cast<int>(monitor.rcWork.top), static_cast<int>(monitor.rcWork.bottom) - windowHeight));
     }
 
-    HWND hDlg = CreateWindowExW(WS_EX_DLGMODALFRAME, kAliasDlgClass,
-        labels.newAlias,
-        style, px, py, ww, wh, hOwner, nullptr, GetModInstanceHandle(), &sess);
-    if (!hDlg) return false;
+    session.background = CreateSolidBrush(SettingsColorRef(session.palette.colBg));
+    session.field = CreateSolidBrush(SettingsColorRef(session.palette.colCtlBg));
+    HWND dialog = CreateWindowExW(WS_EX_DLGMODALFRAME, windowClass, existing ? strings.edit : strings.newAlias,
+        style, x, y, windowWidth, windowHeight, owner, nullptr, GetModInstanceHandle(), &session);
+    if (!dialog) {
+        DeleteObject(session.field);
+        DeleteObject(session.background);
+        return std::nullopt;
+    }
+    ApplyWin11SettingsWindowFrame(dialog, light);
 
-    BOOL dark = isLight ? FALSE : TRUE;
-    DwmSetWindowAttribute(hDlg, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark, sizeof(dark));
-    DWORD corner = 2;
-    DwmSetWindowAttribute(hDlg, DWMWA_WINDOW_CORNER_PREFERENCE, &corner, sizeof(corner));
-
-    HFONT hFont = CreateFontW(-DpiScale(14, dpi), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                              DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                              DEFAULT_PITCH | FF_SWISS, L"Segoe UI");
-    auto addCtrl = [&](const wchar_t* cls, const wchar_t* txt, DWORD st, DWORD ex, int x, int y, int w, int h, int id) -> HWND {
-        HWND hc = CreateWindowExW(ex, cls, txt, WS_CHILD | WS_VISIBLE | st,
-                                  DpiScale(x, dpi), DpiScale(y, dpi), DpiScale(w, dpi), DpiScale(h, dpi),
-                                  hDlg, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), GetModInstanceHandle(), nullptr);
-        if (hc && hFont) SendMessageW(hc, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), TRUE);
-        return hc;
+    const auto makeFont = [dpi](float size) {
+        return CreateFontW(-static_cast<int>(std::lround(DpiScaleF(size, dpi))), 0, 0, 0,
+            FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+            CLEARTYPE_QUALITY, DEFAULT_PITCH | FF_SWISS, GetPreferredFluentFontFamily());
     };
+    HFONT labelFont = makeFont(SettingsStyle::labelSize);
+    HFONT buttonFont = makeFont(SettingsStyle::controlTextSize);
+    auto addControl = [&](const wchar_t* kind, const wchar_t* text, DWORD flags, int left, int top,
+                          int w, int h, int id, HFONT font) {
+        HWND control = CreateWindowExW(0, kind, text, WS_CHILD | WS_VISIBLE | flags, scale(left), scale(top),
+            scale(w), scale(h), dialog, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), GetModInstanceHandle(), nullptr);
+        if (control && font) SendMessageW(control, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
+        return control;
+    };
+    const auto addField = [&](int id, int top, const wchar_t* label, const wchar_t* value) {
+        constexpr int fieldInset = SettingsStyle::dialogFieldInset;
+        addControl(L"STATIC", label, SS_CENTERIMAGE, inset, top, width - 2 * inset, labelHeight, 0, labelFont);
+        return addControl(L"EDIT", value, WS_TABSTOP | ES_AUTOHSCROLL, inset + fieldInset,
+            top + labelHeight + labelGap + SettingsStyle::textInset, width - 2 * (inset + fieldInset),
+            fieldWindowHeight, id, labelFont);
+    };
+    session.name = addField(101, inset, strings.keyword, existing ? existing->alias.c_str() : L"");
+    session.target = addField(102, targetTop, strings.command, existing ? existing->command.c_str() : L"");
+    session.admin = addControl(L"BUTTON", strings.elevate, WS_TABSTOP | BS_AUTOCHECKBOX,
+        inset, checkTop, width - 2 * inset, kSettingsControlHeight, 103, labelFont);
+    if (existing && existing->runAsAdmin) SendMessageW(session.admin, BM_SETCHECK, BST_CHECKED, 0);
+    session.status = addControl(L"STATIC", L"", SS_CENTERIMAGE, inset, statusTop, width - 2 * inset, labelHeight, 0, buttonFont);
+    addControl(L"BUTTON", existing ? strings.save : strings.add, WS_TABSTOP | BS_OWNERDRAW,
+        cancelLeft - SettingsStyle::controlGap - buttonWidth, buttonsTop, buttonWidth, kSettingsControlHeight, IDOK, buttonFont);
+    addControl(L"BUTTON", settingsText.cpCancel, WS_TABSTOP | BS_OWNERDRAW,
+        cancelLeft, buttonsTop, buttonWidth, kSettingsControlHeight, IDCANCEL, buttonFont);
 
-    addCtrl(L"STATIC", labels.keyword, SS_CENTERIMAGE, 0,
-            inset, inset, fieldWidth, labelHeight, 0);
-    sess.hEditAlias = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
-                              inset, inset + labelHeight + labelGap, fieldWidth, fieldHeight, 101);
-    const wchar_t* hint = languageCode == L"ru" ? L"Например, hosts" : languageCode == L"vi" ? L"Ví dụ: hosts" : L"For example, hosts";
-    if (sess.hEditAlias) SendMessageW(sess.hEditAlias, EM_SETCUEBANNER, FALSE, reinterpret_cast<LPARAM>(hint));
-    addCtrl(L"STATIC", labels.command, SS_CENTERIMAGE, 0,
-            inset, targetTop, fieldWidth, labelHeight, 0);
-    sess.hEditCmd = addCtrl(L"EDIT", L"", WS_TABSTOP | ES_AUTOHSCROLL, WS_EX_CLIENTEDGE,
-                            inset, targetTop + labelHeight + labelGap, fieldWidth, fieldHeight, 102);
-    sess.hChkAdmin = addCtrl(L"BUTTON", labels.elevate,
-                             WS_TABSTOP | BS_AUTOCHECKBOX, 0, inset, checkboxTop, fieldWidth, checkboxHeight, 103);
-    addCtrl(L"BUTTON", labels.add, WS_TABSTOP | BS_DEFPUSHBUTTON, 0,
-            cancelLeft - buttonGap - buttonWidth, buttonTop, buttonWidth, kSettingsControlHeight, IDOK);
-    addCtrl(L"BUTTON", settingsText.cpCancel, WS_TABSTOP, 0,
-            cancelLeft, buttonTop, buttonWidth, kSettingsControlHeight, IDCANCEL);
+    EnableWindow(owner, FALSE);
+    ShowWindow(dialog, SW_SHOWNORMAL);
+    UpdateWindow(dialog);
+    SetFocus(session.name);
+    if (existing) SendMessageW(session.name, EM_SETSEL, 0, -1);
 
-    if (hOwner) EnableWindow(hOwner, FALSE);
-    ShowWindow(hDlg, SW_SHOWNORMAL);
-    UpdateWindow(hDlg);
-    SetFocus(sess.hEditAlias);
-
-    MSG msg = {};
-    while (!sess.done && GetMessageW(&msg, nullptr, 0, 0) > 0) {
-        if (msg.message == WM_QUIT) {
-            PostQuitMessage(static_cast<int>(msg.wParam));
-            break;
-        }
+    MSG msg{};
+    while (!session.done && GetMessageW(&msg, nullptr, 0, 0) > 0) {
         if (msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE) {
-            DestroyWindow(hDlg);
-            continue;
-        }
-        if (msg.message == WM_KEYDOWN && msg.wParam == VK_RETURN) {
-            SendMessageW(hDlg, WM_COMMAND, IDOK, 0);
-            continue;
-        }
-        if (!IsDialogMessageW(hDlg, &msg)) {
+            SendMessageW(dialog, WM_COMMAND, IDCANCEL, 0);
+        } else if (msg.message == WM_KEYDOWN && msg.wParam == VK_RETURN) {
+            SendMessageW(dialog, WM_COMMAND, GetDlgCtrlID(GetFocus()) == IDCANCEL ? IDCANCEL : IDOK, 0);
+        } else if (!IsDialogMessageW(dialog, &msg)) {
             TranslateMessage(&msg);
             DispatchMessageW(&msg);
         }
     }
-
-    if (hFont) DeleteObject(hFont);
-    if (hOwner && IsWindow(hOwner)) {
-        EnableWindow(hOwner, TRUE);
-        SetForegroundWindow(hOwner);
+    if (msg.message == WM_QUIT) PostQuitMessage(static_cast<int>(msg.wParam));
+    if (IsWindow(dialog)) DestroyWindow(dialog);
+    DeleteObject(labelFont);
+    DeleteObject(buttonFont);
+    DeleteObject(session.background);
+    DeleteObject(session.field);
+    if (IsWindow(owner)) {
+        EnableWindow(owner, TRUE);
+        SetForegroundWindow(owner);
     }
-    if (sess.confirmed && outAlias) {
-        *outAlias = sess.result;
-        return true;
-    }
-    return false;
+    if (session.confirmed) return std::move(session.result);
+    return std::nullopt;
 }
 
 LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
@@ -16534,6 +16727,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             SetWindowLongPtrW(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(st));
             if (st) {
                 st->hWnd = hWnd;
+                if (const UINT windowDpi = GetDpiForWindow(hWnd)) st->dpi = windowDpi;
                 ApplyWin11SettingsWindowFrame(hWnd, st->isLight);
                 st->hAppIcon = LoadCustomRunIcon(DpiScale(kSettingsEmblemSize, st->dpi));
                 if (st->hAppIcon) {
@@ -16545,6 +16739,29 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         }
         case WM_ERASEBKGND:
             return 1;
+        case WM_GETMINMAXINFO: {
+            auto* limits = reinterpret_cast<MINMAXINFO*>(lParam);
+            const UINT dpi = st ? st->dpi : GetDpiForSystem();
+            MONITORINFO monitor{sizeof(monitor)};
+            if (GetMonitorInfoW(MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST), &monitor)) {
+                limits->ptMinTrackSize.x = (std::min)(monitor.rcWork.right - monitor.rcWork.left,
+                    static_cast<LONG>(DpiScale(SettingsStyle::minWidth, dpi)));
+                limits->ptMinTrackSize.y = (std::min)(monitor.rcWork.bottom - monitor.rcWork.top,
+                    static_cast<LONG>(DpiScale(SettingsStyle::minHeight, dpi)));
+            }
+            return 0;
+        }
+        case WM_DPICHANGED: {
+            if (!st) break;
+            const UINT dpi = HIWORD(wParam);
+            st->scrollY = MulDiv(st->scrollY, dpi, st->dpi);
+            st->dpi = dpi;
+            const auto& rect = *reinterpret_cast<const RECT*>(lParam);
+            SetWindowPos(hWnd, nullptr, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
+                         SWP_NOZORDER | SWP_NOACTIVATE);
+            InvalidateRect(hWnd, nullptr, FALSE);
+            return 0;
+        }
         case WM_SIZE: {
             if (st && st->pHwndRT && wParam != SIZE_MINIMIZED) {
                 UINT nw = LOWORD(lParam);
@@ -16569,6 +16786,8 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
         }
         case WM_MOUSEMOVE: {
             if (st) {
+                TRACKMOUSEEVENT track{sizeof(track), TME_LEAVE, hWnd, 0};
+                TrackMouseEvent(&track);
                 POINT pt = { (short)LOWORD(lParam), (short)HIWORD(lParam) };
                 int newHov = 0;
                 for (const auto& h : st->hits) {
@@ -16581,15 +16800,28 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             }
             return 0;
         }
+        case WM_MOUSELEAVE:
+            if (st && st->hoveredId != 0) {
+                st->hoveredId = 0;
+                InvalidateRect(hWnd, nullptr, FALSE);
+            }
+            return 0;
         case WM_LBUTTONUP: {
             if (!st) return 0;
             POINT pt = { (short)LOWORD(lParam), (short)HIWORD(lParam) };
             SettingsLocalizedStrings ls = GetSettingsLocalizedStrings(st->settings.language);
-            for (const auto& hit : st->hits) {
+            for (const auto hit : st->hits) {
                 if (!PtInRect(&hit.rc, pt)) continue;
                 int id = hit.id;
                 bool changed = false;
 
+                if (id >= kSettingsGroupHitBase && id < kSettingsGroupHitBase + static_cast<int>(SettingsGroup::Count)) {
+                    auto& collapsed = st->collapsedGroups[id - kSettingsGroupHitBase];
+                    collapsed = !collapsed;
+                    st->hoveredId = 0;
+                    InvalidateRect(hWnd, nullptr, FALSE);
+                    return 0;
+                }
                 if (id >= 1000 && id <= 1004) {
                     st->activeTab = hit.intVal;
                     st->scrollY = 0;
@@ -16871,21 +17103,31 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                 } else if (id == 2510) {
                     ClearCurrentUserStoredHistory();
                     changed = true;
-                } else if (id == 2700) {
-                    CommandAlias ca;
-                    if (ShowAddAliasDialog(hWnd, st->isLight, st->settings.language, st->dpi, &ca)) {
-                        auto list = st->settings.customAliases;
-                        bool replaced = false;
-                        for (auto& existing : list) {
-                            if (_wcsicmp(existing.alias.c_str(), ca.alias.c_str()) == 0) {
-                                existing = ca;
-                                replaced = true;
-                                break;
+                } else if (id == kCommandAddHit ||
+                           (id >= kCommandEditHitBase && id < kCommandEditHitBase + static_cast<int>(kMaxSettingsCommands))) {
+                    auto list = st->settings.customAliases;
+                    const int editIndex = id == kCommandAddHit ? -1 : hit.intVal;
+                    if (editIndex < static_cast<int>(list.size())) {
+                        auto command = ShowCommandEditor(hWnd, st->isLight, st->settings.language, st->dpi, list, editIndex);
+                        if (!IsWindow(hWnd)) return 0;
+                        if (command) {
+                            if (editIndex >= 0) {
+                                list[editIndex] = std::move(*command);
+                                changed = true;
+                            } else {
+                                const auto duplicate = std::find_if(list.begin(), list.end(), [&](const auto& item) {
+                                    return _wcsicmp(item.alias.c_str(), command->alias.c_str()) == 0;
+                                });
+                                if (duplicate != list.end()) {
+                                    *duplicate = std::move(*command);
+                                    changed = true;
+                                } else if (list.size() < kMaxSettingsCommands) {
+                                    list.push_back(std::move(*command));
+                                    changed = true;
+                                }
                             }
+                            if (changed) SaveInAppAliasesOverride(list);
                         }
-                        if (!replaced && list.size() < 64) list.push_back(std::move(ca));
-                        SaveInAppAliasesOverride(list);
-                        changed = true;
                     }
                 } else if (id >= 2800 && id < 2900) {
                     int idx = hit.intVal;
@@ -16984,35 +17226,40 @@ void ShowOrFocusWin11SettingsWindow() {
     POINT curPt = { 0, 0 };
     GetCursorPos(&curPt);
     HMONITOR hMon = MonitorFromPoint(curPt, MONITOR_DEFAULTTOPRIMARY);
-    UINT dpi = 96;
-    if (HDC hdc = GetDC(nullptr)) {
-        dpi = static_cast<UINT>(GetDeviceCaps(hdc, LOGPIXELSX));
-        ReleaseDC(nullptr, hdc);
-    }
+    const UINT dpi = GetDpiForSystem();
     st->dpi = dpi;
     st->isLight = (st->settings.colorMode == ColorMode::Light) ? true
                 : ((st->settings.colorMode == ColorMode::Dark) ? false : IsSystemAppLightTheme());
 
-    int winW = DpiScale(880, dpi);
-    int winH = DpiScale(600, dpi);
-    MONITORINFO mi = { sizeof(mi) };
-    int posX = 120, posY = 90;
-    if (GetMonitorInfoW(hMon, &mi)) {
-        posX = mi.rcWork.left + ((mi.rcWork.right - mi.rcWork.left) - winW) / 2;
-        posY = mi.rcWork.top + ((mi.rcWork.bottom - mi.rcWork.top) - winH) / 2;
-    }
+    MONITORINFO mi{sizeof(mi)};
+    RECT workArea{};
+    if (GetMonitorInfoW(hMon, &mi)) workArea = mi.rcWork;
+    else SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0);
+    auto windowRect = [&](UINT targetDpi) {
+        const LONG width = (std::min)(static_cast<LONG>(DpiScale(SettingsStyle::windowWidth, targetDpi)), workArea.right - workArea.left);
+        const LONG height = (std::min)(static_cast<LONG>(DpiScale(SettingsStyle::windowHeight, targetDpi)), workArea.bottom - workArea.top);
+        const LONG x = workArea.left + (workArea.right - workArea.left - width) / 2;
+        const LONG y = workArea.top + (workArea.bottom - workArea.top - height) / 2;
+        return RECT{x, y, x + width, y + height};
+    };
+    const auto rect = windowRect(dpi);
 
     SettingsLocalizedStrings lsInit = GetSettingsLocalizedStrings(st->settings.language);
     HWND hWnd = CreateWindowExW(
         WS_EX_APPWINDOW, kWin11SettingsClassName,
         lsInit.winTitle,
         WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX,
-        posX, posY, winW, winH,
+        rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
         nullptr, nullptr, GetModInstanceHandle(), st);
     if (!hWnd) {
         Wh_Log(L"Could not create the Modern Run Settings window (err=%lu)", GetLastError());
         delete st;
         return;
+    }
+    if (st->dpi != dpi) {
+        const auto actual = windowRect(st->dpi);
+        SetWindowPos(hWnd, nullptr, actual.left, actual.top, actual.right - actual.left, actual.bottom - actual.top,
+                     SWP_NOZORDER | SWP_NOACTIVATE);
     }
     g_hWin11SettingsWnd.store(hWnd);
     ShowModernRunSettingsWindow(hWnd, SW_SHOWNORMAL);
@@ -19579,7 +19826,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     FluentMenuItem pinItem;
                     pinItem.id    = 797;
                     pinItem.label = currentlyPinned ? v53.unpinFromTopMenu : v53.pinToTopMenu;
-                    pinItem.icon  = FluentMenuIcon::History;
+                    pinItem.icon  = FluentMenuIcon::Pin;
                     ctxItems.push_back(std::move(pinItem));
                 }
                 if (hasFileLoc) {

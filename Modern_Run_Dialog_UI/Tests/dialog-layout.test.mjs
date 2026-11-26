@@ -109,8 +109,10 @@ test('approved settings glyphs keep the selected shapes and orientation', () => 
     assert.match(source, /2100, kColorModeSettingsGlyph,/);
     assert.match(source, /CreateTextFormat\(L"Segoe UI Symbol",[^;]+colorModeFormat\.put\(\)/);
     assert.match(source, /\*glyph == kColorModeSettingsGlyph\[0\] \? colorModeFormat\.get\(\) : pFmtGlyph/);
-    assert.match(source, /drawAliasButton\(rcAdm, 2800 \+ i, i, L"\\uEA18", aliases\.administrator/);
-    assert.match(source, /drawAliasButton\(rcDel, 2900 \+ i, i, L"\\uE894", aliases\.remove/);
+    assert.match(source, /drawIconButton\(admin, 2800 \+ i, L"\\uEA18", aliases\.administrator/);
+    assert.match(source, /drawIconButton\(edit, kCommandEditHitBase \+ i, L"\\uE70F", aliases\.edit/);
+    assert.match(source, /drawIconButton\(remove, 2900 \+ i, L"\\uE894", aliases\.remove/);
+    assert.match(source, /pinItem\.icon\s*= FluentMenuIcon::Pin/);
 });
 
 test('each Windhawk setting declares its localized metadata once', () => {
