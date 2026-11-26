@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.0
+// @version         6.6.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 23
+// Build: 25
 
 // ==WindhawkModReadme==
 /*
@@ -316,6 +316,11 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
   $name:vi-VN: 1. Giao diện & Hiệu ứng hình ảnh
 
 - windowBordersGroup:
+  - customBorderColor: ""
+    $name: Custom Border Color (Hex, e.g. #4C566A)
+    $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
+    $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
+    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
   - windowBorderMode: mod
     $name: Border Mode
     $description: Color and visibility of the panel outlines
@@ -464,11 +469,175 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - windows: حسب Windows
     - accent: لون تمييز Windows
     - off: معطلة
-  - customBorderColor: ""
-    $name: Custom Border Color (Hex, e.g. #4C566A)
-    $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
-    $description: Optional hex color (#RRGGBB) to override the dialog border color. Leave empty to follow the selected Theme Preset.
-    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
+  - contextMenuBorderMode: own
+    $name: Context Menu Borders
+    $description: Outer border of the mod-style menu
+    $options:
+    - own: Own border
+    - window: Defined by window settings
+    - windows: Windows-defined
+    - accent: Windows accent
+    - off: Off
+    $name:vi-VN: Viền menu ngữ cảnh
+    $description:vi-VN: Viền ngoài của menu kiểu mod
+    $options:vi-VN:
+    - own: Viền riêng
+    - window: Theo cài đặt cửa sổ
+    - windows: Theo Windows
+    - accent: Màu nhấn Windows
+    - off: Tắt
+    $name:th-TH: ขอบเมนูบริบท
+    $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
+    $options:th-TH:
+    - own: ขอบของเมนู
+    - window: ตามการตั้งค่าหน้าต่าง
+    - windows: ตาม Windows
+    - accent: สีเน้น Windows
+    - off: ปิด
+    $name:id-ID: Bingkai Menu Konteks
+    $description:id-ID: Garis luar menu bergaya mod
+    $options:id-ID:
+    - own: Bingkai menu
+    - window: Sesuai pengaturan jendela
+    - windows: Sesuai Windows
+    - accent: Aksen Windows
+    - off: Nonaktif
+    $name:ms-MY: Sempadan Menu Konteks
+    $description:ms-MY: Sempadan luar menu gaya mod
+    $options:ms-MY:
+    - own: Sempadan menu
+    - window: Mengikut tetapan tetingkap
+    - windows: Mengikut Windows
+    - accent: Aksen Windows
+    - off: Dimatikan
+    $name:ja-JP: コンテキスト メニューの境界線
+    $description:ja-JP: Mod スタイルのメニューの外枠
+    $options:ja-JP:
+    - own: メニュー独自の境界線
+    - window: ウィンドウの設定に従う
+    - windows: Windows に従う
+    - accent: Windows のアクセント
+    - off: 表示しない
+    $name:zh-CN: 右键菜单边框
+    $description:zh-CN: 模组样式菜单的外边框
+    $options:zh-CN:
+    - own: 菜单自带边框
+    - window: 由窗口设置决定
+    - windows: 由 Windows 决定
+    - accent: Windows 强调色
+    - off: 关闭
+    $name:zh-TW: 快顯選單邊框
+    $description:zh-TW: 模組樣式選單的外邊框
+    $options:zh-TW:
+    - own: 選單自帶邊框
+    - window: 由視窗設定決定
+    - windows: 由 Windows 決定
+    - accent: Windows 輔色
+    - off: 關閉
+    $name:ko-KR: 상황에 맞는 메뉴 테두리
+    $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
+    $options:ko-KR:
+    - own: 메뉴 고유 테두리
+    - window: 창 설정에 따름
+    - windows: Windows 설정
+    - accent: Windows 강조색
+    - off: 끔
+    $name:fr-FR: Bordures du menu contextuel
+    $description:fr-FR: Contour du menu dans le style du mod
+    $options:fr-FR:
+    - own: Bordure propre au menu
+    - window: Selon les paramètres de fenêtre
+    - windows: Selon Windows
+    - accent: Accentuation Windows
+    - off: Désactivées
+    $name:de-DE: Kontextmenürahmen
+    $description:de-DE: Außenrahmen des Menüs im Mod-Stil
+    $options:de-DE:
+    - own: Eigener Rahmen
+    - window: Nach Fenstereinstellungen
+    - windows: Von Windows festgelegt
+    - accent: Windows-Akzentfarbe
+    - off: Aus
+    $name:es-ES: Bordes del menú contextual
+    $description:es-ES: Contorno del menú con estilo del mod
+    $options:es-ES:
+    - own: Borde propio del menú
+    - window: Según los ajustes de ventana
+    - windows: Según Windows
+    - accent: Acento de Windows
+    - off: Desactivados
+    $name:pt-BR: Bordas do menu de contexto
+    $description:pt-BR: Contorno externo do menu no estilo do mod
+    $options:pt-BR:
+    - own: Borda própria do menu
+    - window: Conforme as configurações das janelas
+    - windows: Definido pelo Windows
+    - accent: Destaque do Windows
+    - off: Desativadas
+    $name:it-IT: Bordi del menu contestuale
+    $description:it-IT: Contorno esterno del menu in stile mod
+    $options:it-IT:
+    - own: Bordo proprio del menu
+    - window: Secondo le impostazioni delle finestre
+    - windows: Secondo Windows
+    - accent: Colore principale di Windows
+    - off: Disattivati
+    $name:ru-RU: Рамки контекстного меню
+    $description:ru-RU: Внешний контур меню «Стиль мода»
+    $options:ru-RU:
+    - own: Собственная рамка
+    - window: Определено настройками окон
+    - windows: Определено Windows
+    - accent: Акцентный Windows
+    - off: Отключены
+    $name:uk-UA: Рамки контекстного меню
+    $description:uk-UA: Зовнішній контур меню в стилі мода
+    $options:uk-UA:
+    - own: Власна рамка
+    - window: Визначено параметрами вікон
+    - windows: Визначено Windows
+    - accent: Акцент Windows
+    - off: Вимкнено
+    $name:pl-PL: Obramowanie menu kontekstowego
+    $description:pl-PL: Zewnętrzna ramka menu w stylu moda
+    $options:pl-PL:
+    - own: Własne obramowanie
+    - window: Według ustawień okien
+    - windows: Według systemu Windows
+    - accent: Akcent systemu Windows
+    - off: Wyłączone
+    $name:nl-NL: Randen van het snelmenu
+    $description:nl-NL: Buitenrand van het menu in de modstijl
+    $options:nl-NL:
+    - own: Eigen rand
+    - window: Volgens de vensterinstellingen
+    - windows: Volgens Windows
+    - accent: Windows-accentkleur
+    - off: Uit
+    $name:tr-TR: Bağlam Menüsü Kenarlıkları
+    $description:tr-TR: Mod stilindeki menünün dış kenarlığı
+    $options:tr-TR:
+    - own: Menüye özel kenarlık
+    - window: Pencere ayarlarına göre
+    - windows: Windows’a göre
+    - accent: Windows vurgu rengi
+    - off: Kapalı
+    $name:hi-IN: संदर्भ मेनू की सीमाएँ
+    $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
+    $options:hi-IN:
+    - own: मेनू की अपनी सीमा
+    - window: विंडो सेटिंग के अनुसार
+    - windows: Windows के अनुसार
+    - accent: Windows का एक्सेंट रंग
+    - off: बंद
+    $name:ar: حدود قائمة السياق
+    $description:ar: الحد الخارجي للقائمة بنمط التعديل
+    $options:ar:
+    - own: حد خاص بالقائمة
+    - window: حسب إعدادات النوافذ
+    - windows: حسب Windows
+    - accent: لون تمييز Windows
+    - off: معطلة
   $name: Window Borders
   $name:vi-VN: Viền cửa sổ
   $name:th-TH: ขอบหน้าต่าง
@@ -755,175 +924,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $options:ar:
     - mod: نمط التعديل
     - windows_fluent: Windows (Fluent)
-  - contextMenuBorderMode: own
-    $name: Context Menu Borders
-    $description: Outer border of the mod-style menu
-    $options:
-    - own: Own border
-    - window: Defined by window settings
-    - windows: Windows-defined
-    - accent: Windows accent
-    - off: Off
-    $name:vi-VN: Viền menu ngữ cảnh
-    $description:vi-VN: Viền ngoài của menu kiểu mod
-    $options:vi-VN:
-    - own: Viền riêng
-    - window: Theo cài đặt cửa sổ
-    - windows: Theo Windows
-    - accent: Màu nhấn Windows
-    - off: Tắt
-    $name:th-TH: ขอบเมนูบริบท
-    $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
-    $options:th-TH:
-    - own: ขอบของเมนู
-    - window: ตามการตั้งค่าหน้าต่าง
-    - windows: ตาม Windows
-    - accent: สีเน้น Windows
-    - off: ปิด
-    $name:id-ID: Bingkai Menu Konteks
-    $description:id-ID: Garis luar menu bergaya mod
-    $options:id-ID:
-    - own: Bingkai menu
-    - window: Sesuai pengaturan jendela
-    - windows: Sesuai Windows
-    - accent: Aksen Windows
-    - off: Nonaktif
-    $name:ms-MY: Sempadan Menu Konteks
-    $description:ms-MY: Sempadan luar menu gaya mod
-    $options:ms-MY:
-    - own: Sempadan menu
-    - window: Mengikut tetapan tetingkap
-    - windows: Mengikut Windows
-    - accent: Aksen Windows
-    - off: Dimatikan
-    $name:ja-JP: コンテキスト メニューの境界線
-    $description:ja-JP: Mod スタイルのメニューの外枠
-    $options:ja-JP:
-    - own: メニュー独自の境界線
-    - window: ウィンドウの設定に従う
-    - windows: Windows に従う
-    - accent: Windows のアクセント
-    - off: 表示しない
-    $name:zh-CN: 右键菜单边框
-    $description:zh-CN: 模组样式菜单的外边框
-    $options:zh-CN:
-    - own: 菜单自带边框
-    - window: 由窗口设置决定
-    - windows: 由 Windows 决定
-    - accent: Windows 强调色
-    - off: 关闭
-    $name:zh-TW: 快顯選單邊框
-    $description:zh-TW: 模組樣式選單的外邊框
-    $options:zh-TW:
-    - own: 選單自帶邊框
-    - window: 由視窗設定決定
-    - windows: 由 Windows 決定
-    - accent: Windows 輔色
-    - off: 關閉
-    $name:ko-KR: 상황에 맞는 메뉴 테두리
-    $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
-    $options:ko-KR:
-    - own: 메뉴 고유 테두리
-    - window: 창 설정에 따름
-    - windows: Windows 설정
-    - accent: Windows 강조색
-    - off: 끔
-    $name:fr-FR: Bordures du menu contextuel
-    $description:fr-FR: Contour du menu dans le style du mod
-    $options:fr-FR:
-    - own: Bordure propre au menu
-    - window: Selon les paramètres de fenêtre
-    - windows: Selon Windows
-    - accent: Accentuation Windows
-    - off: Désactivées
-    $name:de-DE: Kontextmenürahmen
-    $description:de-DE: Außenrahmen des Menüs im Mod-Stil
-    $options:de-DE:
-    - own: Eigener Rahmen
-    - window: Nach Fenstereinstellungen
-    - windows: Von Windows festgelegt
-    - accent: Windows-Akzentfarbe
-    - off: Aus
-    $name:es-ES: Bordes del menú contextual
-    $description:es-ES: Contorno del menú con estilo del mod
-    $options:es-ES:
-    - own: Borde propio del menú
-    - window: Según los ajustes de ventana
-    - windows: Según Windows
-    - accent: Acento de Windows
-    - off: Desactivados
-    $name:pt-BR: Bordas do menu de contexto
-    $description:pt-BR: Contorno externo do menu no estilo do mod
-    $options:pt-BR:
-    - own: Borda própria do menu
-    - window: Conforme as configurações das janelas
-    - windows: Definido pelo Windows
-    - accent: Destaque do Windows
-    - off: Desativadas
-    $name:it-IT: Bordi del menu contestuale
-    $description:it-IT: Contorno esterno del menu in stile mod
-    $options:it-IT:
-    - own: Bordo proprio del menu
-    - window: Secondo le impostazioni delle finestre
-    - windows: Secondo Windows
-    - accent: Colore principale di Windows
-    - off: Disattivati
-    $name:ru-RU: Рамки контекстного меню
-    $description:ru-RU: Внешний контур меню «Стиль мода»
-    $options:ru-RU:
-    - own: Собственная рамка
-    - window: Определено настройками окон
-    - windows: Определено Windows
-    - accent: Акцентный Windows
-    - off: Отключены
-    $name:uk-UA: Рамки контекстного меню
-    $description:uk-UA: Зовнішній контур меню в стилі мода
-    $options:uk-UA:
-    - own: Власна рамка
-    - window: Визначено параметрами вікон
-    - windows: Визначено Windows
-    - accent: Акцент Windows
-    - off: Вимкнено
-    $name:pl-PL: Obramowanie menu kontekstowego
-    $description:pl-PL: Zewnętrzna ramka menu w stylu moda
-    $options:pl-PL:
-    - own: Własne obramowanie
-    - window: Według ustawień okien
-    - windows: Według systemu Windows
-    - accent: Akcent systemu Windows
-    - off: Wyłączone
-    $name:nl-NL: Randen van het snelmenu
-    $description:nl-NL: Buitenrand van het menu in de modstijl
-    $options:nl-NL:
-    - own: Eigen rand
-    - window: Volgens de vensterinstellingen
-    - windows: Volgens Windows
-    - accent: Windows-accentkleur
-    - off: Uit
-    $name:tr-TR: Bağlam Menüsü Kenarlıkları
-    $description:tr-TR: Mod stilindeki menünün dış kenarlığı
-    $options:tr-TR:
-    - own: Menüye özel kenarlık
-    - window: Pencere ayarlarına göre
-    - windows: Windows’a göre
-    - accent: Windows vurgu rengi
-    - off: Kapalı
-    $name:hi-IN: संदर्भ मेनू की सीमाएँ
-    $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
-    $options:hi-IN:
-    - own: मेनू की अपनी सीमा
-    - window: विंडो सेटिंग के अनुसार
-    - windows: Windows के अनुसार
-    - accent: Windows का एक्सेंट रंग
-    - off: बंद
-    $name:ar: حدود قائمة السياق
-    $description:ar: الحد الخارجي للقائمة بنمط التعديل
-    $options:ar:
-    - own: حد خاص بالقائمة
-    - window: حسب إعدادات النوافذ
-    - windows: حسب Windows
-    - accent: لون تمييز Windows
-    - off: معطلة
   - uiScalePercent: "100"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
@@ -1752,11 +1752,16 @@ bool WindowsUsesAccentBorder() {
                         &size) == ERROR_SUCCESS && value != 0;
 }
 
-D2D1_COLOR_F GetWindowsBorderColor(WindowBorderMode mode, bool highContrast, bool active) {
+D2D1_COLOR_F GetWindowsBorderColor(WindowBorderMode mode, bool highContrast, bool isLight, bool isFlyout) {
     if (mode == WindowBorderMode::Accent) return GetSystemAccentColorF();
-    const COLORREF color = GetSysColor(highContrast ? COLOR_WINDOWTEXT
-        : (active ? COLOR_ACTIVEBORDER : COLOR_INACTIVEBORDER));
-    return D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f, GetBValue(color) / 255.0f);
+    if (highContrast) {
+        const COLORREF color = GetSysColor(COLOR_WINDOWTEXT);
+        return D2D1::ColorF(GetRValue(color) / 255.0f, GetGValue(color) / 255.0f, GetBValue(color) / 255.0f);
+    }
+
+    // Match WinUI's SurfaceStrokeColorFlyout and SurfaceStrokeColorDefault resources.
+    if (isFlyout) return D2D1::ColorF(0x000000, (isLight ? 15.0f : 51.0f) / 255.0f);
+    return D2D1::ColorF(0x757575, 102.0f / 255.0f);
 }
 
 // --- Real-Time iOS 26 Optical Liquid Glass Snapshot, Gaussian Blur & 3D Snell's-Law Lens Refraction Engine ---
@@ -5482,7 +5487,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.colorMode               = ReadGroupedStringSetting(L"appearanceGroup.colorMode", L"colorMode", L"auto");
     curWh.contextMenuStyle = ReadGroupedStringSetting(L"layoutGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
     curWh.contextMenuBorderMode = ReadGroupedStringSetting(
-        L"layoutGroup.contextMenuBorderMode", L"contextMenuBorderMode", L"own");
+        L"windowBordersGroup.contextMenuBorderMode", L"contextMenuBorderMode", L"own");
     {
         auto layout = WindhawkUtils::StringSetting::make(L"layoutGroup.minimalMode");
         const std::wstring_view value = layout.get() ? layout.get() : L"";
@@ -5687,10 +5692,27 @@ void LoadSettings(bool fromSettingsChanged = false) {
     newSettings.contextMenuStyle = contextMenuStyle == L"windows_fluent"
         ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Mod;
     wchar_t menuBorderOverride[24]{};
-    Wh_GetStringValue(GetUserOverrideKey(L"contextMenuBorderMode").c_str(),
-                      menuBorderOverride, ARRAYSIZE(menuBorderOverride));
-    const std::wstring_view menuBorder = menuBorderOverride[0]
+    const auto menuBorderKey = GetUserOverrideKey(L"contextMenuBorderMode");
+    Wh_GetStringValue(menuBorderKey.c_str(), menuBorderOverride, ARRAYSIZE(menuBorderOverride));
+    std::wstring_view menuBorder = menuBorderOverride[0]
         ? std::wstring_view(menuBorderOverride) : std::wstring_view(curWh.contextMenuBorderMode);
+    const auto previousMenuBorder = WindhawkUtils::StringSetting::make(L"layoutGroup.contextMenuBorderMode");
+    const std::wstring_view previousMode = previousMenuBorder.get() ? previousMenuBorder.get() : L"";
+    if (std::find(kContextMenuBorderModeValues.begin() + 1, kContextMenuBorderModeValues.end(), previousMode)
+        != kContextMenuBorderModeValues.end()) {
+        const auto movedKey = GetUserOverrideKey(L"contextMenuBorderModeMoved");
+        if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
+            // Windhawk adds the new key with its default when merging an update.
+            if (!menuBorderOverride[0] && menuBorder == L"own") {
+                menuBorder = previousMode;
+                if (Wh_SetStringValue(menuBorderKey.c_str(), previousMenuBorder.get())) {
+                    Wh_SetIntValue(movedKey.c_str(), 1);
+                }
+            } else {
+                Wh_SetIntValue(movedKey.c_str(), 1);
+            }
+        }
+    }
     const auto menuBorderSetting = std::find(kContextMenuBorderModeValues.begin(), kContextMenuBorderModeValues.end(), menuBorder);
     if (menuBorderSetting != kContextMenuBorderModeValues.end()) {
         newSettings.contextMenuBorderMode = static_cast<ContextMenuBorderMode>(
@@ -12301,7 +12323,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                         DrawD2DGlassRim(pRT, rcMenuCard, menuCornerR, dpi, isLight, preferredBorder ? 1.25f : 1.35f);
                     } else {
                         const auto outline = borderMode == WindowBorderMode::Mod ? visuals.borderColor
-                            : GetWindowsBorderColor(borderMode, highContrast, s->wasForeground);
+                            : GetWindowsBorderColor(borderMode, highContrast, isLight, /*isFlyout=*/true);
                         ID2D1SolidColorBrush* brush = nullptr;
                         if (SUCCEEDED(pRT->CreateSolidColorBrush(outline, &brush))) {
                             const float width = borderMode == WindowBorderMode::Mod ? 1.25f : 1.0f;
@@ -14643,19 +14665,25 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     std::to_wstring(opPct) + L"%");
             }
             const auto borders = GetWindowBorderStrings(st->settings.language);
-            auto [borderGroup, borderY] = beginGroupCard(borders.groupTitle, borders.description, 2, rH);
-            drawDropdownRowInGroup(borderGroup, borderY, rH, 2230, L"\uE91B",
-                borders.modeTitle, L"", borders.labels[static_cast<int>(st->settings.windowBorderMode)]);
-            drawColorRowInGroup(borderGroup, borderY + rH, rH, 2203, 2204, L"\uE790",
+            const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Mod;
+            auto [borderGroup, borderY] = beginGroupCard(borders.groupTitle, borders.description, showMenuBorder ? 3 : 2, rH);
+            drawColorRowInGroup(borderGroup, borderY, rH, 2203, 2204, L"\uE790",
                 ls.bdColTitle, ls.bdColSub, st->settings.customBorderColor);
+            drawDropdownRowInGroup(borderGroup, borderY + rH, rH, 2230, L"\uE91B",
+                borders.modeTitle, L"", borders.labels[static_cast<int>(st->settings.windowBorderMode)]);
+            if (showMenuBorder) {
+                const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
+                drawDropdownRowInGroup(borderGroup, borderY + rH * 2, rH, 2111, L"\uE91B",
+                    borderStrings.title, borderStrings.description,
+                    borderStrings.labels[static_cast<int>(st->settings.contextMenuBorderMode)], 248.0f);
+            }
         } else if (st->activeTab == 1) {
             const auto layoutStrings = GetLayoutLocalizedStrings(st->settings.language);
-            const bool showMenuBorder = st->settings.contextMenuStyle == ContextMenuStyle::Mod;
             float rH = S(60.0f);
             auto [g1, y1] = beginGroupCard(
                 ls.gPosTitle,
                 ls.gPosSub,
-                showMenuBorder ? 6 : 5, rH);
+                5, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE740",
                 ls.posTitle,
                 ls.posSub,
@@ -14673,13 +14701,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 menuStrings.title, menuStrings.description,
                 st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
                     ? kWindowsFluentMenuLabel : menuStrings.modLabel);
-            if (showMenuBorder) {
-                const auto borderStrings = GetContextMenuBorderStrings(st->settings.language);
-                drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2111, L"\uE91B",
-                    borderStrings.title, borderStrings.description,
-                    borderStrings.labels[static_cast<int>(st->settings.contextMenuBorderMode)], 248.0f);
-            }
-            drawDropdownRowInGroup(g1, y1 + rH * (showMenuBorder ? 5 : 4), rH, 2410, L"\uE740",
+            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2410, L"\uE740",
                 ls.scaleTitle,
                 ls.scaleSub,
                 std::to_wstring(st->settings.uiScalePercent) + L"%");
@@ -17247,7 +17269,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.15f, &adminColor);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.25f, custom);
                             } else {
-                                const D2D1_COLOR_F outline = GetWindowsBorderColor(borderMode, highContrast, active);
+                                const D2D1_COLOR_F outline = GetWindowsBorderColor(borderMode, highContrast, isLight, /*isFlyout=*/false);
                                 if (cardH > 0) drawSurfaceBorder(rcHistCard, histCornerR, 1.0f, &outline);
                                 if (adminH > 0) drawSurfaceBorder(rcAdminPill, adminCornerR, 1.0f, &outline);
                                 drawSurfaceBorder(rcBarPill, barCornerR, 1.0f, &outline);

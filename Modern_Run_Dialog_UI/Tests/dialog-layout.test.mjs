@@ -65,7 +65,7 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 });
 
 test('the context menu retains its previous style by default', () => {
-    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - contextMenuBorderMode:)/)?.[0];
+    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
     assert.match(style, /\$name: Context Menu Style/);
     assert.match(style, /- mod: Mod Style/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
@@ -76,7 +76,8 @@ test('layout settings keep position and menu style directly below their related 
     const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
     assert.ok(layout, 'The layout settings group is present');
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
-    assert.deepEqual(keys.slice(0, 6), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'contextMenuBorderMode', 'uiScalePercent']);
+    assert.deepEqual(keys.slice(0, 5), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'uiScalePercent']);
+    assert.ok(!keys.includes('contextMenuBorderMode'));
     assert.match(layout, /\$name:ru-RU: Макет окна/);
     assert.match(layout, /\$description:ru-RU: Базовая компоновка окна, использующая параметры персонализации/);
 });
@@ -207,6 +208,41 @@ test('the four window border modes resolve to the expected outline', () => {
         static_assert(ResolveWindowBorderMode(Accent, true, true, true) == Windows);
         static_assert(ResolveWindowBorderMode(Off, true, true, true) == Off);
     `);
+});
+
+test('Windows borders use the Fluent surface and flyout colors', () => {
+    const mode = source.match(/enum class WindowBorderMode[^\n]*;/)?.[0];
+    const color = source.match(/D2D1_COLOR_F GetWindowsBorderColor\([\s\S]*?\n\}/)?.[0];
+    assert.ok(mode && color);
+    compileChecks(`
+        #include <windows.h>
+        #include <d2d1.h>
+        #include <cassert>
+        ${mode}
+        static D2D1_COLOR_F GetSystemAccentColorF() { return D2D1::ColorF(0x123456); }
+        ${color}
+        int main() {
+            using enum WindowBorderMode;
+            const auto panel = GetWindowsBorderColor(Windows, false, false, false);
+            assert(panel.r == 117.0f / 255 && panel.g == panel.r && panel.b == panel.r);
+            assert(panel.a == 102.0f / 255);
+            const auto darkFlyout = GetWindowsBorderColor(Windows, false, false, true);
+            const auto lightFlyout = GetWindowsBorderColor(Windows, false, true, true);
+            assert(darkFlyout.r == 0 && darkFlyout.a == 51.0f / 255);
+            assert(lightFlyout.r == 0 && lightFlyout.a == 15.0f / 255);
+            const auto accent = GetWindowsBorderColor(Accent, false, true, true);
+            assert(accent.r == GetSystemAccentColorF().r && accent.a == 1.0f);
+            const auto contrast = GetWindowsBorderColor(Windows, true, true, false);
+            assert(contrast.r == GetRValue(GetSysColor(COLOR_WINDOWTEXT)) / 255.0f && contrast.a == 1.0f);
+        }
+    `, true);
+});
+
+test('the border settings are grouped in color, window, and context menu order', () => {
+    const group = source.match(/^\- windowBordersGroup:[\s\S]*?(?=^\- layoutGroup:)/m)?.[0];
+    assert.ok(group, 'The window borders group is present');
+    const keys = Array.from(group.matchAll(/^  - (\w+):/gm), match => match[1]);
+    assert.deepEqual(keys, ['customBorderColor', 'windowBorderMode', 'contextMenuBorderMode']);
 });
 
 test('context menus can keep their own border or override the window border policy', () => {
