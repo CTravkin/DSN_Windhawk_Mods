@@ -4,15 +4,15 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.2.2
+// @version         6.3.3
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
 // @include         Taskmgr.exe
 // @include         windhawk.exe
-// @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs
+// @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 12
+// Build: 16
 
 // ==WindhawkModReadme==
 /*
@@ -179,6 +179,112 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - auto: Auto – Follow Windows
     - dark: Dark Mode
     - light: Light Mode
+  - contextMenuStyle: mod
+    $name: Context Menu Style
+    $description: Changes the appearance of the right-click menu
+    $options:
+    - mod: Mod Style
+    - windows_fluent: Windows (Fluent)
+    $name:vi-VN: Kiểu menu ngữ cảnh
+    $description:vi-VN: Đổi giao diện menu khi nhấp chuột phải
+    $options:vi-VN:
+    - mod: Kiểu của mod
+    - windows_fluent: Windows (Fluent)
+    $name:th-TH: รูปแบบเมนูบริบท
+    $description:th-TH: เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา
+    $options:th-TH:
+    - mod: รูปแบบของม็อด
+    - windows_fluent: Windows (Fluent)
+    $name:id-ID: Gaya Menu Konteks
+    $description:id-ID: Mengubah tampilan menu saat klik kanan
+    $options:id-ID:
+    - mod: Gaya Mod
+    - windows_fluent: Windows (Fluent)
+    $name:ms-MY: Gaya Menu Konteks
+    $description:ms-MY: Mengubah rupa menu apabila klik kanan
+    $options:ms-MY:
+    - mod: Gaya Mod
+    - windows_fluent: Windows (Fluent)
+    $name:ja-JP: コンテキスト メニューのスタイル
+    $description:ja-JP: 右クリック メニューの外観を変更します
+    $options:ja-JP:
+    - mod: Mod のスタイル
+    - windows_fluent: Windows (Fluent)
+    $name:zh-CN: 右键菜单样式
+    $description:zh-CN: 更改右键单击时显示的菜单外观
+    $options:zh-CN:
+    - mod: 模组样式
+    - windows_fluent: Windows (Fluent)
+    $name:zh-TW: 快顯選單樣式
+    $description:zh-TW: 變更按下滑鼠右鍵時顯示的選單外觀
+    $options:zh-TW:
+    - mod: 模組樣式
+    - windows_fluent: Windows (Fluent)
+    $name:ko-KR: 상황에 맞는 메뉴 스타일
+    $description:ko-KR: 마우스 오른쪽 클릭 메뉴의 모양을 변경합니다
+    $options:ko-KR:
+    - mod: 모드 스타일
+    - windows_fluent: Windows (Fluent)
+    $name:fr-FR: Style du menu contextuel
+    $description:fr-FR: Modifie l’apparence du menu du clic droit
+    $options:fr-FR:
+    - mod: Style du mod
+    - windows_fluent: Windows (Fluent)
+    $name:de-DE: Kontextmenüstil
+    $description:de-DE: Ändert das Aussehen des Menüs beim Rechtsklick
+    $options:de-DE:
+    - mod: Mod-Stil
+    - windows_fluent: Windows (Fluent)
+    $name:es-ES: Estilo del menú contextual
+    $description:es-ES: Cambia el aspecto del menú al hacer clic con el botón derecho
+    $options:es-ES:
+    - mod: Estilo del mod
+    - windows_fluent: Windows (Fluent)
+    $name:pt-BR: Estilo do menu de contexto
+    $description:pt-BR: Altera a aparência do menu do botão direito
+    $options:pt-BR:
+    - mod: Estilo do mod
+    - windows_fluent: Windows (Fluent)
+    $name:it-IT: Stile del menu contestuale
+    $description:it-IT: Modifica l’aspetto del menu del tasto destro
+    $options:it-IT:
+    - mod: Stile della mod
+    - windows_fluent: Windows (Fluent)
+    $name:ru-RU: Стиль контекстного меню
+    $description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши
+    $options:ru-RU:
+    - mod: Стиль мода
+    - windows_fluent: Windows (Fluent)
+    $name:uk-UA: Стиль контекстного меню
+    $description:uk-UA: Змінює вигляд меню при натисканні правою кнопкою миші
+    $options:uk-UA:
+    - mod: Стиль мода
+    - windows_fluent: Windows (Fluent)
+    $name:pl-PL: Styl menu kontekstowego
+    $description:pl-PL: Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem
+    $options:pl-PL:
+    - mod: Styl moda
+    - windows_fluent: Windows (Fluent)
+    $name:nl-NL: Stijl van het snelmenu
+    $description:nl-NL: Wijzigt het uiterlijk van het menu bij rechtsklikken
+    $options:nl-NL:
+    - mod: Stijl van de mod
+    - windows_fluent: Windows (Fluent)
+    $name:tr-TR: Bağlam menüsü stili
+    $description:tr-TR: Sağ tıklama menüsünün görünümünü değiştirir
+    $options:tr-TR:
+    - mod: Mod stili
+    - windows_fluent: Windows (Fluent)
+    $name:hi-IN: संदर्भ मेनू की शैली
+    $description:hi-IN: राइट-क्लिक मेनू का रूप बदलता है
+    $options:hi-IN:
+    - mod: मॉड की शैली
+    - windows_fluent: Windows (Fluent)
+    $name:ar: نمط قائمة السياق
+    $description:ar: يغير مظهر القائمة عند النقر بزر الماوس الأيمن
+    $options:ar:
+    - mod: نمط التعديل
+    - windows_fluent: Windows (Fluent)
   - customBgColor: ""
     $name: Custom Background Color (Hex, e.g. #1E1E24)
     $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
@@ -662,6 +768,15 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 #include <dwrite.h>
 #include <wincodec.h>
 #include <imm.h>
+#include <roapi.h>
+#include <windows.ui.xaml.hosting.desktopwindowxamlsource.h>
+#undef GetCurrentTime
+#include <winrt/Windows.Foundation.Collections.h>
+#include <winrt/Windows.UI.Xaml.Controls.h>
+#include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.Hosting.h>
+#include <winrt/Windows.UI.Xaml.Interop.h>
+#include <winrt/Windows.UI.Xaml.Media.h>
 #include <intrin.h>
 #include <cstring>
 #include <cwchar>
@@ -867,6 +982,7 @@ struct CommandAlias {
 };
 
 enum class DialogLayout { Classic = 0, Pill = 1, Fluent = 2 };
+enum class ContextMenuStyle { Mod, WindowsFluent };
 
 enum class RunAction : size_t { Browse, Run, Close, Settings, Count };
 constexpr size_t kRunActionCount = static_cast<size_t>(RunAction::Count);
@@ -910,6 +1026,7 @@ struct ModSettings {
     int customCornerRadius = -1;
     std::wstring dialogPosition = L"auto";
     DialogLayout dialogLayout = DialogLayout::Classic;
+    ContextMenuStyle contextMenuStyle = ContextMenuStyle::Mod;
     HiddenActions hiddenActions{};
     bool rememberPosition = false;
     int uiScalePercent = 100;
@@ -4795,6 +4912,7 @@ struct WindhawkRawSnapshot {
     std::wstring dialogPosition;
     std::wstring colorMode;
     DialogLayout dialogLayout = DialogLayout::Classic;
+    std::wstring contextMenuStyle;
     HiddenActions hiddenActions{};
     std::wstring uiScalePercent;
     int customDialogWidth = 0;
@@ -4882,6 +5000,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.customBackgroundOpacity = ReadGroupedIntSetting(L"appearanceGroup.customBackgroundOpacity", L"customBackgroundOpacity", 215);
     curWh.dialogPosition          = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
     curWh.colorMode               = ReadGroupedStringSetting(L"appearanceGroup.colorMode", L"colorMode", L"auto");
+    curWh.contextMenuStyle = ReadGroupedStringSetting(L"appearanceGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
     {
         auto layout = WindhawkUtils::StringSetting::make(L"layoutGroup.minimalMode");
         const std::wstring_view value = layout.get() ? layout.get() : L"";
@@ -4928,6 +5047,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.customBackgroundOpacity != g_lastWhSnapshot.customBackgroundOpacity, L"customBackgroundOpacity");
             dropIfChanged(curWh.dialogPosition != g_lastWhSnapshot.dialogPosition, L"dialogPosition");
             dropIfChanged(curWh.colorMode != g_lastWhSnapshot.colorMode, L"colorMode");
+            dropIfChanged(curWh.contextMenuStyle != g_lastWhSnapshot.contextMenuStyle, L"contextMenuStyle");
             dropIfChanged(curWh.dialogLayout != g_lastWhSnapshot.dialogLayout, L"minimalModeV3");
             for (size_t i = 0; i < kRunActionCount; ++i) {
                 dropIfChanged(curWh.hiddenActions[i] != g_lastWhSnapshot.hiddenActions[i], kHiddenActionKeys[i]);
@@ -5032,6 +5152,13 @@ void LoadSettings(bool fromSettingsChanged = false) {
 
     int minModeOverride = Wh_GetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), -1);
     newSettings.dialogLayout = ApplyDialogLayoutOverride(curWh.dialogLayout, minModeOverride);
+    wchar_t menuStyleOverride[32]{};
+    const std::wstring_view contextMenuStyle =
+        Wh_GetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(), menuStyleOverride,
+                          ARRAYSIZE(menuStyleOverride)) > 0 && menuStyleOverride[0]
+            ? std::wstring_view(menuStyleOverride) : std::wstring_view(curWh.contextMenuStyle);
+    newSettings.contextMenuStyle = contextMenuStyle == L"windows_fluent"
+        ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Mod;
     for (size_t i = 0; i < kRunActionCount; ++i) {
         int value = Wh_GetIntValue(GetUserOverrideKey(kHiddenActionKeys[i]).c_str(), -1);
         newSettings.hiddenActions[i] = value < 0 ? curWh.hiddenActions[i] : value != 0;
@@ -7803,19 +7930,30 @@ void RemoveCommandFromHistoryStorage(const std::wstring& cmd) {
 }
 
 std::wstring FormatHistoryTimestamp(const FILETIME& ftUtc, const wchar_t* todayPrefix) {
-    FILETIME ftLocal = {};
-    SYSTEMTIME st = {}, now = {};
-    FileTimeToLocalFileTime(&ftUtc, &ftLocal);
-    FileTimeToSystemTime(&ftLocal, &st);
+    SYSTEMTIME utc{}, local{}, now{};
+    if (!FileTimeToSystemTime(&ftUtc, &utc) ||
+        !SystemTimeToTzSpecificLocalTimeEx(nullptr, &utc, &local)) {
+        return {};
+    }
     GetLocalTime(&now);
 
-    wchar_t buf[64] = {};
-    if (st.wYear == now.wYear && st.wMonth == now.wMonth && st.wDay == now.wDay) {
-        swprintf_s(buf, L"%s, %02d:%02d", todayPrefix, st.wHour, st.wMinute);
-    } else {
-        swprintf_s(buf, L"%02d:%02d  %02d/%02d", st.wHour, st.wMinute, st.wDay, st.wMonth);
+    wchar_t timePattern[128]{}, time[256]{};
+    const bool hasShortTime = GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_SSHORTTIME,
+                                              timePattern, ARRAYSIZE(timePattern)) > 0;
+    if (!GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, hasShortTime ? 0 : TIME_NOSECONDS, &local,
+                         hasShortTime ? timePattern : nullptr, time, ARRAYSIZE(time))) {
+        swprintf_s(time, L"%02u:%02u", static_cast<unsigned>(local.wHour), static_cast<unsigned>(local.wMinute));
     }
-    return buf;
+    if (local.wYear == now.wYear && local.wMonth == now.wMonth && local.wDay == now.wDay) {
+        return std::wstring(todayPrefix) + L", " + time;
+    }
+    wchar_t date[256]{};
+    if (!GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &local, nullptr,
+                         date, ARRAYSIZE(date), nullptr)) {
+        swprintf_s(date, L"%04u-%02u-%02u", static_cast<unsigned>(local.wYear),
+                   static_cast<unsigned>(local.wMonth), static_cast<unsigned>(local.wDay));
+    }
+    return std::wstring(time) + L" " + date;
 }
 
 std::wstring LookupOrInitTimestamp(const std::wstring& cmd,
@@ -11959,6 +12097,288 @@ LRESULT CALLBACK FluentMenuWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM l
     return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 }
 
+namespace WindowsMenu = winrt::Windows::UI::Xaml;
+
+const wchar_t* SystemMenuGlyph(FluentMenuIcon icon) {
+    switch (icon) {
+        case FluentMenuIcon::FolderPick: return L"\uE8B7";
+        case FluentMenuIcon::RunArrow: return L"\uE768";
+        case FluentMenuIcon::Close: return L"\uE711";
+        case FluentMenuIcon::Settings: return L"\uE713";
+        case FluentMenuIcon::History: return L"\uE718";
+        case FluentMenuIcon::ClearTrash: return L"\uE74D";
+        default: return L"";
+    }
+}
+
+struct WindowsFluentMenuRequest {
+    HWND owner;
+    bool isLight;
+    const std::vector<FluentMenuItem>& items;
+    POINT anchorPoint;
+    HANDLE done;
+    std::atomic<bool> cancelled{false};
+    std::optional<UINT> result;
+};
+
+constexpr UINT kShowWindowsFluentMenu = WM_APP + 1;
+constexpr int kWindowsMenuAnchorSize = 4;
+static HANDLE g_windowsFluentMenuThread = nullptr;
+static DWORD g_windowsFluentMenuThreadId = 0;
+static std::mutex g_windowsFluentMenuThreadMutex;
+static std::atomic<bool> g_windowsFluentMenuActive{false};
+
+struct WindowsFluentMenuHost {
+    HWND window = nullptr;
+    HWND island = nullptr;
+    WindowsMenu::Hosting::DesktopWindowXamlSource source{nullptr};
+    winrt::com_ptr<IDesktopWindowXamlSourceNative2> interop;
+
+    ~WindowsFluentMenuHost() {
+        interop = nullptr;
+        if (source) {
+            try { source.Close(); } catch (...) {}
+            source = nullptr;
+        }
+        if (window) DestroyWindow(window);
+    }
+
+    void Initialize() {
+        window = CreateWindowExW(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, L"STATIC", L"",
+            WS_POPUP | WS_CLIPCHILDREN, 0, 0, kWindowsMenuAnchorSize, kWindowsMenuAnchorSize,
+            nullptr, nullptr, nullptr, nullptr);
+        if (!window) winrt::throw_last_error();
+        source = WindowsMenu::Hosting::DesktopWindowXamlSource();
+        interop = source.as<IDesktopWindowXamlSourceNative2>();
+        winrt::check_hresult(interop->AttachToWindow(window));
+        winrt::check_hresult(interop->get_WindowHandle(&island));
+        if (!island) winrt::throw_hresult(E_FAIL);
+    }
+
+    // A disengaged result requests the existing menu. A native dismissal is 0.
+    std::optional<UINT> Show(const WindowsFluentMenuRequest& request) {
+        if (request.cancelled || !IsWindowVisible(request.owner)) return 0;
+        if (!SetTimer(window, 1, 50, nullptr)) return std::nullopt;
+        struct HideHost {
+            HWND window;
+            WindowsMenu::Hosting::DesktopWindowXamlSource& source;
+            ~HideHost() {
+                KillTimer(window, 1);
+                ShowWindow(window, SW_HIDE);
+                try { source.Content(nullptr); } catch (...) {}
+            }
+        } hideHost{window, source};
+        const auto theme = request.isLight ? WindowsMenu::ElementTheme::Light : WindowsMenu::ElementTheme::Dark;
+        WindowsMenu::Controls::Grid anchor;
+        anchor.RequestedTheme(theme);
+        WindowsMenu::Controls::MenuFlyout menu;
+        WindowsMenu::Style presenter(winrt::xaml_typename<WindowsMenu::Controls::MenuFlyoutPresenter>());
+        presenter.Setters().Append(WindowsMenu::Setter(
+            WindowsMenu::FrameworkElement::RequestedThemeProperty(), winrt::box_value(theme)));
+        menu.MenuFlyoutPresenterStyle(presenter);
+
+        const wchar_t* iconFont = L"Segoe MDL2 Assets";
+        IDWriteFontCollection* fonts = nullptr;
+        if (g_pDWriteFactory && SUCCEEDED(g_pDWriteFactory->GetSystemFontCollection(&fonts))) {
+            UINT32 index = 0;
+            BOOL exists = FALSE;
+            if (SUCCEEDED(fonts->FindFamilyName(L"Segoe Fluent Icons", &index, &exists)) && exists) {
+                iconFont = L"Segoe Fluent Icons";
+            }
+            fonts->Release();
+        }
+        UINT command = 0;
+        bool closed = false;
+        std::vector<WindowsMenu::Controls::MenuFlyoutItem::Click_revoker> clicks;
+        for (const auto& item : request.items) {
+            if (item.isSeparator) {
+                menu.Items().Append(WindowsMenu::Controls::MenuFlyoutSeparator());
+                continue;
+            }
+            WindowsMenu::Controls::MenuFlyoutItem leaf;
+            leaf.Text(item.label);
+            leaf.IsEnabled(!item.disabled);
+            if (item.shortcut) leaf.KeyboardAcceleratorTextOverride(item.shortcut);
+            if (const auto glyph = SystemMenuGlyph(item.icon); *glyph) {
+                WindowsMenu::Controls::FontIcon icon;
+                icon.FontFamily(WindowsMenu::Media::FontFamily(iconFont));
+                icon.Glyph(glyph);
+                leaf.Icon(icon);
+            }
+            clicks.push_back(leaf.Click(winrt::auto_revoke, [&, id = item.id](auto&&, auto&&) {
+                command = id;
+            }));
+            menu.Items().Append(leaf);
+        }
+        bool opened = false;
+        auto openedEvent = menu.Opened(winrt::auto_revoke, [&](auto&&, auto&&) { opened = true; });
+        auto closedEvent = menu.Closed(winrt::auto_revoke, [&](auto&&, auto&&) { closed = true; });
+        bool showFailed = false;
+        // ShowAt needs the XamlRoot of a loaded element in a XAML Island.
+        auto anchorLoaded = anchor.Loaded(winrt::auto_revoke, [&](auto&&, auto&&) {
+            try {
+                menu.XamlRoot(anchor.XamlRoot());
+                menu.ShowAt(anchor, winrt::Windows::Foundation::Point{0, 0});
+            } catch (const winrt::hresult_error& error) {
+                Wh_Log(L"Windows Fluent menu unavailable (0x%08X)",
+                       static_cast<unsigned>(error.code().value));
+                showFailed = true;
+            }
+        });
+        source.Content(anchor);
+        SetWindowPos(window, HWND_TOPMOST, request.anchorPoint.x, request.anchorPoint.y, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
+        ShowWindow(window, SW_SHOW);
+        SetForegroundWindow(window);
+        SetWindowPos(island, nullptr, 0, 0, kWindowsMenuAnchorSize, kWindowsMenuAnchorSize, SWP_NOZORDER | SWP_SHOWWINDOW);
+        anchor.UpdateLayout();
+        const auto openingDeadline = GetTickCount64() + 1500;
+        MSG msg{};
+        while (!closed && !showFailed && !request.cancelled && !g_unloading.load() &&
+               IsWindowVisible(request.owner) && !IsIconic(request.owner)) {
+            if (!opened && GetTickCount64() >= openingDeadline) break;
+            const BOOL result = GetMessageW(&msg, nullptr, 0, 0);
+            if (result <= 0) {
+                if (result == 0) PostQuitMessage(static_cast<int>(msg.wParam));
+                break;
+            }
+            if (msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE) {
+                closed = true;
+                break;
+            }
+            BOOL handled = FALSE;
+            if (SUCCEEDED(interop->PreTranslateMessage(&msg, &handled)) && handled) continue;
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+        menu.Hide();
+        if (opened || closed || request.cancelled || g_unloading.load() || !IsWindowVisible(request.owner)) {
+            return command;
+        }
+        Wh_Log(L"Windows Fluent menu did not open");
+        return std::nullopt;
+    }
+};
+
+DWORD WINAPI WindowsFluentMenuThreadProc(void* readyEvent) {
+    MSG msg{};
+    PeekMessageW(&msg, nullptr, 0, 0, PM_NOREMOVE);
+    SetEvent(static_cast<HANDLE>(readyEvent));
+    SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    if (FAILED(RoInitialize(RO_INIT_SINGLETHREADED))) return 0;
+    // Keep one XAML manager and island for the lifetime of their STA.
+    WindowsMenu::Hosting::WindowsXamlManager manager{nullptr};
+    try {
+        manager = WindowsMenu::Hosting::WindowsXamlManager::InitializeForCurrentThread();
+        WindowsFluentMenuHost host;
+        host.Initialize();
+        while (GetMessageW(&msg, nullptr, 0, 0) > 0) {
+            if (msg.hwnd == nullptr && msg.message == kShowWindowsFluentMenu) {
+                auto& request = *reinterpret_cast<WindowsFluentMenuRequest*>(msg.lParam);
+                try {
+                    request.result = host.Show(request);
+                } catch (const winrt::hresult_error& error) {
+                    Wh_Log(L"Windows Fluent menu unavailable (0x%08X)", static_cast<unsigned>(error.code().value));
+                }
+                SetEvent(request.done);
+                continue;
+            }
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    } catch (const winrt::hresult_error& error) {
+        Wh_Log(L"Windows Fluent menu host unavailable (0x%08X)", static_cast<unsigned>(error.code().value));
+    }
+    if (manager) {
+        try { manager.Close(); } catch (...) {}
+        manager = nullptr;
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    }
+    RoUninitialize();
+    return 0;
+}
+
+std::optional<UINT> RunWindowsFluentMenu(HWND owner, bool isLight,
+                                        const std::vector<FluentMenuItem>& items,
+                                        POINT anchorPoint) {
+    if (g_windowsFluentMenuActive.exchange(true)) return 0;
+    struct ActiveMenu {
+        ~ActiveMenu() { g_windowsFluentMenuActive = false; }
+    } activeMenu;
+    winrt::handle done(CreateEventW(nullptr, FALSE, FALSE, nullptr));
+    if (!done) return std::nullopt;
+    WindowsFluentMenuRequest request{owner, isLight, items, anchorPoint, done.get()};
+    winrt::handle thread;
+    {
+        std::lock_guard<std::mutex> lock(g_windowsFluentMenuThreadMutex);
+        if (g_unloading.load()) return 0;
+        if (!g_windowsFluentMenuThread) {
+            winrt::handle ready(CreateEventW(nullptr, FALSE, FALSE, nullptr));
+            if (!ready) return std::nullopt;
+            g_windowsFluentMenuThread = CreateThread(nullptr, 0, WindowsFluentMenuThreadProc,
+                                                     ready.get(), 0, &g_windowsFluentMenuThreadId);
+            if (!g_windowsFluentMenuThread) return std::nullopt;
+            HANDLE startEvents[] = {ready.get(), g_windowsFluentMenuThread};
+            if (WaitForMultipleObjects(ARRAYSIZE(startEvents), startEvents, FALSE, INFINITE) != WAIT_OBJECT_0) {
+                return std::nullopt;
+            }
+        }
+        HANDLE threadCopy = nullptr;
+        if (!DuplicateHandle(GetCurrentProcess(), g_windowsFluentMenuThread, GetCurrentProcess(),
+                             &threadCopy, SYNCHRONIZE, FALSE, 0)) return std::nullopt;
+        thread.attach(threadCopy);
+        if (!PostThreadMessageW(g_windowsFluentMenuThreadId, kShowWindowsFluentMenu, 0,
+                                reinterpret_cast<LPARAM>(&request))) return std::nullopt;
+    }
+    HANDLE waitEvents[] = {done.get(), thread.get()};
+    bool quit = false;
+    int exitCode = 0;
+    for (;;) {
+        const DWORD wait = MsgWaitForMultipleObjectsEx(ARRAYSIZE(waitEvents), waitEvents, INFINITE,
+                                                       QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+        if (wait == WAIT_OBJECT_0) break;
+        if (wait == WAIT_OBJECT_0 + 1) break;
+        if (wait != WAIT_OBJECT_0 + ARRAYSIZE(waitEvents)) {
+            request.cancelled = true;
+            WaitForMultipleObjects(ARRAYSIZE(waitEvents), waitEvents, FALSE, INFINITE);
+            break;
+        }
+        MSG msg{};
+        while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE)) {
+            if (msg.message == WM_QUIT) {
+                quit = true;
+                exitCode = static_cast<int>(msg.wParam);
+                request.cancelled = true;
+                continue;
+            }
+            if (msg.hwnd == owner) {
+                if (msg.message == WM_RBUTTONDOWN || msg.message == WM_RBUTTONUP) continue;
+                if (msg.message == WM_CLOSE ||
+                    (g_msgUninit && msg.message == g_msgUninit) ||
+                    (g_msgToggle && msg.message == g_msgToggle && msg.wParam != kActionReloadSettings)) {
+                    request.cancelled = true;
+                }
+            }
+            TranslateMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+    }
+    if (quit) PostQuitMessage(exitCode);
+    return request.cancelled ? std::optional<UINT>(0) : request.result;
+}
+
+void StopWindowsFluentMenuThread() {
+    std::lock_guard<std::mutex> lock(g_windowsFluentMenuThreadMutex);
+    if (!g_windowsFluentMenuThread) return;
+    PostThreadMessageW(g_windowsFluentMenuThreadId, WM_QUIT, 0, 0);
+    WaitForSingleObject(g_windowsFluentMenuThread, INFINITE);
+    CloseHandle(g_windowsFluentMenuThread);
+    g_windowsFluentMenuThread = nullptr;
+    g_windowsFluentMenuThreadId = 0;
+}
+
 UINT RunFluentPopupMenu(RunDialogState* state, std::vector<FluentMenuItem>&& menuItems, POINT ptAnchorRightBottom) {
     if (!state || !state->hDlg || !g_fluentMenuClassRegistered) return 0;
 
@@ -12334,6 +12754,39 @@ struct ActionButtonStrings {
     const wchar_t* hidePattern;
     const wchar_t* labels[kRunActionCount];
 };
+
+struct ContextMenuStyleStrings {
+    const wchar_t* title;
+    const wchar_t* description;
+    const wchar_t* modLabel;
+};
+
+constexpr wchar_t kWindowsFluentMenuLabel[] = L"Windows (Fluent)";
+
+ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) {
+    const auto lang = ResolveEffectiveLanguageCode(rawLang);
+    if (lang == L"vi") return { L"Kiểu menu ngữ cảnh", L"Đổi giao diện menu khi nhấp chuột phải", L"Kiểu của mod" };
+    if (lang == L"th") return { L"รูปแบบเมนูบริบท", L"เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา", L"รูปแบบของม็อด" };
+    if (lang == L"id") return { L"Gaya Menu Konteks", L"Mengubah tampilan menu saat klik kanan", L"Gaya Mod" };
+    if (lang == L"ms") return { L"Gaya Menu Konteks", L"Mengubah rupa menu apabila klik kanan", L"Gaya Mod" };
+    if (lang == L"ja") return { L"コンテキスト メニューのスタイル", L"右クリック メニューの外観を変更します", L"Mod のスタイル" };
+    if (lang == L"zh_cn") return { L"右键菜单样式", L"更改右键单击时显示的菜单外观", L"模组样式" };
+    if (lang == L"zh_tw") return { L"快顯選單樣式", L"變更按下滑鼠右鍵時顯示的選單外觀", L"模組樣式" };
+    if (lang == L"ko") return { L"상황에 맞는 메뉴 스타일", L"마우스 오른쪽 클릭 메뉴의 모양을 변경합니다", L"모드 스타일" };
+    if (lang == L"fr") return { L"Style du menu contextuel", L"Modifie l’apparence du menu du clic droit", L"Style du mod" };
+    if (lang == L"de") return { L"Kontextmenüstil", L"Ändert das Aussehen des Menüs beim Rechtsklick", L"Mod-Stil" };
+    if (lang == L"es") return { L"Estilo del menú contextual", L"Cambia el aspecto del menú al hacer clic con el botón derecho", L"Estilo del mod" };
+    if (lang == L"pt") return { L"Estilo do menu de contexto", L"Altera a aparência do menu do botão direito", L"Estilo do mod" };
+    if (lang == L"it") return { L"Stile del menu contestuale", L"Modifica l’aspetto del menu del tasto destro", L"Stile della mod" };
+    if (lang == L"ru") return { L"Стиль контекстного меню", L"Меняет оформление меню при клике правой кнопкой мыши", L"Стиль мода" };
+    if (lang == L"uk") return { L"Стиль контекстного меню", L"Змінює вигляд меню при натисканні правою кнопкою миші", L"Стиль мода" };
+    if (lang == L"pl") return { L"Styl menu kontekstowego", L"Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem", L"Styl moda" };
+    if (lang == L"nl") return { L"Stijl van het snelmenu", L"Wijzigt het uiterlijk van het menu bij rechtsklikken", L"Stijl van de mod" };
+    if (lang == L"tr") return { L"Bağlam menüsü stili", L"Sağ tıklama menüsünün görünümünü değiştirir", L"Mod stili" };
+    if (lang == L"hi") return { L"संदर्भ मेनू की शैली", L"राइट-क्लिक मेनू का रूप बदलता है", L"मॉड की शैली" };
+    if (lang == L"ar") return { L"نمط قائمة السياق", L"يغير مظهر القائمة عند النقر بزر الماوس الأيمن", L"نمط التعديل" };
+    return { L"Context Menu Style", L"Changes the appearance of the right-click menu", L"Mod Style" };
+}
 
 constexpr int kHideActionRowBase = 2420;
 constexpr UINT kHiddenActionMenuBase = 810;
@@ -13454,7 +13907,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1] = beginGroupCard(
                 ls.gThemeTitle,
                 ls.gThemeSub,
-                2, rH);
+                3, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2000, L"\uE790",
                 ls.themeTitle,
                 ls.themeSub,
@@ -13466,6 +13919,11 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.colorTitle,
                 ls.colorSub,
                 cmLbl);
+            const auto menuStrings = GetContextMenuStyleStrings(st->settings.language);
+            drawDropdownRowInGroup(g1, y1 + rH * 2, rH, 2110, L"\uE712",
+                menuStrings.title, menuStrings.description,
+                st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
+                    ? kWindowsFluentMenuLabel : menuStrings.modLabel);
 
             // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
             auto [g2, y2] = beginGroupCard(
@@ -14298,6 +14756,17 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         static const wchar_t* kC[] = { L"", L"auto", L"dark", L"light" };
                         Wh_SetStringValue(GetUserOverrideKey(L"colorMode").c_str(), kC[sel]);
                         changed = true;
+                    }
+                } else if (id == 2110) {
+                    const auto strings = GetContextMenuStyleStrings(st->settings.language);
+                    std::vector<std::pair<int, std::wstring>> opts = {
+                        { 1, strings.modLabel }, { 2, kWindowsFluentMenuLabel }
+                    };
+                    int current = st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent ? 2 : 1;
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    if (sel >= 1 && sel <= 2 && sel != current) {
+                        changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(),
+                                                    sel == 2 ? L"windows_fluent" : L"mod");
                     }
                 } else if (id == 2201) {
                     COLORREF initRgb = RGB(30, 30, 36);
@@ -15547,6 +16016,12 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             pFmtTime->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
                             pFmtTime->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
                             pFmtTime->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
+                            IDWriteInlineObject* ellipsis = nullptr;
+                            if (SUCCEEDED(g_pDWriteFactory->CreateEllipsisTrimmingSign(pFmtTime, &ellipsis))) {
+                                DWRITE_TRIMMING trim{DWRITE_TRIMMING_GRANULARITY_CHARACTER, 0, 0};
+                                pFmtTime->SetTrimming(&trim, ellipsis);
+                                ellipsis->Release();
+                            }
                         }
                         if (pFmtInput) {
                             pFmtInput->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
@@ -15606,15 +16081,17 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 if (!rowItem.isSuggestion && state->settings.showTimestamp && pFmtTime && pBrTime && !rowItem.timeStr.empty()) {
                                     rightLimit = (float)w - DpiScaleSF(44.0f, state) - sbReserve;
                                     const std::wstring& tStr = rowItem.timeStr;
+                                    const float maxTimeWidth = (std::min)(DpiScaleSF(220.0f, state), w * 0.48f);
                                     IDWriteTextLayout* pTimeLayout = nullptr;
                                     if (SUCCEEDED(g_pDWriteFactory->CreateTextLayout(
-                                            tStr.c_str(), (UINT32)tStr.size(), pFmtTime, DpiScaleSF(160.0f, state), rowH, &pTimeLayout))) {
+                                            tStr.c_str(), (UINT32)tStr.size(), pFmtTime, maxTimeWidth, rowH, &pTimeLayout))) {
                                         DWRITE_TEXT_METRICS tm = {};
                                         pTimeLayout->GetMetrics(&tm);
                                         float timeRight = (float)w - DpiScaleSF(44.0f, state) - sbReserve;
-                                        pRT->DrawTextLayout(D2D1::Point2F(timeRight - DpiScaleSF(160.0f, state), rowTop),
+                                        pRT->DrawTextLayout(D2D1::Point2F(timeRight - maxTimeWidth, rowTop),
                                                             pTimeLayout, pBrTime);
-                                        rightLimit = timeRight - tm.widthIncludingTrailingWhitespace - DpiScaleSF(12.0f, state);
+                                        rightLimit = timeRight - (std::min)(maxTimeWidth, tm.widthIncludingTrailingWhitespace) -
+                                                     DpiScaleSF(12.0f, state);
                                         pTimeLayout->Release();
                                     }
                                     if (rowItem.isPinned) {
@@ -16934,7 +17411,12 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             ClientToScreen(hWnd, &ptScreen);
             state->isBrowsingFile = true;
             g_isBrowsingFile.store(true);
-            UINT cmd = RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
+            std::optional<UINT> nativeCommand;
+            if (state->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent) {
+                nativeCommand = RunWindowsFluentMenu(hWnd, state->isLightMode, ctxItems, ptScreen);
+            }
+            UINT cmd = nativeCommand ? *nativeCommand
+                                     : RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
             g_isBrowsingFile.store(false);
             if (!IsWindow(hWnd) || g_hActiveRunDlg.load() != hWnd) return 0;
             state->isBrowsingFile = false;
@@ -17576,6 +18058,7 @@ void RunDialogModBeforeUninit() {
 
 void RunDialogModUninit() {
     WaitUntilDialogSubclassRemoved();
+    StopWindowsFluentMenuThread();
     ReleaseGlobalResources();
 }
 

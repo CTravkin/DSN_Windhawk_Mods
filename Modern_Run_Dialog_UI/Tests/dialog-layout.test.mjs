@@ -64,15 +64,56 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 `);
 });
 
-function compileChecks(checks) {
+test('the context menu retains its previous style by default', () => {
+    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - customBgColor:)/)?.[0];
+    assert.match(style, /\$name: Context Menu Style/);
+    assert.match(style, /- mod: Mod Style/);
+    assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
+    assert.match(style, /\$description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши/);
+});
+
+test('history follows the Windows short date and short time formats', () => {
+    const formatter = source.match(/std::wstring FormatHistoryTimestamp\([\s\S]*?\n\}/)?.[0];
+    assert.ok(formatter, 'The production formatter is present');
+    compileChecks(`
+        #include <windows.h>
+        #include <cwchar>
+        #include <string>
+        #include <cassert>
+        ${formatter}
+        int main() {
+            SYSTEMTIME past{2024, 11, 0, 25, 9, 5, 22, 0};
+            SYSTEMTIME utcTime{};
+            FILETIME utc{};
+            assert(TzSpecificLocalTimeToSystemTimeEx(nullptr, &past, &utcTime));
+            assert(SystemTimeToFileTime(&utcTime, &utc));
+            wchar_t pattern[128]{}, time[256]{}, date[256]{};
+            assert(GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_SSHORTTIME, pattern, 128));
+            assert(GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &past, pattern, time, 256));
+            assert(GetDateFormatEx(LOCALE_NAME_USER_DEFAULT, DATE_SHORTDATE, &past, nullptr, date, 256, nullptr));
+            assert(FormatHistoryTimestamp(utc, L"Today") == std::wstring(time) + L" " + date);
+            GetSystemTimeAsFileTime(&utc);
+            assert(FileTimeToSystemTime(&utc, &utcTime));
+            assert(SystemTimeToTzSpecificLocalTimeEx(nullptr, &utcTime, &past));
+            assert(GetTimeFormatEx(LOCALE_NAME_USER_DEFAULT, 0, &past, pattern, time, 256));
+            assert(FormatHistoryTimestamp(utc, L"Today") == std::wstring(L"Today, ") + time);
+        }
+    `, true);
+});
+
+function compileChecks(checks, run = false) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });
     const build = mkdtempSync(join(buildRoot, 'layout-test-'));
     const translationUnit = join(build, 'layout.cpp');
+    const executable = join(build, 'layout.exe');
     try {
         writeFileSync(translationUnit, checks);
-        execFileSync(compiler, ['-std=c++23', '-fsyntax-only', translationUnit], { stdio: 'pipe' });
+        const flags = run ? ['-D_WIN32_WINNT=0x0A00', '-static', '-o', executable] : ['-fsyntax-only'];
+        execFileSync(compiler, ['-std=c++23', ...flags, translationUnit], { stdio: 'pipe' });
+        if (run) execFileSync(executable, { stdio: 'pipe' });
     } finally {
+        rmSync(executable, { force: true });
         rmSync(join(build, 'layout.cpp'), { force: true });
         rmdirSync(build);
     }
