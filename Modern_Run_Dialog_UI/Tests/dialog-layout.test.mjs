@@ -8,31 +8,29 @@ const source = readFileSync(new URL('../Mod/modern-run-dialog-ui.wh.cpp', import
 const compiler = process.env.WINDHAWK_CLANG ||
     'C:/Program Files/Windhawk/Compiler/bin/clang++.exe';
 
-test('each button can be hidden while all layouts preserve their defaults', () => {
+test('all four buttons share the same opt-out behavior', () => {
     for (const name of ['hideBrowse', 'hideRun', 'hideClose', 'hideSettings']) {
         assert.match(source, new RegExp(`^  - ${name}: false$`, 'm'));
     }
 
-    const mode = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
     const actionDefs = source.match(/enum class RunAction[\s\S]*?\nusing ActionWidths[^\n]*;/)?.[0];
     const applyVisibility = source.match(/constexpr ActionWidths VisibleActionWidths\([\s\S]*?\n\}/)?.[0];
-    assert.ok(mode && actionDefs && applyVisibility, 'Action widths are resolved by production code');
+    assert.ok(actionDefs && applyVisibility, 'Action widths are resolved by production code');
+    assert.match(source, /int wBrowse = compactActions \? btnH/);
+    assert.match(source, /drawActionButton\(layout\.rcBrowse, compactActions \? nullptr/);
     compileChecks(`
         #include <array>
         #include <cstddef>
         using std::size_t;
-        ${mode}
         ${actionDefs}
         ${applyVisibility}
         constexpr ActionWidths widths{86, 80, 76, 32};
-        static_assert(VisibleActionWidths(DialogLayout::Classic, {}, widths) == widths);
-        static_assert(VisibleActionWidths(DialogLayout::Pill, {}, widths) == ActionWidths{0, 80, 76, 32});
-        static_assert(VisibleActionWidths(DialogLayout::Fluent, {}, widths) == widths);
-        static_assert(VisibleActionWidths(DialogLayout::Classic, {true,false,false,false}, widths) == ActionWidths{0,80,76,32});
-        static_assert(VisibleActionWidths(DialogLayout::Fluent, {false,true,false,false}, widths) == ActionWidths{86,0,76,32});
-        static_assert(VisibleActionWidths(DialogLayout::Pill, {false,false,true,false}, widths) == ActionWidths{0,80,0,32});
-        static_assert(VisibleActionWidths(DialogLayout::Classic, {false,false,false,true}, widths) == ActionWidths{86,80,76,0});
-        static_assert(VisibleActionWidths(DialogLayout::Fluent, {true,true,true,true}, widths) == ActionWidths{});
+        static_assert(VisibleActionWidths({}, widths) == widths);
+        static_assert(VisibleActionWidths({true, false, false, false}, widths) == ActionWidths{0, 80, 76, 32});
+        static_assert(VisibleActionWidths({false, true, false, false}, widths) == ActionWidths{86, 0, 76, 32});
+        static_assert(VisibleActionWidths({false, false, true, false}, widths) == ActionWidths{86, 80, 0, 32});
+        static_assert(VisibleActionWidths({false, false, false, true}, widths) == ActionWidths{86, 80, 76, 0});
+        static_assert(VisibleActionWidths({true, true, true, true}, widths) == ActionWidths{});
     `);
 });
 

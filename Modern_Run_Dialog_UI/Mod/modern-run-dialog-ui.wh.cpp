@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.2.1
+// @version         6.2.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs
 // ==/WindhawkMod==
-// Build: 11
+// Build: 12
 
 // ==WindhawkModReadme==
 /*
@@ -538,47 +538,47 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $name:tr-TR: Ayarlar düğmesini gizle
     $name:hi-IN: सेटिंग्स बटन छिपाएँ
     $name:ar: إخفاء زر الإعدادات
-  $name: Window Buttons
+  $name: Action Buttons
   $description: Hidden actions are available in the right-click menu
-  $name:vi-VN: Nút trên cửa sổ
+  $name:vi-VN: Nút thao tác
   $description:vi-VN: Các thao tác đã ẩn có trong menu chuột phải
-  $name:th-TH: ปุ่มหน้าต่าง
+  $name:th-TH: ปุ่มคำสั่ง
   $description:th-TH: คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา
-  $name:id-ID: Tombol Jendela
+  $name:id-ID: Tombol Tindakan
   $description:id-ID: Tindakan tersembunyi tersedia di menu klik kanan
-  $name:ms-MY: Butang Tetingkap
+  $name:ms-MY: Butang Tindakan
   $description:ms-MY: Tindakan tersembunyi tersedia dalam menu klik kanan
-  $name:ja-JP: ウィンドウのボタン
+  $name:ja-JP: 操作ボタン
   $description:ja-JP: 非表示にした操作は右クリックメニューに表示されます
-  $name:zh-CN: 窗口按钮
+  $name:zh-CN: 操作按钮
   $description:zh-CN: 隐藏按钮的操作可通过右键菜单使用
-  $name:zh-TW: 視窗按鈕
+  $name:zh-TW: 操作按鈕
   $description:zh-TW: 隱藏按鈕的動作仍可從右鍵選單使用
-  $name:ko-KR: 창 버튼
+  $name:ko-KR: 동작 버튼
   $description:ko-KR: 숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다
-  $name:fr-FR: Boutons de la fenêtre
+  $name:fr-FR: Boutons d’action
   $description:fr-FR: Les actions masquées restent accessibles via le menu contextuel
-  $name:de-DE: Fensterschaltflächen
+  $name:de-DE: Aktionsschaltflächen
   $description:de-DE: Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung
-  $name:es-ES: Botones de la ventana
+  $name:es-ES: Botones de acción
   $description:es-ES: Las acciones ocultas están disponibles en el menú contextual
-  $name:pt-BR: Botões da janela
+  $name:pt-BR: Botões de ação
   $description:pt-BR: As ações ocultas ficam disponíveis no menu de contexto
-  $name:it-IT: Pulsanti della finestra
+  $name:it-IT: Pulsanti di azione
   $description:it-IT: Le azioni nascoste restano disponibili nel menu di scelta rapida
-  $name:ru-RU: Кнопки окна
+  $name:ru-RU: Кнопки действий
   $description:ru-RU: Действия скрытых кнопок доступны в контекстном меню
-  $name:uk-UA: Кнопки вікна
+  $name:uk-UA: Кнопки дій
   $description:uk-UA: Дії прихованих кнопок доступні в контекстному меню
-  $name:pl-PL: Przyciski okna
+  $name:pl-PL: Przyciski akcji
   $description:pl-PL: Ukryte akcje są dostępne w menu kontekstowym
-  $name:nl-NL: Vensterknoppen
+  $name:nl-NL: Actieknoppen
   $description:nl-NL: Verborgen acties staan in het snelmenu
-  $name:tr-TR: Pencere düğmeleri
+  $name:tr-TR: Eylem düğmeleri
   $description:tr-TR: Gizlenen eylemler sağ tıklama menüsünde bulunur
-  $name:hi-IN: विंडो बटन
+  $name:hi-IN: कार्रवाई बटन
   $description:hi-IN: छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं
-  $name:ar: أزرار النافذة
+  $name:ar: أزرار الإجراءات
   $description:ar: تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن
 
 - historyBehaviorGroup:
@@ -873,10 +873,7 @@ constexpr size_t kRunActionCount = static_cast<size_t>(RunAction::Count);
 using HiddenActions = std::array<bool, kRunActionCount>;
 using ActionWidths = std::array<int, kRunActionCount>;
 
-constexpr ActionWidths VisibleActionWidths(DialogLayout layout,
-                                           const HiddenActions& hidden,
-                                           ActionWidths widths) {
-    if (layout == DialogLayout::Pill) widths[static_cast<size_t>(RunAction::Browse)] = 0;
+constexpr ActionWidths VisibleActionWidths(const HiddenActions& hidden, ActionWidths widths) {
     for (size_t i = 0; i < widths.size(); ++i) {
         if (hidden[i]) widths[i] = 0;
     }
@@ -9966,13 +9963,13 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     const wchar_t* runLabel = state ? state->i18n.runBtn : L"Run";
     bool isCompact = state && state->settings.dialogLayout == DialogLayout::Pill;
     bool isFluent = state && state->settings.dialogLayout == DialogLayout::Fluent;
+    bool compactActions = isCompact || isFluent;
 
     int wGear   = btnH;
-    int wBrowse = isFluent ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.browseBtn, 86));
+    int wBrowse = compactActions ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.browseBtn, 86));
     int wRun    = isCompact ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(runLabel, 80));
-    int wClose  = (isCompact || isFluent) ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.exitBtn, 76));
-    const auto widths = VisibleActionWidths(state->settings.dialogLayout,
-                                            state->settings.hiddenActions,
+    int wClose  = compactActions ? btnH : scaleBtnW(MeasureButtonWidthAt96Dpi(state->i18n.exitBtn, 76));
+    const auto widths = VisibleActionWidths(state->settings.hiddenActions,
                                             {wBrowse, wRun, wClose, wGear});
 
     int barTop = GetInputBarTopY(state);
@@ -12349,27 +12346,27 @@ constexpr std::array<const wchar_t*, kRunActionCount> kActionShortcuts{
 
 ActionButtonStrings GetActionButtonStrings(const std::wstring& rawLang) {
     const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Nút trên cửa sổ", L"Các thao tác đã ẩn có trong menu chuột phải", L"Ẩn nút %s", { L"Duyệt", L"Chạy", L"Đóng", L"Cài đặt" } };
-    if (lang == L"th") return { L"ปุ่มหน้าต่าง", L"คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา", L"ซ่อนปุ่ม %s", { L"เรียกดู", L"เรียกใช้", L"ปิด", L"การตั้งค่า" } };
-    if (lang == L"id") return { L"Tombol Jendela", L"Tindakan tersembunyi tersedia di menu klik kanan", L"Sembunyikan tombol %s", { L"Telusuri", L"Jalankan", L"Tutup", L"Pengaturan" } };
-    if (lang == L"ms") return { L"Butang Tetingkap", L"Tindakan tersembunyi tersedia dalam menu klik kanan", L"Sembunyikan butang %s", { L"Semak imbas", L"Jalankan", L"Tutup", L"Tetapan" } };
-    if (lang == L"ja") return { L"ウィンドウのボタン", L"非表示にした操作は右クリックメニューに表示されます", L"「%s」ボタンを非表示にする", { L"参照", L"実行", L"閉じる", L"設定" } };
-    if (lang == L"zh_cn") return { L"窗口按钮", L"隐藏按钮的操作可通过右键菜单使用", L"隐藏“%s”按钮", { L"浏览", L"运行", L"关闭", L"设置" } };
-    if (lang == L"zh_tw") return { L"視窗按鈕", L"隱藏按鈕的動作仍可從右鍵選單使用", L"隱藏「%s」按鈕", { L"瀏覽", L"執行", L"關閉", L"設定" } };
-    if (lang == L"ko") return { L"창 버튼", L"숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다", L"%s 버튼 숨기기", { L"찾아보기", L"실행", L"닫기", L"설정" } };
-    if (lang == L"fr") return { L"Boutons de la fenêtre", L"Les actions masquées restent accessibles via le menu contextuel", L"Masquer le bouton %s", { L"Parcourir", L"Exécuter", L"Fermer", L"Paramètres" } };
-    if (lang == L"de") return { L"Fensterschaltflächen", L"Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung", L"Schaltfläche „%s“ ausblenden", { L"Durchsuchen", L"Ausführen", L"Schließen", L"Einstellungen" } };
-    if (lang == L"es") return { L"Botones de la ventana", L"Las acciones ocultas están disponibles en el menú contextual", L"Ocultar el botón %s", { L"Examinar", L"Ejecutar", L"Cerrar", L"Configuración" } };
-    if (lang == L"pt") return { L"Botões da janela", L"As ações ocultas ficam disponíveis no menu de contexto", L"Ocultar o botão %s", { L"Procurar", L"Executar", L"Fechar", L"Configurações" } };
-    if (lang == L"it") return { L"Pulsanti della finestra", L"Le azioni nascoste restano disponibili nel menu di scelta rapida", L"Nascondi il pulsante %s", { L"Sfoglia", L"Esegui", L"Chiudi", L"Impostazioni" } };
-    if (lang == L"ru") return { L"Кнопки окна", L"Действия скрытых кнопок доступны в контекстном меню", L"Скрыть кнопку «%s»", { L"Обзор", L"Выполнить", L"Закрыть", L"Настройки" } };
-    if (lang == L"uk") return { L"Кнопки вікна", L"Дії прихованих кнопок доступні в контекстному меню", L"Приховати кнопку «%s»", { L"Огляд", L"Виконати", L"Закрити", L"Налаштування" } };
-    if (lang == L"pl") return { L"Przyciski okna", L"Ukryte akcje są dostępne w menu kontekstowym", L"Ukryj przycisk „%s”", { L"Przeglądaj", L"Uruchom", L"Zamknij", L"Ustawienia" } };
-    if (lang == L"nl") return { L"Vensterknoppen", L"Verborgen acties staan in het snelmenu", L"Knop %s verbergen", { L"Bladeren", L"Uitvoeren", L"Sluiten", L"Instellingen" } };
-    if (lang == L"tr") return { L"Pencere düğmeleri", L"Gizlenen eylemler sağ tıklama menüsünde bulunur", L"%s düğmesini gizle", { L"Gözat", L"Çalıştır", L"Kapat", L"Ayarlar" } };
-    if (lang == L"hi") return { L"विंडो बटन", L"छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं", L"%s बटन छिपाएँ", { L"ब्राउज़ करें", L"चलाएँ", L"बंद करें", L"सेटिंग्स" } };
-    if (lang == L"ar") return { L"أزرار النافذة", L"تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن", L"إخفاء زر %s", { L"استعراض", L"تشغيل", L"إغلاق", L"الإعدادات" } };
-    return { L"Window Buttons", L"Hidden actions are available in the right-click menu", L"Hide the %s button", { L"Browse", L"Run", L"Close", L"Settings" } };
+    if (lang == L"vi") return { L"Nút thao tác", L"Các thao tác đã ẩn có trong menu chuột phải", L"Ẩn nút %s", { L"Duyệt", L"Chạy", L"Đóng", L"Cài đặt" } };
+    if (lang == L"th") return { L"ปุ่มคำสั่ง", L"คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา", L"ซ่อนปุ่ม %s", { L"เรียกดู", L"เรียกใช้", L"ปิด", L"การตั้งค่า" } };
+    if (lang == L"id") return { L"Tombol Tindakan", L"Tindakan tersembunyi tersedia di menu klik kanan", L"Sembunyikan tombol %s", { L"Telusuri", L"Jalankan", L"Tutup", L"Pengaturan" } };
+    if (lang == L"ms") return { L"Butang Tindakan", L"Tindakan tersembunyi tersedia dalam menu klik kanan", L"Sembunyikan butang %s", { L"Semak imbas", L"Jalankan", L"Tutup", L"Tetapan" } };
+    if (lang == L"ja") return { L"操作ボタン", L"非表示にした操作は右クリックメニューに表示されます", L"「%s」ボタンを非表示にする", { L"参照", L"実行", L"閉じる", L"設定" } };
+    if (lang == L"zh_cn") return { L"操作按钮", L"隐藏按钮的操作可通过右键菜单使用", L"隐藏“%s”按钮", { L"浏览", L"运行", L"关闭", L"设置" } };
+    if (lang == L"zh_tw") return { L"操作按鈕", L"隱藏按鈕的動作仍可從右鍵選單使用", L"隱藏「%s」按鈕", { L"瀏覽", L"執行", L"關閉", L"設定" } };
+    if (lang == L"ko") return { L"동작 버튼", L"숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다", L"%s 버튼 숨기기", { L"찾아보기", L"실행", L"닫기", L"설정" } };
+    if (lang == L"fr") return { L"Boutons d’action", L"Les actions masquées restent accessibles via le menu contextuel", L"Masquer le bouton %s", { L"Parcourir", L"Exécuter", L"Fermer", L"Paramètres" } };
+    if (lang == L"de") return { L"Aktionsschaltflächen", L"Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung", L"Schaltfläche „%s“ ausblenden", { L"Durchsuchen", L"Ausführen", L"Schließen", L"Einstellungen" } };
+    if (lang == L"es") return { L"Botones de acción", L"Las acciones ocultas están disponibles en el menú contextual", L"Ocultar el botón %s", { L"Examinar", L"Ejecutar", L"Cerrar", L"Configuración" } };
+    if (lang == L"pt") return { L"Botões de ação", L"As ações ocultas ficam disponíveis no menu de contexto", L"Ocultar o botão %s", { L"Procurar", L"Executar", L"Fechar", L"Configurações" } };
+    if (lang == L"it") return { L"Pulsanti di azione", L"Le azioni nascoste restano disponibili nel menu di scelta rapida", L"Nascondi il pulsante %s", { L"Sfoglia", L"Esegui", L"Chiudi", L"Impostazioni" } };
+    if (lang == L"ru") return { L"Кнопки действий", L"Действия скрытых кнопок доступны в контекстном меню", L"Скрыть кнопку «%s»", { L"Обзор", L"Выполнить", L"Закрыть", L"Настройки" } };
+    if (lang == L"uk") return { L"Кнопки дій", L"Дії прихованих кнопок доступні в контекстному меню", L"Приховати кнопку «%s»", { L"Огляд", L"Виконати", L"Закрити", L"Налаштування" } };
+    if (lang == L"pl") return { L"Przyciski akcji", L"Ukryte akcje są dostępne w menu kontekstowym", L"Ukryj przycisk „%s”", { L"Przeglądaj", L"Uruchom", L"Zamknij", L"Ustawienia" } };
+    if (lang == L"nl") return { L"Actieknoppen", L"Verborgen acties staan in het snelmenu", L"Knop %s verbergen", { L"Bladeren", L"Uitvoeren", L"Sluiten", L"Instellingen" } };
+    if (lang == L"tr") return { L"Eylem düğmeleri", L"Gizlenen eylemler sağ tıklama menüsünde bulunur", L"%s düğmesini gizle", { L"Gözat", L"Çalıştır", L"Kapat", L"Ayarlar" } };
+    if (lang == L"hi") return { L"कार्रवाई बटन", L"छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं", L"%s बटन छिपाएँ", { L"ब्राउज़ करें", L"चलाएँ", L"बंद करें", L"सेटिंग्स" } };
+    if (lang == L"ar") return { L"أزرار الإجراءات", L"تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن", L"إخفاء زر %s", { L"استعراض", L"تشغيل", L"إغلاق", L"الإعدادات" } };
+    return { L"Action Buttons", L"Hidden actions are available in the right-click menu", L"Hide the %s button", { L"Browse", L"Run", L"Close", L"Settings" } };
 }
 
 static LayoutLocalizedStrings GetLayoutLocalizedStrings(const std::wstring& rawLang) {
@@ -15925,12 +15922,11 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         };
 
                         bool isCompact = state->settings.dialogLayout == DialogLayout::Pill;
-                        if (!isCompact) {
-                            drawActionButton(layout.rcBrowse, isFluent ? nullptr : state->i18n.browseBtn, ActionBtnKind::Browse,
-                                             state->browseHovered, state->browsePressed);
-                        }
+                        bool compactActions = isCompact || isFluent;
+                        drawActionButton(layout.rcBrowse, compactActions ? nullptr : state->i18n.browseBtn,
+                                         ActionBtnKind::Browse, state->browseHovered, state->browsePressed);
                         const wchar_t* runBtnLabel   = isCompact ? nullptr : state->i18n.runBtn;
-                        const wchar_t* closeBtnLabel = (isCompact || isFluent) ? nullptr : state->i18n.exitBtn;
+                        const wchar_t* closeBtnLabel = compactActions ? nullptr : state->i18n.exitBtn;
                         drawActionButton(layout.rcRun,   runBtnLabel,   ActionBtnKind::Run,  state->btnHovered,   state->btnPressed);
                         drawActionButton(layout.rcClose, closeBtnLabel, ActionBtnKind::Exit, state->closeHovered, state->closePressed);
                         drawActionButton(layout.rcGear,  nullptr,       ActionBtnKind::Gear, state->gearHovered,  state->gearPressed);
