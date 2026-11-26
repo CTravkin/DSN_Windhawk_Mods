@@ -67,7 +67,8 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 test('the context menu retains its previous style by default', () => {
     const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
     assert.match(style, /\$name: "?Context Menu Style"?/);
-    assert.match(style, /- mod: Mod Style/);
+    assert.match(style, /- mod: Standard/);
+    assert.match(style, /- mod: Обычный/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
     assert.match(style, /\$description:ru-RU: "?Оформление меню по правой кнопке мыши"?/);
 });
@@ -76,7 +77,7 @@ test('both menu styles use the separately selected icon set', () => {
     const schema = source.match(/  - colorMode:[\s\S]*?\n  - iconSet: mod([\s\S]*?)\n  - customBgColor:/)?.[1];
     assert.ok(schema, 'The icon list follows Color Mode in Personalization');
     assert.match(schema, /\$name:ru-RU: "?Иконки"?/);
-    assert.match(schema, /- mod: Иконки мода/);
+    assert.match(schema, /- mod: По умолчанию/);
     assert.equal((schema.match(/\$options(?::[\w-]+)?:/g) ?? []).length, 21);
     assert.match(source, /DrawRunUiIcon\(pRT, pItemIconBr, pRoundStroke, s->dlgState->settings\.iconSet/);
     assert.match(source, /MakeWindowsMenuIcon\(request\.iconSet, item\.icon\)/);
@@ -107,14 +108,15 @@ test('the 20 DIP Run emblem uses the same asset in both icon modes and on the ta
 test('approved settings glyphs keep the selected shapes and orientation', () => {
     assert.match(source, /2111, L"\\uEDE3"/);
     assert.match(source, /2506, L"\\uE90E"/);
-    assert.match(source, /2213, 2214, 2215, L"\\uE744",\s*cornerStrings\.innerTitle, cornerStrings\.innerHint, innerRadius, true/);
+    assert.match(source, /2210, 2211, 2212, L"\\uE744",\s*cornerStrings\.outerTitle,\s*ls\.radiusSub,\s*crStr, true/);
+    assert.match(source, /2213, 2214, 2215, L"\\uE744",\s*cornerStrings\.innerTitle, cornerStrings\.innerHint, innerRadius\);/);
     assert.match(source, /Matrix3x2F::Rotation\(180\.0f, center\) \* transform/);
     assert.match(source, /kColorModeSettingsGlyph\[\] = L"\\u25D0"/);
     assert.match(source, /2100, kColorModeSettingsGlyph,/);
     assert.match(source, /CreateTextFormat\(L"Segoe UI Symbol",[^;]+colorModeFormat\.put\(\)/);
     assert.match(source, /\*glyph == kColorModeSettingsGlyph\[0\] \? colorModeFormat\.get\(\) : pFmtGlyph/);
-    assert.match(source, /drawAliasButton\(rcAdm, 2800 \+ i, L"\\uEA18"/);
-    assert.match(source, /drawAliasButton\(rcDel, 2900 \+ i, L"\\uE894"/);
+    assert.match(source, /drawAliasButton\(rcAdm, 2800 \+ i, i, L"\\uEA18", aliases\.administrator/);
+    assert.match(source, /drawAliasButton\(rcDel, 2900 \+ i, i, L"\\uE894", aliases\.remove/);
 });
 
 test('each Windhawk setting declares its localized metadata once', () => {
