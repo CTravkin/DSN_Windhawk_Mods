@@ -317,10 +317,66 @@ test('centered rows split spare space and keep dropdown input within its rows', 
     `);
 });
 
-test('DirectWrite keeps the rendered history text centered on the row', () => {
+test('Auto contrast follows solid theme backgrounds in both Windows color modes', () => {
+    const palette = source.match(/struct ResolvedThemeVisuals \{[\s\S]*?\n\}/)?.[0];
+    const visuals = source.match(/ResolvedThemeVisuals ResolveEffectiveThemeVisuals\([\s\S]*?\n\}/)?.[0];
+    const contrast = source.match(/bool ResolveDialogLightContrast\([^;\n]*\) \{[\s\S]*?\n\}/)?.[0];
+    assert.ok(palette && visuals && contrast);
+    compileChecks(`
+        #include <windows.h>
+        #include <d2d1.h>
+        #include <algorithm>
+        #include <cassert>
+        #include <string>
+        enum class SurfaceTheme { Glass, Blur, Solid };
+        enum class ColorMode { Auto, Dark, Light };
+        struct ModSettings {
+            std::wstring themePreset, customBgColor, customBorderColor;
+            int customCornerRadius = -1;
+            ColorMode colorMode = ColorMode::Auto;
+        };
+        struct RunDialogState {
+            ModSettings settings;
+            bool customBgLumValid = false, customBgIsLight = false, backdropLightSample = false;
+            SurfaceTheme effectiveSurface = SurfaceTheme::Solid;
+        };
+        bool systemLight;
+        bool IsSystemAppLightTheme() { return systemLight; }
+        bool IsHighContrastActive() { return false; }
+        bool HasActiveCustomBackground(const RunDialogState*) { return false; }
+        bool TryParseHexColor(const std::wstring& color, COLORREF* result) {
+            *result = RGB(0, 0, 0);
+            return color == L"000000";
+        }
+        ${palette};
+        ${visuals}
+        ${contrast}
+        int main() {
+            RunDialogState dialog{};
+            for (bool light : {false, true}) {
+                systemLight = light;
+                dialog.settings.themePreset = L"warm_paper";
+                assert(ResolveDialogLightContrast(&dialog));
+                dialog.settings.themePreset = L"rose_pine";
+                assert(!ResolveDialogLightContrast(&dialog));
+                dialog.settings.themePreset = L"fluent_solid";
+                assert(ResolveDialogLightContrast(&dialog) == light);
+            }
+            dialog.settings.themePreset = L"warm_paper";
+            dialog.settings.customBgColor = L"000000";
+            assert(!ResolveDialogLightContrast(&dialog));
+            dialog.settings.colorMode = ColorMode::Light;
+            assert(ResolveDialogLightContrast(&dialog));
+        }
+    `, true, ['-luser32']);
+});
+
+test('DirectWrite centers history text and shares a baseline for menu labels and shortcuts', () => {
     const center = source.match(/float GetCenteredInkTop\([\s\S]*?\n\}/)?.[0];
     const draw = source.match(/void DrawCenteredTextLayout\([\s\S]*?\n\}/)?.[0];
-    assert.ok(center && draw, 'The history and other surfaces use the same text renderer');
+    const single = source.match(/void DrawCenteredText\([\s\S]*?\n\}/)?.[0];
+    const menu = source.match(/void DrawMenuItemText\([\s\S]*?\n\}/)?.[0];
+    assert.ok(center && draw && single && menu, 'Use the production text renderers');
     compileChecks(String.raw`
         #include <windows.h>
         #include <d2d1.h>
@@ -330,15 +386,21 @@ test('DirectWrite keeps the rendered history text centered on the row', () => {
         #include <cstdint>
         #include <cwchar>
         #include <optional>
+        #include <string>
+        #include <winrt/base.h>
 
+        IDWriteFactory* g_pDWriteFactory = nullptr;
         ${center}
         ${draw}
+        ${single}
+        ${menu}
 
         int main() {
             constexpr int width = 420, height = 80;
             IDWriteFactory* textFactory = nullptr;
             assert(SUCCEEDED(DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED, __uuidof(IDWriteFactory),
                 reinterpret_cast<IUnknown**>(&textFactory))));
+            g_pDWriteFactory = textFactory;
             ID2D1Factory* graphicsFactory = nullptr;
             assert(SUCCEEDED(D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &graphicsFactory)));
             const auto dc = CreateCompatibleDC(nullptr);
@@ -399,6 +461,44 @@ test('DirectWrite keeps the rendered history text centered on the row', () => {
                     layout->Release();
                     format->Release();
                 }
+            }
+
+            const wchar_t* labels[] = {L"\u041e\u0431\u0437\u043e\u0440",
+                L"\u0412\u044b\u043f\u043e\u043b\u043d\u0438\u0442\u044c",
+                L"\u0417\u0430\u043a\u0440\u044b\u0442\u044c",
+                L"\u041d\u0430\u0441\u0442\u0440\u043e\u0439\u043a\u0438"};
+            const wchar_t* shortcuts[] = {L"Ctrl+O", L"Enter", L"Esc", L"Ctrl+,"};
+            for (float scale : scales) {
+                IDWriteTextFormat* format = nullptr;
+                assert(SUCCEEDED(textFactory->CreateTextFormat(L"Segoe UI Variable Text", nullptr,
+                    DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
+                    13.0f * scale, L"", &format)));
+                format->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
+                format->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
+                const auto labelBounds = D2D1::RectF(8, 9 * scale, 220, 43 * scale);
+                const auto shortcutBounds = D2D1::RectF(250, 9 * scale, width - 8, 43 * scale);
+                for (int i = 0; i < 4; ++i) {
+                    target->BeginDraw();
+                    target->Clear(D2D1::ColorF(D2D1::ColorF::Black));
+                    DrawMenuItemText(target, labels[i], shortcuts[i], format,
+                        labelBounds, shortcutBounds, brush, brush);
+                    assert(SUCCEEDED(target->EndDraw()));
+                    GdiFlush();
+                    const auto image = static_cast<const uint32_t*>(pixels);
+                    for (const auto& bounds : {labelBounds, shortcutBounds}) {
+                        int top = height, bottom = -1;
+                        for (int y = 0; y < height; ++y) {
+                            for (int x = static_cast<int>(bounds.left); x < bounds.right; ++x) {
+                                if ((image[y * width + x] & 255) <= 16) continue;
+                                if (y < top) top = y;
+                                if (y > bottom) bottom = y;
+                            }
+                        }
+                        assert(top <= bottom &&
+                            std::abs((top + bottom + 1) * 0.5f - 26.0f * scale) <= 1.5f);
+                    }
+                }
+                format->Release();
             }
 
             brush->Release();

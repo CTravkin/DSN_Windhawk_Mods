@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.6.5
+// @version         6.6.6
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 28
+// Build: 29
 
 // ==WindhawkModReadme==
 /*
@@ -7414,6 +7414,29 @@ void DrawCenteredText(ID2D1RenderTarget* target, const wchar_t* text, UINT32 len
     }
 }
 
+void DrawMenuItemText(ID2D1RenderTarget* target, const std::wstring& label, const wchar_t* shortcut,
+                      IDWriteTextFormat* format, const D2D1_RECT_F& labelBounds,
+                      const D2D1_RECT_F& shortcutBounds, ID2D1Brush* labelBrush, ID2D1Brush* shortcutBrush) {
+    if (!format || !labelBrush || label.empty() || labelBounds.right <= labelBounds.left) return;
+    const auto labelLength = static_cast<UINT32>(label.size());
+    const float height = labelBounds.bottom - labelBounds.top;
+    winrt::com_ptr<IDWriteTextLayout> labelLayout, shortcutLayout;
+    if (shortcut && shortcutBrush && shortcutBounds.right > shortcutBounds.left &&
+        SUCCEEDED(g_pDWriteFactory->CreateTextLayout(label.c_str(), labelLength, format,
+            labelBounds.right - labelBounds.left, height, labelLayout.put())) &&
+        SUCCEEDED(g_pDWriteFactory->CreateTextLayout(shortcut, static_cast<UINT32>(wcslen(shortcut)), format,
+            shortcutBounds.right - shortcutBounds.left, height, shortcutLayout.put()))) {
+        shortcutLayout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+        // Keep the two baselines aligned while centering the combined text on the icon.
+        const float offset = (GetCenteredInkTop(labelLayout.get(), height * 0.5f) +
+                              GetCenteredInkTop(shortcutLayout.get(), height * 0.5f)) * 0.5f;
+        DrawCenteredTextLayout(target, labelLayout.get(), labelBounds, labelBrush, offset);
+        DrawCenteredTextLayout(target, shortcutLayout.get(), shortcutBounds, shortcutBrush, offset);
+        return;
+    }
+    DrawCenteredText(target, label.c_str(), labelLength, format, labelBounds, labelBrush);
+}
+
 struct TextLineMetrics {
     float offset;
     float height;
@@ -9645,20 +9668,13 @@ bool ResolveDialogLightContrast(const RunDialogState* state) {
     }
     if (state->settings.colorMode == ColorMode::Light) return true;
     if (state->settings.colorMode == ColorMode::Dark) return false;
-    if (state) {
-        COLORREF customRgb = 0;
-        if (!state->settings.customBgColor.empty() && TryParseHexColor(state->settings.customBgColor, &customRgb)) {
-            double lum = (0.299 * GetRValue(customRgb) + 0.587 * GetGValue(customRgb) + 0.114 * GetBValue(customRgb)) / 255.0;
-            return lum > 0.54;
-        }
-        if (state->settings.themePreset == L"midnight_oled" || state->settings.themePreset == L"nord_frost") {
-            return false;
-        }
+    const bool systemLight = IsSystemAppLightTheme();
+    const auto visuals = ResolveEffectiveThemeVisuals(state->settings, systemLight);
+    if (visuals.hasCustomBg) {
+        const auto& bg = visuals.bgColor;
+        return 0.299f * bg.r + 0.587f * bg.g + 0.114f * bg.b > 0.54f;
     }
-    if (state->effectiveSurface == SurfaceTheme::Glass) {
-        return state ? state->backdropLightSample : false;
-    }
-    return IsSystemAppLightTheme();
+    return state->effectiveSurface == SurfaceTheme::Glass ? state->backdropLightSample : systemLight;
 }
 
 void ApplyWindowAppearance(HWND hDlg, RunDialogState* state) {
@@ -12113,7 +12129,6 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     pFmtItem->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
                     pFmtItem->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
                 }
-                const float menuTextOffset = MeasureTextLine(pFmtItem).offset;
 
                 int padY = GetMenuPadY(s);
                 int rowH = GetMenuRowHeight(s);
@@ -12195,15 +12210,6 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                     ID2D1Brush* pCheckedBr  = (item.id == 450 && pBrAmber) ? pBrAmber : pBrAccent;
                     ID2D1Brush* pItemIconBr = item.disabled ? pBrMuted : (item.checked && pCheckedBr ? pCheckedBr : pBrIcon);
 
-                    if (item.shortcut && pFmtItem && pBrSub) {
-                        const float hintRight = right - textInset;
-                        const auto hintRect = D2D1::RectF(hintRight - shortcutWidth, curY,
-                                                        hintRight, curY + rowH);
-                        pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
-                        DrawCenteredText(pRT, item.shortcut, static_cast<UINT32>(wcslen(item.shortcut)),
-                                      pFmtItem, hintRect, pBrSub, menuTextOffset);
-                        pFmtItem->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
-                    }
                     if (item.icon != FluentMenuIcon::None && pItemIconBr && pRoundStroke) {
                         DrawD2DFluentMenuIcon(pRT, pItemIconBr, pRoundStroke, item.icon, iconCx, iconCy, dpi);
                     }
@@ -12219,7 +12225,7 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                 rcMinus.left - DpiScaleF(6.0f, dpi),
                                 curY + rowH);
                             DrawCenteredText(pRT, item.label.c_str(), (UINT32)item.label.size(),
-                                          pFmtItem, rcText, pItemTextBr, menuTextOffset);
+                                          pFmtItem, rcText, pItemTextBr);
                         }
 
                         bool isEditingThis = (s->editingInlineKind == item.inlineEditKind);
@@ -12304,8 +12310,11 @@ void PaintFluentMenuPanel(HWND hWnd, FluentMenuPanelState* p) {
                                 curY,
                                 right - rightReserve,
                                 curY + rowH);
-                            DrawCenteredText(pRT, item.label.c_str(), (UINT32)item.label.size(),
-                                          pFmtItem, rcText, pItemTextBr, menuTextOffset);
+                            const float hintRight = right - textInset;
+                            const auto hintRect = D2D1::RectF(hintRight - shortcutWidth, curY,
+                                                             hintRight, curY + rowH);
+                            DrawMenuItemText(pRT, item.label, item.shortcut, pFmtItem,
+                                             rcText, hintRect, pItemTextBr, pBrSub);
                         }
 
                         if (!item.subItems.empty() && pBrSub && pRoundStroke) {
