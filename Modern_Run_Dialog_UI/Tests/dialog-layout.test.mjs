@@ -35,7 +35,7 @@ test('all four buttons share the same opt-out behavior', () => {
 });
 
 test('layout settings preserve the prior Classic/Pill values and accept Fluent', () => {
-    const schema = source.match(/- layoutGroup:\s*\n([\s\S]*?)\n  - rememberPosition:/)?.[1];
+    const schema = source.match(/- minimalMode: "0"[\s\S]*?(?=\n  - contextMenuStyle:)/)?.[0];
     assert.match(schema, /- minimalMode: "0"/);
     for (const [value, label] of [['0', 'Classic'], ['1', 'Compact Mini-Pill'], ['2', 'Fluent']]) {
         assert.match(schema, new RegExp(`^    - "${value}": ${label}$`, 'm'));
@@ -65,11 +65,20 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 });
 
 test('the context menu retains its previous style by default', () => {
-    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - customBgColor:)/)?.[0];
+    const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
     assert.match(style, /\$name: Context Menu Style/);
     assert.match(style, /- mod: Mod Style/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
     assert.match(style, /\$description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши/);
+});
+
+test('layout settings keep position and menu style directly below their related controls', () => {
+    const layout = source.match(/^- layoutGroup:[\s\S]*?(?=^- actionButtonsGroup:)/m)?.[0];
+    assert.ok(layout, 'The layout settings group is present');
+    const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
+    assert.deepEqual(keys.slice(0, 5), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'uiScalePercent']);
+    assert.match(layout, /\$name:ru-RU: Макет окна/);
+    assert.match(layout, /\$description:ru-RU: Базовая компоновка окна, использующая параметры персонализации/);
 });
 
 test('history follows the Windows short date and short time formats', () => {
@@ -127,6 +136,20 @@ test('inner corners support auto, square and a radius bounded by the row', () =>
             assert(ParseInnerCornerRadius(L"12abc") == -1);
         }
     `, true);
+});
+
+test('vertical panel insets center controls with at most a one-pixel difference', () => {
+    const inset = source.match(/constexpr int GetVerticalPanelInset\([\s\S]*?\n\}/)?.[0];
+    assert.ok(inset, 'History and the input bar use the shared padding calculation');
+    compileChecks(`
+        ${inset}
+        static_assert(GetVerticalPanelInset(54, 32, false) == 11);
+        static_assert(GetVerticalPanelInset(54, 32, true) == 11);
+        static_assert(GetVerticalPanelInset(59, 36, false) == 11);
+        static_assert(GetVerticalPanelInset(59, 36, true) == 12);
+        static_assert(GetVerticalPanelInset(96, 46, false) == 25);
+        static_assert(GetVerticalPanelInset(96, 46, true) == 25);
+    `);
 });
 
 function compileChecks(checks, run = false) {

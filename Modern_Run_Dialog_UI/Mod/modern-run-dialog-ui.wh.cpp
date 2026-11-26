@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.4.0
+// @version         6.4.2
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 17
+// Build: 19
 
 // ==WindhawkModReadme==
 /*
@@ -179,112 +179,6 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - auto: Auto – Follow Windows
     - dark: Dark Mode
     - light: Light Mode
-  - contextMenuStyle: mod
-    $name: Context Menu Style
-    $description: Changes the appearance of the right-click menu
-    $options:
-    - mod: Mod Style
-    - windows_fluent: Windows (Fluent)
-    $name:vi-VN: Kiểu menu ngữ cảnh
-    $description:vi-VN: Đổi giao diện menu khi nhấp chuột phải
-    $options:vi-VN:
-    - mod: Kiểu của mod
-    - windows_fluent: Windows (Fluent)
-    $name:th-TH: รูปแบบเมนูบริบท
-    $description:th-TH: เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา
-    $options:th-TH:
-    - mod: รูปแบบของม็อด
-    - windows_fluent: Windows (Fluent)
-    $name:id-ID: Gaya Menu Konteks
-    $description:id-ID: Mengubah tampilan menu saat klik kanan
-    $options:id-ID:
-    - mod: Gaya Mod
-    - windows_fluent: Windows (Fluent)
-    $name:ms-MY: Gaya Menu Konteks
-    $description:ms-MY: Mengubah rupa menu apabila klik kanan
-    $options:ms-MY:
-    - mod: Gaya Mod
-    - windows_fluent: Windows (Fluent)
-    $name:ja-JP: コンテキスト メニューのスタイル
-    $description:ja-JP: 右クリック メニューの外観を変更します
-    $options:ja-JP:
-    - mod: Mod のスタイル
-    - windows_fluent: Windows (Fluent)
-    $name:zh-CN: 右键菜单样式
-    $description:zh-CN: 更改右键单击时显示的菜单外观
-    $options:zh-CN:
-    - mod: 模组样式
-    - windows_fluent: Windows (Fluent)
-    $name:zh-TW: 快顯選單樣式
-    $description:zh-TW: 變更按下滑鼠右鍵時顯示的選單外觀
-    $options:zh-TW:
-    - mod: 模組樣式
-    - windows_fluent: Windows (Fluent)
-    $name:ko-KR: 상황에 맞는 메뉴 스타일
-    $description:ko-KR: 마우스 오른쪽 클릭 메뉴의 모양을 변경합니다
-    $options:ko-KR:
-    - mod: 모드 스타일
-    - windows_fluent: Windows (Fluent)
-    $name:fr-FR: Style du menu contextuel
-    $description:fr-FR: Modifie l’apparence du menu du clic droit
-    $options:fr-FR:
-    - mod: Style du mod
-    - windows_fluent: Windows (Fluent)
-    $name:de-DE: Kontextmenüstil
-    $description:de-DE: Ändert das Aussehen des Menüs beim Rechtsklick
-    $options:de-DE:
-    - mod: Mod-Stil
-    - windows_fluent: Windows (Fluent)
-    $name:es-ES: Estilo del menú contextual
-    $description:es-ES: Cambia el aspecto del menú al hacer clic con el botón derecho
-    $options:es-ES:
-    - mod: Estilo del mod
-    - windows_fluent: Windows (Fluent)
-    $name:pt-BR: Estilo do menu de contexto
-    $description:pt-BR: Altera a aparência do menu do botão direito
-    $options:pt-BR:
-    - mod: Estilo do mod
-    - windows_fluent: Windows (Fluent)
-    $name:it-IT: Stile del menu contestuale
-    $description:it-IT: Modifica l’aspetto del menu del tasto destro
-    $options:it-IT:
-    - mod: Stile della mod
-    - windows_fluent: Windows (Fluent)
-    $name:ru-RU: Стиль контекстного меню
-    $description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши
-    $options:ru-RU:
-    - mod: Стиль мода
-    - windows_fluent: Windows (Fluent)
-    $name:uk-UA: Стиль контекстного меню
-    $description:uk-UA: Змінює вигляд меню при натисканні правою кнопкою миші
-    $options:uk-UA:
-    - mod: Стиль мода
-    - windows_fluent: Windows (Fluent)
-    $name:pl-PL: Styl menu kontekstowego
-    $description:pl-PL: Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem
-    $options:pl-PL:
-    - mod: Styl moda
-    - windows_fluent: Windows (Fluent)
-    $name:nl-NL: Stijl van het snelmenu
-    $description:nl-NL: Wijzigt het uiterlijk van het menu bij rechtsklikken
-    $options:nl-NL:
-    - mod: Stijl van de mod
-    - windows_fluent: Windows (Fluent)
-    $name:tr-TR: Bağlam menüsü stili
-    $description:tr-TR: Sağ tıklama menüsünün görünümünü değiştirir
-    $options:tr-TR:
-    - mod: Mod stili
-    - windows_fluent: Windows (Fluent)
-    $name:hi-IN: संदर्भ मेनू की शैली
-    $description:hi-IN: राइट-क्लिक मेनू का रूप बदलता है
-    $options:hi-IN:
-    - mod: मॉड की शैली
-    - windows_fluent: Windows (Fluent)
-    $name:ar: نمط قائمة السياق
-    $description:ar: يغير مظهر القائمة عند النقر بزر الماوس الأيمن
-    $options:ar:
-    - mod: نمط التعديل
-    - windows_fluent: Windows (Fluent)
   - customBgColor: ""
     $name: Custom Background Color (Hex, e.g. #1E1E24)
     $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
@@ -427,141 +321,10 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
   $name:vi-VN: 1. Giao diện & Hiệu ứng hình ảnh
 
 - layoutGroup:
-  - minimalMode: "0"
-    $name: Dialog Layout
-    $description: Change the Run dialog layout while keeping your theme and other settings
-    $options:
-    - "0": Classic
-    - "1": Compact Mini-Pill
-    - "2": Fluent
-    $name:vi-VN: Bố cục hộp thoại
-    $description:vi-VN: Đổi bố cục hộp thoại Run và giữ nguyên chủ đề cùng các cài đặt khác
-    $options:vi-VN:
-    - "0": Cổ điển
-    - "1": Thu gọn (Pill)
-    - "2": Fluent
-    $name:th-TH: รูปแบบกล่องโต้ตอบ
-    $description:th-TH: เปลี่ยนรูปแบบหน้าต่าง Run โดยคงธีมและการตั้งค่าอื่นไว้
-    $options:th-TH:
-    - "0": คลาสสิก
-    - "1": กะทัดรัด (Pill)
-    - "2": Fluent
-    $name:id-ID: Tata Letak Dialog
-    $description:id-ID: Ubah tata letak dialog Run dengan tetap mempertahankan tema dan pengaturan lainnya
-    $options:id-ID:
-    - "0": Klasik
-    - "1": Ringkas (Pill)
-    - "2": Fluent
-    $name:ms-MY: Susun Atur Dialog
-    $description:ms-MY: Tukar susun atur dialog Run sambil mengekalkan tema dan tetapan lain
-    $options:ms-MY:
-    - "0": Klasik
-    - "1": Padat (Pill)
-    - "2": Fluent
-    $name:ja-JP: ダイアログのレイアウト
-    $description:ja-JP: テーマやその他の設定を保持したまま「ファイル名を指定して実行」のレイアウトを変更します
-    $options:ja-JP:
-    - "0": クラシック
-    - "1": コンパクト (Pill)
-    - "2": Fluent
-    $name:zh-CN: 对话框布局
-    $description:zh-CN: 更改“运行”对话框的布局，并保留主题和其他设置
-    $options:zh-CN:
-    - "0": 经典
-    - "1": 紧凑（胶囊形）
-    - "2": Fluent
-    $name:zh-TW: 對話方塊版面配置
-    $description:zh-TW: 變更「執行」對話方塊的版面配置，並保留佈景主題和其他設定
-    $options:zh-TW:
-    - "0": 傳統
-    - "1": 精簡（膠囊形）
-    - "2": Fluent
-    $name:ko-KR: 대화 상자 레이아웃
-    $description:ko-KR: 테마와 다른 설정을 유지하면서 실행 대화 상자의 레이아웃을 변경합니다
-    $options:ko-KR:
-    - "0": 클래식
-    - "1": 간단히 (Pill)
-    - "2": Fluent
-    $name:fr-FR: Disposition de la fenêtre
-    $description:fr-FR: Modifie la disposition de la fenêtre Exécuter en conservant le thème et les autres paramètres
-    $options:fr-FR:
-    - "0": Classique
-    - "1": Compact (Pill)
-    - "2": Fluent
-    $name:de-DE: Dialoglayout
-    $description:de-DE: Ändert das Layout des Ausführen-Dialogs und behält das Design und die übrigen Einstellungen bei
-    $options:de-DE:
-    - "0": Klassisch
-    - "1": Kompakt (Pill)
-    - "2": Fluent
-    $name:es-ES: Diseño del cuadro de diálogo
-    $description:es-ES: Cambia el diseño del cuadro Ejecutar y conserva el tema y las demás opciones
-    $options:es-ES:
-    - "0": Clásico
-    - "1": Compacto (Pill)
-    - "2": Fluent
-    $name:pt-BR: Layout da janela
-    $description:pt-BR: Altera o layout da janela Executar e mantém o tema e as demais configurações
-    $options:pt-BR:
-    - "0": Clássico
-    - "1": Compacto (Pill)
-    - "2": Fluent
-    $name:it-IT: Layout della finestra
-    $description:it-IT: Modifica il layout della finestra Esegui mantenendo il tema e le altre impostazioni
-    $options:it-IT:
-    - "0": Classico
-    - "1": Compatto (Pill)
-    - "2": Fluent
-    $name:ru-RU: Вид окна
-    $description:ru-RU: Меняет компоновку окна «Выполнить». Тема и остальные настройки сохраняются
-    $options:ru-RU:
-    - "0": Классический
-    - "1": Компактный (Pill)
-    - "2": Современный (Fluent)
-    $name:uk-UA: Вигляд вікна
-    $description:uk-UA: Змінює компонування вікна «Виконати», зберігаючи тему та інші налаштування
-    $options:uk-UA:
-    - "0": Класичний
-    - "1": Компактний (Pill)
-    - "2": Fluent
-    $name:pl-PL: Układ okna
-    $description:pl-PL: Zmienia układ okna Uruchamianie, zachowując motyw i pozostałe ustawienia
-    $options:pl-PL:
-    - "0": Klasyczny
-    - "1": Kompaktowy (Pill)
-    - "2": Fluent
-    $name:nl-NL: Vensterindeling
-    $description:nl-NL: Wijzigt de indeling van Uitvoeren en behoudt het thema en de overige instellingen
-    $options:nl-NL:
-    - "0": Klassiek
-    - "1": Compact (Pill)
-    - "2": Fluent
-    $name:tr-TR: İletişim Kutusu Düzeni
-    $description:tr-TR: Çalıştır penceresinin düzenini değiştirir, temayı ve diğer ayarları korur
-    $options:tr-TR:
-    - "0": Klasik
-    - "1": Kompakt (Pill)
-    - "2": Fluent
-    $name:hi-IN: डायलॉग का लेआउट
-    $description:hi-IN: थीम और अन्य सेटिंग रखते हुए रन डायलॉग का लेआउट बदलें
-    $options:hi-IN:
-    - "0": क्लासिक
-    - "1": कॉम्पैक्ट (Pill)
-    - "2": Fluent
-    $name:ar: تخطيط النافذة
-    $description:ar: يغير تخطيط نافذة تشغيل مع الاحتفاظ بالنسق والإعدادات الأخرى
-    $options:ar:
-    - "0": كلاسيكي
-    - "1": مدمج (Pill)
-    - "2": Fluent
-  - rememberPosition: false
-    $name: Remember Last Window Position
-    $name:vi-VN: Nhớ vị trí cửa sổ lần cuối
-    $description: Remember where you dragged the Run pill and open new Win + R dialogs at that saved position.
-    $description:vi-VN: Ghi nhớ vị trí bạn đã kéo thả hộp thoại Run và tự động mở lại ở đúng vị trí đó cho các lần Win + R tiếp theo.
   - dialogPosition: auto
     $name: Dialog Position
     $name:vi-VN: Vị trí hiển thị hộp thoại
+    $name:ru-RU: Позиция окна
     $description: Choose where the Run dialog opens on screen (Auto follows Classic corner or Bottom-Center).
     $description:vi-VN: Chọn vị trí mở hộp thoại Run trên màn hình (Tự động sẽ theo góc Classic hoặc chính giữa dưới).
     $options:vi-VN:
@@ -582,6 +345,245 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - top_center: Top Center
     - top_right: Top Right
     - center: Screen Center (Spotlight)
+  - rememberPosition: false
+    $name: Remember Last Window Position
+    $name:vi-VN: Nhớ vị trí cửa sổ lần cuối
+    $name:ru-RU: Запоминать позицию окна
+    $description: Remember where you dragged the Run pill and open new Win + R dialogs at that saved position.
+    $description:vi-VN: Ghi nhớ vị trí bạn đã kéo thả hộp thoại Run và tự động mở lại ở đúng vị trí đó cho các lần Win + R tiếp theo.
+  - minimalMode: "0"
+    $name: Dialog Layout
+    $description: Base window layout that uses personalization settings
+    $options:
+    - "0": Classic
+    - "1": Compact Mini-Pill
+    - "2": Fluent
+    $name:vi-VN: Bố cục hộp thoại
+    $description:vi-VN: Bố cục cửa sổ cơ bản sử dụng các thiết lập cá nhân hóa
+    $options:vi-VN:
+    - "0": Cổ điển
+    - "1": Thu gọn (Pill)
+    - "2": Fluent
+    $name:th-TH: รูปแบบกล่องโต้ตอบ
+    $description:th-TH: รูปแบบหน้าต่างพื้นฐานที่ใช้การตั้งค่าส่วนบุคคล
+    $options:th-TH:
+    - "0": คลาสสิก
+    - "1": กะทัดรัด (Pill)
+    - "2": Fluent
+    $name:id-ID: Tata Letak Dialog
+    $description:id-ID: Tata letak dasar jendela yang menggunakan pengaturan personalisasi
+    $options:id-ID:
+    - "0": Klasik
+    - "1": Ringkas (Pill)
+    - "2": Fluent
+    $name:ms-MY: Susun Atur Dialog
+    $description:ms-MY: Susun atur asas tetingkap yang menggunakan tetapan pemperibadian
+    $options:ms-MY:
+    - "0": Klasik
+    - "1": Padat (Pill)
+    - "2": Fluent
+    $name:ja-JP: ダイアログのレイアウト
+    $description:ja-JP: 個人用設定を使用する基本的なウィンドウレイアウト
+    $options:ja-JP:
+    - "0": クラシック
+    - "1": コンパクト (Pill)
+    - "2": Fluent
+    $name:zh-CN: 对话框布局
+    $description:zh-CN: 使用个性化设置的基本窗口布局
+    $options:zh-CN:
+    - "0": 经典
+    - "1": 紧凑（胶囊形）
+    - "2": Fluent
+    $name:zh-TW: 對話方塊版面配置
+    $description:zh-TW: 使用個人化設定的基本視窗版面配置
+    $options:zh-TW:
+    - "0": 傳統
+    - "1": 精簡（膠囊形）
+    - "2": Fluent
+    $name:ko-KR: 대화 상자 레이아웃
+    $description:ko-KR: 개인 설정을 사용하는 기본 창 레이아웃
+    $options:ko-KR:
+    - "0": 클래식
+    - "1": 간단히 (Pill)
+    - "2": Fluent
+    $name:fr-FR: Disposition de la fenêtre
+    $description:fr-FR: Disposition de base de la fenêtre qui utilise les paramètres de personnalisation
+    $options:fr-FR:
+    - "0": Classique
+    - "1": Compact (Pill)
+    - "2": Fluent
+    $name:de-DE: Dialoglayout
+    $description:de-DE: Grundlayout des Fensters unter Verwendung der Personalisierungseinstellungen
+    $options:de-DE:
+    - "0": Klassisch
+    - "1": Kompakt (Pill)
+    - "2": Fluent
+    $name:es-ES: Diseño del cuadro de diálogo
+    $description:es-ES: Diseño básico de la ventana que usa la configuración de personalización
+    $options:es-ES:
+    - "0": Clásico
+    - "1": Compacto (Pill)
+    - "2": Fluent
+    $name:pt-BR: Layout da janela
+    $description:pt-BR: Layout básico da janela que usa as configurações de personalização
+    $options:pt-BR:
+    - "0": Clássico
+    - "1": Compacto (Pill)
+    - "2": Fluent
+    $name:it-IT: Layout della finestra
+    $description:it-IT: Layout di base della finestra che usa le impostazioni di personalizzazione
+    $options:it-IT:
+    - "0": Classico
+    - "1": Compatto (Pill)
+    - "2": Fluent
+    $name:ru-RU: Макет окна
+    $description:ru-RU: Базовая компоновка окна, использующая параметры персонализации
+    $options:ru-RU:
+    - "0": Классический
+    - "1": Компактный (Pill)
+    - "2": Современный (Fluent)
+    $name:uk-UA: Макет вікна
+    $description:uk-UA: Базове компонування вікна з урахуванням параметрів персоналізації
+    $options:uk-UA:
+    - "0": Класичний
+    - "1": Компактний (Pill)
+    - "2": Fluent
+    $name:pl-PL: Układ okna
+    $description:pl-PL: Podstawowy układ okna, który korzysta z ustawień personalizacji
+    $options:pl-PL:
+    - "0": Klasyczny
+    - "1": Kompaktowy (Pill)
+    - "2": Fluent
+    $name:nl-NL: Vensterindeling
+    $description:nl-NL: Basisindeling van het venster met de instellingen voor persoonlijke voorkeur
+    $options:nl-NL:
+    - "0": Klassiek
+    - "1": Compact (Pill)
+    - "2": Fluent
+    $name:tr-TR: İletişim Kutusu Düzeni
+    $description:tr-TR: Kişiselleştirme ayarlarını kullanan temel pencere düzeni
+    $options:tr-TR:
+    - "0": Klasik
+    - "1": Kompakt (Pill)
+    - "2": Fluent
+    $name:hi-IN: डायलॉग का लेआउट
+    $description:hi-IN: वैयक्तिकरण सेटिंग का उपयोग करने वाला मूल विंडो लेआउट
+    $options:hi-IN:
+    - "0": क्लासिक
+    - "1": कॉम्पैक्ट (Pill)
+    - "2": Fluent
+    $name:ar: تخطيط النافذة
+    $description:ar: التخطيط الأساسي للنافذة الذي يستخدم إعدادات التخصيص
+    $options:ar:
+    - "0": كلاسيكي
+    - "1": مدمج (Pill)
+    - "2": Fluent
+  - contextMenuStyle: mod
+    $name: Context Menu Style
+    $description: Changes the appearance of the right-click menu
+    $options:
+    - mod: Mod Style
+    - windows_fluent: Windows (Fluent)
+    $name:vi-VN: Kiểu menu ngữ cảnh
+    $description:vi-VN: Đổi giao diện menu khi nhấp chuột phải
+    $options:vi-VN:
+    - mod: Kiểu của mod
+    - windows_fluent: Windows (Fluent)
+    $name:th-TH: รูปแบบเมนูบริบท
+    $description:th-TH: เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา
+    $options:th-TH:
+    - mod: รูปแบบของม็อด
+    - windows_fluent: Windows (Fluent)
+    $name:id-ID: Gaya Menu Konteks
+    $description:id-ID: Mengubah tampilan menu saat klik kanan
+    $options:id-ID:
+    - mod: Gaya Mod
+    - windows_fluent: Windows (Fluent)
+    $name:ms-MY: Gaya Menu Konteks
+    $description:ms-MY: Mengubah rupa menu apabila klik kanan
+    $options:ms-MY:
+    - mod: Gaya Mod
+    - windows_fluent: Windows (Fluent)
+    $name:ja-JP: コンテキスト メニューのスタイル
+    $description:ja-JP: 右クリック メニューの外観を変更します
+    $options:ja-JP:
+    - mod: Mod のスタイル
+    - windows_fluent: Windows (Fluent)
+    $name:zh-CN: 右键菜单样式
+    $description:zh-CN: 更改右键单击时显示的菜单外观
+    $options:zh-CN:
+    - mod: 模组样式
+    - windows_fluent: Windows (Fluent)
+    $name:zh-TW: 快顯選單樣式
+    $description:zh-TW: 變更按下滑鼠右鍵時顯示的選單外觀
+    $options:zh-TW:
+    - mod: 模組樣式
+    - windows_fluent: Windows (Fluent)
+    $name:ko-KR: 상황에 맞는 메뉴 스타일
+    $description:ko-KR: 마우스 오른쪽 클릭 메뉴의 모양을 변경합니다
+    $options:ko-KR:
+    - mod: 모드 스타일
+    - windows_fluent: Windows (Fluent)
+    $name:fr-FR: Style du menu contextuel
+    $description:fr-FR: Modifie l’apparence du menu du clic droit
+    $options:fr-FR:
+    - mod: Style du mod
+    - windows_fluent: Windows (Fluent)
+    $name:de-DE: Kontextmenüstil
+    $description:de-DE: Ändert das Aussehen des Menüs beim Rechtsklick
+    $options:de-DE:
+    - mod: Mod-Stil
+    - windows_fluent: Windows (Fluent)
+    $name:es-ES: Estilo del menú contextual
+    $description:es-ES: Cambia el aspecto del menú al hacer clic con el botón derecho
+    $options:es-ES:
+    - mod: Estilo del mod
+    - windows_fluent: Windows (Fluent)
+    $name:pt-BR: Estilo do menu de contexto
+    $description:pt-BR: Altera a aparência do menu do botão direito
+    $options:pt-BR:
+    - mod: Estilo do mod
+    - windows_fluent: Windows (Fluent)
+    $name:it-IT: Stile del menu contestuale
+    $description:it-IT: Modifica l’aspetto del menu del tasto destro
+    $options:it-IT:
+    - mod: Stile della mod
+    - windows_fluent: Windows (Fluent)
+    $name:ru-RU: Стиль контекстного меню
+    $description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши
+    $options:ru-RU:
+    - mod: Стиль мода
+    - windows_fluent: Windows (Fluent)
+    $name:uk-UA: Стиль контекстного меню
+    $description:uk-UA: Змінює вигляд меню при натисканні правою кнопкою миші
+    $options:uk-UA:
+    - mod: Стиль мода
+    - windows_fluent: Windows (Fluent)
+    $name:pl-PL: Styl menu kontekstowego
+    $description:pl-PL: Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem
+    $options:pl-PL:
+    - mod: Styl moda
+    - windows_fluent: Windows (Fluent)
+    $name:nl-NL: Stijl van het snelmenu
+    $description:nl-NL: Wijzigt het uiterlijk van het menu bij rechtsklikken
+    $options:nl-NL:
+    - mod: Stijl van de mod
+    - windows_fluent: Windows (Fluent)
+    $name:tr-TR: Bağlam menüsü stili
+    $description:tr-TR: Sağ tıklama menüsünün görünümünü değiştirir
+    $options:tr-TR:
+    - mod: Mod stili
+    - windows_fluent: Windows (Fluent)
+    $name:hi-IN: संदर्भ मेनू की शैली
+    $description:hi-IN: राइट-क्लिक मेनू का रूप बदलता है
+    $options:hi-IN:
+    - mod: मॉड की शैली
+    - windows_fluent: Windows (Fluent)
+    $name:ar: نمط قائمة السياق
+    $description:ar: يغير مظهر القائمة عند النقر بزر الماوس الأيمن
+    $options:ar:
+    - mod: نمط التعديل
+    - windows_fluent: Windows (Fluent)
   - uiScalePercent: "100"
     $name: UI Size / Scale Preset (85% – 120%)
     $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
@@ -616,6 +618,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:vi-VN: Tự chỉnh cỡ chữ hiển thị trong hộp thoại Run (9–24 pt, chuẩn 14). Để 0 để theo mức kích thước có sẵn.
   $name: 2. Layout & Sizing
   $name:vi-VN: 2. Bố cục & Kích thước
+  $name:ru-RU: 2. Макет и позиция
 
 - actionButtonsGroup:
   - hideBrowse: false
@@ -1317,11 +1320,12 @@ enum ToggleAction : WPARAM {
 constexpr int kBaseDlgWidth = 636;
 constexpr int kBaseCompactDlgWidth  = 360;
 constexpr int kBaseRowHeight        = 38;
-constexpr int kBaseListPadTop       = 10;
-constexpr int kBaseListPadBottom    = 10;
+constexpr int kBasePanelInset       = 11;
+constexpr int kBaseRowHighlightInset = 2;
+constexpr int kBaseScrollbarReserve = 12;
+constexpr int kLegacyListPadding   = 20;
 constexpr int kBaseDetachedGap      = 12;
 constexpr int kBaseAdminBannerHeight = 32;
-constexpr int kBaseAdminBannerGap   = 8;
 constexpr int kBaseInputBarHeight   = 54;
 constexpr UINT_PTR kTimerCaret              = 9010;
 constexpr UINT_PTR kTimerLuminance          = 9011;
@@ -5085,7 +5089,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.customBackgroundOpacity = ReadGroupedIntSetting(L"appearanceGroup.customBackgroundOpacity", L"customBackgroundOpacity", 215);
     curWh.dialogPosition          = ReadGroupedStringSetting(L"layoutGroup.dialogPosition", L"dialogPosition", L"auto");
     curWh.colorMode               = ReadGroupedStringSetting(L"appearanceGroup.colorMode", L"colorMode", L"auto");
-    curWh.contextMenuStyle = ReadGroupedStringSetting(L"appearanceGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
+    curWh.contextMenuStyle = ReadGroupedStringSetting(L"layoutGroup.contextMenuStyle", L"contextMenuStyle", L"mod");
     {
         auto layout = WindhawkUtils::StringSetting::make(L"layoutGroup.minimalMode");
         const std::wstring_view value = layout.get() ? layout.get() : L"";
@@ -5241,11 +5245,26 @@ void LoadSettings(bool fromSettingsChanged = false) {
 
     int minModeOverride = Wh_GetIntValue(GetUserOverrideKey(L"minimalModeV3").c_str(), -1);
     newSettings.dialogLayout = ApplyDialogLayoutOverride(curWh.dialogLayout, minModeOverride);
+    const auto menuStyleOverrideKey = GetUserOverrideKey(L"contextMenuStyle");
     wchar_t menuStyleOverride[32]{};
-    const std::wstring_view contextMenuStyle =
-        Wh_GetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(), menuStyleOverride,
-                          ARRAYSIZE(menuStyleOverride)) > 0 && menuStyleOverride[0]
-            ? std::wstring_view(menuStyleOverride) : std::wstring_view(curWh.contextMenuStyle);
+    Wh_GetStringValue(menuStyleOverrideKey.c_str(), menuStyleOverride, ARRAYSIZE(menuStyleOverride));
+    std::wstring_view contextMenuStyle = menuStyleOverride[0]
+        ? std::wstring_view(menuStyleOverride) : std::wstring_view(curWh.contextMenuStyle);
+    const auto oldMenuStyle = WindhawkUtils::StringSetting::make(L"appearanceGroup.contextMenuStyle");
+    if (oldMenuStyle.get() && std::wstring_view(oldMenuStyle.get()) == L"windows_fluent") {
+        const auto movedKey = GetUserOverrideKey(L"contextMenuStyleMoved");
+        if (!Wh_GetIntValue(movedKey.c_str(), 0)) {
+            // Windhawk adds the new key with its default during an upgrade.
+            if (!menuStyleOverride[0] && curWh.contextMenuStyle == L"mod") {
+                contextMenuStyle = L"windows_fluent";
+                if (Wh_SetStringValue(menuStyleOverrideKey.c_str(), L"windows_fluent")) {
+                    Wh_SetIntValue(movedKey.c_str(), 1);
+                }
+            } else {
+                Wh_SetIntValue(movedKey.c_str(), 1);
+            }
+        }
+    }
     newSettings.contextMenuStyle = contextMenuStyle == L"windows_fluent"
         ? ContextMenuStyle::WindowsFluent : ContextMenuStyle::Mod;
     for (size_t i = 0; i < kRunActionCount; ++i) {
@@ -5268,7 +5287,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     int heightOverride = Wh_GetIntValue(GetUserOverrideKey(L"customBarHeight").c_str(), -1);
     int rawHeight = (heightOverride >= 0) ? heightOverride : heightSetting;
     if (rawHeight >= 150) {
-        rawHeight = MulDiv(rawHeight, kBaseInputBarHeight, kBaseInputBarHeight + 5 * kBaseRowHeight + kBaseListPadTop + kBaseListPadBottom);
+        rawHeight = MulDiv(rawHeight, kBaseInputBarHeight, kBaseInputBarHeight + 5 * kBaseRowHeight + kLegacyListPadding);
     }
     newSettings.customBarHeight = (rawHeight > 0) ? std::clamp(rawHeight, 36, 96) : 0;
 
@@ -6934,12 +6953,23 @@ int GetRowHeight(const RunDialogState* state) {
     return DpiScaleS(kBaseRowHeight, state);
 }
 
-int GetListPadTop(const RunDialogState* state) {
-    return DpiScaleS(kBaseListPadTop, state);
+int GetActionButtonHeight(const RunDialogState* state, int barHeight) {
+    if (state && state->settings.customBarHeight > 0) {
+        UINT dpi = state->dpi;
+        return std::clamp(barHeight - DpiScale(18, dpi), DpiScale(24, dpi), DpiScale(46, dpi));
+    }
+    return barHeight - 2 * DpiScaleS(kBasePanelInset, state);
 }
 
-int GetListPadBottom(const RunDialogState* state) {
-    return DpiScaleS(kBaseListPadBottom, state);
+constexpr int GetVerticalPanelInset(int panelHeight, int contentHeight, bool bottom) {
+    return (panelHeight - contentHeight + (bottom ? 1 : 0)) / 2;
+}
+
+int GetListPadding(const RunDialogState* state, bool bottom = false) {
+    const int barHeight = GetInputBarHeight(state);
+    const int inset = GetVerticalPanelInset(barHeight, GetActionButtonHeight(state, barHeight), bottom);
+    // The highlight itself is inset within each row to leave space between rows.
+    return (std::max)(0, inset - DpiScaleS(kBaseRowHighlightInset, state));
 }
 
 inline bool HasActiveCustomBackground(const RunDialogState*) {
@@ -10133,7 +10163,7 @@ int GetAdminBannerHeight(const RunDialogState* state) {
 
 int GetAdminBannerGap(const RunDialogState* state) {
     if (GetAdminBannerHeight(state) <= 0) return 0;
-    return DpiScaleS(kBaseAdminBannerGap, state);
+    return GetDetachedGap(state);
 }
 
 int GetHistoryCardHeight(const RunDialogState* state) {
@@ -10171,14 +10201,10 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     int dlgW = GetDlgWidth(state);
     int barH = GetInputBarHeight(state);
     UINT dpi = state ? state->dpi : 96;
-    int btnH = DpiScaleS(32, state);
-    if (state && state->settings.customBarHeight > 0) {
-        btnH = std::clamp(barH - DpiScale(18, dpi, 100), DpiScale(24, dpi, 100), DpiScale(46, dpi, 100));
-    }
+    const int btnH = GetActionButtonHeight(state, barH);
 
     int gap = DpiScaleS(6, state);
-    int singleLineBarH = DpiScaleS(kBaseInputBarHeight, state);
-    int rightMargin = (std::max)(DpiScaleS(10, state), (singleLineBarH - btnH) / 2);
+    int rightMargin = DpiScaleS(kBasePanelInset, state);
 
     float fontScale = (state && state->settings.customFontSize > 0)
                       ? (std::clamp(state->settings.customFontSize, 9, 24) / 13.5f)
@@ -10200,7 +10226,7 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
                                             {wBrowse, wRun, wClose, wGear});
 
     int barTop = GetInputBarTopY(state);
-    int top = barTop + (barH - btnH) / 2;
+    int top = barTop + GetVerticalPanelInset(barH, btnH, false);
     ActionButtonsLayout layout = {};
 
     int right = dlgW - rightMargin;
@@ -10258,8 +10284,8 @@ RECT GetScrollbarTrackRect(const RunDialogState* state) {
     if (!HasVerticalScrollbar(state)) return { 0, 0, 0, 0 };
     int dlgW = GetDlgWidth(state);
     int cardTop = GetDetachedCardTopY(state);
-    int padTop = GetListPadTop(state);
-    int padBot = GetListPadBottom(state);
+    int padTop = GetListPadding(state);
+    int padBot = GetListPadding(state, true);
     int cardH  = GetHistoryCardHeight(state);
     int rightPad = DpiScaleS(8, state);
     int trackW = DpiScaleS(6, state);
@@ -10294,24 +10320,19 @@ int HitTestHistoryRow(const RunDialogState* state, POINT pt) {
     const auto& activeRows = GetActiveRowItems(state);
     int visRows = GetVisibleRowCount(state);
     int cardTop = GetDetachedCardTopY(state);
-    int padTop = GetListPadTop(state);
-    int padBot = GetListPadBottom(state);
+    int padTop = GetListPadding(state);
+    int padBot = GetListPadding(state, true);
     int cardH  = GetHistoryCardHeight(state);
     int rowH   = GetRowHeight(state);
     int dlgW   = GetDlgWidth(state);
-    int padX   = DpiScaleS(12, state);
+    int padX   = DpiScaleS(kBasePanelInset, state);
+    int scrollbarReserve = HasVerticalScrollbar(state) ? DpiScaleS(kBaseScrollbarReserve, state) : 0;
 
     if (activeRows.empty() || visRows <= 0 || cardH <= 0 ||
         pt.y < cardTop + padTop || pt.y >= cardTop + cardH - padBot) {
         return -1;
     }
-    if (HasVerticalScrollbar(state)) {
-        RECT rcTrack = GetScrollbarTrackRect(state);
-        if (pt.x >= rcTrack.left - DpiScaleS(4, state)) {
-            return -1;
-        }
-    }
-    if (pt.x < padX || pt.x > dlgW - padX) return -1;
+    if (pt.x < padX || pt.x >= dlgW - padX - scrollbarReserve) return -1;
     int visIdx = (pt.y - (cardTop + padTop)) / rowH;
     if (visIdx >= 0 && visIdx < visRows) {
         int actualIdx = state->scrollOffset + visIdx;
@@ -11154,7 +11175,7 @@ void ApplyInlineMenuFieldValue(FluentMenuSession* s, int kind, int val) {
     } else if (kind == 2) {
         if (val >= 150) {
             val = MulDiv(val, kBaseInputBarHeight,
-                         kBaseInputBarHeight + 5 * kBaseRowHeight + kBaseListPadTop + kBaseListPadBottom);
+                         kBaseInputBarHeight + 5 * kBaseRowHeight + kLegacyListPadding);
         }
         val = std::clamp(val, 36, 96);
         Wh_SetIntValue(GetUserOverrideKey(L"customBarHeight").c_str(), val);
@@ -12954,27 +12975,27 @@ ActionButtonStrings GetActionButtonStrings(const std::wstring& rawLang) {
 
 static LayoutLocalizedStrings GetLayoutLocalizedStrings(const std::wstring& rawLang) {
     const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Bố cục hộp thoại", L"Đổi bố cục hộp thoại Run và giữ nguyên chủ đề cùng các cài đặt khác", { L"Cổ điển", L"Thu gọn (Pill)", L"Fluent" } };
-    if (lang == L"th") return { L"รูปแบบกล่องโต้ตอบ", L"เปลี่ยนรูปแบบหน้าต่าง Run โดยคงธีมและการตั้งค่าอื่นไว้", { L"คลาสสิก", L"กะทัดรัด (Pill)", L"Fluent" } };
-    if (lang == L"id") return { L"Tata Letak Dialog", L"Ubah tata letak dialog Run dengan tetap mempertahankan tema dan pengaturan lainnya", { L"Klasik", L"Ringkas (Pill)", L"Fluent" } };
-    if (lang == L"ms") return { L"Susun Atur Dialog", L"Tukar susun atur dialog Run sambil mengekalkan tema dan tetapan lain", { L"Klasik", L"Padat (Pill)", L"Fluent" } };
-    if (lang == L"ja") return { L"ダイアログのレイアウト", L"テーマやその他の設定を保持したまま「ファイル名を指定して実行」のレイアウトを変更します", { L"クラシック", L"コンパクト (Pill)", L"Fluent" } };
-    if (lang == L"zh_cn") return { L"对话框布局", L"更改“运行”对话框的布局，并保留主题和其他设置", { L"经典", L"紧凑（胶囊形）", L"Fluent" } };
-    if (lang == L"zh_tw") return { L"對話方塊版面配置", L"變更「執行」對話方塊的版面配置，並保留佈景主題和其他設定", { L"傳統", L"精簡（膠囊形）", L"Fluent" } };
-    if (lang == L"ko") return { L"대화 상자 레이아웃", L"테마와 다른 설정을 유지하면서 실행 대화 상자의 레이아웃을 변경합니다", { L"클래식", L"간단히 (Pill)", L"Fluent" } };
-    if (lang == L"fr") return { L"Disposition de la fenêtre", L"Modifie la disposition de la fenêtre Exécuter en conservant le thème et les autres paramètres", { L"Classique", L"Compact (Pill)", L"Fluent" } };
-    if (lang == L"de") return { L"Dialoglayout", L"Ändert das Layout des Ausführen-Dialogs und behält das Design und die übrigen Einstellungen bei", { L"Klassisch", L"Kompakt (Pill)", L"Fluent" } };
-    if (lang == L"es") return { L"Diseño del cuadro de diálogo", L"Cambia el diseño del cuadro Ejecutar y conserva el tema y las demás opciones", { L"Clásico", L"Compacto (Pill)", L"Fluent" } };
-    if (lang == L"pt") return { L"Layout da janela", L"Altera o layout da janela Executar e mantém o tema e as demais configurações", { L"Clássico", L"Compacto (Pill)", L"Fluent" } };
-    if (lang == L"it") return { L"Layout della finestra", L"Modifica il layout della finestra Esegui mantenendo il tema e le altre impostazioni", { L"Classico", L"Compatto (Pill)", L"Fluent" } };
-    if (lang == L"ru") return { L"Вид окна", L"Меняет компоновку окна «Выполнить». Тема и остальные настройки сохраняются", { L"Классический", L"Компактный (Pill)", L"Современный (Fluent)" } };
-    if (lang == L"uk") return { L"Вигляд вікна", L"Змінює компонування вікна «Виконати», зберігаючи тему та інші налаштування", { L"Класичний", L"Компактний (Pill)", L"Fluent" } };
-    if (lang == L"pl") return { L"Układ okna", L"Zmienia układ okna Uruchamianie, zachowując motyw i pozostałe ustawienia", { L"Klasyczny", L"Kompaktowy (Pill)", L"Fluent" } };
-    if (lang == L"nl") return { L"Vensterindeling", L"Wijzigt de indeling van Uitvoeren en behoudt het thema en de overige instellingen", { L"Klassiek", L"Compact (Pill)", L"Fluent" } };
-    if (lang == L"tr") return { L"İletişim Kutusu Düzeni", L"Çalıştır penceresinin düzenini değiştirir, temayı ve diğer ayarları korur", { L"Klasik", L"Kompakt (Pill)", L"Fluent" } };
-    if (lang == L"hi") return { L"डायलॉग का लेआउट", L"थीम और अन्य सेटिंग रखते हुए रन डायलॉग का लेआउट बदलें", { L"क्लासिक", L"कॉम्पैक्ट (Pill)", L"Fluent" } };
-    if (lang == L"ar") return { L"تخطيط النافذة", L"يغير تخطيط نافذة تشغيل مع الاحتفاظ بالنسق والإعدادات الأخرى", { L"كلاسيكي", L"مدمج (Pill)", L"Fluent" } };
-    return { L"Dialog Layout", L"Change the Run dialog layout while keeping your theme and other settings", { L"Classic", L"Compact Mini-Pill", L"Fluent" } };
+    if (lang == L"vi") return { L"Bố cục hộp thoại", L"Bố cục cửa sổ cơ bản sử dụng các thiết lập cá nhân hóa", { L"Cổ điển", L"Thu gọn (Pill)", L"Fluent" } };
+    if (lang == L"th") return { L"รูปแบบกล่องโต้ตอบ", L"รูปแบบหน้าต่างพื้นฐานที่ใช้การตั้งค่าส่วนบุคคล", { L"คลาสสิก", L"กะทัดรัด (Pill)", L"Fluent" } };
+    if (lang == L"id") return { L"Tata Letak Dialog", L"Tata letak dasar jendela yang menggunakan pengaturan personalisasi", { L"Klasik", L"Ringkas (Pill)", L"Fluent" } };
+    if (lang == L"ms") return { L"Susun Atur Dialog", L"Susun atur asas tetingkap yang menggunakan tetapan pemperibadian", { L"Klasik", L"Padat (Pill)", L"Fluent" } };
+    if (lang == L"ja") return { L"ダイアログのレイアウト", L"個人用設定を使用する基本的なウィンドウレイアウト", { L"クラシック", L"コンパクト (Pill)", L"Fluent" } };
+    if (lang == L"zh_cn") return { L"对话框布局", L"使用个性化设置的基本窗口布局", { L"经典", L"紧凑（胶囊形）", L"Fluent" } };
+    if (lang == L"zh_tw") return { L"對話方塊版面配置", L"使用個人化設定的基本視窗版面配置", { L"傳統", L"精簡（膠囊形）", L"Fluent" } };
+    if (lang == L"ko") return { L"대화 상자 레이아웃", L"개인 설정을 사용하는 기본 창 레이아웃", { L"클래식", L"간단히 (Pill)", L"Fluent" } };
+    if (lang == L"fr") return { L"Disposition de la fenêtre", L"Disposition de base de la fenêtre qui utilise les paramètres de personnalisation", { L"Classique", L"Compact (Pill)", L"Fluent" } };
+    if (lang == L"de") return { L"Dialoglayout", L"Grundlayout des Fensters unter Verwendung der Personalisierungseinstellungen", { L"Klassisch", L"Kompakt (Pill)", L"Fluent" } };
+    if (lang == L"es") return { L"Diseño del cuadro de diálogo", L"Diseño básico de la ventana que usa la configuración de personalización", { L"Clásico", L"Compacto (Pill)", L"Fluent" } };
+    if (lang == L"pt") return { L"Layout da janela", L"Layout básico da janela que usa as configurações de personalização", { L"Clássico", L"Compacto (Pill)", L"Fluent" } };
+    if (lang == L"it") return { L"Layout della finestra", L"Layout di base della finestra che usa le impostazioni di personalizzazione", { L"Classico", L"Compatto (Pill)", L"Fluent" } };
+    if (lang == L"ru") return { L"Макет окна", L"Базовая компоновка окна, использующая параметры персонализации", { L"Классический", L"Компактный (Pill)", L"Современный (Fluent)" } };
+    if (lang == L"uk") return { L"Макет вікна", L"Базове компонування вікна з урахуванням параметрів персоналізації", { L"Класичний", L"Компактний (Pill)", L"Fluent" } };
+    if (lang == L"pl") return { L"Układ okna", L"Podstawowy układ okna, który korzysta z ustawień personalizacji", { L"Klasyczny", L"Kompaktowy (Pill)", L"Fluent" } };
+    if (lang == L"nl") return { L"Vensterindeling", L"Basisindeling van het venster met de instellingen voor persoonlijke voorkeur", { L"Klassiek", L"Compact (Pill)", L"Fluent" } };
+    if (lang == L"tr") return { L"İletişim Kutusu Düzeni", L"Kişiselleştirme ayarlarını kullanan temel pencere düzeni", { L"Klasik", L"Kompakt (Pill)", L"Fluent" } };
+    if (lang == L"hi") return { L"डायलॉग का लेआउट", L"वैयक्तिकरण सेटिंग का उपयोग करने वाला मूल विंडो लेआउट", { L"क्लासिक", L"कॉम्पैक्ट (Pill)", L"Fluent" } };
+    if (lang == L"ar") return { L"تخطيط النافذة", L"التخطيط الأساسي للنافذة الذي يستخدم إعدادات التخصيص", { L"كلاسيكي", L"مدمج (Pill)", L"Fluent" } };
+    return { L"Dialog Layout", L"Base window layout that uses personalization settings", { L"Classic", L"Compact Mini-Pill", L"Fluent" } };
 }
 
 struct SettingsLocalizedStrings {
@@ -14037,7 +14058,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1] = beginGroupCard(
                 ls.gThemeTitle,
                 ls.gThemeSub,
-                3, rH);
+                2, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2000, L"\uE790",
                 ls.themeTitle,
                 ls.themeSub,
@@ -14049,11 +14070,6 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 ls.colorTitle,
                 ls.colorSub,
                 cmLbl);
-            const auto menuStrings = GetContextMenuStyleStrings(st->settings.language);
-            drawDropdownRowInGroup(g1, y1 + rH * 2, rH, 2110, L"\uE712",
-                menuStrings.title, menuStrings.description,
-                st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
-                    ? kWindowsFluentMenuLabel : menuStrings.modLabel);
 
             // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
             auto [g2, y2] = beginGroupCard(
@@ -14123,20 +14139,25 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1] = beginGroupCard(
                 ls.gPosTitle,
                 ls.gPosSub,
-                4, rH);
+                5, rH);
             drawDropdownRowInGroup(g1, y1, rH, 2300, L"\uE740",
                 ls.posTitle,
                 ls.posSub,
                 getPosLabel(st->settings.dialogPosition));
-            drawDropdownRowInGroup(g1, y1 + rH, rH, 2401, L"\uE81C",
-                layoutStrings.title,
-                layoutStrings.description,
-                layoutStrings.options[static_cast<int>(st->settings.dialogLayout)]);
-            drawToggleRowInGroup(g1, y1 + rH * 2, rH, 2403, L"\uE718",
+            drawToggleRowInGroup(g1, y1 + rH, rH, 2403, L"\uE718",
                 ls.remPosTitle,
                 ls.remPosSub,
                 st->settings.rememberPosition);
-            drawDropdownRowInGroup(g1, y1 + rH * 3, rH, 2410, L"\uE740",
+            drawDropdownRowInGroup(g1, y1 + rH * 2, rH, 2401, L"\uE81C",
+                layoutStrings.title,
+                layoutStrings.description,
+                layoutStrings.options[static_cast<int>(st->settings.dialogLayout)]);
+            const auto menuStrings = GetContextMenuStyleStrings(st->settings.language);
+            drawDropdownRowInGroup(g1, y1 + rH * 3, rH, 2110, L"\uE712",
+                menuStrings.title, menuStrings.description,
+                st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent
+                    ? kWindowsFluentMenuLabel : menuStrings.modLabel);
+            drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2410, L"\uE740",
                 ls.scaleTitle,
                 ls.scaleSub,
                 std::to_wstring(st->settings.uiScalePercent) + L"%");
@@ -15419,8 +15440,8 @@ void RecomputeDialogMetrics(RunDialogState* state) {
 
     ClampScrollOffset(state);
     int visRowCount = GetVisibleRowCount(state);
-    int padTop = GetListPadTop(state);
-    int padBot = GetListPadBottom(state);
+    int padTop = GetListPadding(state);
+    int padBot = GetListPadding(state, true);
     int rowH   = GetRowHeight(state);
 
     state->historyCardHeight = (visRowCount > 0) ? (padTop + visRowCount * rowH + padBot) : 0;
@@ -16175,11 +16196,11 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                             pFmtBtn->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
                         }
 
-                        int padTop = GetListPadTop(state);
+                        int padTop = GetListPadding(state);
                         int rowHInt = GetRowHeight(state);
-                        float textLeftX = DpiScaleSF(50.0f, state);
+                        float textLeftX = static_cast<float>(layout.rcEdit.left);
                         bool hasScrollbar = HasVerticalScrollbar(state);
-                        float sbReserve = hasScrollbar ? DpiScaleSF(12.0f, state) : 0.0f;
+                        float sbReserve = hasScrollbar ? DpiScaleS(kBaseScrollbarReserve, state) : 0.0f;
 
                         ExtraLocalizedStrings ex = GetExtraLocalizedStrings(state->settings.language);
 
@@ -16196,8 +16217,8 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 bool isSelected = (i == state->selectedRow);
 
                                 if (isHovered || isPressed || isSelected) {
-                                    float padX = DpiScaleSF(10.0f, state);
-                                    float padY = DpiScaleSF(2.0f, state);
+                                    float padX = DpiScaleS(kBasePanelInset, state);
+                                    float padY = DpiScaleS(kBaseRowHighlightInset, state);
                                     D2D1_RECT_F rcPill = D2D1::RectF(padX, rowTop + padY, (float)w - padX - sbReserve, rowTop + rowH - padY);
                                     const int innerRadius = state->settings.customInnerCornerRadius;
                                     const float innerPx = innerRadius >= 0 ? DpiScaleSF(static_cast<float>(innerRadius), state)
@@ -16582,7 +16603,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                            : D2D1::ColorF(1.00f, 0.71f, 0.18f, 1.00f));
                             ID2D1SolidColorBrush* pBrAmberBanner = nullptr;
                             if (SUCCEEDED(pRT->CreateSolidColorBrush(colAmberBanner, &pBrAmberBanner)) && pBrAmberBanner) {
-                                float pillInnerPadX = DpiScaleSF(14.0f, state);
+                                float pillInnerPadX = DpiScaleS(kBasePanelInset, state);
                                 float iconSlotW     = DpiScaleSF(19.0f, state);
                                 float availBannerW  = (std::max)(DpiScaleSF(60.0f, state),
                                                                  (rcAdminPill.right - rcAdminPill.left) - pillInnerPadX * 2.0f - iconSlotW);
@@ -16639,7 +16660,13 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
 
                                         DrawD2DShieldVector(pRT, pBrAmberBanner, pRoundStroke,
                                                             groupStartX + DpiScaleSF(6.0f, state), centerY, effectiveDpi, 0.90f);
-                                        pRT->DrawTextLayout(D2D1::Point2F(groupStartX + iconSlotW, rcAdminPill.top),
+                                        DWRITE_OVERHANG_METRICS ink{};
+                                        float textY = rcAdminPill.top;
+                                        if (SUCCEEDED(pFinalLayout->GetOverhangMetrics(&ink)) &&
+                                            adminH + ink.top + ink.bottom > 0.0f) {
+                                            textY = centerY - (adminH + ink.bottom - ink.top) * 0.5f;
+                                        }
+                                        pRT->DrawTextLayout(D2D1::Point2F(groupStartX + iconSlotW, textY),
                                                             pFinalLayout, pBrAmberBanner, D2D1_DRAW_TEXT_OPTIONS_CLIP);
                                         pFinalLayout->Release();
                                     }
@@ -16711,7 +16738,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                     int iconX    = DpiScaleS(22, state);
                     int cardTop  = GetDetachedCardTopY(state);
                     int barTop   = GetInputBarTopY(state);
-                    int padTop   = GetListPadTop(state);
+                    int padTop   = GetListPadding(state);
                     int rowHInt  = GetRowHeight(state);
                     int barH     = GetInputBarHeight(state);
 
