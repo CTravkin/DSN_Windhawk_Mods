@@ -66,16 +66,16 @@ test('layout settings preserve the prior Classic/Pill values and accept Fluent',
 
 test('the context menu retains its previous style by default', () => {
     const style = source.match(/- contextMenuStyle: mod[\s\S]*?(?=\n  - uiScalePercent:)/)?.[0];
-    assert.match(style, /\$name: Context Menu Style/);
+    assert.match(style, /\$name: "?Context Menu Style"?/);
     assert.match(style, /- mod: Mod Style/);
     assert.match(style, /- windows_fluent: Windows \(Fluent\)/);
-    assert.match(style, /\$description:ru-RU: Меняет оформление меню при клике правой кнопкой мыши/);
+    assert.match(style, /\$description:ru-RU: "?Оформление меню по правой кнопке мыши"?/);
 });
 
 test('both menu styles use the separately selected icon set', () => {
     const schema = source.match(/  - colorMode:[\s\S]*?\n  - iconSet: mod([\s\S]*?)\n  - customBgColor:/)?.[1];
     assert.ok(schema, 'The icon list follows Color Mode in Personalization');
-    assert.match(schema, /\$name:ru-RU: Иконки/);
+    assert.match(schema, /\$name:ru-RU: "?Иконки"?/);
     assert.match(schema, /- mod: Иконки мода/);
     assert.equal((schema.match(/\$options(?::[\w-]+)?:/g) ?? []).length, 21);
     assert.match(source, /DrawRunUiIcon\(pRT, pItemIconBr, pRoundStroke, s->dlgState->settings\.iconSet/);
@@ -87,13 +87,14 @@ test('both menu styles use the separately selected icon set', () => {
 test('the settings window uses Fluent glyphs for either icon set', () => {
     const painter = source.match(/void PaintWin11SettingsWindow\([\s\S]*?(?=\nstruct WinUI3ComboFlyoutSession)/)?.[0];
     assert.ok(painter);
-    assert.match(painter, /CreateTextFormat\(GetWindowsIconFontFamily\(\)/);
+    assert.match(painter, /const wchar_t\* iconFont = GetWindowsIconFontFamily\(\)/);
+    assert.match(painter, /CreateTextFormat\(iconFont,/);
     assert.doesNotMatch(painter, /FindModSettingsIcon|DrawRunUiIcon/);
     assert.match(painter, /DrawLayeredRunIcon\(pRT, imaging\.get\(\), st->hAppIcon/);
 });
 
-test('the larger Run emblem uses the same asset in both icon modes and on the taskbar', () => {
-    assert.match(source, /constexpr int kRunEmblemSize\s*=\s*24;/);
+test('the 20 DIP Run emblem uses the same asset in both icon modes and on the taskbar', () => {
+    assert.match(source, /constexpr int kRunEmblemSize\s*=\s*20;/);
     const refresh = source.match(/void RefreshDialogRunIcons\(RunDialogState\* state\) \{[\s\S]*?\n\}/)?.[0];
     assert.ok(refresh);
     assert.match(refresh, /const int barIconSize = DpiScaleS\(kRunEmblemSize, state\)/);
@@ -101,6 +102,25 @@ test('the larger Run emblem uses the same asset in both icon modes and on the ta
         assert.ok(refresh.includes('LoadCustomRunIcon(' + size + ')'));
     }
     assert.doesNotMatch(refresh, /settings\.iconSet/);
+});
+
+test('approved settings glyphs keep the selected shapes and orientation', () => {
+    assert.match(source, /2111, L"\\uEDE3"/);
+    assert.match(source, /2506, L"\\uE90E"/);
+    assert.match(source, /2213, 2214, 2215, L"\\uE744",\s*cornerStrings\.innerTitle, cornerStrings\.innerHint, innerRadius, true/);
+    assert.match(source, /Matrix3x2F::Rotation\(180\.0f, center\) \* transform/);
+    assert.match(source, /legacyIconFont && \*glyph == L'\\uE7A1'\) glyph = L"\\uE706"/);
+    assert.match(source, /drawAliasButton\(rcAdm, 2800 \+ i, L"\\uEA18"/);
+    assert.match(source, /drawAliasButton\(rcDel, 2900 \+ i, L"\\uE894"/);
+});
+
+test('each Windhawk setting declares its localized metadata once', () => {
+    const schema = source.match(/\/\/ ==WindhawkModSettings==([\s\S]*?)\/\/ ==\/WindhawkModSettings==/)?.[1];
+    assert.ok(schema);
+    for (const [, setting, block] of schema.matchAll(/^  - (\w+):[^\n]*\n((?: {4}[^\n]*(?:\n|$))*)/gm)) {
+        const fields = [...block.matchAll(/^ {4}(\$(?:name|description|options)(?::[\w-]+)?):/gm)].map(match => match[1]);
+        assert.equal(fields.length, new Set(fields).size, setting);
+    }
 });
 
 test('settings show the current version and build number without a prefix', () => {
@@ -127,8 +147,8 @@ test('layout settings keep position and menu style directly below their related 
     const keys = Array.from(layout.matchAll(/^  - (\w+):/gm), match => match[1]);
     assert.deepEqual(keys.slice(0, 6), ['dialogPosition', 'rememberPosition', 'minimalMode', 'contextMenuStyle', 'dialogWidthPreset', 'uiScalePercent']);
     assert.ok(!keys.includes('contextMenuBorderMode'));
-    assert.match(layout, /\$name:ru-RU: Макет окна/);
-    assert.match(layout, /\$description:ru-RU: Базовая компоновка окна, использующая параметры персонализации/);
+    assert.match(layout, /\$name:ru-RU: "?Макет окна"?/);
+    assert.match(layout, /\$description:ru-RU: "?Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"?/);
 });
 
 test('all width presets reserve 100 pixels for input beside visible controls', () => {
