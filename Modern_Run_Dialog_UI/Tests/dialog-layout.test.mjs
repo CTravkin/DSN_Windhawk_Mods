@@ -73,7 +73,7 @@ test('both menu styles use the separately selected icon set', () => {
     assert.match(schema, /\$name:ru-RU: "?Иконки"?/);
     assert.match(schema, /- default: По умолчанию/);
     assert.equal((schema.match(/\$options(?::[\w-]+)?:/g) ?? []).length, 21);
-    assert.match(source, /DrawRunUiIcon\(pRT, pItemIconBr, pRoundStroke, s->dlgState->settings\.iconSet/);
+    assert.match(source, /DrawRunUiIcon\(pRT, pBrIcon, pRoundStroke, s->dlgState->settings\.iconSet/);
     assert.match(source, /MakeWindowsMenuIcon\(request\.iconSet, item\.icon\)/);
     assert.match(source, /id == kIconSetControl/);
     assert.match(source, /GetUserOverrideKey\(L"iconSet"\)/);
@@ -541,7 +541,7 @@ test('history stores and displays up to 50 items while retaining its default lim
     assert.match(source, /constexpr int kMaxHistoryItems = 50;/);
     assert.match(source, /kMaxMruEntries\s*= kMaxHistoryItems;/);
     assert.match(source, /newSettings\.maxHistoryItems = std::clamp\([^;]+, 0, kMaxHistoryItems\);/);
-    assert.match(source, /Wh_SetIntValue\(GetUserOverrideKey\(L"maxHistoryItems"\)\.c_str\(\), val\);/);
+    assert.match(source, /Wh_SetIntValue\(GetUserOverrideKey\(L"maxHistoryItems"\)\.c_str\(\), \(st->settings\.maxHistoryItems > 0\) \? 0 : 20\);/);
 });
 
 test('all localized border lists omit the explicit accent and preserve the option order', () => {
@@ -599,14 +599,16 @@ test('centered rows split spare space and keep dropdown input within its rows', 
 
 test('Auto contrast follows solid theme backgrounds in both Windows color modes', () => {
     const palette = source.match(/struct ResolvedThemeVisuals \{[\s\S]*?\n\}/)?.[0];
+    const presets = source.match(/struct ThemeColors \{[\s\S]*?(?=ResolvedThemeVisuals ResolveEffectiveThemeVisuals)/)?.[0];
     const visuals = source.match(/ResolvedThemeVisuals ResolveEffectiveThemeVisuals\([\s\S]*?\n\}/)?.[0];
     const contrast = source.match(/bool ResolveDialogLightContrast\([^;\n]*\) \{[\s\S]*?\n\}/)?.[0];
-    assert.ok(palette && visuals && contrast);
+    assert.ok(palette && presets && visuals && contrast);
     compileChecks(`
         #include <windows.h>
         #include <d2d1.h>
         #include <algorithm>
         #include <cassert>
+        #include <optional>
         #include <string>
         enum class SurfaceTheme { Glass, Blur, Solid };
         enum class ColorMode { Auto, Dark, Light };
@@ -629,8 +631,12 @@ test('Auto contrast follows solid theme backgrounds in both Windows color modes'
             return color == L"000000";
         }
         ${palette};
+        ${presets}
         ${visuals}
         ${contrast}
+        static_assert(std::size(kThemePresets) == 13);
+        static_assert(GetThemePresetIndex(L"unknown") == GetThemePresetIndex(L"windows_blur"));
+        static_assert(GetThemePresetIndex(L"custom") == 12);
         int main() {
             RunDialogState dialog{};
             for (bool light : {false, true}) {
