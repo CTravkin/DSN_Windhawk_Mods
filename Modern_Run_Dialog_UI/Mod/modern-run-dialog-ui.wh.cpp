@@ -42,7 +42,7 @@
 // @description:hi-IN रन (Win + R) और कार्य प्रबंधक के «नया कार्य चलाएँ» संवाद की जगह थीम, इतिहास, सुझाव और कस्टम कमांड वाला संवाद देता है
 // @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
 // @description:ar يستبدل نافذة «تشغيل» (Win + R) ومربع حوار «تشغيل مهمة جديدة» في إدارة المهام ويضيف نُسقًا وسجلًا واقتراحات وأوامر مخصصة
-// @version         6.10.11
+// @version         6.10.14
 // @author          caotu2005, CTravkin
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -50,7 +50,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 61
+// Build: 64
 
 // ==WindhawkModReadme==
 /*
@@ -96,7 +96,7 @@ Shared options are available in both Modern Run Settings and Windhawk. In-app se
 
 - Set the number of stored and visible history entries, hide history, or show timestamps in the Windows regional format.
 - Clear the input when Run opens or close Run by clicking outside it. The taskbar icon can minimize and restore the window, close it, or be hidden.
-- Enable elevation by default and choose a separate indicator panel or a shield in the input row. **Shift + Enter** normally runs the command in a terminal and can be assigned to switch privileges.
+- Enable elevation by default and choose a separate indicator panel or a shield in the input row. Enable **Ctrl + Enter** as an additional shortcut to switch privileges.
 
 ### Display language
 
@@ -112,7 +112,8 @@ Press **Win + R** to open Modern Run in place of the classic Run dialog. Type a 
 
 - **↑ / ↓** browse history and suggestions. With an empty field, press **↑** to open the history if it is enabled.
 - **Tab** puts the selected item in the input so it can be edited. **Enter** runs the selected item or the text in the field.
-- **Ctrl + Shift + Enter** switches privileges for this launch by default. **Shift + Enter** runs the command in a terminal by default.
+- **Ctrl + Shift + Enter** switches privileges for this launch.
+- **Shift + Enter** runs the command in a terminal.
 - **Ctrl + O** opens the file picker, **Ctrl + ,** opens Modern Run Settings, and **Esc** closes the dialog.
 - **Delete** removes the selected history entry. Right-click an entry to pin or remove it.
 
@@ -3488,49 +3489,49 @@ Use **Commands** in Modern Run Settings to add, edit, or remove custom commands.
     $options:ar:
     - panel: لوحة منفصلة
     - field: مؤشر داخل حقل الإدخال
-  - shiftEnterSwitchesPrivileges: false
-    $name: "Switch Privileges with Shift + Enter"
-    $name:ru-RU: "Менять права по Shift + Enter"
-    $name:vi-VN: "Đổi quyền bằng Shift + Enter"
-    $name:zh-CN: "用 Shift + Enter 切换权限"
-    $name:zh-TW: "使用 Shift + Enter 切換權限"
-    $name:ja-JP: "Shift + Enter で権限を切り替える"
-    $name:ko-KR: "Shift + Enter로 권한 전환"
-    $name:th-TH: "สลับสิทธิ์ด้วย Shift + Enter"
-    $name:id-ID: "Ganti hak akses dengan Shift + Enter"
-    $name:ms-MY: "Tukar keistimewaan dengan Shift + Enter"
-    $name:fr-FR: "Changer de droits avec Maj + Entrée"
-    $name:de-DE: "Berechtigungsstufe mit Umschalt + Eingabe wechseln"
-    $name:es-ES: "Cambiar los privilegios con Mayús + Entrar"
-    $name:pt-BR: "Alternar privilégios com Shift + Enter"
-    $name:it-IT: "Alterna i privilegi con Maiusc + Invio"
-    $name:uk-UA: "Змінювати права клавішами Shift + Enter"
-    $name:pl-PL: "Zmieniaj poziom uprawnień skrótem Shift + Enter"
-    $name:nl-NL: "Machtigingsniveau wisselen met Shift + Enter"
-    $name:tr-TR: "Shift + Enter ile yetki düzeyini değiştir"
-    $name:hi-IN: "Shift + Enter से विशेषाधिकार बदलें"
-    $name:ar: "تبديل الصلاحيات باستخدام Shift + Enter"
-    $description: "Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
-    $description:ru-RU: "Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
-    $description:vi-VN: "Nhấn Shift + Enter thay cho Ctrl + Shift + Enter để chạy với quyền quản trị viên"
-    $description:zh-CN: "使用 Shift + Enter 代替 Ctrl + Shift + Enter 以管理员身份运行"
-    $description:zh-TW: "按 Shift + Enter 取代 Ctrl + Shift + Enter，以系統管理員身分執行"
-    $description:ja-JP: "Ctrl + Shift + Enter の代わりに Shift + Enter を押すと、管理者として実行できます"
-    $description:ko-KR: "Ctrl + Shift + Enter 대신 Shift + Enter를 눌러 관리자 권한으로 실행합니다"
-    $description:th-TH: "กด Shift + Enter แทน Ctrl + Shift + Enter เพื่อเรียกใช้ในฐานะผู้ดูแลระบบ"
-    $description:id-ID: "Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai administrator"
-    $description:ms-MY: "Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai pentadbir"
-    $description:fr-FR: "Exécute en tant qu’administrateur avec Maj + Entrée au lieu de Ctrl + Maj + Entrée"
-    $description:de-DE: "Mit Umschalt + Eingabe statt Strg + Umschalt + Eingabe als Administrator ausführen"
-    $description:es-ES: "Ejecuta como administrador con Mayús + Entrar en lugar de Ctrl + Mayús + Entrar"
-    $description:pt-BR: "Executa como administrador com Shift + Enter em vez de Ctrl + Shift + Enter"
-    $description:it-IT: "Esegue come amministratore con Maiusc + Invio anziché Ctrl + Maiusc + Invio"
-    $description:uk-UA: "Для запуску від імені адміністратора достатньо натиснути Shift + Enter замість Ctrl + Shift + Enter"
-    $description:pl-PL: "Uruchamia jako administrator skrótem Shift + Enter zamiast Ctrl + Shift + Enter"
-    $description:nl-NL: "Voert uit als administrator met Shift + Enter in plaats van Ctrl + Shift + Enter"
-    $description:tr-TR: "Yönetici olarak çalıştırmak için Ctrl + Shift + Enter yerine Shift + Enter kullanılır"
-    $description:hi-IN: "व्यवस्थापक के रूप में चलाने के लिए Ctrl + Shift + Enter की जगह Shift + Enter दबाएँ"
-    $description:ar: "للتشغيل كمسؤول، يُستخدم Shift + Enter بدلًا من Ctrl + Shift + Enter"
+  - ctrlEnterSwitchesPrivileges: false
+    $name: "Switch Privileges with Ctrl + Enter"
+    $name:ru-RU: "Менять права по Ctrl + Enter"
+    $name:vi-VN: "Đổi quyền bằng Ctrl + Enter"
+    $name:zh-CN: "用 Ctrl + Enter 切换权限"
+    $name:zh-TW: "使用 Ctrl + Enter 切換權限"
+    $name:ja-JP: "Ctrl + Enter で権限を切り替える"
+    $name:ko-KR: "Ctrl + Enter로 권한 전환"
+    $name:th-TH: "สลับสิทธิ์ด้วย Ctrl + Enter"
+    $name:id-ID: "Ganti hak akses dengan Ctrl + Enter"
+    $name:ms-MY: "Tukar keistimewaan dengan Ctrl + Enter"
+    $name:fr-FR: "Changer de droits avec Ctrl + Entrée"
+    $name:de-DE: "Berechtigungsstufe mit Strg + Eingabe wechseln"
+    $name:es-ES: "Cambiar los privilegios con Ctrl + Entrar"
+    $name:pt-BR: "Alternar privilégios com Ctrl + Enter"
+    $name:it-IT: "Alterna i privilegi con Ctrl + Invio"
+    $name:uk-UA: "Змінювати права клавішами Ctrl + Enter"
+    $name:pl-PL: "Zmieniaj poziom uprawnień skrótem Ctrl + Enter"
+    $name:nl-NL: "Machtigingsniveau wisselen met Ctrl + Enter"
+    $name:tr-TR: "Ctrl + Enter ile yetki düzeyini değiştir"
+    $name:hi-IN: "Ctrl + Enter से विशेषाधिकार बदलें"
+    $name:ar: "تبديل الصلاحيات باستخدام Ctrl + Enter"
+    $description: "Additional shortcut to switch privileges for the current command"
+    $description:ru-RU: "Дополнительное сочетание для смены прав текущей команды"
+    $description:vi-VN: "Phím tắt bổ sung để đổi quyền cho lệnh hiện tại"
+    $description:zh-CN: "用于切换当前命令权限的附加快捷键"
+    $description:zh-TW: "用於切換目前命令權限的額外快速鍵"
+    $description:ja-JP: "現在のコマンドの権限を切り替える追加のショートカット"
+    $description:ko-KR: "현재 명령의 권한을 전환하는 추가 단축키"
+    $description:th-TH: "แป้นพิมพ์ลัดเพิ่มเติมสำหรับสลับสิทธิ์ของคำสั่งปัจจุบัน"
+    $description:id-ID: "Pintasan tambahan untuk mengganti hak akses perintah saat ini"
+    $description:ms-MY: "Pintasan tambahan untuk menukar keistimewaan arahan semasa"
+    $description:fr-FR: "Raccourci supplémentaire pour changer les droits de la commande en cours"
+    $description:de-DE: "Zusätzliche Tastenkombination zum Wechseln der Berechtigungsstufe des aktuellen Befehls"
+    $description:es-ES: "Atajo adicional para cambiar los privilegios del comando actual"
+    $description:pt-BR: "Atalho adicional para alternar os privilégios do comando atual"
+    $description:it-IT: "Tasto di scelta rapida aggiuntivo per cambiare i privilegi del comando corrente"
+    $description:uk-UA: "Додаткове сполучення клавіш для зміни прав поточної команди"
+    $description:pl-PL: "Dodatkowy skrót do zmiany poziomu uprawnień bieżącego polecenia"
+    $description:nl-NL: "Extra sneltoets om het machtigingsniveau voor de huidige opdracht te wisselen"
+    $description:tr-TR: "Geçerli komutun yetki düzeyini değiştirmek için ek kısayol"
+    $description:hi-IN: "मौजूदा कमांड के विशेषाधिकार बदलने का एक अतिरिक्त शॉर्टकट"
+    $description:ar: "اختصار إضافي لتبديل صلاحيات الأمر الحالي"
   $name: "Behavior"
   $name:ru-RU: "Поведение"
   $name:vi-VN: "Cách hoạt động"
@@ -3968,13 +3969,17 @@ constexpr TaskbarIconMode ParseTaskbarIconMode(std::wstring_view setting) {
 
 constexpr int kMaxHistoryItems = 50;
 
-constexpr RunEnterAction ResolveRunEnterAction(bool shiftSwitchesPrivileges, bool shift, bool ctrl) {
-    if (!shift) return RunEnterAction::Normal;
-    return ctrl || shiftSwitchesPrivileges ? RunEnterAction::InvertElevation : RunEnterAction::Terminal;
+constexpr RunEnterAction ResolveRunEnterAction(bool ctrlSwitchesPrivileges, bool shift, bool ctrl) {
+    if (ctrl && (shift || ctrlSwitchesPrivileges)) return RunEnterAction::InvertElevation;
+    return shift ? RunEnterAction::Terminal : RunEnterAction::Normal;
 }
 
 constexpr bool ResolveRunElevation(bool defaultAdmin, RunEnterAction action) {
     return defaultAdmin != (action == RunEnterAction::InvertElevation);
+}
+
+constexpr bool ResolveRunElevationIndicator(bool defaultAdmin, RunEnterAction action) {
+    return action != RunEnterAction::Terminal && ResolveRunElevation(defaultAdmin, action);
 }
 
 constexpr int GetLayoutWidthDip(DialogLayout layout, DialogWidthPreset preset) {
@@ -4083,7 +4088,7 @@ struct ModSettings {
     bool closeOnClickOutside = false;
     bool runAsAdmin = false;
     bool inlineAdminIndicator = false;
-    bool shiftEnterSwitchesPrivileges = false;
+    bool ctrlEnterSwitchesPrivileges = false;
     std::vector<CommandAlias> customAliases;
 };
 
@@ -6201,7 +6206,7 @@ struct WindhawkRawSnapshot {
     int closeOnClickOutside = 0;
     int runAsAdmin = 0;
     std::wstring adminIndicatorPlacement;
-    int shiftEnterSwitchesPrivileges = 0;
+    int ctrlEnterSwitchesPrivileges = 0;
     std::vector<CommandAlias> customAliases;
 };
 
@@ -6347,7 +6352,7 @@ void LoadSettings(bool fromSettingsChanged = false) {
     curWh.closeOnClickOutside     = (Wh_GetIntSetting(L"historyBehaviorGroup.closeOnClickOutside") != 0) ? 1 : 0;
     curWh.runAsAdmin              = (Wh_GetIntSetting(L"historyBehaviorGroup.runAsAdmin") != 0) ? 1 : 0;
     curWh.adminIndicatorPlacement = ReadGroupedStringSetting(L"historyBehaviorGroup.adminIndicatorPlacement", nullptr, L"panel");
-    curWh.shiftEnterSwitchesPrivileges = Wh_GetIntSetting(L"historyBehaviorGroup.shiftEnterSwitchesPrivileges");
+    curWh.ctrlEnterSwitchesPrivileges = Wh_GetIntSetting(L"historyBehaviorGroup.ctrlEnterSwitchesPrivileges");
     for (int i = 0; i < 64; ++i) {
         auto aStr = WindhawkUtils::StringSetting::make(L"customAliases[%d].alias", i);
         auto cStr = WindhawkUtils::StringSetting::make(L"customAliases[%d].command", i);
@@ -6396,8 +6401,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
             dropIfChanged(curWh.closeOnClickOutside != g_lastWhSnapshot.closeOnClickOutside, L"closeOnClickOutside");
             dropIfChanged(curWh.runAsAdmin != g_lastWhSnapshot.runAsAdmin, L"runAsAdmin");
             dropIfChanged(curWh.adminIndicatorPlacement != g_lastWhSnapshot.adminIndicatorPlacement, L"adminIndicatorPlacement");
-            dropIfChanged(curWh.shiftEnterSwitchesPrivileges != g_lastWhSnapshot.shiftEnterSwitchesPrivileges,
-                          L"shiftEnterSwitchesPrivileges");
+            dropIfChanged(curWh.ctrlEnterSwitchesPrivileges != g_lastWhSnapshot.ctrlEnterSwitchesPrivileges,
+                          L"ctrlEnterSwitchesPrivileges");
             if (!AliasesEqual(curWh.customAliases, g_lastWhSnapshot.customAliases)) {
                 ClearInAppAliasesOverride();
             }
@@ -6605,8 +6610,8 @@ void LoadSettings(bool fromSettingsChanged = false) {
     const std::wstring_view adminIndicator = adminIndicatorOverride[0]
         ? std::wstring_view(adminIndicatorOverride) : std::wstring_view(curWh.adminIndicatorPlacement);
     newSettings.inlineAdminIndicator = adminIndicator == L"field";
-    newSettings.shiftEnterSwitchesPrivileges = Wh_GetIntValue(
-        GetUserOverrideKey(L"shiftEnterSwitchesPrivileges").c_str(), curWh.shiftEnterSwitchesPrivileges) != 0;
+    newSettings.ctrlEnterSwitchesPrivileges = Wh_GetIntValue(
+        GetUserOverrideKey(L"ctrlEnterSwitchesPrivileges").c_str(), curWh.ctrlEnterSwitchesPrivileges) != 0;
 
     newSettings.customAliases.clear();
     int aliasCountOv = Wh_GetIntValue(GetUserOverrideKey(L"aliasCount").c_str(), -1);
@@ -7911,7 +7916,7 @@ struct ActionButtonsLayout {
     RECT rcClose;
     RECT rcGear;
     RECT rcEdit;
-    RECT rcAdminIndicator;
+    RECT rcModifierIndicator;
 };
 
 struct RunDialogState {
@@ -11514,7 +11519,7 @@ bool ShouldShowRunElevation(const RunDialogState* state) {
             ResolveCustomAlias(state->settings, GetEffectiveInputText(state->hModernEdit), nullptr, &defaultAdmin);
         }
     }
-    return ResolveRunElevation(defaultAdmin, state->enterPreview);
+    return ResolveRunElevationIndicator(defaultAdmin, state->enterPreview);
 }
 
 int GetAdminBannerHeight(const RunDialogState* state) {
@@ -11581,8 +11586,9 @@ int GetInputLeft(const RunDialogState* state) {
     return DpiScaleS(state->settings.dialogLayout == DialogLayout::Pill ? 46 : 50, state);
 }
 
-int GetAdminIndicatorWidth(const RunDialogState* state) {
-    return state->settings.inlineAdminIndicator ? DpiScaleS(26, state) : 0;
+int GetModifierIndicatorWidth(const RunDialogState* state) {
+    const bool reserveSlot = state->settings.inlineAdminIndicator || state->enterPreview == RunEnterAction::Terminal;
+    return reserveSlot ? DpiScaleS(26, state) : 0;
 }
 
 int GetDlgWidth(const RunDialogState* state) {
@@ -11592,7 +11598,7 @@ int GetDlgWidth(const RunDialogState* state) {
         ? DpiScale(state->settings.customDialogWidth, state->dpi)
         : DpiScaleS(GetLayoutWidthDip(state->settings.dialogLayout, preset), state);
     const auto widths = GetVisibleActionButtonWidths(state, GetActionButtonHeight(state, GetInputBarHeight(state)));
-    int occupiedWidth = GetAdminIndicatorWidth(state);
+    int occupiedWidth = GetModifierIndicatorWidth(state);
     int visible = occupiedWidth > 0;
     for (const auto width : widths) {
         occupiedWidth += width;
@@ -11629,7 +11635,7 @@ ActionButtonsLayout GetActionButtonsLayout(const RunDialogState* state) {
     layout.rcClose  = placeControl(widths[static_cast<size_t>(RunAction::Close)]);
     layout.rcRun    = placeControl(widths[static_cast<size_t>(RunAction::Run)]);
     layout.rcBrowse = placeControl(widths[static_cast<size_t>(RunAction::Browse)]);
-    layout.rcAdminIndicator = placeControl(GetAdminIndicatorWidth(state));
+    layout.rcModifierIndicator = placeControl(GetModifierIndicatorWidth(state));
 
     int editH = (std::max)(DpiScaleS(24, state), (int)std::ceil(GetFontSizeSF(13.5f, state) * 1.6f));
     editH = (std::min)(editH, barH - DpiScale(6, dpi, 100));
@@ -11935,6 +11941,7 @@ enum class FluentMenuIcon {
     ClearTrash,
     FolderPick,
     AdminShield,
+    Terminal,
     RunArrow,
     Close,
     Settings,
@@ -11988,6 +11995,20 @@ void DrawD2DFluentMenuIcon(Target* pRT, ID2D1Brush* pBrush, ID2D1StrokeStyle* pS
             DrawD2DShieldVector(pRT, pBrush, pStroke, cx, cy, dpi, 1.0f);
             break;
         }
+        case FluentMenuIcon::Terminal: {
+            const auto point = [&](float x, float y) {
+                return D2D1::Point2F(cx + DpiScaleF(x, dpi), cy + DpiScaleF(y, dpi));
+            };
+            const auto topLeft = point(-6.5f, -5.0f);
+            const auto bottomRight = point(6.5f, 5.0f);
+            const float radius = DpiScaleF(1.3f, dpi);
+            const auto frame = D2D1::RectF(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+            pRT->DrawRoundedRectangle(D2D1::RoundedRect(frame, radius, radius), pBrush, sw, pStroke);
+            pRT->DrawLine(point(-3.5f, -1.8f), point(-1.4f, 0.0f), pBrush, sw, pStroke);
+            pRT->DrawLine(point(-1.4f, 0.0f), point(-3.5f, 1.8f), pBrush, sw, pStroke);
+            pRT->DrawLine(point(0.8f, 1.8f), point(3.6f, 1.8f), pBrush, sw, pStroke);
+            break;
+        }
         default:
             break;
     }
@@ -12000,6 +12021,7 @@ constexpr const wchar_t* SystemMenuGlyph(FluentMenuIcon icon) {
         case FluentMenuIcon::FolderPick: return L"\uE8B7";
         case FluentMenuIcon::Close: return L"\uE711";
         case FluentMenuIcon::AdminShield: return L"\uEA18";
+        case FluentMenuIcon::Terminal: return L"\uE756";
         case FluentMenuIcon::RunArrow: return L"\uE751";
         case FluentMenuIcon::Settings: return L"\uE713";
         case FluentMenuIcon::Pin: return L"\uE840";
@@ -13518,8 +13540,8 @@ struct RunDisplaySettingStrings {
     const wchar_t* indicatorDescription;
     const wchar_t* panel;
     const wchar_t* field;
-    const wchar_t* shiftTitle;
-    const wchar_t* shiftDescription;
+    const wchar_t* ctrlEnterTitle;
+    const wchar_t* ctrlEnterDescription;
 };
 
 RunDisplaySettingStrings GetRunDisplaySettingStrings(const std::wstring& language) {
@@ -13528,127 +13550,127 @@ RunDisplaySettingStrings GetRunDisplaySettingStrings(const std::wstring& languag
         L"Ширина окна", L"Ширина по умолчанию зависит от макета окна", L"По умолчанию", L"Узкая",
         L"Широкая", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию",
         L"Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды", L"Размещение индикатора", L"Где отображается статус запуска от имени администратора", L"Отдельная панель",
-        L"Индикатор в поле", L"Менять права по Shift + Enter", L"Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
+        L"Индикатор в поле", L"Менять права по Ctrl + Enter", L"Дополнительное сочетание для смены прав текущей команды"
     };
     if (code == L"vi") return {
         L"Chiều rộng cửa sổ", L"Chiều rộng mặc định phụ thuộc vào bố cục cửa sổ", L"Mặc định", L"Hẹp",
         L"Rộng", L"Cách hoạt động", L"Chạy với quyền quản trị viên", L"Mặc định chạy với quyền quản trị viên",
         L"Chạy với quyền quản trị viên. Dùng Ctrl + Shift + Enter để đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Nơi hiển thị trạng thái chạy với quyền quản trị viên", L"Khung riêng",
-        L"Trong ô nhập", L"Đổi quyền bằng Shift + Enter", L"Nhấn Shift + Enter thay cho Ctrl + Shift + Enter để chạy với quyền quản trị viên"
+        L"Trong ô nhập", L"Đổi quyền bằng Ctrl + Enter", L"Phím tắt bổ sung để đổi quyền cho lệnh hiện tại"
     };
     if (code == L"zh_cn") return {
         L"窗口宽度", L"默认宽度由窗口布局决定", L"默认", L"较窄",
         L"较宽", L"行为", L"以管理员身份运行", L"默认以管理员身份运行",
         L"以管理员身份运行。按 Ctrl + Shift + Enter 可切换当前命令的权限", L"指示器位置", L"显示管理员运行状态的位置", L"独立面板",
-        L"输入框内", L"用 Shift + Enter 切换权限", L"使用 Shift + Enter 代替 Ctrl + Shift + Enter 以管理员身份运行"
+        L"输入框内", L"用 Ctrl + Enter 切换权限", L"用于切换当前命令权限的附加快捷键"
     };
     if (code == L"zh_tw") return {
         L"視窗寬度", L"預設寬度由視窗版面配置決定", L"預設", L"窄",
         L"寬", L"行為", L"以系統管理員身分執行", L"預設以系統管理員身分執行",
         L"以系統管理員身分執行。按 Ctrl + Shift + Enter 可切換目前命令的權限", L"指示器位置", L"顯示系統管理員執行狀態的位置", L"獨立面板",
-        L"輸入欄內", L"使用 Shift + Enter 切換權限", L"按 Shift + Enter 取代 Ctrl + Shift + Enter，以系統管理員身分執行"
+        L"輸入欄內", L"使用 Ctrl + Enter 切換權限", L"用於切換目前命令權限的額外快速鍵"
     };
     if (code == L"ja") return {
         L"ウィンドウの幅", L"既定の幅はウィンドウのレイアウトに応じて決まります", L"既定", L"狭い",
         L"広い", L"動作", L"管理者として実行", L"既定で管理者として実行する",
         L"管理者として実行します。Ctrl + Shift + Enter で現在のコマンドの権限を切り替えます", L"インジケーターの位置", L"管理者として実行する状態を表示する場所", L"別のパネル",
-        L"入力欄内", L"Shift + Enter で権限を切り替える", L"Ctrl + Shift + Enter の代わりに Shift + Enter を押すと、管理者として実行できます"
+        L"入力欄内", L"Ctrl + Enter で権限を切り替える", L"現在のコマンドの権限を切り替える追加のショートカット"
     };
     if (code == L"ko") return {
         L"창 너비", L"기본 너비는 창 레이아웃에 따라 결정됩니다", L"기본값", L"좁게",
         L"넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 관리자 권한으로 실행",
         L"관리자 권한으로 실행합니다. Ctrl + Shift + Enter로 현재 명령의 권한을 전환합니다", L"표시기 위치", L"관리자 권한으로 실행하는 상태를 표시할 위치", L"별도 패널",
-        L"입력란 안", L"Shift + Enter로 권한 전환", L"Ctrl + Shift + Enter 대신 Shift + Enter를 눌러 관리자 권한으로 실행합니다"
+        L"입력란 안", L"Ctrl + Enter로 권한 전환", L"현재 명령의 권한을 전환하는 추가 단축키"
     };
     if (code == L"th") return {
         L"ความกว้างหน้าต่าง", L"ความกว้างเริ่มต้นขึ้นอยู่กับเค้าโครงหน้าต่าง", L"ค่าเริ่มต้น", L"แคบ",
         L"กว้าง", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"เรียกใช้ในฐานะผู้ดูแลระบบเป็นค่าเริ่มต้น",
         L"เรียกใช้ในฐานะผู้ดูแลระบบ กด Ctrl + Shift + Enter เพื่อสลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"ตำแหน่งที่แสดงสถานะการเรียกใช้ในฐานะผู้ดูแลระบบ", L"แผงแยก",
-        L"ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift + Enter", L"กด Shift + Enter แทน Ctrl + Shift + Enter เพื่อเรียกใช้ในฐานะผู้ดูแลระบบ"
+        L"ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Ctrl + Enter", L"แป้นพิมพ์ลัดเพิ่มเติมสำหรับสลับสิทธิ์ของคำสั่งปัจจุบัน"
     };
     if (code == L"id") return {
         L"Lebar jendela", L"Lebar default mengikuti tata letak jendela", L"Default", L"Sempit",
         L"Lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Jalankan sebagai administrator secara default",
         L"Jalankan sebagai administrator. Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Lokasi tampilan status jalankan sebagai administrator", L"Panel terpisah",
-        L"Indikator di kolom input", L"Ganti hak akses dengan Shift + Enter", L"Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai administrator"
+        L"Indikator di kolom input", L"Ganti hak akses dengan Ctrl + Enter", L"Pintasan tambahan untuk mengganti hak akses perintah saat ini"
     };
     if (code == L"ms") return {
         L"Lebar tetingkap", L"Lebar lalai mengikut susun atur tetingkap", L"Lalai", L"Sempit",
         L"Lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Jalankan sebagai pentadbir secara lalai",
         L"Jalankan sebagai pentadbir. Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Tempat status jalankan sebagai pentadbir dipaparkan", L"Panel berasingan",
-        L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift + Enter", L"Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai pentadbir"
+        L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Ctrl + Enter", L"Pintasan tambahan untuk menukar keistimewaan arahan semasa"
     };
     if (code == L"fr") return {
         L"Largeur de la fenêtre", L"La largeur par défaut dépend de la disposition de la fenêtre", L"Par défaut", L"Étroite",
         L"Large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Exécuter en tant qu’administrateur par défaut",
         L"Exécute en tant qu’administrateur. Ctrl + Maj + Entrée inverse les droits pour la commande en cours", L"Emplacement de l’indicateur", L"Emplacement de l’indicateur d’exécution en tant qu’administrateur", L"Panneau séparé",
-        L"Dans le champ de saisie", L"Changer de droits avec Maj + Entrée", L"Exécute en tant qu’administrateur avec Maj + Entrée au lieu de Ctrl + Maj + Entrée"
+        L"Dans le champ de saisie", L"Changer de droits avec Ctrl + Entrée", L"Raccourci supplémentaire pour changer les droits de la commande en cours"
     };
     if (code == L"de") return {
         L"Fensterbreite", L"Die Standardbreite richtet sich nach dem Fensterlayout", L"Standard", L"Schmal",
         L"Breit", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig als Administrator ausführen",
         L"Führt als Administrator aus. Strg + Umschalt + Eingabe wechselt die Berechtigungsstufe für den aktuellen Befehl", L"Position der Anzeige", L"Position der Anzeige für die Ausführung als Administrator", L"Separater Bereich",
-        L"Im Eingabefeld", L"Berechtigungsstufe mit Umschalt + Eingabe wechseln", L"Mit Umschalt + Eingabe statt Strg + Umschalt + Eingabe als Administrator ausführen"
+        L"Im Eingabefeld", L"Berechtigungsstufe mit Strg + Eingabe wechseln", L"Zusätzliche Tastenkombination zum Wechseln der Berechtigungsstufe des aktuellen Befehls"
     };
     if (code == L"es") return {
         L"Ancho de la ventana", L"El ancho predeterminado depende de la distribución de la ventana", L"Predeterminado", L"Estrecho",
         L"Ancho", L"Comportamiento", L"Ejecutar como administrador", L"Ejecutar como administrador de forma predeterminada",
         L"Ejecuta como administrador. Ctrl + Mayús + Entrar cambia los privilegios del comando actual", L"Posición del indicador", L"Lugar donde aparece el indicador de ejecución como administrador", L"Panel separado",
-        L"En el campo de entrada", L"Cambiar los privilegios con Mayús + Entrar", L"Ejecuta como administrador con Mayús + Entrar en lugar de Ctrl + Mayús + Entrar"
+        L"En el campo de entrada", L"Cambiar los privilegios con Ctrl + Entrar", L"Atajo adicional para cambiar los privilegios del comando actual"
     };
     if (code == L"pt") return {
         L"Largura da janela", L"A largura padrão segue o layout da janela", L"Padrão", L"Estreita",
         L"Larga", L"Comportamento", L"Executar como administrador", L"Executar como administrador por padrão",
         L"Executa como administrador. Ctrl + Shift + Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Local do indicador de execução como administrador", L"Painel separado",
-        L"No campo de entrada", L"Alternar privilégios com Shift + Enter", L"Executa como administrador com Shift + Enter em vez de Ctrl + Shift + Enter"
+        L"No campo de entrada", L"Alternar privilégios com Ctrl + Enter", L"Atalho adicional para alternar os privilégios do comando atual"
     };
     if (code == L"it") return {
         L"Larghezza della finestra", L"La larghezza predefinita dipende dal layout della finestra", L"Predefinito", L"Stretta",
         L"Larga", L"Comportamento", L"Esegui come amministratore", L"Esegui come amministratore per impostazione predefinita",
         L"Esegue come amministratore. Ctrl + Maiusc + Invio alterna i privilegi per il comando corrente", L"Posizione dell’indicatore", L"Posizione dell’indicatore di esecuzione come amministratore", L"Pannello separato",
-        L"Nel campo di immissione", L"Alterna i privilegi con Maiusc + Invio", L"Esegue come amministratore con Maiusc + Invio anziché Ctrl + Maiusc + Invio"
+        L"Nel campo di immissione", L"Alterna i privilegi con Ctrl + Invio", L"Tasto di scelta rapida aggiuntivo per cambiare i privilegi del comando corrente"
     };
     if (code == L"uk") return {
         L"Ширина вікна", L"Типова ширина залежить від макета вікна", L"За замовчуванням", L"Вузьке",
         L"Широке", L"Поведінка", L"Запуск від імені адміністратора", L"Запускати від імені адміністратора за замовчуванням",
         L"Запуск від імені адміністратора. Ctrl + Shift + Enter змінює права для поточної команди", L"Розташування індикатора", L"Де відображається стан запуску від імені адміністратора", L"Окрема панель",
-        L"Індикатор у полі введення", L"Змінювати права клавішами Shift + Enter", L"Для запуску від імені адміністратора достатньо натиснути Shift + Enter замість Ctrl + Shift + Enter"
+        L"Індикатор у полі введення", L"Змінювати права клавішами Ctrl + Enter", L"Додаткове сполучення клавіш для зміни прав поточної команди"
     };
     if (code == L"pl") return {
         L"Szerokość okna", L"Domyślna szerokość zależy od układu okna", L"Domyślne", L"Wąskie",
         L"Szerokie", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie uruchamiaj jako administrator",
         L"Uruchamia jako administrator. Ctrl + Shift + Enter zmienia poziom uprawnień dla bieżącego polecenia", L"Położenie wskaźnika", L"Miejsce wyświetlania wskaźnika uruchamiania jako administrator", L"Osobny panel",
-        L"W polu wprowadzania", L"Zmieniaj poziom uprawnień skrótem Shift + Enter", L"Uruchamia jako administrator skrótem Shift + Enter zamiast Ctrl + Shift + Enter"
+        L"W polu wprowadzania", L"Zmieniaj poziom uprawnień skrótem Ctrl + Enter", L"Dodatkowy skrót do zmiany poziomu uprawnień bieżącego polecenia"
     };
     if (code == L"nl") return {
         L"Vensterbreedte", L"De standaardbreedte hangt af van de vensterindeling", L"Standaard", L"Smal",
         L"Breed", L"Gedrag", L"Als administrator uitvoeren", L"Standaard uitvoeren als administrator",
         L"Voert uit als administrator. Ctrl + Shift + Enter wisselt het machtigingsniveau voor de huidige opdracht", L"Positie van de indicator", L"Locatie van de indicator voor uitvoering als administrator", L"Apart paneel",
-        L"In het invoerveld", L"Machtigingsniveau wisselen met Shift + Enter", L"Voert uit als administrator met Shift + Enter in plaats van Ctrl + Shift + Enter"
+        L"In het invoerveld", L"Machtigingsniveau wisselen met Ctrl + Enter", L"Extra sneltoets om het machtigingsniveau voor de huidige opdracht te wisselen"
     };
     if (code == L"tr") return {
         L"Pencere genişliği", L"Varsayılan genişlik pencere düzenine göre belirlenir", L"Varsayılan", L"Dar",
         L"Geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yönetici yetkileriyle çalıştır",
         L"Yönetici olarak çalıştırır. Ctrl + Shift + Enter geçerli komutun yetki düzeyini değiştirir", L"Gösterge konumu", L"Yönetici olarak çalıştırma durumunun göründüğü yer", L"Ayrı panel",
-        L"Giriş alanında gösterge", L"Shift + Enter ile yetki düzeyini değiştir", L"Yönetici olarak çalıştırmak için Ctrl + Shift + Enter yerine Shift + Enter kullanılır"
+        L"Giriş alanında gösterge", L"Ctrl + Enter ile yetki düzeyini değiştir", L"Geçerli komutun yetki düzeyini değiştirmek için ek kısayol"
     };
     if (code == L"hi") return {
         L"विंडो की चौड़ाई", L"डिफ़ॉल्ट चौड़ाई विंडो के लेआउट पर निर्भर करती है", L"डिफ़ॉल्ट", L"संकरा",
         L"चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से व्यवस्थापक के रूप में चलाएँ",
         L"व्यवस्थापक के रूप में चलाएँ। Ctrl + Shift + Enter से मौजूदा कमांड के विशेषाधिकार बदलते हैं", L"संकेतक का स्थान", L"व्यवस्थापक के रूप में चलाने की स्थिति दिखाने की जगह", L"अलग पैनल",
-        L"इनपुट फ़ील्ड में संकेतक", L"Shift + Enter से विशेषाधिकार बदलें", L"व्यवस्थापक के रूप में चलाने के लिए Ctrl + Shift + Enter की जगह Shift + Enter दबाएँ"
+        L"इनपुट फ़ील्ड में संकेतक", L"Ctrl + Enter से विशेषाधिकार बदलें", L"मौजूदा कमांड के विशेषाधिकार बदलने का एक अतिरिक्त शॉर्टकट"
     };
     if (code == L"ar") return {
         L"عرض النافذة", L"يحدد تخطيط النافذة العرض الافتراضي", L"افتراضي", L"ضيّق",
         L"عريض", L"السلوك", L"تشغيل كمسؤول", L"التشغيل كمسؤول افتراضيًا",
         L"تشغيل كمسؤول. يبدّل Ctrl + Shift + Enter صلاحيات الأمر الحالي", L"موضع المؤشر", L"مكان عرض حالة التشغيل كمسؤول", L"لوحة منفصلة",
-        L"مؤشر داخل حقل الإدخال", L"تبديل الصلاحيات باستخدام Shift + Enter", L"للتشغيل كمسؤول، يُستخدم Shift + Enter بدلًا من Ctrl + Shift + Enter"
+        L"مؤشر داخل حقل الإدخال", L"تبديل الصلاحيات باستخدام Ctrl + Enter", L"اختصار إضافي لتبديل صلاحيات الأمر الحالي"
     };
     return {
         L"Window Width", L"The default width follows the window layout", L"Default", L"Narrow",
         L"Wide", L"Behavior", L"Run as administrator", L"Elevate by Default",
         L"Run as administrator. Ctrl + Shift + Enter switches privileges for the current command", L"Indicator Placement", L"Where the administrator launch status appears", L"Separate panel",
-        L"Inline indicator", L"Switch Privileges with Shift + Enter", L"Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
+        L"Inline indicator", L"Switch Privileges with Ctrl + Enter", L"Additional shortcut to switch privileges for the current command"
     };
 }
 
@@ -13769,7 +13791,7 @@ std::wstring GetInterfaceScaleLabel(int percent, const SettingsOptionDetails& de
     return label;
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 61)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 64)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -15811,7 +15833,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     displaySettings.indicatorTitle, displaySettings.indicatorDescription,
                     st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel);
                 drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uEDA7",
-                    displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
+                    displaySettings.ctrlEnterTitle, displaySettings.ctrlEnterDescription, st->settings.ctrlEnterSwitchesPrivileges);
             }
         } else if (commandsPage) {
             const int count = static_cast<int>((std::min)(st->settings.customAliases.size(), kMaxSettingsCommands));
@@ -16910,8 +16932,8 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                                                     sel == 2 ? L"field" : L"panel");
                     }
                 } else if (id == 2508) {
-                    changed = Wh_SetIntValue(GetUserOverrideKey(L"shiftEnterSwitchesPrivileges").c_str(),
-                                             st->settings.shiftEnterSwitchesPrivileges ? 0 : 1);
+                    changed = Wh_SetIntValue(GetUserOverrideKey(L"ctrlEnterSwitchesPrivileges").c_str(),
+                                             st->settings.ctrlEnterSwitchesPrivileges ? 0 : 1);
                 } else if (id == 2504) {
                     Wh_SetIntValue(GetUserOverrideKey(L"showTimestamp").c_str(), st->settings.showTimestamp ? 0 : 1);
                     changed = true;
@@ -17468,7 +17490,8 @@ void RecomputeDialogMetrics(RunDialogState* state) {
 void RefreshRunDialogMetrics(RunDialogState* state) {
     const int oldHeight = state->totalHeight;
     RecomputeDialogMetrics(state);
-    if (state->totalHeight != oldHeight) {
+    if (state->totalHeight != oldHeight ||
+        (state->hasCommittedPos && GetDlgWidth(state) != state->lastCommittedW)) {
         ResizeDialogPreservingBottomAnchor(state, oldHeight);
     }
     RefreshDialogVisual(state->hDlg, state);
@@ -17657,11 +17680,11 @@ bool TryTabCompletePathOrEnv(HWND hEdit, RunDialogState* state, bool reverse) {
 
 RunEnterAction GetCurrentEnterAction(const RunDialogState* state) {
     if ((GetKeyState(VK_MENU) & 0x8000) != 0) return RunEnterAction::Normal;
-    return ResolveRunEnterAction(state->settings.shiftEnterSwitchesPrivileges,
+    return ResolveRunEnterAction(state->settings.ctrlEnterSwitchesPrivileges,
         (GetKeyState(VK_SHIFT) & 0x8000) != 0, (GetKeyState(VK_CONTROL) & 0x8000) != 0);
 }
 
-void UpdateRunElevationPreview(RunDialogState* state, RunEnterAction action) {
+void UpdateRunLaunchPreview(RunDialogState* state, RunEnterAction action) {
     if (!state || state->enterPreview == action) return;
     state->enterPreview = action;
     RefreshRunDialogMetrics(state);
@@ -17688,7 +17711,7 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
     if (state && (uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP) &&
         (wParam == VK_CONTROL || wParam == VK_SHIFT || wParam == VK_MENU)) {
-        UpdateRunElevationPreview(state, GetCurrentEnterAction(state));
+        UpdateRunLaunchPreview(state, GetCurrentEnterAction(state));
     }
 
     if (uMsg == WM_KEYDOWN && state) {
@@ -18678,14 +18701,16 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                         drawActionButton(layout.rcClose, closeBtnLabel, ActionBtnKind::Exit, state->closeHovered, state->closePressed);
                         drawActionButton(layout.rcGear,  nullptr,       ActionBtnKind::Gear, state->gearHovered,  state->gearPressed);
 
-                        if (state->settings.inlineAdminIndicator && ShouldShowRunElevation(state) && pRoundStroke) {
-                            winrt::com_ptr<ID2D1SolidColorBrush> shieldBrush;
-                            const D2D1_COLOR_F shieldColor = highContrast ? colPrimary : isLight
+                        const bool terminalPreview = state->enterPreview == RunEnterAction::Terminal;
+                        if (terminalPreview || (state->settings.inlineAdminIndicator && ShouldShowRunElevation(state))) {
+                            winrt::com_ptr<ID2D1SolidColorBrush> indicatorBrush;
+                            const D2D1_COLOR_F indicatorColor = highContrast ? colPrimary : isLight
                                 ? D2D1::ColorF(0.70f, 0.35f, 0.01f, 1.0f)
                                 : D2D1::ColorF(1.00f, 0.71f, 0.18f, 1.0f);
-                            if (SUCCEEDED(pRT->CreateSolidColorBrush(shieldColor, shieldBrush.put()))) {
-                                const auto& box = layout.rcAdminIndicator;
-                                DrawRunUiIcon(pRT, shieldBrush.get(), pRoundStroke, iconSet, FluentMenuIcon::AdminShield,
+                            if (SUCCEEDED(pRT->CreateSolidColorBrush(indicatorColor, indicatorBrush.put()))) {
+                                const auto& box = layout.rcModifierIndicator;
+                                const auto glyph = terminalPreview ? FluentMenuIcon::Terminal : FluentMenuIcon::AdminShield;
+                                DrawRunUiIcon(pRT, indicatorBrush.get(), pRoundStroke, iconSet, glyph,
                                     (box.left + box.right) * 0.5f, (box.top + box.bottom) * 0.5f, effectiveDpi, iconFormat.get());
                             }
                         }
@@ -18894,7 +18919,7 @@ bool PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, 
 void UpdateAdminIndicatorTooltip(RunDialogState* state) {
     const bool active = state->settings.inlineAdminIndicator && ShouldShowRunElevation(state);
     if (active) {
-        const auto rect = GetActionButtonsLayout(state).rcAdminIndicator;
+        const auto rect = GetActionButtonsLayout(state).rcModifierIndicator;
         const auto text = GetRunDisplaySettingStrings(state->settings.language).adminTitle;
         TOOLINFOW tool{};
         tool.cbSize = sizeof(tool);
@@ -19286,7 +19311,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                 g_dlgIsForeground.store(false);
                 CloseActiveGearMenu();
-                UpdateRunElevationPreview(state, RunEnterAction::Normal);
+                UpdateRunLaunchPreview(state, RunEnterAction::Normal);
                 if (state && state->settings.closeOnClickOutside &&
                     IsWindowVisible(hWnd) && !IsIconic(hWnd) && !state->launching &&
                     (!state->isBrowsingFile || g_hActiveGearMenu.load() != nullptr)) {
@@ -19299,7 +19324,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 g_dlgIsForeground.store(true);
                 g_deactivatedByTaskbarTick.store(0);
                 if (!IsIconic(hWnd) && IsWindowVisible(hWnd) && state) {
-                    UpdateRunElevationPreview(state, GetCurrentEnterAction(state));
+                    UpdateRunLaunchPreview(state, GetCurrentEnterAction(state));
                     if (!state->isBrowsingFile && g_hActiveGearMenu.load() == nullptr) {
                         SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
                     }

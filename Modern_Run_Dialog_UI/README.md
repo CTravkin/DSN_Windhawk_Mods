@@ -54,7 +54,7 @@ Shared options are available in both Modern Run Settings and Windhawk. In-app se
 
 - Set the number of stored and visible history entries, hide history, or show timestamps in the Windows regional format.
 - Clear the input when Run opens or close Run by clicking outside it. The taskbar icon can minimize and restore the window, close it, or be hidden.
-- Enable elevation by default and choose a separate indicator panel or a shield in the input row. **Shift + Enter** normally runs the command in a terminal and can be assigned to switch privileges.
+- Enable elevation by default and choose a separate indicator panel or a shield in the input row. Enable **Ctrl + Enter** as an additional shortcut to switch privileges.
 
 ### Display language
 
@@ -84,7 +84,8 @@ Press **Win + R** to open Modern Run in place of the classic Run dialog. Type a 
 
 - **↑ / ↓** browse history and suggestions. With an empty field, press **↑** to open the history if it is enabled.
 - **Tab** puts the selected item in the input so it can be edited. **Enter** runs the selected item or the text in the field.
-- **Ctrl + Shift + Enter** switches privileges for this launch by default. **Shift + Enter** runs the command in a terminal by default.
+- **Ctrl + Shift + Enter** switches privileges for this launch.
+- **Shift + Enter** runs the command in a terminal.
 - **Ctrl + O** opens the file picker, **Ctrl + ,** opens Modern Run Settings, and **Esc** closes the dialog.
 - **Delete** removes the selected history entry. Right-click an entry to pin or remove it.
 

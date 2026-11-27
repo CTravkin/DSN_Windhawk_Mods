@@ -54,7 +54,7 @@ Các tùy chọn chung có trong cài đặt Modern Run và Windhawk. Cài đặ
 
 - Đặt số lệnh được lưu và số hàng hiển thị, ẩn lịch sử hoặc hiện ngày giờ theo định dạng khu vực của Windows.
 - Có thể xóa nội dung ô nhập khi mở và đóng cửa sổ khi nhấp ra ngoài. Biểu tượng trên thanh tác vụ có thể thu nhỏ và khôi phục cửa sổ, đóng cửa sổ hoặc được ẩn.
-- Có thể mặc định chạy với quyền quản trị và hiện trạng thái trong bảng riêng hoặc qua biểu tượng khiên cạnh ô nhập. **Shift + Enter** mặc định chạy lệnh trong thiết bị đầu cuối và có thể được gán lại để đổi quyền.
+- Có thể mặc định chạy với quyền quản trị và hiện trạng thái trong bảng riêng hoặc qua biểu tượng khiên cạnh ô nhập. Có thể bật **Ctrl + Enter** làm phím tắt bổ sung để đổi quyền.
 
 ### Ngôn ngữ hiển thị
 
@@ -84,7 +84,8 @@ Nhấn **Win + R** để mở Modern Run thay cho hộp thoại Chạy cổ đi�
 
 - Dùng **↑ / ↓** để duyệt lịch sử và gợi ý. Khi ô nhập trống, nhấn **↑** để mở lịch sử nếu tính năng này đang bật.
 - **Tab** đưa mục đã chọn vào ô nhập để chỉnh sửa. **Enter** chạy mục đã chọn hoặc nội dung trong ô nhập.
-- Theo mặc định, **Ctrl + Shift + Enter** đổi quyền cho lần chạy này. **Shift + Enter** chạy lệnh trong thiết bị đầu cuối.
+- **Ctrl + Shift + Enter** đổi quyền cho lần chạy này.
+- **Shift + Enter** chạy lệnh trong thiết bị đầu cuối.
 - **Ctrl + O** mở hộp thoại chọn tệp, **Ctrl + ,** mở cài đặt Modern Run, còn **Esc** đóng cửa sổ.
 - **Delete** xóa mục đã chọn khỏi lịch sử. Nhấp chuột phải vào mục để ghim hoặc xóa.
 

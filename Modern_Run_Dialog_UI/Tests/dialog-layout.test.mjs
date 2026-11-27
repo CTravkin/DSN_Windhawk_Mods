@@ -180,15 +180,16 @@ test('all width presets reserve 100 pixels for input beside visible controls', (
     `);
 });
 
-test('the inline shield uses the standard gap before any visible action', () => {
+test('the shield and terminal indicators share a slot and the standard action gap', () => {
     const layout = source.match(/enum class DialogLayout[^\n]*;/)?.[0];
     const preset = source.match(/enum class DialogWidthPreset[^\n]*;/)?.[0];
+    const enterAction = source.match(/enum class RunEnterAction[^\n]*;/)?.[0];
     const actions = source.match(/enum class RunAction[\s\S]*?\nusing ActionWidths[^\n]*;/)?.[0];
     const rects = source.match(/struct ActionButtonsLayout \{[\s\S]*?\n\};/)?.[0];
     const functions = ['GetLayoutWidthDip', 'FitDialogWidth', 'GetInputLeft',
-        'GetAdminIndicatorWidth', 'GetDlgWidth', 'GetActionButtonsLayout']
+        'GetModifierIndicatorWidth', 'GetDlgWidth', 'GetActionButtonsLayout']
         .map(name => source.match(new RegExp(`(?:constexpr int|int|ActionButtonsLayout) ${name}\\([^;]*?\\) \\{[\\s\\S]*?\\n\\}`))?.[0]);
-    assert.ok(layout && preset && actions && rects && functions.every(Boolean));
+    assert.ok(layout && preset && enterAction && actions && rects && functions.every(Boolean));
     compileChecks(`
         #include <windows.h>
         #include <algorithm>
@@ -197,10 +198,12 @@ test('the inline shield uses the standard gap before any visible action', () => 
         #include <cmath>
         ${layout}
         ${preset}
+        ${enterAction}
         ${actions}
         ${rects}
         struct RunDialogState {
             UINT dpi = 96;
+            RunEnterAction enterPreview = RunEnterAction::Normal;
             struct {
                 DialogLayout dialogLayout = DialogLayout::Pill;
                 DialogWidthPreset dialogWidthPreset = DialogWidthPreset::Narrow;
@@ -224,44 +227,59 @@ test('the inline shield uses the standard gap before any visible action', () => 
             RunDialogState state;
             for (unsigned visible = 0; visible < 16; ++visible) {
                 for (size_t i = 0; i < kRunActionCount; ++i) state.actions[i] = visible & (1u << i) ? 32 : 0;
+                state.settings.inlineAdminIndicator = true;
+                state.enterPreview = RunEnterAction::Normal;
+                const auto shieldBox = GetActionButtonsLayout(&state).rcModifierIndicator;
+                state.settings.inlineAdminIndicator = false;
+                assert(GetModifierIndicatorWidth(&state) == 0);
+                state.enterPreview = RunEnterAction::Terminal;
                 const auto result = GetActionButtonsLayout(&state);
                 const RECT buttons[]{result.rcBrowse, result.rcRun, result.rcClose, result.rcGear};
+                assert(EqualRect(&shieldBox, &result.rcModifierIndicator));
                 assert(result.rcEdit.right - result.rcEdit.left >= 100);
-                assert(result.rcAdminIndicator.left - result.rcEdit.right == 8);
+                assert(result.rcModifierIndicator.left - result.rcEdit.right == 8);
                 bool matched = false;
                 for (const auto& button : buttons) {
                     if (button.right == button.left) continue;
-                    assert(button.left - result.rcAdminIndicator.right == 6);
+                    assert(button.left - result.rcModifierIndicator.right == 6);
                     matched = true;
                     break;
                 }
-                if (!matched) assert(GetDlgWidth(&state) - result.rcAdminIndicator.right == 11);
+                if (!matched) assert(GetDlgWidth(&state) - result.rcModifierIndicator.right == 11);
             }
         }
     `, true);
 });
 
-test('the administrator gesture inverts the effective default without changing it', () => {
+test('the optional Ctrl+Enter gesture preserves terminal and standard elevation shortcuts', () => {
     const action = source.match(/enum class RunEnterAction[^\n]*;/)?.[0];
     const resolve = source.match(/constexpr RunEnterAction ResolveRunEnterAction\([\s\S]*?\n\}/)?.[0];
     const privileges = source.match(/constexpr bool ResolveRunElevation\([\s\S]*?\n\}/)?.[0];
-    assert.ok(action && resolve && privileges);
+    const indicator = source.match(/constexpr bool ResolveRunElevationIndicator\([\s\S]*?\n\}/)?.[0];
+    assert.ok(action && resolve && privileges && indicator);
     compileChecks(`
         ${action}
         ${resolve}
         ${privileges}
+        ${indicator}
         using enum RunEnterAction;
         static_assert(ResolveRunEnterAction(false, false, false) == Normal);
         static_assert(ResolveRunEnterAction(true, false, false) == Normal);
+        static_assert(ResolveRunEnterAction(false, false, true) == Normal);
+        static_assert(ResolveRunEnterAction(true, false, true) == InvertElevation);
         static_assert(ResolveRunEnterAction(false, true, false) == Terminal);
         static_assert(ResolveRunEnterAction(false, true, true) == InvertElevation);
-        static_assert(ResolveRunEnterAction(true, true, false) == InvertElevation);
+        static_assert(ResolveRunEnterAction(true, true, false) == Terminal);
         static_assert(ResolveRunEnterAction(true, true, true) == InvertElevation);
         static_assert(!ResolveRunElevation(false, Normal));
         static_assert(ResolveRunElevation(true, Normal));
         static_assert(ResolveRunElevation(false, InvertElevation));
         static_assert(!ResolveRunElevation(true, InvertElevation));
         static_assert(ResolveRunElevation(true, Terminal));
+        static_assert(ResolveRunElevationIndicator(true, Normal));
+        static_assert(ResolveRunElevationIndicator(false, InvertElevation));
+        static_assert(!ResolveRunElevationIndicator(false, Terminal));
+        static_assert(!ResolveRunElevationIndicator(true, Terminal));
     `);
 });
 
