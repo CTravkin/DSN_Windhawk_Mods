@@ -7,6 +7,7 @@ const source = readFileSync(localFile('../Mod/Source/QuickLinkMenu.cpp'), 'utf8'
 const availability = readFileSync(localFile('../Mod/Source/Availability.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
 const powerActions = readFileSync(localFile('../Mod/Source/PowerActions.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
 const workQueue = readFileSync(localFile('../Mod/Source/ModuleWorkQueue.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
+const quickKeys = readFileSync(localFile('../Mod/Source/QuickKeys.h'), 'utf8').replace(/\r\n/g, '\n').trimEnd();
 const target = localFile('../Mod/quick-link-menu.wh.cpp');
 const locales = ['', ':ru-RU', ':es-ES', ':de-DE', ':pt-BR', ':zh-CN'];
 const wide = (value) => `L${JSON.stringify(value)}`;
@@ -81,6 +82,13 @@ addOption('submenuHover', 'immediate',
     ['arrow', ['On arrow hover', 'При наведении на стрелку', 'Al pasar el puntero sobre la flecha', 'Beim Darüberfahren über den Pfeil', 'Ao passar o ponteiro sobre a seta', '悬停在箭头上时打开']],
     ['click', ['On arrow click', 'При нажатии на стрелку', 'Al hacer clic en la flecha', 'Beim Klicken auf den Pfeil', 'Ao clicar na seta', '单击箭头时打开']],
   ]);
+addOption('quickLaunchKeys', 'none',
+  ['Quick launch keys', 'Клавиши быстрого запуска', 'Teclas de inicio rápido', 'Schnellstarttasten', 'Teclas de inicialização rápida', '快速启动键'],
+  ['Underlines the letters assigned to commands in the standard Windows menu', 'Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows', 'Subraya las letras asignadas a los comandos en el menú estándar de Windows', 'Unterstreicht die Buchstaben, die Befehlen im Standardmenü von Windows zugeordnet sind', 'Sublinha as letras atribuídas a comandos no menu padrão do Windows', '为 Windows 标准菜单中已指定字母的命令显示下划线'], [
+    ['none', ['None', 'Нет', 'Ninguna', 'Keine', 'Nenhuma', '无']],
+    ['visible', ['Visible only', 'Только видимые', 'Solo visibles', 'Nur sichtbare', 'Somente visíveis', '仅可见项']],
+    ['all', ['All commands', 'Все команды', 'Todos los comandos', 'Alle Befehle', 'Todos os comandos', '所有命令']],
+  ]);
 addOption('hideAdminCommands', false,
   ['Hide administrator commands', 'Скрытие команд администратора', 'Ocultar comandos de administrador', 'Administratorbefehle ausblenden', 'Ocultar comandos de administrador', '隐藏管理员命令'],
   ['A command is hidden if the current user lacks permission to run it or if elevation is blocked', 'Если выполнение команды запрещено текущему пользователю или повышение прав запрещено, она скрывается', 'Se oculta el comando si el usuario actual no tiene permiso para ejecutarlo o si se bloquea la elevación de privilegios', 'Ein Befehl wird ausgeblendet, wenn dem aktuellen Benutzer die Berechtigung zur Ausführung fehlt oder die Rechteerhöhung gesperrt ist', 'O comando é ocultado se o usuário atual não tiver permissão para executá-lo ou se a elevação de privilégios estiver bloqueada', '如果当前用户无权执行某条命令，或系统禁止提升权限，该命令将被隐藏']);
@@ -130,7 +138,7 @@ blocks.forEach((block, group) => {
 });
 
 for (const token of ['// GENERATED_SETTINGS', '// GENERATED_CATALOG', '// GENERATED_AVAILABILITY',
-  '// GENERATED_POWER_ACTIONS', '// GENERATED_WORK_QUEUE']) {
+  '// GENERATED_POWER_ACTIONS', '// GENERATED_WORK_QUEUE', '// GENERATED_QUICK_KEYS']) {
   if (source.split(token).length !== 2) throw new Error(`Missing or repeated ${token}`);
 }
 const packed = source
@@ -141,7 +149,8 @@ const packed = source
   })
   .replace('// GENERATED_AVAILABILITY', () => availability)
   .replace('// GENERATED_POWER_ACTIONS', () => powerActions)
-  .replace('// GENERATED_WORK_QUEUE', () => workQueue);
+  .replace('// GENERATED_WORK_QUEUE', () => workQueue)
+  .replace('// GENERATED_QUICK_KEYS', () => quickKeys);
 
 if (process.argv.includes('--check')) {
   if (readFileSync(target, 'utf8').replace(/\r\n/g, '\n') !== packed) {

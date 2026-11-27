@@ -22,6 +22,7 @@ function setting(group, key, value) {
 for (const [group, key, value, title, hint] of [
   ['general', null, null, 'Общие настройки', 'Глобальные параметры меню и команд'],
   ['general', 'submenuHover', 'immediate', 'Раскрытие подменю', 'Определяет, как открывается список дополнительных команд из основного меню'],
+  ['general', 'quickLaunchKeys', 'none', 'Клавиши быстрого запуска', 'Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows'],
   ['general', 'hideAdminCommands', false, 'Скрытие команд администратора', 'Если выполнение команды запрещено текущему пользователю или повышение прав запрещено, она скрывается'],
   ['general', 'showHandCursor', true, 'Индикация активных команд', 'При наведении на область, нажатие в которой выполняет команду, указатель принимает форму руки'],
   ['commandOptions', null, null, 'Настройки команд', 'Дополнительные параметры конкретных команд'],
@@ -79,6 +80,7 @@ test('command settings omit the removed task dialog', () => {
 
 for (const [group, key, value, options] of [
   ['general', 'submenuHover', 'immediate', ['immediate', 'delayed', 'arrow', 'click']],
+  ['general', 'quickLaunchKeys', 'none', ['none', 'visible', 'all']],
   ['commandOptions', 'primaryPowerAction', 'shutdown', ['none', 'lock', 'signOut', 'sleep', 'hibernate', 'shutdown', 'restart']],
 ]) {
   test(`${group}.${key} exposes every option in every language`, () => {

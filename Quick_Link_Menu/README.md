@@ -95,6 +95,12 @@ replace its source, and compile again.
 Click a row's label or press **Enter** to run its main action. Click the arrow
 or press **→** to open the submenu. Click the label if a row only has a submenu.
 
+**Quick launch keys** is off by default under **General settings**. **Visible only**
+works in the main menu and any open submenu. **All commands** also finds commands
+in closed submenus and opens them for selection. When several eligible items
+share a letter, press it again to cycle and press **Enter** to run the focused
+command. A letter assigned to a submenu opener opens that submenu.
+
 To change the menu, open **Quick Link Menu → Settings** in Windhawk. Section
 switches are below their descriptions. Row and submenu switches follow the menu
 order. Find submenu behavior and the administrator filter under **General settings**,
