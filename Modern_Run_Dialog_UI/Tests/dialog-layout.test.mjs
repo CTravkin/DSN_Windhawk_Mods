@@ -1267,6 +1267,58 @@ test('Windhawk keeps the detailed theme and scale choices offered in Modern Run'
     assert.match(source, /opts.emplace_back\(kInterfaceScaleChoices\[i\], GetInterfaceScaleLabel\(/);
 });
 
+test('the active Run window reads persisted settings before applying them', () => {
+    const reload = source.match(/^void ApplyReloadedSettingsToDialog\(RunDialogState\* state\) \{[\s\S]*?^\}/m)?.[0] ?? '';
+    assert.ok(
+        /LoadSettings\(false\);[\s\S]*state->settings = g_settings;[\s\S]*state->i18n = g_i18n;/.test(reload),
+        'the receiving process must read overrides before copying settings and language',
+    );
+});
+
+test('shortcut history retains the launch target and displays the shortcut name', () => {
+    const restore = source.match(/^HistoryItem RestoreRunHistoryItem\([^\n]+\) \{[\s\S]*?^\}/m)?.[0];
+    const extension = source.match(/^bool IsRunShortcutExtension\([^\n]+\) \{[\s\S]*?^\}/m)?.[0];
+    const item = source.match(/^struct HistoryItem \{[\s\S]*?^\};/m)?.[0];
+    const trim = source.match(/^std::wstring TrimCommandString\([^\n]+\) \{[\s\S]*?^\}/m)?.[0];
+    assert.ok(restore && extension && item && trim, 'persisted shortcut commands must restore their execution target');
+    const candidates = source.match(/\/\/ 2\. Score catalog items[\s\S]*?(?=    std::stable_sort)/)?.[0] ?? '';
+    assert.ok(/item\.cmd = [^;]*cand\.execTarget/.test(candidates), 'save the command path instead of the display name');
+    assert.ok(/m\.item\.isShortcutFile[\s\S]*m\.item\.execTarget/.test(candidates), 'deduplicate shortcuts by target');
+    assert.ok(/HistoryItem item = RestoreRunHistoryItem\(cleanText\);/.test(source), 'restore the stored command when building history');
+    assert.ok(!/copy\.execTarget = h\.cmd;/.test(source), 'history search must keep the restored target');
+    compileChecks(String.raw`
+#include <windows.h>
+#include <shlwapi.h>
+#include <algorithm>
+#include <string>
+${trim}
+${item}
+${extension}
+${restore}
+int main() {
+    const auto shortcut = RestoreRunHistoryItem(L"\"C:\\Start Menu\\My App.LNK\"");
+    if (!shortcut.isShortcutFile || shortcut.cmd != L"\"C:\\Start Menu\\My App.LNK\"" ||
+        shortcut.execTarget != L"C:\\Start Menu\\My App.LNK" || shortcut.displayCmd != L"My App") return 1;
+    const auto appReference = RestoreRunHistoryItem(L"\"C:\\Start Menu\\My App.appref-ms\"");
+    if (!appReference.isShortcutFile || appReference.displayCmd != L"My App") return 2;
+    const auto legacy = RestoreRunHistoryItem(L"My App");
+    if (legacy.isShortcutFile || legacy.execTarget != L"My App") return 3;
+    const auto command = RestoreRunHistoryItem(L"\"C:\\Start Menu\\My App.lnk\" --flag");
+    if (command.isShortcutFile || command.execTarget != command.cmd) return 4;
+    const auto relative = RestoreRunHistoryItem(L"\"My App.lnk\"");
+    if (relative.isShortcutFile || relative.execTarget != relative.cmd) return 5;
+}
+`, true, ['-lshlwapi']);
+});
+
+test('keyboard and menu deletion remove pinned entries from the same history storage', () => {
+    const remove = source.match(/^void RemoveCommandFromHistoryStorage\([^\n]+\) \{[\s\S]*?^\}/m)?.[0] ?? '';
+    const keyboard = source.match(/if \(wParam == VK_DELETE[\s\S]*?(?=        if \(wParam == VK_UP)/)?.[0] ?? '';
+    const menu = source.match(/else if \(cmd == 799\) \{[\s\S]*?(?=            ForceFocusModernEdit)/)?.[0] ?? '';
+    assert.ok(/RemovePinnedCommand\(cmd\);/.test(remove), 'shared history removal must also remove the pin');
+    assert.ok(/RemoveCommandFromHistoryStorage\(/.test(keyboard) && /RemoveCommandFromHistoryStorage\(/.test(menu));
+});
+
 function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });

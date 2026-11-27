@@ -22,7 +22,7 @@
 // @description:tr-TR Çalıştır (Win + R) ve Görev Yöneticisi’ndeki Yeni görev çalıştır pencerelerinin yerine geçerek temalar, geçmiş, öneriler ve özel komutlar ekler
 // @description:hi-IN रन (Win + R) और कार्य प्रबंधक के «नया कार्य चलाएँ» संवाद की जगह थीम, इतिहास, सुझाव और कस्टम कमांड वाला संवाद देता है
 // @description:ar يستبدل نافذة «تشغيل» (Win + R) ومربع حوار «تشغيل مهمة جديدة» في إدارة المهام ويضيف نُسقًا وسجلًا واقتراحات وأوامر مخصصة
-// @version         6.10.15
+// @version         6.10.16
 // @author          caotu2005, CTravkin
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -30,7 +30,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 65
+// Build: 66
 
 // ==WindhawkModReadme==
 /*
@@ -7882,6 +7882,7 @@ void NotifyTaskbarRedrawWindowIcon(HWND hDlg) {
 
 struct HistoryItem {
     std::wstring cmd;
+    std::wstring displayCmd;
     std::wstring execTarget;
     std::wstring appName;
     std::wstring timeStr;
@@ -7897,6 +7898,32 @@ struct HistoryItem {
     bool isAlias = false;
     bool aliasRunAsAdmin = false;
 };
+
+const std::wstring& GetRunItemDisplayCommand(const HistoryItem& item) {
+    return item.displayCmd.empty() ? item.cmd : item.displayCmd;
+}
+
+bool IsRunShortcutExtension(const wchar_t* extension) {
+    return _wcsicmp(extension, L".lnk") == 0 || _wcsicmp(extension, L".appref-ms") == 0;
+}
+
+HistoryItem RestoreRunHistoryItem(const std::wstring& command) {
+    HistoryItem item;
+    item.cmd = command;
+    item.execTarget = command;
+    if (command.size() < 3 || command.front() != L'"' || command.back() != L'"') return item;
+
+    std::wstring target = command.substr(1, command.size() - 2);
+    if (target.find(L'"') != std::wstring::npos || PathIsRelativeW(target.c_str())) return item;
+    const wchar_t* filename = PathFindFileNameW(target.c_str());
+    const wchar_t* extension = PathFindExtensionW(filename);
+    if (extension == filename || !IsRunShortcutExtension(extension)) return item;
+
+    item.displayCmd = TrimCommandString(std::wstring_view(filename, extension - filename));
+    item.execTarget = std::move(target);
+    item.isShortcutFile = true;
+    return item;
+}
 
 struct ActionButtonsLayout {
     RECT rcBrowse;
@@ -9353,21 +9380,6 @@ void SaveCommandTimestamp(const std::wstring& cmd) {
     SaveStoredTimestamps(entries);
 }
 
-void RemoveCommandFromHistoryStorage(const std::wstring& cmd) {
-    std::wstring keyName = NormalizeCmdKey(cmd);
-    if (keyName.empty()) return;
-
-    auto entries = LoadStoredTimestamps();
-    auto newEnd = std::remove_if(entries.begin(), entries.end(),
-                                 [&](const StoredTimestampEntry& e) { return e.cmdKey == keyName; });
-    if (newEnd != entries.end()) {
-        entries.erase(newEnd, entries.end());
-        SaveStoredTimestamps(entries);
-    }
-
-    AddCommandToHiddenMru(cmd);
-}
-
 std::wstring FormatHistoryTimestamp(const FILETIME& ftUtc, const wchar_t* todayPrefix) {
     SYSTEMTIME utc{}, local{}, now{};
     if (!FileTimeToSystemTime(&ftUtc, &utc) ||
@@ -10186,6 +10198,21 @@ void RemovePinnedCommand(const std::wstring& cmd) {
     }
 }
 
+void RemoveCommandFromHistoryStorage(const std::wstring& cmd) {
+    std::wstring keyName = NormalizeCmdKey(cmd);
+    if (keyName.empty()) return;
+
+    RemovePinnedCommand(cmd);
+    auto entries = LoadStoredTimestamps();
+    auto newEnd = std::remove_if(entries.begin(), entries.end(),
+                                 [&](const StoredTimestampEntry& e) { return e.cmdKey == keyName; });
+    if (newEnd != entries.end()) {
+        entries.erase(newEnd, entries.end());
+        SaveStoredTimestamps(entries);
+    }
+    AddCommandToHiddenMru(cmd);
+}
+
 bool TryResolveCommandFilePath(const std::wstring& rawCmd, std::wstring* outPath, bool* outIsDir) {
     std::wstring trimmed = TrimCommandString(rawCmd);
     if (trimmed.empty()) return false;
@@ -10483,6 +10510,9 @@ void ExecuteRunItem(RunDialogState* state, const HistoryItem& item, RunEnterActi
         }
     }
 
+    if (request.isShortcut && request.action != RunEnterAction::Terminal) {
+        request.target = request.historyCommand;
+    }
     SubmitNativeRunCommand(state, request);
 }
 
@@ -10919,10 +10949,7 @@ void ScanShortcutDirectoryRecursive(const std::wstring& dirPath,
         }
 
         const wchar_t* ext = PathFindExtensionW(fd.cFileName);
-        if (!ext) continue;
-        if (_wcsicmp(ext, L".lnk") != 0 && _wcsicmp(ext, L".appref-ms") != 0) {
-            continue;
-        }
+        if (!ext || !IsRunShortcutExtension(ext)) continue;
 
         std::wstring title(fd.cFileName, ext - fd.cFileName);
         title = TrimCommandString(title);
@@ -11258,12 +11285,14 @@ void UpdateAppSuggestionsForQuery(RunDialogState* state, const std::wstring& raw
     // 1. Score recent history items first (giving them a slight recency bonus and keeping their timestamp)
     for (size_t i = 0; i < state->history.size(); ++i) {
         const auto& h = state->history[i];
-        std::wstring cmdL = ToLowerString(h.cmd);
         std::wstring subL = ToLowerString(h.appName);
-        int score = ScoreCandidateAgainstQuery(cmdL, subL, queryLower, 45 - (int)i * 2);
+        const int bonus = 45 - (int)i * 2;
+        int score = ScoreCandidateAgainstQuery(ToLowerString(GetRunItemDisplayCommand(h)), subL, queryLower, bonus);
+        if (h.isShortcutFile) {
+            score = (std::max)(score, ScoreCandidateAgainstQuery(ToLowerString(h.cmd), subL, queryLower, bonus));
+        }
         if (score > 0) {
             HistoryItem copy = h;
-            copy.execTarget = h.cmd;
             copy.ownsIcon = false;
             copy.isSuggestion = false;
             matches.push_back({ score, std::move(copy) });
@@ -11278,18 +11307,19 @@ void UpdateAppSuggestionsForQuery(RunDialogState* state, const std::wstring& raw
             int score = ScoreCandidateAgainstQuery(cand.cmdLower, cand.subLower, queryLower, bonus);
             if (score <= 0) continue;
 
-            bool alreadyInMatches = false;
-            for (const auto& m : matches) {
-                if (ToLowerString(m.item.cmd) == cand.cmdLower ||
-                    (!cand.subtitle.empty() && ToLowerString(m.item.cmd) == cand.subLower)) {
-                    alreadyInMatches = true;
-                    break;
+            const bool alreadyInMatches = std::any_of(matches.begin(), matches.end(), [&](const ScoredMatch& m) {
+                if (cand.isShortcutFile || m.item.isShortcutFile) {
+                    return cand.isShortcutFile && m.item.isShortcutFile &&
+                           _wcsicmp(m.item.execTarget.c_str(), cand.execTarget.c_str()) == 0;
                 }
-            }
+                const auto key = ToLowerString(m.item.cmd);
+                return key == cand.cmdLower || (!cand.subtitle.empty() && key == cand.subLower);
+            });
             if (alreadyInMatches) continue;
 
             HistoryItem item;
-            item.cmd = cand.cmd;
+            item.cmd = cand.isShortcutFile ? L"\"" + cand.execTarget + L"\"" : cand.cmd;
+            if (cand.isShortcutFile) item.displayCmd = cand.cmd;
             item.execTarget = cand.execTarget;
             item.appName = cand.subtitle.empty() ? state->i18n.appTag : cand.subtitle;
             item.timeStr.clear();
@@ -11322,7 +11352,7 @@ void UpdateAppSuggestionsForQuery(RunDialogState* state, const std::wstring& raw
         for (auto& m : matches) {
             if (resolvedCount++ >= visLimit) break;
             if (!m.item.isSuggestion || m.item.hIcon != nullptr) continue;
-            std::wstring keyL = ToLowerString(m.item.cmd);
+            std::wstring keyL = ToLowerString(GetRunItemDisplayCommand(m.item));
             for (auto& cand : g_appCatalog) {
                 if (cand.cmdLower == keyL) {
                     LazilyResolveCandidateMetadata(cand, state->i18n.appTag);
@@ -11399,9 +11429,7 @@ void LoadHistoryItems(RunDialogState* state) {
             }
         }
 
-        HistoryItem item;
-        item.cmd = cleanText;
-        item.execTarget = cleanText;
+        HistoryItem item = RestoreRunHistoryItem(cleanText);
         ResolveCommandMetadata(cleanText, &item.hIcon, &item.appName);
         item.ownsIcon = true;
         item.isSuggestion = false;
@@ -13779,7 +13807,7 @@ std::wstring GetInterfaceScaleLabel(int percent, const SettingsOptionDetails& de
     return label;
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 65)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 66)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -17337,6 +17365,7 @@ void SetRunTaskbarButtonVisible(RunDialogState* state, bool visible) {
 
 void ApplyReloadedSettingsToDialog(RunDialogState* state) {
     if (!state || !state->hDlg || !IsWindow(state->hDlg)) return;
+    LoadSettings(false);
     int oldHeight = state->totalHeight;
     const bool taskbarWasHidden = state->settings.taskbarIconMode == TaskbarIconMode::Hidden;
     {
@@ -17950,7 +17979,7 @@ void DrawRunDialogIcons(ID2D1RenderTarget* target, RunDialogState* state, int vi
                 if (index < 0 || index >= static_cast<int>(rows.size())) continue;
                 if (!rows[index].hIcon && rows[index].isSuggestion && state->showingSuggestions) {
                     std::lock_guard<std::mutex> lock(g_catalogMutex);
-                    const auto key = ToLowerString(rows[index].cmd);
+                    const auto key = ToLowerString(GetRunItemDisplayCommand(rows[index]));
                     for (auto& candidate : g_appCatalog) {
                         if (candidate.cmdLower == key) {
                             LazilyResolveCandidateMetadata(candidate, state->i18n.appTag);
@@ -18407,7 +18436,7 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
                                 }
 
                                 if (pFmtRow && pBrPrimary) {
-                                    const std::wstring& cmdStr = rowItem.cmd;
+                                    const std::wstring& cmdStr = GetRunItemDisplayCommand(rowItem);
                                     const std::wstring& appStr = rowItem.appName;
                                     std::wstring fullStr = cmdStr;
                                     if (!appStr.empty() && _wcsicmp(cmdStr.c_str(), appStr.c_str()) != 0) {
@@ -19735,7 +19764,6 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 OpenFileLocationInExplorer(resolvedFilePath, resolvedIsDir);
             } else if (cmd == 799) {
                 int oldH = state->totalHeight;
-                RemovePinnedCommand(targetCmd);
                 RemoveCommandFromHistoryStorage(targetCmd);
                 state->hoveredRow = -1;
                 state->selectedRow = -1;
