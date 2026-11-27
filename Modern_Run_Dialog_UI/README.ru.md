@@ -4,24 +4,24 @@
 
 Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R**) и окно запуска новой задачи в Диспетчере задач. В нем можно запускать приложения, открывать файлы и выполнять команды.
 
-## Макеты
+## Макеты и темы
 
 <table>
   <tbody>
     <tr>
       <td valign="middle"><strong>Классический</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Классический · Windows 11 Blur · Закрепленная команда"></a><br>Windows 11 Blur · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="386" alt="Классический · Dracula Velvet · Калькулятор"></a><br>Dracula Velvet · Калькулятор</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Классический · Windows 11 Blur"></a><br>Windows 11 Blur</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-elevation.png"><img src="Assets/Previews/classic-elevation.png" width="386" alt="Классический · Dracula Velvet"></a><br>Dracula Velvet</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Компактный (Pill)</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Компактный (Pill) · Nord Frost · Закрепленная команда"></a><br>Nord Frost · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="171" alt="Компактный (Pill) · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="202" alt="Компактный (Pill) · Emerald Slate · Подсказка Paint"></a><br>Emerald Slate · Подсказка Paint</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Компактный (Pill) · Fluent Solid"></a><br>Fluent Solid</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="202" alt="Компактный (Pill) · Liquid Glass"></a><br>Liquid Glass<br><br><a href="Assets/Previews/pill-minimal.png"><img src="Assets/Previews/pill-minimal.png" width="171" alt="Компактный (Pill) · Emerald Slate"></a><br>Emerald Slate</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Fluent</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha · Закрепленная команда"></a><br>Catppuccin Mocha · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Fluent Solid · Индикатор администратора"></a><br>Fluent Solid · Индикатор администратора</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha"></a><br>Catppuccin Mocha</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Nord Frost"></a><br>Nord Frost</td>
     </tr>
   </tbody>
 </table>
