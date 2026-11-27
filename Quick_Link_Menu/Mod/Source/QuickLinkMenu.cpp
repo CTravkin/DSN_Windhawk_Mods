@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         1.1.5
+// @version         1.2.0
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 47
+// Build: 48
 
 // ==WindhawkModReadme==
 /*
@@ -90,6 +90,12 @@ it are incompatible. One example is [Windows 10 Win+X restorer on Win11 24H2](ht
 Click a row's label or press **Enter** to run its main action. Click the arrow
 or press **→** to open the submenu. Click the label if a row only has a submenu.
 
+**Quick launch keys** is off by default under **General settings**. **Visible only**
+works in the main menu and any open submenu. **All commands** also finds commands
+in closed submenus and opens them for selection. When several eligible items
+share a letter, press it again to cycle and press **Enter** to run the focused
+command. A letter assigned to a submenu opener opens that submenu.
+
 To change the menu, open **Quick Link Menu → Settings** in Windhawk. Section
 switches are below their descriptions. Row and submenu switches follow the menu
 order. Find submenu behavior and the administrator filter under **General settings**,
@@ -117,10 +123,12 @@ and Terminal and power actions under **Command settings**.
 #include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.System.h>
 #include <winrt/Windows.UI.Input.h>
+#include <winrt/Windows.UI.Xaml.Automation.h>
 #include <winrt/Windows.UI.Xaml.Automation.Peers.h>
 #include <winrt/Windows.UI.Xaml.Automation.Provider.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
+#include <winrt/Windows.UI.Xaml.Documents.h>
 #include <winrt/Windows.UI.Xaml.Input.h>
 #include <winrt/Windows.UI.Xaml.Media.h>
 
@@ -132,6 +140,7 @@ and Terminal and power actions under **Command settings**.
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -163,12 +172,14 @@ struct CatalogItem {
 
 // GENERATED_POWER_ACTIONS
 // GENERATED_WORK_QUEUE
+// GENERATED_QUICK_KEYS
 
 enum class HoverMode { Immediate, Delayed, Arrow, ArrowClick };
 enum class HoverZone { Outside, Body, Arrow };
 
 struct Settings {
     HoverMode mode{};
+    QuickKeyMode quickKeys{};
     bool hideAdminCommands{};
     bool showHandCursor{};
     bool terminalAsAdmin{};
@@ -182,6 +193,21 @@ struct MenuSession;
 struct Destination {
     CatalogItem const* item{};
     C::MenuFlyoutItem original{nullptr};
+    unsigned powerKeyCaption{};
+};
+
+struct MenuKeyRow {
+    C::MenuFlyoutItemBase element{nullptr};
+    C::MenuFlyoutSubItem parent{nullptr};
+    Destination destination;
+    wchar_t key{};
+    std::optional<QuickKeyMark> mark;
+    X::FrameworkElement::Loaded_revoker loaded;
+};
+
+struct MenuKeyPresenter {
+    C::MenuFlyoutPresenter element{nullptr};
+    X::UIElement::PreviewKeyDown_revoker keyDown;
 };
 
 struct RowInteraction {
@@ -200,7 +226,6 @@ struct RowInteraction {
     bool openOnUpdate{};
     std::optional<uint32_t> pressedPointer;
     HoverZone pressedZone{HoverZone::Outside};
-    X::UIElement::PreviewKeyDown_revoker keyDown;
     X::UIElement::PointerPressed_revoker pointerPressed;
     X::UIElement::PointerReleased_revoker pointerReleased;
     X::UIElement::PointerMoved_revoker pointerMoved;
@@ -226,10 +251,6 @@ struct SubmenuCleanup {
 struct MenuSession {
     C::MenuFlyout menu{nullptr};
     std::vector<C::MenuFlyoutItemBase> original;
-    C::MenuFlyoutSubItem power{nullptr};
-    std::vector<C::MenuFlyoutItemBase> originalPower;
-    winrt::Windows::Foundation::IInspectable oldPowerIcon{nullptr};
-    bool powerChanged{};
     bool menuChanged{};
     bool closing{};
     HCURSOR commandCursor{};
@@ -239,6 +260,13 @@ struct MenuSession {
     SubmenuCleanup submenus;
     std::vector<C::MenuFlyoutItem::Click_revoker> clicks;
     std::vector<CursorEvents> cursorEvents;
+    QuickKeyMode quickKeys{};
+    QuickKeyCycle keyCycle;
+    std::vector<MenuKeyRow> keyRows;
+    std::vector<MenuKeyPresenter> keyPresenters;
+    C::MenuFlyoutItemBase focusWhenLoaded{nullptr};
+    X::DispatcherTimer keyLaunch{nullptr};
+    X::DispatcherTimer::Tick_revoker keyLaunchTick;
     P::FlyoutBase::Opened_revoker opened;
     P::FlyoutBase::Closing_revoker closingEvent;
     P::FlyoutBase::Closed_revoker closed;
@@ -258,6 +286,7 @@ HWND subclassRetryWindow;
 std::atomic<DWORD> trayThread;
 UINT setupMessage;
 constexpr WPARAM sweepClosedSubmenus = 2;
+constexpr WPARAM resetNativeAccessKeys = 3;
 bool subclassPresent;
 constexpr DWORD taskbarRetryInterval = 250;
 constexpr DWORD taskbarSlowRetryInterval = 2'000;
@@ -288,6 +317,10 @@ void LoadSettings() {
     next.mode = option == L"delayed" ? HoverMode::Delayed :
                 option == L"arrow" ? HoverMode::Arrow :
                 option == L"click" ? HoverMode::ArrowClick : HoverMode::Immediate;
+    const auto quickKeys = WindhawkUtils::StringSetting::make(L"general.quickLaunchKeys");
+    const std::wstring_view keyMode = quickKeys.get();
+    next.quickKeys = keyMode == L"visible" ? QuickKeyMode::Visible :
+                     keyMode == L"all" ? QuickKeyMode::All : QuickKeyMode::Off;
     next.hideAdminCommands = Wh_GetIntSetting(L"general.hideAdminCommands") != 0;
     next.showHandCursor = Wh_GetIntSetting(L"general.showHandCursor") != 0;
     next.terminalAsAdmin = Wh_GetIntSetting(L"commandOptions.terminalAsAdmin") != 0;
@@ -349,9 +382,13 @@ std::wstring Indirect(PCWSTR token, HRESULT* resultCode = nullptr) {
     return result;
 }
 
-std::wstring SystemString(std::wstring_view reference) {
+std::wstring RawSystemString(std::wstring_view reference) {
     const auto token = L"@%SystemRoot%\\System32\\" + std::wstring(reference);
-    auto result = Indirect(token.c_str());
+    return Indirect(token.c_str());
+}
+
+std::wstring SystemString(std::wstring_view reference) {
+    auto result = RawSystemString(reference);
     if (reference.starts_with(L"twinui.pcshell.dll,")) return MenuCaption(result);
     return result;
 }
@@ -974,25 +1011,36 @@ C::MenuFlyoutItem StockAction(StockMenu const& stock, std::wstring_view id) {
 struct StockPowerCaption {
     CatalogItem const* item;
     std::wstring caption;
+    unsigned keyCaption;
 };
+
+unsigned PowerKeyCaption(std::wstring_view action) {
+    if (action == L"power:signOut") return 3041;
+    if (action == L"power:sleep") return 3020;
+    if (action == L"power:hibernate") return 3023;
+    if (action == L"power:shutdown") return 3014;
+    if (action == L"power:restart") return 3017;
+    return 0;
+}
 
 std::vector<StockPowerCaption> ReadPowerCaptions(bool withUpdate) {
     std::vector<StockPowerCaption> captions;
-    const auto add = [&](CatalogItem const& item, std::wstring_view caption) {
-        if (!caption.empty()) captions.push_back({&item, Normalize(caption)});
+    const auto add = [&](CatalogItem const& item, std::wstring_view caption, unsigned keyCaption) {
+        if (!caption.empty()) captions.push_back({&item, Normalize(caption), keyCaption});
     };
     for (auto const& item : catalog) {
         if (!std::wstring_view(item.action).starts_with(L"power:") || !*item.resource) continue;
         if (!withUpdate) {
-            add(item, SystemString(item.resource));
+            const auto keyCaption = PowerKeyCaption(item.action);
+            add(item, SystemString(item.resource), keyCaption);
             // Some stock captions differ from the system resource, for example Russian Sign out.
-            add(item, item.names[DisplayLanguage()]);
+            add(item, item.names[DisplayLanguage()], keyCaption);
             continue;
         }
         const auto [plainId, estimatedId] = item.updateCaptions;
         if (!plainId) continue;
         const auto addResource = [&](unsigned id) {
-            add(item, SystemString(L"shutdownux.dll,-" + std::to_wstring(id)));
+            add(item, SystemString(L"shutdownux.dll,-" + std::to_wstring(id)), id + 1);
         };
         addResource(plainId);
         // Each of the eight estimates has an access-key resource next to it.
@@ -1029,7 +1077,7 @@ bool ReadStockPowerActions(StockMenu& stock) {
             })) {
             return false;
         }
-        stock.powerActions.push_back({{item, command}, withUpdate});
+        stock.powerActions.push_back({{item, command, found->keyCaption}, withUpdate});
     }
     return !stock.powerActions.empty();
 }
@@ -1063,6 +1111,323 @@ std::optional<Destination> Resolve(CatalogItem const& item, StockMenu const& sto
         if (!destination.original || !destination.original.IsEnabled()) return std::nullopt;
     }
     return destination;
+}
+
+wchar_t FoldQuickKey(wchar_t key) {
+    wchar_t upper{};
+    return LCMapStringEx(LOCALE_NAME_INVARIANT, LCMAP_UPPERCASE, &key, 1, &upper, 1,
+                         nullptr, nullptr, 0) ? upper : key;
+}
+
+bool IsQuickKey(wchar_t key) {
+    WORD type{};
+    return key && GetStringTypeW(CT_CTYPE1, &key, 1, &type) && (type & (C1_ALPHA | C1_DIGIT));
+}
+
+std::wstring_view StockQuickKeyId(CatalogItem const& item) {
+    const auto [kind, target] = Split(item.action, L':');
+    if (kind == L"native") return target;
+    if (target == L"network-status") return L"10912";
+    if (target == L"about") return L"10915";
+    if (target == L"powersleep") return L"10913";
+    if (target == L"installed-apps") return L"10946";
+    if (target == L"mmc.exe;devmgmt.msc") return L"10916";
+    return {};
+}
+
+std::wstring_view FindStockQuickKeyVariant(C::MenuFlyoutItem const& original, std::wstring_view id) {
+    if (!original) return id;
+    const auto title = Normalize(original.Text());
+    if (id == L"10960" && title != Normalize(Twinui(id))) return L"10944";
+    if (id == L"10961" && title != Normalize(Twinui(id))) return L"10945";
+    return id;
+}
+
+std::optional<QuickKeyMark> MenuQuickKey(StockMenu const& stock, Destination const& destination,
+                                       bool powerOpener, std::wstring_view caption, wchar_t& key) {
+    X::UIElement source{nullptr};
+    std::wstring resource;
+    if (powerOpener) {
+        source = stock.power;
+        resource = L"twinui.pcshell.dll,-10930";
+    } else if (destination.item) {
+        auto id = StockQuickKeyId(*destination.item);
+        auto original = destination.original;
+        if (!original && !id.empty()) {
+            original = StockAction(stock, id);
+            if (!original && id == L"10946") {
+                id = L"10911";
+                original = StockAction(stock, id);
+            }
+        }
+        if (!original) return std::nullopt;
+        source = original;
+        if (destination.powerKeyCaption) {
+            resource = L"shutdownux.dll,-" + std::to_wstring(destination.powerKeyCaption);
+        } else if (!id.empty()) {
+            resource = L"twinui.pcshell.dll,-" + std::wstring(FindStockQuickKeyVariant(original, id));
+        }
+    }
+    if (!source) return std::nullopt;
+    const auto access = source.AccessKey();
+    if (access.size() != 1 || !IsQuickKey(access[0])) return std::nullopt;
+    key = FoldQuickKey(access[0]);
+    const auto raw = resource.empty() ? std::wstring{} : RawSystemString(resource);
+    return MarkQuickKey(raw, caption, key, FoldQuickKey);
+}
+
+bool MenuInputCurrent(MenuSession const* owner) {
+    return owner && !unloading && session.get() == owner && !owner->closing;
+}
+
+bool MenuInputActive(MenuSession const* owner) {
+    return MenuInputCurrent(owner) && owner->menu.IsOpen();
+}
+
+AV::IExpandCollapseProvider QuickKeyExpander(MenuSession const& active,
+                                            C::MenuFlyoutSubItem const& submenu) {
+    const auto found = std::ranges::find_if(active.rows, [&](auto const& row) { return row->split == submenu; });
+    return found == active.rows.end() ? nullptr : (*found)->expand;
+}
+
+bool QuickKeySubmenuOpen(MenuSession const& active, C::MenuFlyoutSubItem const& submenu) {
+    const auto provider = QuickKeyExpander(active, submenu);
+    return provider && provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Expanded;
+}
+
+void ExpandForQuickKey(MenuSession& active, C::MenuFlyoutSubItem const& submenu) {
+    const auto provider = QuickKeyExpander(active, submenu);
+    if (!provider) return;
+    // XAML providers can dispatch menu events. Hold providers independently of the session.
+    std::vector<AV::IExpandCollapseProvider> otherMenus;
+    for (auto const& row : active.rows) {
+        row->openOnUpdate = false;
+        if (row->hoverUpdate) row->hoverUpdate.Stop();
+        if (row->split != submenu && row->expand &&
+            row->expand.ExpandCollapseState() == X::Automation::ExpandCollapseState::Expanded)
+            otherMenus.push_back(row->expand);
+    }
+    auto owner = &active;
+    for (auto const& other : otherMenus) {
+        other.Collapse();
+        if (!MenuInputActive(owner)) return;
+    }
+    if (provider.ExpandCollapseState() == X::Automation::ExpandCollapseState::Collapsed)
+        provider.Expand();
+}
+
+void FocusQuickKeyRow(MenuSession& active, C::MenuFlyoutItemBase const& row) {
+    if (!row.XamlRoot() || !row.Focus(X::FocusState::Keyboard)) return;
+    if (!MenuInputActive(&active)) return;
+    active.focusWhenLoaded = nullptr;
+    X::BringIntoViewOptions options;
+    options.AnimationDesired(false);
+    row.StartBringIntoView(options);
+}
+
+void LaunchKeyboardCommand(MenuSession& active, MenuKeyRow const& row) {
+    if (active.keyLaunch && active.keyLaunch.IsEnabled()) return;
+    const auto destination = row.destination;
+    X::VisualStateManager::GoToState(row.element, L"PointerOver", false);
+    // The command may close the window synchronously. Leave time for the
+    // compositor to display the same visual state as a pointer launch.
+    active.keyLaunch = X::DispatcherTimer();
+    active.keyLaunch.Interval(std::chrono::milliseconds(60));
+    active.keyLaunchTick = active.keyLaunch.Tick(winrt::auto_revoke,
+        [owner = &active, destination](auto const& sender, auto const&) {
+            sender.template as<X::DispatcherTimer>().Stop();
+            if (!MenuInputActive(owner)) return;
+            try { RunDestination(*owner, destination); }
+            catch (...) { Wh_Log(L"Win+X keyboard command failed"); }
+        });
+    active.keyLaunch.Start();
+}
+
+wchar_t QuickKeyFromInput(I::KeyRoutedEventArgs const& args) {
+    BYTE keyboard[256]{};
+    if (!GetKeyboardState(keyboard) || (keyboard[VK_CONTROL] & 0x80) || (keyboard[VK_MENU] & 0x80))
+        return {};
+    wchar_t text[8]{};
+    // Do not alter the keyboard layout's dead-key state while translating this event.
+    const auto length = ToUnicodeEx(static_cast<UINT>(args.OriginalKey()), args.KeyStatus().ScanCode,
+                                    keyboard, text, ARRAYSIZE(text), 4, GetKeyboardLayout(0));
+    return length == 1 && IsQuickKey(text[0]) ? FoldQuickKey(text[0]) : wchar_t{};
+}
+
+void OnQuickKey(MenuSession& active, I::KeyRoutedEventArgs const& args) {
+    const wchar_t key = QuickKeyFromInput(args);
+    if (!key) {
+        active.keyCycle = {};
+        return;
+    }
+    // Consume an auto-repeat before it changes the cycle or launches an action.
+    if (args.KeyStatus().WasKeyDown) {
+        if (active.keyCycle.key == key ||
+            std::ranges::find(active.keyRows, key, &MenuKeyRow::key) != active.keyRows.end())
+            args.Handled(true);
+        return;
+    }
+    std::vector<QuickKeyTarget> targets;
+    targets.reserve(active.keyRows.size());
+    for (auto const& row : active.keyRows) {
+        if (row.key != key) {
+            targets.emplace_back();
+            continue;
+        }
+        const bool opener = !row.destination.item;
+        targets.push_back({row.key, !row.parent || QuickKeySubmenuOpen(active, row.parent),
+                           static_cast<bool>(row.parent), opener,
+                           opener && QuickKeySubmenuOpen(active, row.element.as<C::MenuFlyoutSubItem>())});
+    }
+    const auto decision = ChooseQuickKey(targets, active.quickKeys, key, active.keyCycle);
+    if (decision.action == QuickKeyAction::Ignore) return;
+    args.Handled(true);
+    if (active.keyLaunch && active.keyLaunch.IsEnabled()) return;
+    const auto& target = active.keyRows[decision.index];
+    switch (decision.action) {
+    case QuickKeyAction::Expand:
+        active.focusWhenLoaded = nullptr;
+        ExpandForQuickKey(active, target.element.as<C::MenuFlyoutSubItem>());
+        break;
+    case QuickKeyAction::Focus: {
+        auto element = target.element;
+        active.focusWhenLoaded = element;
+        if (target.parent && !targets[decision.index].visible) ExpandForQuickKey(active, target.parent);
+        if (MenuInputActive(&active) && active.focusWhenLoaded) FocusQuickKeyRow(active, element);
+        break;
+    }
+    case QuickKeyAction::Launch:
+        LaunchKeyboardCommand(active, target);
+        break;
+    case QuickKeyAction::Ignore:
+        break;
+    }
+}
+
+void OnMenuPreviewKey(MenuSession& active, I::KeyRoutedEventArgs const& args) {
+    switch (args.Key()) {
+    case Key::Up: case Key::Down: case Key::Left: case Key::Right:
+    case Key::Home: case Key::End: case Key::PageUp: case Key::PageDown:
+    case Key::Tab: case Key::Escape:
+        active.keyCycle = {};
+        active.focusWhenLoaded = nullptr;
+        return;
+    case Key::Enter: case Key::Space:
+        break;
+    default:
+        if (active.quickKeys != QuickKeyMode::Off) OnQuickKey(active, args);
+        return;
+    }
+    active.keyCycle = {};
+    active.focusWhenLoaded = nullptr;
+    for (auto node = args.OriginalSource().try_as<X::DependencyObject>(); node;
+         node = X::Media::VisualTreeHelper::GetParent(node)) {
+        auto element = node.try_as<C::MenuFlyoutItemBase>();
+        if (!element) continue;
+        const auto row = std::ranges::find(active.keyRows, element, &MenuKeyRow::element);
+        if (row != active.keyRows.end() && row->destination.item &&
+            (args.Key() == Key::Enter || element.try_as<C::MenuFlyoutItem>())) {
+            args.Handled(true);
+            if (!args.KeyStatus().WasKeyDown) LaunchKeyboardCommand(active, *row);
+        }
+        break;
+    }
+}
+
+C::TextBlock FindCaptionBlock(X::DependencyObject const& node, std::wstring_view title,
+                              std::wstring_view marked) {
+    if (auto block = node.try_as<C::TextBlock>(); block && (block.Text() == title || block.Text() == marked))
+        return block;
+    for (int index = 0; index < X::Media::VisualTreeHelper::GetChildrenCount(node); ++index) {
+        auto child = FindCaptionBlock(X::Media::VisualTreeHelper::GetChild(node, index), title, marked);
+        if (child) return child;
+    }
+    return nullptr;
+}
+
+void ApplyQuickKeyMark(MenuKeyRow const& row) {
+    if (!row.mark) return;
+    const auto leaf = row.element.try_as<C::MenuFlyoutItem>();
+    const auto caption = leaf ? leaf.Text() : row.element.as<C::MenuFlyoutSubItem>().Text();
+    auto block = FindCaptionBlock(row.element, caption, row.mark->caption);
+    if (!block) return;
+    auto inlines = block.Inlines();
+    inlines.Clear();
+    const std::wstring_view text = row.mark->caption;
+    const auto addRun = [&](std::wstring_view value, bool underline) {
+        if (value.empty()) return;
+        X::Documents::Run run;
+        run.Text(winrt::hstring(value));
+        if (underline) {
+            X::Documents::Underline line;
+            line.Inlines().Append(run);
+            inlines.Append(line);
+        } else {
+            inlines.Append(run);
+        }
+    };
+    addRun(text.substr(0, row.mark->index), false);
+    addRun(text.substr(row.mark->index, 1), true);
+    addRun(text.substr(row.mark->index + 1), false);
+}
+
+void BindMenuKeyPresenter(MenuSession& active, C::MenuFlyoutItemBase const& item) {
+    for (auto node = X::Media::VisualTreeHelper::GetParent(item); node;
+         node = X::Media::VisualTreeHelper::GetParent(node)) {
+        auto presenter = node.try_as<C::MenuFlyoutPresenter>();
+        if (!presenter) continue;
+        if (std::ranges::find(active.keyPresenters, presenter, &MenuKeyPresenter::element) !=
+            active.keyPresenters.end()) return;
+        MenuKeyPresenter handlers;
+        handlers.element = presenter;
+        handlers.keyDown = presenter.PreviewKeyDown(winrt::auto_revoke,
+            [owner = &active](auto const&, I::KeyRoutedEventArgs const& args) {
+                if (!MenuInputActive(owner)) return;
+                try { OnMenuPreviewKey(*owner, args); }
+                catch (...) { Wh_Log(L"Could not process Win+X navigation key"); }
+            });
+        active.keyPresenters.push_back(std::move(handlers));
+        return;
+    }
+}
+
+void AddMenuKeyRow(MenuSession& active, C::MenuFlyoutItemBase const& element,
+                   Destination const& destination, C::MenuFlyoutSubItem const& parent,
+                   StockMenu const& stock, bool allowLetter, bool powerOpener = false) {
+    MenuKeyRow row;
+    row.element = element;
+    row.parent = parent;
+    row.destination = destination;
+    if (active.quickKeys != QuickKeyMode::Off && allowLetter) {
+        const auto leaf = element.try_as<C::MenuFlyoutItem>();
+        const auto caption = leaf ? leaf.Text() : element.as<C::MenuFlyoutSubItem>().Text();
+        row.mark = MenuQuickKey(stock, destination, powerOpener, caption, row.key);
+        if (row.key) {
+            X::Automation::AutomationProperties::SetAccessKey(
+                element, winrt::hstring(std::wstring_view(&row.key, 1)));
+        }
+    }
+    row.loaded = element.Loaded(winrt::auto_revoke,
+        [owner = &active, index = active.keyRows.size()](auto const&, auto const&) {
+            if (!MenuInputCurrent(owner)) return;
+            try {
+                auto const& row = owner->keyRows[index];
+                BindMenuKeyPresenter(*owner, row.element);
+                ApplyQuickKeyMark(row);
+                if (MenuInputActive(owner) && owner->focusWhenLoaded == row.element)
+                    FocusQuickKeyRow(*owner, row.element);
+            } catch (...) { Wh_Log(L"Could not initialize Win+X keyboard controls"); }
+        });
+    active.keyRows.push_back(std::move(row));
+}
+
+void LeaveNativeAccessKeyMode() {
+    // The shell enters native access-key mode when opening Win+X. That mode can
+    // consume a letter before PreviewKeyDown, even if the cloned rows lack keys.
+    // The tray message completes after the shell has shown the menu and cannot
+    // call into the mod after its subclass is removed during unload.
+    if (!trayWindow || !PostMessageW(trayWindow, setupMessage, resetNativeAccessKeys, 0))
+        I::AccessKeyManager::ExitDisplayMode();
 }
 
 void RememberSubmenuRoot(SubmenuCleanup& cleanup, X::XamlRoot const& root) {
@@ -1192,17 +1557,8 @@ void Restore() noexcept {
     for (auto const& row : old->rows) {
         try { RemoveRowVisual(*row); } catch (...) {}
     }
-    try {
-        if (old->powerChanged) {
-            old->power.Items().ReplaceAll(old->originalPower);
-            if (old->oldPowerIcon == X::DependencyProperty::UnsetValue())
-                old->power.ClearValue(C::MenuFlyoutSubItem::IconProperty());
-            else
-                old->power.SetValue(C::MenuFlyoutSubItem::IconProperty(), old->oldPowerIcon);
-        }
-    } catch (...) {
-        Wh_Log(L"Could not restore the original Win+X power submenu");
-    }
+    try { if (old->keyLaunch) old->keyLaunch.Stop(); }
+    catch (...) { Wh_Log(L"Could not cancel the pending Win+X keyboard command"); }
     try {
         if (old->menuChanged) old->menu.Items().ReplaceAll(old->original);
     } catch (...) {
@@ -1252,16 +1608,6 @@ void AddInteraction(MenuSession& pending, C::MenuFlyoutSubItem const& split,
     row->split = split;
     row->destination = destination;
     row->mode = mode;
-    if (destination.item) {
-        row->keyDown = split.PreviewKeyDown(winrt::auto_revoke,
-            [ptr = row.get()](auto const&, I::KeyRoutedEventArgs const& args) {
-                if (args.Key() != Key::Enter) return;
-                OnRow(ptr, [&](auto& active) {
-                    args.Handled(true);
-                    RunDestination(*active.owner, active.destination);
-                });
-            });
-    }
     pending.rows.push_back(std::move(row));
 }
 
@@ -1296,14 +1642,14 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
     auto pending = std::make_unique<MenuSession>();
     pending->menu = menu;
     pending->original = stock.rows;
+    pending->quickKeys = snapshot.quickKeys;
     if (snapshot.showHandCursor) pending->commandCursor = LoadCursorW(nullptr, IDC_HAND);
-    pending->power = stock.power;
-    for (auto const& item : stock.power.Items()) pending->originalPower.push_back(item);
-    pending->oldPowerIcon = stock.power.ReadLocalValue(C::MenuFlyoutSubItem::IconProperty());
 
+    struct ChildRow {
+        C::MenuFlyoutItem element;
+        Destination destination;
+    };
     std::vector<C::MenuFlyoutItemBase> visible;
-    std::vector<C::MenuFlyoutItemBase> powerChildren;
-    wchar_t powerGlyph{};
     int previousGroup = -1;
     for (size_t index = 0; index < std::size(catalog); ++index) {
         const auto& item = catalog[index];
@@ -1314,7 +1660,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
         auto destination = power ? std::optional<Destination>{} :
             Resolve(item, stock, availability, snapshot.hideAdminCommands);
 
-        std::vector<C::MenuFlyoutItem> children;
+        std::vector<ChildRow> children;
         for (size_t child = index + 1; child < std::size(catalog) && catalog[child].parent == static_cast<int>(index); ++child) {
             const auto& command = catalog[child];
             // Stock power commands are appended below in the order Windows presents them.
@@ -1330,7 +1676,7 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
             if (!resolved) continue;
             if (elevatedTerminal) std::swap(resolved, destination);
             if (snapshot.enabled[child] && resolved) {
-                if (auto leaf = CreateLeaf(*pending, *resolved)) children.push_back(leaf);
+                if (auto leaf = CreateLeaf(*pending, *resolved)) children.push_back({leaf, *resolved});
             }
         }
         if (power && recognizedPowerMenu) {
@@ -1341,36 +1687,39 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
                     snapshot.primaryPowerAction == native.item->action, snapshot.enabled[native.item - catalog]);
                 if (placement == PowerPlacement::Main) destination = native;
                 if (placement == PowerPlacement::Submenu) {
-                    if (auto leaf = CreateLeaf(*pending, native)) children.push_back(leaf);
+                    if (auto leaf = CreateLeaf(*pending, native)) children.push_back({leaf, native});
                 }
             }
         }
 
         C::MenuFlyoutItemBase entry{nullptr};
+        C::MenuFlyoutSubItem submenu{nullptr};
         if (power && !recognizedPowerMenu) {
-            entry = stock.power;
-        } else if (power && !destination) {
-            if (children.empty()) continue;
-            powerChildren.assign(children.begin(), children.end());
-            powerGlyph = item.glyph;
-            AddInteraction(*pending, stock.power, {}, snapshot.mode);
             entry = stock.power;
         } else if (children.empty()) {
             if (!destination) continue;
             entry = CreateLeaf(*pending, *destination);
         } else {
-            const auto caption = Caption(destination.value_or(Destination{&item}));
+            const auto caption = power && !destination ? MenuCaption(stock.power.Text()) :
+                Caption(destination.value_or(Destination{&item}));
             if (caption.empty()) continue;
             C::MenuFlyoutSubItem split;
             split.Text(caption);
             const auto glyph = destination ? destination->item->glyph : item.glyph;
             if (glyph) split.Icon(MakeIcon(glyph));
-            for (auto const& child : children) split.Items().Append(child);
+            for (auto const& child : children) split.Items().Append(child.element);
             AddInteraction(*pending, split, destination.value_or(Destination{}), snapshot.mode);
             entry = split;
+            submenu = split;
         }
         if (!entry) continue;
-        pending->submenus.items.insert(pending->submenus.items.end(), children.begin(), children.end());
+        const bool powerOpener = power && recognizedPowerMenu && !destination;
+        AddMenuKeyRow(*pending, entry, destination.value_or(Destination{}), nullptr, stock,
+                      !power || powerOpener, powerOpener);
+        for (auto const& child : children) {
+            pending->submenus.items.push_back(child.element);
+            AddMenuKeyRow(*pending, child.element, child.destination, submenu, stock, true);
+        }
         if (previousGroup >= 0 && previousGroup != item.group) visible.push_back(C::MenuFlyoutSeparator());
         visible.push_back(entry);
         previousGroup = item.group;
@@ -1388,6 +1737,13 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
                     return;
                 }
             }
+            for (auto const& item : owner->keyRows) {
+                if (!item.parent) {
+                    BindMenuKeyPresenter(*owner, item.element);
+                    ApplyQuickKeyMark(item);
+                }
+            }
+            LeaveNativeAccessKeyMode();
         } catch (...) {
             Wh_Log(L"Could not initialize Win+X submenu interactions; restoring the Windows menu");
             Restore();
@@ -1400,11 +1756,6 @@ void TryPatchMenu(C::MenuFlyout const& menu) {
         if (session.get() == owner) Restore();
     });
     session = std::move(pending);
-    if (!powerChildren.empty()) {
-        session->powerChanged = true;
-        stock.power.Items().ReplaceAll(powerChildren);
-        if (powerGlyph) stock.power.Icon(MakeIcon(powerGlyph));
-    }
     session->menuChanged = true;
     items.ReplaceAll(visible);
 }
@@ -1503,6 +1854,12 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
     if (message == setupMessage) {
         if (action == sweepClosedSubmenus) {
             ClosePendingSubmenuPopups();
+            return 0;
+        }
+        if (action == resetNativeAccessKeys) {
+            try {
+                if (MenuInputActive(session.get())) I::AccessKeyManager::ExitDisplayMode();
+            } catch (...) { Wh_Log(L"Could not leave native Win+X access-key mode"); }
             return 0;
         }
         if (action) {

@@ -27,3 +27,5 @@ general and command settings, defaults, and localization in the packaged
 source. Build `Tests/availability-tests.cpp`
 with Windhawk clang++ for Windows x64 using `-static -ladvapi32 -liphlpapi` to test
 availability, the background work queue, and power command matching.
+Build `Tests/quick-keys-tests.cpp` with Windhawk clang++ using C++23 to test
+submenu selection, cycling, and localized key annotations.
