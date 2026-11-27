@@ -9,19 +9,19 @@ Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp tho�
 <table>
   <tbody>
     <tr>
-      <th scope="row" valign="middle">Classic</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Classic · Windows 11 Blur · Lệnh đã ghim"></a><br>Windows 11 Blur · Lệnh đã ghim</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="497" alt="Classic · Dracula Velvet · Máy tính"></a><br>Dracula Velvet · Máy tính</td>
+      <td valign="middle"><strong>Classic</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Classic · Windows 11 Blur · Lệnh đã ghim"></a><br>Windows 11 Blur · Lệnh đã ghim</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="386" alt="Classic · Dracula Velvet · Máy tính"></a><br>Dracula Velvet · Máy tính</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Compact Mini-Pill</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Compact Mini-Pill · Nord Frost · Lệnh đã ghim"></a><br>Nord Frost · Lệnh đã ghim</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="220" alt="Compact Mini-Pill · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="259" alt="Compact Mini-Pill · Emerald Slate · Gợi ý Paint"></a><br>Emerald Slate · Gợi ý Paint</td>
+      <td valign="middle"><strong>Compact Mini-Pill</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Compact Mini-Pill · Nord Frost · Lệnh đã ghim"></a><br>Nord Frost · Lệnh đã ghim</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="171" alt="Compact Mini-Pill · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="202" alt="Compact Mini-Pill · Emerald Slate · Gợi ý Paint"></a><br>Emerald Slate · Gợi ý Paint</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Fluent</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha · Lệnh đã ghim"></a><br>Catppuccin Mocha · Lệnh đã ghim</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Fluent Solid · Chỉ báo quyền quản trị"></a><br>Fluent Solid · Chỉ báo quyền quản trị</td>
+      <td valign="middle"><strong>Fluent</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha · Lệnh đã ghim"></a><br>Catppuccin Mocha · Lệnh đã ghim</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Fluent Solid · Chỉ báo quyền quản trị"></a><br>Fluent Solid · Chỉ báo quyền quản trị</td>
     </tr>
   </tbody>
 </table>
@@ -29,15 +29,15 @@ Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp tho�
 ## Tính năng
 
 - **Lệnh tùy chỉnh và gợi ý.** Nhập tên để tìm ứng dụng và công cụ Windows. Có thể đặt tên ngắn cho lệnh, chương trình và tệp, cũng như yêu cầu quyền quản trị cho từng lệnh.
-- **Lịch sử lệnh.** Lưu tối đa 50 lệnh gần đây. Có thể ghim hoặc xóa từng mục. Dùng **↑** và **↓** để duyệt lịch sử và gợi ý, nhấn **Tab** để đưa mục đã chọn vào ô nhập hoặc **Enter** để chạy.
+- **Lịch sử lệnh.** Lưu tối đa 50 lệnh gần đây. Có thể ghim hoặc xóa từng mục.
 - **Máy tính và tìm kiếm trên web.** Nhập biểu thức như `sqrt(144)` hoặc `2^10`, rồi chọn kết quả để chèn vào ô nhập và sao chép vào bảng tạm. Dùng `google:<truy vấn>` để tìm trên trình duyệt mặc định.
-- **Chạy với quyền quản trị.** Mặc định, **Ctrl + Shift + Enter** đổi quyền cho lần chạy hiện tại. Nếu đã bật quyền quản trị mặc định, tổ hợp này sẽ chạy lệnh với quyền thông thường. Mod cũng giữ tùy chọn quyền đã chọn trong Trình quản lý Tác vụ.
+- **Chạy với quyền quản trị.** Có thể chạy từng lệnh với quyền quản trị hoặc bật quyền quản trị mặc định. Mod giữ tùy chọn quyền đã chọn trong Trình quản lý Tác vụ.
 
 ## Cài đặt
 
 ![Cửa sổ cài đặt Modern Run ở trang Cá nhân hóa](Assets/Previews/settings.png)
 
-Nhấn **Ctrl + ,** để mở cài đặt Modern Run. Các tùy chọn chung cũng có trong Windhawk. Cài đặt trong mod áp dụng cho người dùng hiện tại. Khi sửa một tùy chọn trong Windhawk, giá trị mới sẽ thay giá trị đã đặt trong mod cho tùy chọn đó.
+Các tùy chọn chung có trong cài đặt Modern Run và Windhawk. Cài đặt trong mod áp dụng cho người dùng hiện tại. Khi sửa một tùy chọn trong Windhawk, giá trị mới sẽ thay giá trị đã đặt trong mod cho tùy chọn đó.
 
 ### Cá nhân hóa
 
@@ -74,13 +74,21 @@ Trong Windhawk, mở **Explore**, tìm **Modern Run Dialog UI** và chọn **Ins
 
 #### Từ mã nguồn (thủ công)
 
-1. Mở [mã nguồn độc lập của mod](Mod/modern-run-dialog-ui.wh.cpp).
+1. Mở [mã nguồn của mod](Mod/modern-run-dialog-ui.wh.cpp).
 2. Nếu mod đã được cài, mở mod ở chế độ chỉnh sửa trong Windhawk. Nếu cài mới, chọn **Create a New Mod**.
 3. Thay nội dung trình chỉnh sửa bằng toàn bộ mã nguồn, chọn **Compile Mod** và kiểm tra xem mod đã bật chưa.
 
 ### Sử dụng
 
-Nhấn **Ctrl + O** để chọn tệp hoặc **Esc** để đóng cửa sổ. Nhấp chuột phải để mở menu. Dùng mục **Lệnh** trong cài đặt Modern Run để thêm, sửa hoặc xóa lệnh tùy chỉnh.
+Nhấn **Win + R** để mở Modern Run thay cho hộp thoại Chạy cổ điển. Nhập lệnh, tên ứng dụng hoặc đường dẫn đến tệp hay thư mục. Trong khi nhập, hộp thoại gợi ý các ứng dụng, công cụ Windows và lệnh tùy chỉnh phù hợp.
+
+- Dùng **↑ / ↓** để duyệt lịch sử và gợi ý. Khi ô nhập trống, nhấn **↑** để mở lịch sử nếu tính năng này đang bật.
+- **Tab** đưa mục đã chọn vào ô nhập để chỉnh sửa. **Enter** chạy mục đã chọn hoặc nội dung trong ô nhập.
+- Theo mặc định, **Ctrl + Shift + Enter** đổi quyền cho lần chạy này. **Shift + Enter** chạy lệnh trong thiết bị đầu cuối.
+- **Ctrl + O** mở hộp thoại chọn tệp, **Ctrl + ,** mở cài đặt Modern Run, còn **Esc** đóng cửa sổ.
+- **Delete** xóa mục đã chọn khỏi lịch sử. Nhấp chuột phải vào mục để ghim hoặc xóa.
+
+Dùng mục **Lệnh** trong cài đặt Modern Run để thêm, sửa hoặc xóa lệnh tùy chỉnh.
 
 ### Kiểm tra
 

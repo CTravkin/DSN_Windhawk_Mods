@@ -62,20 +62,24 @@ Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run
 
 ## Layouts
 
-[![Classic, Compact Mini-Pill, and Fluent layouts with pinned history, calculator, Paint suggestions, and an administrator indicator](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/layouts.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/layouts.png)
+| | | |
+| --- | :---: | :---: |
+| **Classic** | [![Classic · Windows 11 Blur · Pinned command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-history.png)&#8232;Windows 11 Blur · Pinned command | [![Classic · Warm Paper](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-idle.png)&#8232;Warm Paper&#8232;&#8232;[![Classic · Dracula Velvet · Calculator](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-suggestions.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-suggestions.png)&#8232;Dracula Velvet · Calculator |
+| **Compact Mini-Pill** | [![Compact Mini-Pill · Nord Frost · Pinned command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-history.png)&#8232;Nord Frost · Pinned command | [![Compact Mini-Pill · Classic Win11](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-idle.png)&#8232;Classic Win11&#8232;&#8232;[![Compact Mini-Pill · Emerald Slate · Paint suggestion](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-suggestions.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-suggestions.png)&#8232;Emerald Slate · Paint suggestion |
+| **Fluent** | [![Fluent · Catppuccin Mocha · Pinned command](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-history.png)&#8232;Catppuccin Mocha · Pinned command | [![Fluent · Windows 11 Mica](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-idle.png)&#8232;Windows 11 Mica&#8232;&#8232;[![Fluent · Fluent Solid · Administrator indicator](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-elevation.png)&#8232;Fluent Solid · Administrator indicator |
 
 ## Features
 
 - **Custom commands and suggestions.** Search for apps and Windows tools by typing their names. Add short names for your own commands, programs, and files. A custom command can request administrator privileges.
-- **Command history.** Keep up to 50 recent commands, pin entries, and remove them individually. Browse history and suggestions with **↑** and **↓**. Press **Tab** to fill the input or **Enter** to run the selected command.
+- **Command history.** Keep up to 50 recent commands, pin entries, and remove them individually.
 - **Calculator and web search.** Enter an expression such as `sqrt(144)` or `2^10` and select the result to insert it and copy it to the clipboard. Type `google:<query>` to search in your default browser.
-- **Run as administrator.** By default, **Ctrl + Shift + Enter** switches privileges for the current launch. If elevation is enabled by default, the same shortcut runs with standard privileges. The mod also honors the elevation option in Task Manager.
+- **Run as administrator.** Launch a single command with administrator privileges or set elevation as the default. The mod honors the elevation option in Task Manager.
 
 ## Settings
 
 ![Modern Run Settings open to Personalization](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/settings.png)
 
-Open Modern Run Settings with **Ctrl + ,**. Shared options are also available in Windhawk. In-app settings apply to the current user. Changing an option in Windhawk replaces the in-app choice for that option.
+Shared options are available in both Modern Run Settings and Windhawk. In-app settings apply to the current user. Changing an option in Windhawk replaces the in-app choice for that option.
 
 ### Personalization
 
@@ -104,7 +108,15 @@ Requires Windows 10 or 11 and [Windhawk](https://windhawk.net/). Smart App Contr
 
 ## Usage
 
-Use **Ctrl + O** to browse for a file, **Esc** to close Run, or right-click to open the context menu. Open **Commands** in Modern Run Settings to add, edit, or remove a custom command.
+Press **Win + R** to open Modern Run in place of the classic Run dialog. Type a command, an app name, or a path to a file or folder. As you type, the dialog suggests matching apps, Windows tools, and custom commands.
+
+- **↑ / ↓** browse history and suggestions. With an empty field, press **↑** to open the history if it is enabled.
+- **Tab** puts the selected item in the input so it can be edited. **Enter** runs the selected item or the text in the field.
+- **Ctrl + Shift + Enter** switches privileges for this launch by default. **Shift + Enter** runs the command in a terminal by default.
+- **Ctrl + O** opens the file picker, **Ctrl + ,** opens Modern Run Settings, and **Esc** closes the dialog.
+- **Delete** removes the selected history entry. Right-click an entry to pin or remove it.
+
+Use **Commands** in Modern Run Settings to add, edit, or remove custom commands.
 
 ## Links
 

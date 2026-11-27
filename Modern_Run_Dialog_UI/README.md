@@ -9,19 +9,19 @@ Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run
 <table>
   <tbody>
     <tr>
-      <th scope="row" valign="middle">Classic</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Classic · Windows 11 Blur · Pinned command"></a><br>Windows 11 Blur · Pinned command</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="497" alt="Classic · Dracula Velvet · Calculator"></a><br>Dracula Velvet · Calculator</td>
+      <td valign="middle"><strong>Classic</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Classic · Windows 11 Blur · Pinned command"></a><br>Windows 11 Blur · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="386" alt="Classic · Dracula Velvet · Calculator"></a><br>Dracula Velvet · Calculator</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Compact Mini-Pill</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Compact Mini-Pill · Nord Frost · Pinned command"></a><br>Nord Frost · Pinned command</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="220" alt="Compact Mini-Pill · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="259" alt="Compact Mini-Pill · Emerald Slate · Paint suggestion"></a><br>Emerald Slate · Paint suggestion</td>
+      <td valign="middle"><strong>Compact Mini-Pill</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Compact Mini-Pill · Nord Frost · Pinned command"></a><br>Nord Frost · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="171" alt="Compact Mini-Pill · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="202" alt="Compact Mini-Pill · Emerald Slate · Paint suggestion"></a><br>Emerald Slate · Paint suggestion</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Fluent</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha · Pinned command"></a><br>Catppuccin Mocha · Pinned command</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Fluent Solid · Administrator indicator"></a><br>Fluent Solid · Administrator indicator</td>
+      <td valign="middle"><strong>Fluent</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha · Pinned command"></a><br>Catppuccin Mocha · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Fluent Solid · Administrator indicator"></a><br>Fluent Solid · Administrator indicator</td>
     </tr>
   </tbody>
 </table>
@@ -29,15 +29,15 @@ Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run
 ## Features
 
 - **Custom commands and suggestions.** Search for apps and Windows tools by typing their names. Add short names for your own commands, programs, and files. A custom command can request administrator privileges.
-- **Command history.** Keep up to 50 recent commands, pin entries, and remove them individually. Browse history and suggestions with **↑** and **↓**. Press **Tab** to fill the input or **Enter** to run the selected command.
+- **Command history.** Keep up to 50 recent commands, pin entries, and remove them individually.
 - **Calculator and web search.** Enter an expression such as `sqrt(144)` or `2^10` and select the result to insert it and copy it to the clipboard. Type `google:<query>` to search in your default browser.
-- **Run as administrator.** By default, **Ctrl + Shift + Enter** switches privileges for the current launch. If elevation is enabled by default, the same shortcut runs with standard privileges. The mod also honors the elevation option in Task Manager.
+- **Run as administrator.** Launch a single command with administrator privileges or set elevation as the default. The mod honors the elevation option in Task Manager.
 
 ## Settings
 
 ![Modern Run Settings open to Personalization](Assets/Previews/settings.png)
 
-Open Modern Run Settings with **Ctrl + ,**. Shared options are also available in Windhawk. In-app settings apply to the current user. Changing an option in Windhawk replaces the in-app choice for that option.
+Shared options are available in both Modern Run Settings and Windhawk. In-app settings apply to the current user. Changing an option in Windhawk replaces the in-app choice for that option.
 
 ### Personalization
 
@@ -74,13 +74,21 @@ In Windhawk, open **Explore**, search for **Modern Run Dialog UI**, and select *
 
 #### From source (manual)
 
-1. Open [the standalone mod source](Mod/modern-run-dialog-ui.wh.cpp).
+1. Open [the mod source](Mod/modern-run-dialog-ui.wh.cpp).
 2. Open the mod in Windhawk editing mode if it is already installed. For a fresh installation, choose **Create a New Mod**.
 3. Replace the editor contents with the complete source, select **Compile Mod**, and check that the mod is enabled.
 
 ### Usage
 
-Use **Ctrl + O** to browse for a file, **Esc** to close Run, or right-click to open the context menu. Open **Commands** in Modern Run Settings to add, edit, or remove a custom command.
+Press **Win + R** to open Modern Run in place of the classic Run dialog. Type a command, an app name, or a path to a file or folder. As you type, the dialog suggests matching apps, Windows tools, and custom commands.
+
+- **↑ / ↓** browse history and suggestions. With an empty field, press **↑** to open the history if it is enabled.
+- **Tab** puts the selected item in the input so it can be edited. **Enter** runs the selected item or the text in the field.
+- **Ctrl + Shift + Enter** switches privileges for this launch by default. **Shift + Enter** runs the command in a terminal by default.
+- **Ctrl + O** opens the file picker, **Ctrl + ,** opens Modern Run Settings, and **Esc** closes the dialog.
+- **Delete** removes the selected history entry. Right-click an entry to pin or remove it.
+
+Use **Commands** in Modern Run Settings to add, edit, or remove custom commands.
 
 ### Verification
 

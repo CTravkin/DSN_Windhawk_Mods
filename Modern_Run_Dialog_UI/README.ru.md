@@ -9,19 +9,19 @@ Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R
 <table>
   <tbody>
     <tr>
-      <th scope="row" valign="middle">Классический</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Классический · Windows 11 Blur · Закрепленная команда"></a><br>Windows 11 Blur · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="497" alt="Классический · Dracula Velvet · Калькулятор"></a><br>Dracula Velvet · Калькулятор</td>
+      <td valign="middle"><strong>Классический</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Классический · Windows 11 Blur · Закрепленная команда"></a><br>Windows 11 Blur · Закрепленная команда</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="386" alt="Классический · Dracula Velvet · Калькулятор"></a><br>Dracula Velvet · Калькулятор</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Компактный (Pill)</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Компактный (Pill) · Nord Frost · Закрепленная команда"></a><br>Nord Frost · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="220" alt="Компактный (Pill) · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="259" alt="Компактный (Pill) · Emerald Slate · Подсказка Paint"></a><br>Emerald Slate · Подсказка Paint</td>
+      <td valign="middle"><strong>Компактный (Pill)</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Компактный (Pill) · Nord Frost · Закрепленная команда"></a><br>Nord Frost · Закрепленная команда</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="171" alt="Компактный (Pill) · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="202" alt="Компактный (Pill) · Emerald Slate · Подсказка Paint"></a><br>Emerald Slate · Подсказка Paint</td>
     </tr>
     <tr>
-      <th scope="row" valign="middle">Fluent</th>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha · Закрепленная команда"></a><br>Catppuccin Mocha · Закрепленная команда</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Fluent Solid · Индикатор администратора"></a><br>Fluent Solid · Индикатор администратора</td>
+      <td valign="middle"><strong>Fluent</strong></td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha · Закрепленная команда"></a><br>Catppuccin Mocha · Закрепленная команда</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Fluent Solid · Индикатор администратора"></a><br>Fluent Solid · Индикатор администратора</td>
     </tr>
   </tbody>
 </table>
@@ -29,15 +29,15 @@ Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R
 ## Функции
 
 - **Собственные команды и подсказки.** Приложения и инструменты Windows можно найти по имени. Своим командам, программам и файлам можно назначить короткие имена, а для отдельной команды задать запуск от имени администратора.
-- **История команд.** Хранит до 50 недавних команд. Записи можно закреплять и удалять по одной. Клавиши **↑** и **↓** переключают записи в истории и подсказках, **Tab** вставляет выбранную запись в поле, **Enter** запускает ее.
+- **История команд.** Хранит до 50 недавних команд. Записи можно закреплять и удалять по одной.
 - **Калькулятор и поиск в интернете.** Введите выражение, например `sqrt(144)` или `2^10`, и выберите результат, чтобы вставить его в поле и скопировать в буфер обмена. Запрос `google:<запрос>` открывает поиск в браузере по умолчанию.
-- **Запуск от имени администратора.** По умолчанию **Ctrl + Shift + Enter** меняет права для текущего запуска. Если по умолчанию включено повышение прав, комбинация запускает команду с обычными правами. Мод учитывает выбор прав и в Диспетчере задач.
+- **Запуск от имени администратора.** Повышение прав можно включить для отдельной команды или по умолчанию. Мод учитывает выбор прав в Диспетчере задач.
 
 ## Настройки
 
 ![Окно настроек Modern Run на странице персонализации](Assets/Previews/settings.png)
 
-**Ctrl + ,** открывает настройки Modern Run. Общие параметры доступны и в Windhawk. Настройки окна мода применяются для текущего пользователя. Изменение параметра в Windhawk заменяет значение, заданное для него в окне мода.
+Общие параметры доступны в настройках Modern Run и Windhawk. Настройки окна мода применяются для текущего пользователя. Изменение параметра в Windhawk заменяет значение, заданное для него в окне мода.
 
 ### Персонализация
 
@@ -74,13 +74,21 @@ Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R
 
 #### Из исходника (вручную)
 
-1. Откройте [самодостаточный исходник мода](Mod/modern-run-dialog-ui.wh.cpp).
+1. Откройте [исходник мода](Mod/modern-run-dialog-ui.wh.cpp).
 2. Откройте установленный мод в режиме редактирования Windhawk. Если мод еще не установлен, выберите **Создать новый мод**.
 3. Замените содержимое редактора полным исходником, скомпилируйте мод и убедитесь, что он включен.
 
 ### Использование
 
-**Ctrl + O** открывает выбор файла, **Esc** закрывает окно. Нажатие правой кнопкой мыши открывает контекстное меню. Добавлять, редактировать и удалять собственные команды можно в разделе **Команды** окна настроек.
+Нажмите **Win + R**, чтобы открыть Modern Run вместо классического окна «Выполнить». Введите команду, название приложения или путь к файлу либо папке. По мере ввода появляются подходящие приложения, инструменты Windows и собственные команды.
+
+- **↑ / ↓** перемещают выбор по истории и подсказкам. Если поле пустое, нажмите **↑**, чтобы открыть историю, когда она включена.
+- **Tab** вставляет выбранную запись в поле для редактирования. **Enter** запускает выбранную запись или текст из поля.
+- **Ctrl + Shift + Enter** по умолчанию меняет права для текущего запуска. **Shift + Enter** по умолчанию запускает команду в терминале.
+- **Ctrl + O** открывает выбор файла, **Ctrl + ,** — настройки Modern Run, **Esc** закрывает окно.
+- **Delete** удаляет выбранную запись из истории. Запись также можно закрепить или удалить через контекстное меню.
+
+Собственные команды можно добавить, изменить или удалить в разделе **Команды** окна настроек.
 
 ### Проверка
 
