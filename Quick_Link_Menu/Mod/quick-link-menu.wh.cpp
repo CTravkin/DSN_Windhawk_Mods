@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         1.1.3
+// @version         1.1.5
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 45
+// Build: 47
 
 // ==WindhawkModReadme==
 /*
@@ -1638,6 +1638,7 @@ struct CursorEvents {
 struct SubmenuCleanup {
     std::vector<X::XamlRoot> roots;
     std::vector<C::MenuFlyoutItemBase> items;
+    ULONGLONG retryUntil{};
 };
 
 struct MenuSession {
@@ -2864,21 +2865,40 @@ void ClosePopupWindows(std::vector<P::Popup> const& popups) noexcept {
     }
 }
 
-void ClosePendingSubmenuPopups() noexcept {
+constexpr UINT submenuSweepInterval = 100;
+constexpr ULONGLONG submenuCleanupWindow = 750;
+
+UINT_PTR SubmenuCleanupTimerId() noexcept {
+    return reinterpret_cast<UINT_PTR>(&pendingSubmenuCleanups);
+}
+
+void ClosePendingSubmenuPopups(bool retry = true) noexcept {
     // Closing a XAML popup may dispatch another flyout event.
     auto pending = std::exchange(pendingSubmenuCleanups, {});
     for (auto& cleanup : pending) {
         try { ClosePopupWindows(FindSubmenuPopups(cleanup)); }
         catch (...) { Wh_Log(L"Could not identify the detached Win+X submenu popups"); }
+
+        // XAML can publish the popup after this message has already run.
+        if (retry && !unloading && GetTickCount64() < cleanup.retryUntil) {
+            try { pendingSubmenuCleanups.push_back(std::move(cleanup)); }
+            catch (...) { Wh_Log(L"Could not retain the detached Win+X submenu cleanup"); }
+        }
     }
+    if (pendingSubmenuCleanups.empty() && trayWindow)
+        KillTimer(trayWindow, SubmenuCleanupTimerId());
 }
 
 void QueueSubmenuCleanup(SubmenuCleanup&& cleanup) noexcept {
     if (cleanup.items.empty()) return;
     try {
+        const bool first = pendingSubmenuCleanups.empty();
+        cleanup.retryUntil = GetTickCount64() + submenuCleanupWindow;
         pendingSubmenuCleanups.push_back(std::move(cleanup));
-        if (unloading || (pendingSubmenuCleanups.size() == 1 &&
-                         !PostMessageW(trayWindow, setupMessage, sweepClosedSubmenus, 0))) {
+        if (unloading || !trayWindow ||
+            (first && !SetTimer(trayWindow, SubmenuCleanupTimerId(), submenuSweepInterval, nullptr))) {
+            ClosePendingSubmenuPopups(false);
+        } else if (first && !PostMessageW(trayWindow, setupMessage, sweepClosedSubmenus, 0)) {
             ClosePendingSubmenuPopups();
         }
     } catch (...) {
@@ -2948,7 +2968,7 @@ void Restore() noexcept {
     } catch (...) {
         Wh_Log(L"Could not restore the original Win+X menu");
     }
-    // Sweep once more after XAML finishes dispatching the closing event.
+    // Keep tracking these exact items while XAML settles the closed menu.
     QueueSubmenuCleanup(std::move(old->submenus));
 }
 
@@ -3271,7 +3291,16 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
         ClosePendingSubmenuPopups();
         return 0;
     }
-    if (message == WM_NCDESTROY && window == trayWindow) pendingSubmenuCleanups.clear();
+    if (window == trayWindow) {
+        if (message == WM_TIMER && action == SubmenuCleanupTimerId()) {
+            ClosePendingSubmenuPopups();
+            return 0;
+        }
+        if (message == WM_NCDESTROY) {
+            KillTimer(window, SubmenuCleanupTimerId());
+            pendingSubmenuCleanups.clear();
+        }
+    }
     return DefSubclassProc(window, message, action, data);
 }
 
