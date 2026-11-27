@@ -42,7 +42,7 @@
 // @description:hi-IN Win + R और कार्य प्रबंधक में «नया कार्य चलाएँ» के लिए आधुनिक रन डायलॉग। इसमें थीम, कमांड का इतिहास, कस्टम कमांड, ऐप के सुझाव और कैलकुलेटर हैं
 // @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
 // @description:ar مربع حوار «تشغيل» عصري للاختصار Win + R ولخيار «تشغيل مهمة جديدة» في إدارة المهام. يتضمن نُسقًا وسجل الأوامر وأوامر مخصصة واقتراحات للتطبيقات وآلة حاسبة
-// @version         6.10.10
+// @version         6.10.11
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -50,7 +50,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 60
+// Build: 61
 
 // ==WindhawkModReadme==
 /*
@@ -217,298 +217,298 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:hi-IN: "रंग, पृष्ठभूमि और कोनों की गोलाई का तैयार संयोजन"
     $description:ar: "مجموعة جاهزة من الألوان والخلفية واستدارة الزوايا"
     $options:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Recommended Default)
+    - liquid_glass: Liquid Glass (Refractive Glass)
+    - mica_alt: Windows 11 Mica (Soft Native Mica)
+    - fluent_solid: Fluent Solid (Opaque Win11 Pill)
+    - classic_win11: Classic Win11 (Subtle Corners & Border)
+    - midnight_oled: Midnight OLED (Deep Black)
+    - nord_frost: Nord Frost (Arctic Slate & Ice)
+    - catppuccin_mocha: Catppuccin Mocha (Warm Dark & Lavender)
+    - dracula_velvet: Dracula Velvet (Deep Plum & Violet)
+    - rose_pine: Rosé Pine (Twilight & Rose Gold)
+    - emerald_slate: Emerald Slate (Deep Forest & Mint)
+    - warm_paper: Warm Paper (Soft Light Ivory)
     - custom: Custom Colors & Corner Radius
     $options:ru-RU:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Рекомендуется по умолчанию)
+    - liquid_glass: Liquid Glass (Преломляющее стекло)
+    - mica_alt: Windows 11 Mica (Мягкий системный эффект Mica)
+    - fluent_solid: Fluent Solid (Непрозрачная капсула Windows 11)
+    - classic_win11: Classic Win11 (Легкое скругление и тонкая рамка)
+    - midnight_oled: Midnight OLED (Глубокий черный)
+    - nord_frost: Nord Frost (Холодный сланец и лед)
+    - catppuccin_mocha: Catppuccin Mocha (Теплый темный фон и лаванда)
+    - dracula_velvet: Dracula Velvet (Темная слива и фиолетовый)
+    - rose_pine: Rosé Pine (Сумерки и розовое золото)
+    - emerald_slate: Emerald Slate (Темный лес и мята)
+    - warm_paper: Warm Paper (Мягкая слоновая кость)
     - custom: Свои цвета и радиус углов
     $options:vi-VN:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Mặc định khuyên dùng)
+    - liquid_glass: Liquid Glass (Kính khúc xạ)
+    - mica_alt: Windows 11 Mica (Mica gốc dịu nhẹ)
+    - fluent_solid: Fluent Solid (Dạng viên nang đục của Windows 11)
+    - classic_win11: Classic Win11 (Góc bo nhẹ và viền mảnh)
+    - midnight_oled: Midnight OLED (Đen sâu)
+    - nord_frost: Nord Frost (Xám đá và xanh băng)
+    - catppuccin_mocha: Catppuccin Mocha (Nền tối ấm và tím oải hương)
+    - dracula_velvet: Dracula Velvet (Tím mận đậm và tím sáng)
+    - rose_pine: Rosé Pine (Chạng vạng và vàng hồng)
+    - emerald_slate: Emerald Slate (Xanh rừng đậm và xanh bạc hà)
+    - warm_paper: Warm Paper (Trắng ngà dịu)
     - custom: Tùy chỉnh màu và độ bo góc
     $options:zh-CN:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (推荐的默认主题)
+    - liquid_glass: Liquid Glass (折射玻璃)
+    - mica_alt: Windows 11 Mica (柔和的系统 Mica 效果)
+    - fluent_solid: Fluent Solid (Windows 11 不透明胶囊形)
+    - classic_win11: Classic Win11 (细微圆角和边框)
+    - midnight_oled: Midnight OLED (深黑色)
+    - nord_frost: Nord Frost (冷灰和冰蓝)
+    - catppuccin_mocha: Catppuccin Mocha (暖深色和薰衣草紫)
+    - dracula_velvet: Dracula Velvet (深梅紫和亮紫)
+    - rose_pine: Rosé Pine (暮色和玫瑰金)
+    - emerald_slate: Emerald Slate (深森林绿和薄荷绿)
+    - warm_paper: Warm Paper (柔和的象牙白)
     - custom: 自定义颜色和圆角半径
     $options:zh-TW:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (建議的預設佈景主題)
+    - liquid_glass: Liquid Glass (折射玻璃)
+    - mica_alt: Windows 11 Mica (柔和的原生 Mica 效果)
+    - fluent_solid: Fluent Solid (Windows 11 不透明膠囊形)
+    - classic_win11: Classic Win11 (細緻的圓角和邊框)
+    - midnight_oled: Midnight OLED (深黑色)
+    - nord_frost: Nord Frost (冷灰與冰藍)
+    - catppuccin_mocha: Catppuccin Mocha (暖深色與薰衣草紫)
+    - dracula_velvet: Dracula Velvet (深梅紫與亮紫)
+    - rose_pine: Rosé Pine (暮色與玫瑰金)
+    - emerald_slate: Emerald Slate (深森林綠與薄荷綠)
+    - warm_paper: Warm Paper (柔和的象牙白)
     - custom: 自訂色彩與圓角半徑
     $options:ja-JP:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (推奨の既定値)
+    - liquid_glass: Liquid Glass (屈折ガラス)
+    - mica_alt: Windows 11 Mica (柔らかい標準 Mica)
+    - fluent_solid: Fluent Solid (不透明な Windows 11 のカプセル型)
+    - classic_win11: Classic Win11 (控えめな角丸と枠線)
+    - midnight_oled: Midnight OLED (深い黒)
+    - nord_frost: Nord Frost (寒色のスレートとアイスブルー)
+    - catppuccin_mocha: Catppuccin Mocha (暖色系の暗い背景とラベンダー)
+    - dracula_velvet: Dracula Velvet (濃いプラムと紫)
+    - rose_pine: Rosé Pine (黄昏とローズゴールド)
+    - emerald_slate: Emerald Slate (深い森の緑とミント)
+    - warm_paper: Warm Paper (柔らかいアイボリー)
     - custom: 色と角の丸みをカスタマイズ
     $options:ko-KR:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (권장 기본값)
+    - liquid_glass: Liquid Glass (굴절 유리)
+    - mica_alt: Windows 11 Mica (은은한 기본 Mica)
+    - fluent_solid: Fluent Solid (Windows 11 불투명 캡슐형)
+    - classic_win11: Classic Win11 (은은한 모서리와 테두리)
+    - midnight_oled: Midnight OLED (깊은 검정)
+    - nord_frost: Nord Frost (차가운 회색과 얼음색)
+    - catppuccin_mocha: Catppuccin Mocha (따뜻한 어두운 배경과 라벤더)
+    - dracula_velvet: Dracula Velvet (짙은 자두색과 보라색)
+    - rose_pine: Rosé Pine (황혼과 로즈 골드)
+    - emerald_slate: Emerald Slate (짙은 숲색과 민트색)
+    - warm_paper: Warm Paper (은은한 아이보리)
     - custom: 사용자 지정 색상 및 모서리 반경
     $options:th-TH:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (ค่าเริ่มต้นที่แนะนำ)
+    - liquid_glass: Liquid Glass (กระจกหักเหแสง)
+    - mica_alt: Windows 11 Mica (เอฟเฟ็กต์ไมกาของระบบแบบนุ่มนวล)
+    - fluent_solid: Fluent Solid (ทรงแคปซูลทึบแบบ Windows 11)
+    - classic_win11: Classic Win11 (มุมโค้งและขอบบาง)
+    - midnight_oled: Midnight OLED (ดำสนิท)
+    - nord_frost: Nord Frost (สีเทาหินกับสีฟ้าน้ำแข็ง)
+    - catppuccin_mocha: Catppuccin Mocha (พื้นมืดโทนอุ่นกับสีลาเวนเดอร์)
+    - dracula_velvet: Dracula Velvet (สีพลัมเข้มกับสีม่วง)
+    - rose_pine: Rosé Pine (สีสนธยากับสีโรสโกลด์)
+    - emerald_slate: Emerald Slate (สีเขียวป่าเข้มกับสีมิ้นต์)
+    - warm_paper: Warm Paper (สีงาช้างอ่อน)
     - custom: กำหนดสีและรัศมีมุมเอง
     $options:id-ID:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Default yang disarankan)
+    - liquid_glass: Liquid Glass (Kaca refraktif)
+    - mica_alt: Windows 11 Mica (Efek mika bawaan yang lembut)
+    - fluent_solid: Fluent Solid (Kapsul buram Windows 11)
+    - classic_win11: Classic Win11 (Sudut halus dan bingkai tipis)
+    - midnight_oled: Midnight OLED (Hitam pekat)
+    - nord_frost: Nord Frost (Kelabu dingin dan biru es)
+    - catppuccin_mocha: Catppuccin Mocha (Warna gelap hangat dan lavender)
+    - dracula_velvet: Dracula Velvet (Plum gelap dan ungu)
+    - rose_pine: Rosé Pine (Senja dan emas mawar)
+    - emerald_slate: Emerald Slate (Hijau hutan gelap dan mint)
+    - warm_paper: Warm Paper (Gading lembut)
     - custom: Warna dan radius sudut khusus
     $options:ms-MY:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Lalai yang disyorkan)
+    - liquid_glass: Liquid Glass (Kaca biasan)
+    - mica_alt: Windows 11 Mica (Kesan mika asli yang lembut)
+    - fluent_solid: Fluent Solid (Kapsul legap Windows 11)
+    - classic_win11: Classic Win11 (Sudut lembut dan bingkai nipis)
+    - midnight_oled: Midnight OLED (Hitam pekat)
+    - nord_frost: Nord Frost (Kelabu sejuk dan biru ais)
+    - catppuccin_mocha: Catppuccin Mocha (Warna gelap hangat dan lavender)
+    - dracula_velvet: Dracula Velvet (Plum gelap dan ungu)
+    - rose_pine: Rosé Pine (Senja dan emas ros)
+    - emerald_slate: Emerald Slate (Hijau hutan gelap dan pudina)
+    - warm_paper: Warm Paper (Gading lembut)
     - custom: Warna dan jejari sudut tersuai
     $options:fr-FR:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Valeur par défaut recommandée)
+    - liquid_glass: Liquid Glass (Verre à réfraction)
+    - mica_alt: Windows 11 Mica (Mica natif doux)
+    - fluent_solid: Fluent Solid (Capsule opaque Windows 11)
+    - classic_win11: Classic Win11 (Angles et bordure discrets)
+    - midnight_oled: Midnight OLED (Noir profond)
+    - nord_frost: Nord Frost (Ardoise froide et bleu glacier)
+    - catppuccin_mocha: Catppuccin Mocha (Fond sombre chaud et lavande)
+    - dracula_velvet: Dracula Velvet (Prune foncé et violet)
+    - rose_pine: Rosé Pine (Crépuscule et or rose)
+    - emerald_slate: Emerald Slate (Vert forêt profond et menthe)
+    - warm_paper: Warm Paper (Ivoire doux)
     - custom: Couleurs et rayon des angles personnalisés
     $options:de-DE:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Empfohlener Standard)
+    - liquid_glass: Liquid Glass (Lichtbrechendes Glas)
+    - mica_alt: Windows 11 Mica (Sanftes natives Mica)
+    - fluent_solid: Fluent Solid (Blickdichte Windows-11-Kapsel)
+    - classic_win11: Classic Win11 (Dezente Ecken und Rahmen)
+    - midnight_oled: Midnight OLED (Tiefschwarz)
+    - nord_frost: Nord Frost (Kühler Schiefer und Eisblau)
+    - catppuccin_mocha: Catppuccin Mocha (Warmer dunkler Hintergrund und Lavendel)
+    - dracula_velvet: Dracula Velvet (Dunkle Pflaume und Violett)
+    - rose_pine: Rosé Pine (Dämmerung und Roségold)
+    - emerald_slate: Emerald Slate (Tiefes Waldgrün und Minze)
+    - warm_paper: Warm Paper (Sanftes Elfenbein)
     - custom: Benutzerdefinierte Farben und Eckenradien
     $options:es-ES:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Predeterminado recomendado)
+    - liquid_glass: Liquid Glass (Vidrio refractivo)
+    - mica_alt: Windows 11 Mica (Mica nativa suave)
+    - fluent_solid: Fluent Solid (Cápsula opaca de Windows 11)
+    - classic_win11: Classic Win11 (Esquinas y borde discretos)
+    - midnight_oled: Midnight OLED (Negro profundo)
+    - nord_frost: Nord Frost (Pizarra fría y azul hielo)
+    - catppuccin_mocha: Catppuccin Mocha (Fondo oscuro cálido y lavanda)
+    - dracula_velvet: Dracula Velvet (Ciruela oscura y violeta)
+    - rose_pine: Rosé Pine (Crepúsculo y oro rosa)
+    - emerald_slate: Emerald Slate (Verde bosque profundo y menta)
+    - warm_paper: Warm Paper (Marfil suave)
     - custom: Colores y redondeo personalizados
     $options:pt-BR:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Padrão recomendado)
+    - liquid_glass: Liquid Glass (Vidro refrativo)
+    - mica_alt: Windows 11 Mica (Mica nativa suave)
+    - fluent_solid: Fluent Solid (Cápsula opaca do Windows 11)
+    - classic_win11: Classic Win11 (Cantos e borda discretos)
+    - midnight_oled: Midnight OLED (Preto profundo)
+    - nord_frost: Nord Frost (Ardósia fria e azul-gelo)
+    - catppuccin_mocha: Catppuccin Mocha (Fundo escuro quente e lavanda)
+    - dracula_velvet: Dracula Velvet (Ameixa escura e violeta)
+    - rose_pine: Rosé Pine (Crepúsculo e ouro rosé)
+    - emerald_slate: Emerald Slate (Verde-floresta escuro e menta)
+    - warm_paper: Warm Paper (Marfim suave)
     - custom: Cores e arredondamento personalizados
     $options:it-IT:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Predefinito consigliato)
+    - liquid_glass: Liquid Glass (Vetro rifrangente)
+    - mica_alt: Windows 11 Mica (Mica nativa tenue)
+    - fluent_solid: Fluent Solid (Capsula opaca di Windows 11)
+    - classic_win11: Classic Win11 (Angoli e bordo discreti)
+    - midnight_oled: Midnight OLED (Nero profondo)
+    - nord_frost: Nord Frost (Ardesia fredda e azzurro ghiaccio)
+    - catppuccin_mocha: Catppuccin Mocha (Sfondo scuro caldo e lavanda)
+    - dracula_velvet: Dracula Velvet (Prugna scuro e viola)
+    - rose_pine: Rosé Pine (Crepuscolo e oro rosa)
+    - emerald_slate: Emerald Slate (Verde bosco intenso e menta)
+    - warm_paper: Warm Paper (Avorio tenue)
     - custom: Colori e arrotondamento personalizzati
     $options:uk-UA:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Рекомендовано за замовчуванням)
+    - liquid_glass: Liquid Glass (Заломлювальне скло)
+    - mica_alt: Windows 11 Mica (М’який системний ефект Mica)
+    - fluent_solid: Fluent Solid (Непрозора капсула Windows 11)
+    - classic_win11: Classic Win11 (Легке заокруглення й тонка рамка)
+    - midnight_oled: Midnight OLED (Глибокий чорний)
+    - nord_frost: Nord Frost (Холодний сланець і лід)
+    - catppuccin_mocha: Catppuccin Mocha (Тепле темне тло й лаванда)
+    - dracula_velvet: Dracula Velvet (Темна слива й фіолетовий)
+    - rose_pine: Rosé Pine (Сутінки й рожеве золото)
+    - emerald_slate: Emerald Slate (Темний ліс і м’ята)
+    - warm_paper: Warm Paper (М’який колір слонової кістки)
     - custom: Власні кольори й заокруглення
     $options:pl-PL:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Zalecany domyślny)
+    - liquid_glass: Liquid Glass (Szkło załamujące światło)
+    - mica_alt: Windows 11 Mica (Stonowana natywna mika)
+    - fluent_solid: Fluent Solid (Nieprzezroczysta kapsuła Windows 11)
+    - classic_win11: Classic Win11 (Subtelne narożniki i obramowanie)
+    - midnight_oled: Midnight OLED (Głęboka czerń)
+    - nord_frost: Nord Frost (Chłodny łupek i lodowy błękit)
+    - catppuccin_mocha: Catppuccin Mocha (Ciepłe ciemne tło i lawenda)
+    - dracula_velvet: Dracula Velvet (Ciemna śliwka i fiolet)
+    - rose_pine: Rosé Pine (Zmierzch i różowe złoto)
+    - emerald_slate: Emerald Slate (Głęboka leśna zieleń i mięta)
+    - warm_paper: Warm Paper (Delikatna kość słoniowa)
     - custom: Własne kolory i zaokrąglenia
     $options:nl-NL:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Aanbevolen standaard)
+    - liquid_glass: Liquid Glass (Lichtbrekend glas)
+    - mica_alt: Windows 11 Mica (Zachte ingebouwde mica)
+    - fluent_solid: Fluent Solid (Ondoorzichtige Windows 11-capsule)
+    - classic_win11: Classic Win11 (Subtiele hoeken en rand)
+    - midnight_oled: Midnight OLED (Diepzwart)
+    - nord_frost: Nord Frost (Koele leisteen en ijsblauw)
+    - catppuccin_mocha: Catppuccin Mocha (Warme donkere achtergrond en lavendel)
+    - dracula_velvet: Dracula Velvet (Diep pruim en violet)
+    - rose_pine: Rosé Pine (Schemering en roségoud)
+    - emerald_slate: Emerald Slate (Diep bosgroen en mint)
+    - warm_paper: Warm Paper (Zacht ivoor)
     - custom: Aangepaste kleuren en hoekafronding
     $options:tr-TR:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (Önerilen varsayılan)
+    - liquid_glass: Liquid Glass (Işığı kıran cam)
+    - mica_alt: Windows 11 Mica (Yumuşak yerel mika)
+    - fluent_solid: Fluent Solid (Opak Windows 11 kapsülü)
+    - classic_win11: Classic Win11 (İnce köşeler ve kenarlık)
+    - midnight_oled: Midnight OLED (Derin siyah)
+    - nord_frost: Nord Frost (Soğuk arduvaz ve buz mavisi)
+    - catppuccin_mocha: Catppuccin Mocha (Sıcak koyu zemin ve lavanta)
+    - dracula_velvet: Dracula Velvet (Koyu erik ve mor)
+    - rose_pine: Rosé Pine (Alacakaranlık ve pembe altın)
+    - emerald_slate: Emerald Slate (Derin orman yeşili ve nane)
+    - warm_paper: Warm Paper (Yumuşak fildişi)
     - custom: Özel renkler ve köşe yarıçapı
     $options:hi-IN:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (सुझाया गया डिफ़ॉल्ट)
+    - liquid_glass: Liquid Glass (प्रकाश मोड़ने वाला काँच)
+    - mica_alt: Windows 11 Mica (हल्का सिस्टम माइका)
+    - fluent_solid: Fluent Solid (अपारदर्शी Windows 11 कैप्सूल)
+    - classic_win11: Classic Win11 (हल्के गोल कोने और पतली सीमा)
+    - midnight_oled: Midnight OLED (गहरा काला)
+    - nord_frost: Nord Frost (ठंडा स्लेटी और बर्फ़ीला नीला)
+    - catppuccin_mocha: Catppuccin Mocha (गर्म गहरी पृष्ठभूमि और लैवेंडर)
+    - dracula_velvet: Dracula Velvet (गहरा आलूबुखारा और बैंगनी)
+    - rose_pine: Rosé Pine (सांझ और गुलाबी सुनहरा)
+    - emerald_slate: Emerald Slate (गहरा वन हरा और पुदीना)
+    - warm_paper: Warm Paper (हल्का हाथीदाँत)
     - custom: कस्टम रंग और कोनों की गोलाई
     $options:ar:
-    - windows_blur: Windows 11 Blur
-    - liquid_glass: Liquid Glass
-    - mica_alt: Windows 11 Mica
-    - fluent_solid: Fluent Solid
-    - classic_win11: Classic Win11
-    - midnight_oled: Midnight OLED
-    - nord_frost: Nord Frost
-    - catppuccin_mocha: Catppuccin Mocha
-    - dracula_velvet: Dracula Velvet
-    - rose_pine: Rosé Pine
-    - emerald_slate: Emerald Slate
-    - warm_paper: Warm Paper
+    - windows_blur: Windows 11 Blur (الإعداد الافتراضي الموصى به)
+    - liquid_glass: Liquid Glass (زجاج كاسر للضوء)
+    - mica_alt: Windows 11 Mica (ميكا النظام الناعمة)
+    - fluent_solid: Fluent Solid (كبسولة Windows 11 معتمة)
+    - classic_win11: Classic Win11 (زوايا وحدود خفيفة)
+    - midnight_oled: Midnight OLED (أسود داكن)
+    - nord_frost: Nord Frost (رمادي بارد وأزرق جليدي)
+    - catppuccin_mocha: Catppuccin Mocha (خلفية داكنة دافئة وخزامى)
+    - dracula_velvet: Dracula Velvet (برقوقي داكن وبنفسجي)
+    - rose_pine: Rosé Pine (شفق وذهبي وردي)
+    - emerald_slate: Emerald Slate (أخضر غابي داكن ونعناعي)
+    - warm_paper: Warm Paper (عاجي ناعم)
     - custom: ألوان واستدارة زوايا مخصصة
   - colorMode: auto
     $name: "Color Mode"
@@ -2634,6 +2634,132 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:tr-TR: "Pencerenin, denetimlerin ve metnin genel boyutu"
     $description:hi-IN: "विंडो, नियंत्रणों और टेक्स्ट का कुल आकार"
     $description:ar: "الحجم الإجمالي للنافذة وعناصر التحكم والنص"
+    $options:
+    - "85": 85% – Compact
+    - "90": 90% – Slightly Smaller
+    - "100": 100% – Default (Standard)
+    - "110": 110% – Medium Large
+    - "120": 120% – Large
+    $options:ru-RU:
+    - "85": 85% – Компактный
+    - "90": 90% – Уменьшенный
+    - "100": 100% – Обычный
+    - "110": 110% – Увеличенный
+    - "120": 120% – Крупный
+    $options:vi-VN:
+    - "85": 85% – Thu gọn
+    - "90": 90% – Hơi nhỏ
+    - "100": 100% – Mặc định
+    - "110": 110% – Hơi lớn
+    - "120": 120% – Lớn
+    $options:zh-CN:
+    - "85": 85% – 紧凑
+    - "90": 90% – 稍小
+    - "100": 100% – 默认
+    - "110": 110% – 稍大
+    - "120": 120% – 大
+    $options:zh-TW:
+    - "85": 85% – 精簡
+    - "90": 90% – 稍小
+    - "100": 100% – 預設
+    - "110": 110% – 稍大
+    - "120": 120% – 大
+    $options:ja-JP:
+    - "85": 85% – コンパクト
+    - "90": 90% – やや小さい
+    - "100": 100% – 既定
+    - "110": 110% – やや大きい
+    - "120": 120% – 大きい
+    $options:ko-KR:
+    - "85": 85% – 간결하게
+    - "90": 90% – 약간 작게
+    - "100": 100% – 기본값
+    - "110": 110% – 약간 크게
+    - "120": 120% – 크게
+    $options:th-TH:
+    - "85": 85% – กะทัดรัด
+    - "90": 90% – เล็กลงเล็กน้อย
+    - "100": 100% – ค่าเริ่มต้น
+    - "110": 110% – ใหญ่ขึ้นเล็กน้อย
+    - "120": 120% – ใหญ่
+    $options:id-ID:
+    - "85": 85% – Ringkas
+    - "90": 90% – Sedikit lebih kecil
+    - "100": 100% – Default
+    - "110": 110% – Sedikit lebih besar
+    - "120": 120% – Besar
+    $options:ms-MY:
+    - "85": 85% – Padat
+    - "90": 90% – Sedikit lebih kecil
+    - "100": 100% – Lalai
+    - "110": 110% – Sedikit lebih besar
+    - "120": 120% – Besar
+    $options:fr-FR:
+    - "85": 85% – Compact
+    - "90": 90% – Légèrement réduit
+    - "100": 100% – Par défaut
+    - "110": 110% – Légèrement agrandi
+    - "120": 120% – Grand
+    $options:de-DE:
+    - "85": 85% – Kompakt
+    - "90": 90% – Etwas kleiner
+    - "100": 100% – Standard
+    - "110": 110% – Etwas größer
+    - "120": 120% – Groß
+    $options:es-ES:
+    - "85": 85% – Compacto
+    - "90": 90% – Algo más pequeño
+    - "100": 100% – Predeterminado
+    - "110": 110% – Algo más grande
+    - "120": 120% – Grande
+    $options:pt-BR:
+    - "85": 85% – Compacto
+    - "90": 90% – Um pouco menor
+    - "100": 100% – Padrão
+    - "110": 110% – Um pouco maior
+    - "120": 120% – Grande
+    $options:it-IT:
+    - "85": 85% – Compatto
+    - "90": 90% – Leggermente più piccolo
+    - "100": 100% – Predefinito
+    - "110": 110% – Leggermente più grande
+    - "120": 120% – Grande
+    $options:uk-UA:
+    - "85": 85% – Компактний
+    - "90": 90% – Дещо менший
+    - "100": 100% – За замовчуванням
+    - "110": 110% – Дещо більший
+    - "120": 120% – Великий
+    $options:pl-PL:
+    - "85": 85% – Kompaktowy
+    - "90": 90% – Nieco mniejszy
+    - "100": 100% – Domyślny
+    - "110": 110% – Nieco większy
+    - "120": 120% – Duży
+    $options:nl-NL:
+    - "85": 85% – Compact
+    - "90": 90% – Iets kleiner
+    - "100": 100% – Standaard
+    - "110": 110% – Iets groter
+    - "120": 120% – Groot
+    $options:tr-TR:
+    - "85": 85% – Kompakt
+    - "90": 90% – Biraz daha küçük
+    - "100": 100% – Varsayılan
+    - "110": 110% – Biraz daha büyük
+    - "120": 120% – Büyük
+    $options:hi-IN:
+    - "85": 85% – कॉम्पैक्ट
+    - "90": 90% – थोड़ा छोटा
+    - "100": 100% – डिफ़ॉल्ट
+    - "110": 110% – थोड़ा बड़ा
+    - "120": 120% – बड़ा
+    $options:ar:
+    - "85": 85% – مدمج
+    - "90": 90% – أصغر قليلًا
+    - "100": 100% – افتراضي
+    - "110": 110% – أكبر قليلًا
+    - "120": 120% – كبير
   $name: "Layout & Position"
   $name:ru-RU: "Макет и положение"
   $name:vi-VN: "Bố cục và vị trí"
@@ -7973,6 +8099,12 @@ const std::vector<HistoryItem>& GetActiveRowItems(const RunDialogState* state) {
     return state->showingSuggestions ? state->suggestions : state->history;
 }
 
+const HistoryItem* GetSelectedRunItem(const RunDialogState* state) {
+    const auto& rows = GetActiveRowItems(state);
+    return state->selectedRow >= 0 && state->selectedRow < static_cast<int>(rows.size())
+        ? &rows[state->selectedRow] : nullptr;
+}
+
 // Atomic state shared safely across threads
 std::atomic<HWND> g_hActiveRunDlg{nullptr};
 std::atomic<HWND> g_hTrackedRunDlg{nullptr};
@@ -8238,9 +8370,8 @@ bool NeedsBackdropSnapshot(const RunDialogState* state) {
 
 int GetVisibleRowCount(const RunDialogState* state) {
     if (!state) return 0;
-    // In Compact Mini-Pill mode, hide initial history list so only the cute single pill bar appears on open,
-    // while still showing App Suggestions & Math Calculator results as soon as the user types!
-    if (state->settings.dialogLayout == DialogLayout::Pill && !state->showingSuggestions) {
+    // The compact layout reveals its history when the user navigates to a row.
+    if (state->settings.dialogLayout == DialogLayout::Pill && !state->showingSuggestions && state->selectedRow < 0) {
         return 0;
     }
     int totalRows = (int)GetActiveRowItems(state).size();
@@ -10432,10 +10563,9 @@ void TriggerRunCommand(RunDialogState* state, RunEnterAction action = RunEnterAc
     }
     if (!CanContinueRunDialog(state)) return;
 
-    const auto& rows = GetActiveRowItems(state);
     HistoryItem item;
-    if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < static_cast<int>(rows.size())) {
-        item = rows[state->selectedRow];
+    if (const auto* selected = GetSelectedRunItem(state)) {
+        item = *selected;
     } else {
         item.cmd = GetEffectiveInputText(edit);
     }
@@ -11419,12 +11549,10 @@ int GetDetachedGap(const RunDialogState* state) {
 bool ShouldShowRunElevation(const RunDialogState* state) {
     bool defaultAdmin = state->settings.runAsAdmin;
     if (!defaultAdmin && !state->settings.customAliases.empty()) {
-        const auto& rows = GetActiveRowItems(state);
-        if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < static_cast<int>(rows.size())) {
-            const auto& item = rows[state->selectedRow];
-            defaultAdmin = item.isAlias && item.aliasRunAsAdmin;
-            if (!defaultAdmin && !item.isShortcutFile) {
-                ResolveCustomAlias(state->settings, item.execTarget.empty() ? item.cmd : item.execTarget,
+        if (const auto* item = GetSelectedRunItem(state)) {
+            defaultAdmin = item->isAlias && item->aliasRunAsAdmin;
+            if (!defaultAdmin && !item->isShortcutFile) {
+                ResolveCustomAlias(state->settings, item->execTarget.empty() ? item->cmd : item->execTarget,
                                    nullptr, &defaultAdmin);
             }
         } else if (state->hModernEdit) {
@@ -13569,7 +13697,124 @@ RunDisplaySettingStrings GetRunDisplaySettingStrings(const std::wstring& languag
     };
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 60)";
+constexpr std::array kInterfaceScaleChoices{85, 90, 100, 110, 120};
+
+struct SettingsOptionDetails {
+    const wchar_t* language;
+    std::array<const wchar_t*, std::size(kThemePresets) - 1> themes;
+    std::array<const wchar_t*, kInterfaceScaleChoices.size()> scales;
+};
+
+const SettingsOptionDetails& GetSettingsOptionDetails(const std::wstring& language) {
+    static constexpr SettingsOptionDetails details[] = {
+        {L"en",
+         {L"Recommended Default", L"Refractive Glass", L"Soft Native Mica", L"Opaque Win11 Pill", L"Subtle Corners & Border", L"Deep Black",
+          L"Arctic Slate & Ice", L"Warm Dark & Lavender", L"Deep Plum & Violet", L"Twilight & Rose Gold", L"Deep Forest & Mint", L"Soft Light Ivory"},
+         {L"Compact", L"Slightly Smaller", L"Default (Standard)", L"Medium Large", L"Large"}},
+        {L"ru",
+         {L"Рекомендуется по умолчанию", L"Преломляющее стекло", L"Мягкий системный эффект Mica", L"Непрозрачная капсула Windows 11", L"Легкое скругление и тонкая рамка", L"Глубокий черный",
+          L"Холодный сланец и лед", L"Теплый темный фон и лаванда", L"Темная слива и фиолетовый", L"Сумерки и розовое золото", L"Темный лес и мята", L"Мягкая слоновая кость"},
+         {L"Компактный", L"Уменьшенный", L"Обычный", L"Увеличенный", L"Крупный"}},
+        {L"vi",
+         {L"Mặc định khuyên dùng", L"Kính khúc xạ", L"Mica gốc dịu nhẹ", L"Dạng viên nang đục của Windows 11", L"Góc bo nhẹ và viền mảnh", L"Đen sâu",
+          L"Xám đá và xanh băng", L"Nền tối ấm và tím oải hương", L"Tím mận đậm và tím sáng", L"Chạng vạng và vàng hồng", L"Xanh rừng đậm và xanh bạc hà", L"Trắng ngà dịu"},
+         {L"Thu gọn", L"Hơi nhỏ", L"Mặc định", L"Hơi lớn", L"Lớn"}},
+        {L"zh_cn",
+         {L"推荐的默认主题", L"折射玻璃", L"柔和的系统 Mica 效果", L"Windows 11 不透明胶囊形", L"细微圆角和边框", L"深黑色",
+          L"冷灰和冰蓝", L"暖深色和薰衣草紫", L"深梅紫和亮紫", L"暮色和玫瑰金", L"深森林绿和薄荷绿", L"柔和的象牙白"},
+         {L"紧凑", L"稍小", L"默认", L"稍大", L"大"}},
+        {L"zh_tw",
+         {L"建議的預設佈景主題", L"折射玻璃", L"柔和的原生 Mica 效果", L"Windows 11 不透明膠囊形", L"細緻的圓角和邊框", L"深黑色",
+          L"冷灰與冰藍", L"暖深色與薰衣草紫", L"深梅紫與亮紫", L"暮色與玫瑰金", L"深森林綠與薄荷綠", L"柔和的象牙白"},
+         {L"精簡", L"稍小", L"預設", L"稍大", L"大"}},
+        {L"ja",
+         {L"推奨の既定値", L"屈折ガラス", L"柔らかい標準 Mica", L"不透明な Windows 11 のカプセル型", L"控えめな角丸と枠線", L"深い黒",
+          L"寒色のスレートとアイスブルー", L"暖色系の暗い背景とラベンダー", L"濃いプラムと紫", L"黄昏とローズゴールド", L"深い森の緑とミント", L"柔らかいアイボリー"},
+         {L"コンパクト", L"やや小さい", L"既定", L"やや大きい", L"大きい"}},
+        {L"ko",
+         {L"권장 기본값", L"굴절 유리", L"은은한 기본 Mica", L"Windows 11 불투명 캡슐형", L"은은한 모서리와 테두리", L"깊은 검정",
+          L"차가운 회색과 얼음색", L"따뜻한 어두운 배경과 라벤더", L"짙은 자두색과 보라색", L"황혼과 로즈 골드", L"짙은 숲색과 민트색", L"은은한 아이보리"},
+         {L"간결하게", L"약간 작게", L"기본값", L"약간 크게", L"크게"}},
+        {L"th",
+         {L"ค่าเริ่มต้นที่แนะนำ", L"กระจกหักเหแสง", L"เอฟเฟ็กต์ไมกาของระบบแบบนุ่มนวล", L"ทรงแคปซูลทึบแบบ Windows 11", L"มุมโค้งและขอบบาง", L"ดำสนิท",
+          L"สีเทาหินกับสีฟ้าน้ำแข็ง", L"พื้นมืดโทนอุ่นกับสีลาเวนเดอร์", L"สีพลัมเข้มกับสีม่วง", L"สีสนธยากับสีโรสโกลด์", L"สีเขียวป่าเข้มกับสีมิ้นต์", L"สีงาช้างอ่อน"},
+         {L"กะทัดรัด", L"เล็กลงเล็กน้อย", L"ค่าเริ่มต้น", L"ใหญ่ขึ้นเล็กน้อย", L"ใหญ่"}},
+        {L"id",
+         {L"Default yang disarankan", L"Kaca refraktif", L"Efek mika bawaan yang lembut", L"Kapsul buram Windows 11", L"Sudut halus dan bingkai tipis", L"Hitam pekat",
+          L"Kelabu dingin dan biru es", L"Warna gelap hangat dan lavender", L"Plum gelap dan ungu", L"Senja dan emas mawar", L"Hijau hutan gelap dan mint", L"Gading lembut"},
+         {L"Ringkas", L"Sedikit lebih kecil", L"Default", L"Sedikit lebih besar", L"Besar"}},
+        {L"ms",
+         {L"Lalai yang disyorkan", L"Kaca biasan", L"Kesan mika asli yang lembut", L"Kapsul legap Windows 11", L"Sudut lembut dan bingkai nipis", L"Hitam pekat",
+          L"Kelabu sejuk dan biru ais", L"Warna gelap hangat dan lavender", L"Plum gelap dan ungu", L"Senja dan emas ros", L"Hijau hutan gelap dan pudina", L"Gading lembut"},
+         {L"Padat", L"Sedikit lebih kecil", L"Lalai", L"Sedikit lebih besar", L"Besar"}},
+        {L"fr",
+         {L"Valeur par défaut recommandée", L"Verre à réfraction", L"Mica natif doux", L"Capsule opaque Windows 11", L"Angles et bordure discrets", L"Noir profond",
+          L"Ardoise froide et bleu glacier", L"Fond sombre chaud et lavande", L"Prune foncé et violet", L"Crépuscule et or rose", L"Vert forêt profond et menthe", L"Ivoire doux"},
+         {L"Compact", L"Légèrement réduit", L"Par défaut", L"Légèrement agrandi", L"Grand"}},
+        {L"de",
+         {L"Empfohlener Standard", L"Lichtbrechendes Glas", L"Sanftes natives Mica", L"Blickdichte Windows-11-Kapsel", L"Dezente Ecken und Rahmen", L"Tiefschwarz",
+          L"Kühler Schiefer und Eisblau", L"Warmer dunkler Hintergrund und Lavendel", L"Dunkle Pflaume und Violett", L"Dämmerung und Roségold", L"Tiefes Waldgrün und Minze", L"Sanftes Elfenbein"},
+         {L"Kompakt", L"Etwas kleiner", L"Standard", L"Etwas größer", L"Groß"}},
+        {L"es",
+         {L"Predeterminado recomendado", L"Vidrio refractivo", L"Mica nativa suave", L"Cápsula opaca de Windows 11", L"Esquinas y borde discretos", L"Negro profundo",
+          L"Pizarra fría y azul hielo", L"Fondo oscuro cálido y lavanda", L"Ciruela oscura y violeta", L"Crepúsculo y oro rosa", L"Verde bosque profundo y menta", L"Marfil suave"},
+         {L"Compacto", L"Algo más pequeño", L"Predeterminado", L"Algo más grande", L"Grande"}},
+        {L"pt",
+         {L"Padrão recomendado", L"Vidro refrativo", L"Mica nativa suave", L"Cápsula opaca do Windows 11", L"Cantos e borda discretos", L"Preto profundo",
+          L"Ardósia fria e azul-gelo", L"Fundo escuro quente e lavanda", L"Ameixa escura e violeta", L"Crepúsculo e ouro rosé", L"Verde-floresta escuro e menta", L"Marfim suave"},
+         {L"Compacto", L"Um pouco menor", L"Padrão", L"Um pouco maior", L"Grande"}},
+        {L"it",
+         {L"Predefinito consigliato", L"Vetro rifrangente", L"Mica nativa tenue", L"Capsula opaca di Windows 11", L"Angoli e bordo discreti", L"Nero profondo",
+          L"Ardesia fredda e azzurro ghiaccio", L"Sfondo scuro caldo e lavanda", L"Prugna scuro e viola", L"Crepuscolo e oro rosa", L"Verde bosco intenso e menta", L"Avorio tenue"},
+         {L"Compatto", L"Leggermente più piccolo", L"Predefinito", L"Leggermente più grande", L"Grande"}},
+        {L"uk",
+         {L"Рекомендовано за замовчуванням", L"Заломлювальне скло", L"М’який системний ефект Mica", L"Непрозора капсула Windows 11", L"Легке заокруглення й тонка рамка", L"Глибокий чорний",
+          L"Холодний сланець і лід", L"Тепле темне тло й лаванда", L"Темна слива й фіолетовий", L"Сутінки й рожеве золото", L"Темний ліс і м’ята", L"М’який колір слонової кістки"},
+         {L"Компактний", L"Дещо менший", L"За замовчуванням", L"Дещо більший", L"Великий"}},
+        {L"pl",
+         {L"Zalecany domyślny", L"Szkło załamujące światło", L"Stonowana natywna mika", L"Nieprzezroczysta kapsuła Windows 11", L"Subtelne narożniki i obramowanie", L"Głęboka czerń",
+          L"Chłodny łupek i lodowy błękit", L"Ciepłe ciemne tło i lawenda", L"Ciemna śliwka i fiolet", L"Zmierzch i różowe złoto", L"Głęboka leśna zieleń i mięta", L"Delikatna kość słoniowa"},
+         {L"Kompaktowy", L"Nieco mniejszy", L"Domyślny", L"Nieco większy", L"Duży"}},
+        {L"nl",
+         {L"Aanbevolen standaard", L"Lichtbrekend glas", L"Zachte ingebouwde mica", L"Ondoorzichtige Windows 11-capsule", L"Subtiele hoeken en rand", L"Diepzwart",
+          L"Koele leisteen en ijsblauw", L"Warme donkere achtergrond en lavendel", L"Diep pruim en violet", L"Schemering en roségoud", L"Diep bosgroen en mint", L"Zacht ivoor"},
+         {L"Compact", L"Iets kleiner", L"Standaard", L"Iets groter", L"Groot"}},
+        {L"tr",
+         {L"Önerilen varsayılan", L"Işığı kıran cam", L"Yumuşak yerel mika", L"Opak Windows 11 kapsülü", L"İnce köşeler ve kenarlık", L"Derin siyah",
+          L"Soğuk arduvaz ve buz mavisi", L"Sıcak koyu zemin ve lavanta", L"Koyu erik ve mor", L"Alacakaranlık ve pembe altın", L"Derin orman yeşili ve nane", L"Yumuşak fildişi"},
+         {L"Kompakt", L"Biraz daha küçük", L"Varsayılan", L"Biraz daha büyük", L"Büyük"}},
+        {L"hi",
+         {L"सुझाया गया डिफ़ॉल्ट", L"प्रकाश मोड़ने वाला काँच", L"हल्का सिस्टम माइका", L"अपारदर्शी Windows 11 कैप्सूल", L"हल्के गोल कोने और पतली सीमा", L"गहरा काला",
+          L"ठंडा स्लेटी और बर्फ़ीला नीला", L"गर्म गहरी पृष्ठभूमि और लैवेंडर", L"गहरा आलूबुखारा और बैंगनी", L"सांझ और गुलाबी सुनहरा", L"गहरा वन हरा और पुदीना", L"हल्का हाथीदाँत"},
+         {L"कॉम्पैक्ट", L"थोड़ा छोटा", L"डिफ़ॉल्ट", L"थोड़ा बड़ा", L"बड़ा"}},
+        {L"ar",
+         {L"الإعداد الافتراضي الموصى به", L"زجاج كاسر للضوء", L"ميكا النظام الناعمة", L"كبسولة Windows 11 معتمة", L"زوايا وحدود خفيفة", L"أسود داكن",
+          L"رمادي بارد وأزرق جليدي", L"خلفية داكنة دافئة وخزامى", L"برقوقي داكن وبنفسجي", L"شفق وذهبي وردي", L"أخضر غابي داكن ونعناعي", L"عاجي ناعم"},
+         {L"مدمج", L"أصغر قليلًا", L"افتراضي", L"أكبر قليلًا", L"كبير"}},
+    };
+    const auto code = ResolveEffectiveLanguageCode(language);
+    for (const auto& entry : details) {
+        if (code == entry.language) return entry;
+    }
+    return details[0];
+}
+
+std::wstring GetThemeSettingLabel(size_t index, const SettingsOptionDetails& details, const wchar_t* customLabel) {
+    const auto* themeName = kThemePresets[index].label;
+    return themeName ? std::wstring(themeName) + L" (" + details.themes[index] + L")" : customLabel;
+}
+
+std::wstring GetInterfaceScaleLabel(int percent, const SettingsOptionDetails& details) {
+    std::wstring label = std::to_wstring(percent) + L"%";
+    const auto choice = std::find(kInterfaceScaleChoices.begin(), kInterfaceScaleChoices.end(), percent);
+    if (choice != kInterfaceScaleChoices.end()) {
+        label += L" – ";
+        label += details.scales[choice - kInterfaceScaleChoices.begin()];
+    }
+    return label;
+}
+
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 61)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -13586,7 +13831,6 @@ struct SettingsLocalizedStrings {
     const wchar_t* clear;
     const wchar_t* clearNow;
     const wchar_t* custom;
-    const wchar_t* blurDefault;
     const wchar_t* colorAuto;
     const wchar_t* colorDark;
     const wchar_t* colorLight;
@@ -13657,7 +13901,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Язык интерфейса", L"Вкл.", L"Выкл.",
         L"Сбросить", L"Авто", L"Выбрать",
         L"Открыть", L"Удалить", L"Очистить",
-        L"Свои цвета и радиус углов", L"Windows 11 Blur", L"Авто",
+        L"Свои цвета и радиус углов", L"Авто",
         L"Темный", L"Светлый", L"Снизу слева",
         L"Снизу по центру", L"Снизу справа", L"Сверху слева",
         L"Сверху по центру", L"Сверху справа", L"По центру экрана",
@@ -13684,7 +13928,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Ngôn ngữ hiển thị", L"Bật", L"Tắt",
         L"Đặt lại", L"Tự động (góc theo kiểu cổ điển hoặc giữa cạnh dưới)", L"Chọn",
         L"Mở", L"Xóa", L"Xóa",
-        L"Tùy chỉnh màu và độ bo góc", L"Windows 11 Blur", L"Tự động",
+        L"Tùy chỉnh màu và độ bo góc", L"Tự động",
         L"Tối", L"Sáng", L"Góc dưới bên trái (kiểu Windows cổ điển)",
         L"Giữa cạnh dưới", L"Góc dưới bên phải", L"Góc trên bên trái",
         L"Giữa cạnh trên", L"Góc trên bên phải", L"Giữa màn hình (Spotlight)",
@@ -13711,7 +13955,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"显示语言", L"开启", L"关闭",
         L"重置", L"自动（经典角落或底部居中）", L"选择",
         L"打开", L"移除", L"清除",
-        L"自定义颜色和圆角半径", L"Windows 11 Blur", L"自动",
+        L"自定义颜色和圆角半径", L"自动",
         L"深色", L"浅色", L"左下角（经典 Windows）",
         L"底部居中", L"右下角", L"左上角",
         L"顶部居中", L"右上角", L"屏幕中央（Spotlight）",
@@ -13738,7 +13982,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"顯示語言", L"開啟", L"關閉",
         L"重設", L"自動（傳統角落或底部置中）", L"選取",
         L"開啟", L"移除", L"清除",
-        L"自訂色彩與圓角半徑", L"Windows 11 Blur", L"自動",
+        L"自訂色彩與圓角半徑", L"自動",
         L"深色", L"淺色", L"左下角（傳統 Windows）",
         L"底部置中", L"右下角", L"左上角",
         L"頂端置中", L"右上角", L"螢幕中央（Spotlight）",
@@ -13765,7 +14009,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"表示言語", L"オン", L"オフ",
         L"リセット", L"自動 (クラシックの隅または下中央)", L"選択",
         L"開く", L"削除", L"クリア",
-        L"色と角の丸みをカスタマイズ", L"Windows 11 Blur", L"自動",
+        L"色と角の丸みをカスタマイズ", L"自動",
         L"ダーク", L"ライト", L"左下 (Windows クラシック)",
         L"下中央", L"右下", L"左上",
         L"上中央", L"右上", L"画面中央 (Spotlight)",
@@ -13792,7 +14036,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"표시 언어", L"켬", L"끔",
         L"초기화", L"자동(클래식 모서리 또는 하단 가운데)", L"선택",
         L"열기", L"제거", L"지우기",
-        L"사용자 지정 색상 및 모서리 반경", L"Windows 11 Blur", L"자동",
+        L"사용자 지정 색상 및 모서리 반경", L"자동",
         L"어둡게", L"밝게", L"왼쪽 아래(클래식 Windows)",
         L"하단 가운데", L"오른쪽 아래", L"왼쪽 위",
         L"상단 가운데", L"오른쪽 위", L"화면 가운데(Spotlight)",
@@ -13819,7 +14063,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"ภาษาที่แสดง", L"เปิด", L"ปิด",
         L"รีเซ็ต", L"อัตโนมัติ (มุมแบบคลาสสิกหรือตรงกลางด้านล่าง)", L"เลือก",
         L"เปิด", L"เอาออก", L"ล้าง",
-        L"กำหนดสีและรัศมีมุมเอง", L"Windows 11 Blur", L"อัตโนมัติ",
+        L"กำหนดสีและรัศมีมุมเอง", L"อัตโนมัติ",
         L"มืด", L"สว่าง", L"มุมซ้ายล่าง (Windows แบบคลาสสิก)",
         L"ตรงกลางด้านล่าง", L"มุมขวาล่าง", L"มุมซ้ายบน",
         L"ตรงกลางด้านบน", L"มุมขวาบน", L"กลางหน้าจอ (Spotlight)",
@@ -13846,7 +14090,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Bahasa tampilan", L"Aktif", L"Nonaktif",
         L"Reset", L"Otomatis (sudut klasik atau tengah bawah)", L"Pilih",
         L"Buka", L"Hapus", L"Hapus",
-        L"Warna dan radius sudut khusus", L"Windows 11 Blur", L"Otomatis",
+        L"Warna dan radius sudut khusus", L"Otomatis",
         L"Gelap", L"Terang", L"Kiri bawah (Windows klasik)",
         L"Tengah bawah", L"Kanan bawah", L"Kiri atas",
         L"Tengah atas", L"Kanan atas", L"Tengah layar (Spotlight)",
@@ -13873,7 +14117,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Bahasa paparan", L"Hidup", L"Mati",
         L"Set semula", L"Automatik (sudut klasik atau tengah bawah)", L"Pilih",
         L"Buka", L"Alih keluar", L"Kosongkan",
-        L"Warna dan jejari sudut tersuai", L"Windows 11 Blur", L"Automatik",
+        L"Warna dan jejari sudut tersuai", L"Automatik",
         L"Gelap", L"Cerah", L"Kiri bawah (Windows klasik)",
         L"Tengah bawah", L"Kanan bawah", L"Kiri atas",
         L"Tengah atas", L"Kanan atas", L"Tengah skrin (Spotlight)",
@@ -13900,7 +14144,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Langue d’affichage", L"Activé", L"Désactivé",
         L"Réinitialiser", L"Automatique (coin classique ou bas au centre)", L"Choisir",
         L"Ouvrir", L"Supprimer", L"Effacer",
-        L"Couleurs et rayon des angles personnalisés", L"Windows 11 Blur", L"Automatique",
+        L"Couleurs et rayon des angles personnalisés", L"Automatique",
         L"Mode sombre", L"Mode clair", L"En bas à gauche (Windows classique)",
         L"En bas au centre", L"En bas à droite", L"En haut à gauche",
         L"En haut au centre", L"En haut à droite", L"Au centre de l’écran (Spotlight)",
@@ -13927,7 +14171,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Anzeigesprache", L"Ein", L"Aus",
         L"Zurücksetzen", L"Automatisch (klassische Ecke oder unten mittig)", L"Auswählen",
         L"Öffnen", L"Entfernen", L"Löschen",
-        L"Benutzerdefinierte Farben und Eckenradien", L"Windows 11 Blur", L"Automatisch",
+        L"Benutzerdefinierte Farben und Eckenradien", L"Automatisch",
         L"Dunkler Modus", L"Heller Modus", L"Unten links (klassisches Windows)",
         L"Unten mittig", L"Unten rechts", L"Oben links",
         L"Oben mittig", L"Oben rechts", L"Bildschirmmitte (Spotlight)",
@@ -13954,7 +14198,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Idioma de visualización", L"Activado", L"Desactivado",
         L"Restablecer", L"Automático (esquina clásica o abajo en el centro)", L"Elegir",
         L"Abrir", L"Quitar", L"Borrar",
-        L"Colores y redondeo personalizados", L"Windows 11 Blur", L"Automático",
+        L"Colores y redondeo personalizados", L"Automático",
         L"Modo oscuro", L"Modo claro", L"Abajo a la izquierda (Windows clásico)",
         L"Abajo en el centro", L"Abajo a la derecha", L"Arriba a la izquierda",
         L"Arriba en el centro", L"Arriba a la derecha", L"Centro de la pantalla (Spotlight)",
@@ -13981,7 +14225,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Idioma de exibição", L"Ativado", L"Desativado",
         L"Redefinir", L"Automático (canto clássico ou centro inferior)", L"Escolher",
         L"Abrir", L"Remover", L"Limpar",
-        L"Cores e arredondamento personalizados", L"Windows 11 Blur", L"Automático",
+        L"Cores e arredondamento personalizados", L"Automático",
         L"Modo escuro", L"Modo claro", L"Inferior esquerdo (Windows clássico)",
         L"Inferior central", L"Inferior direito", L"Superior esquerdo",
         L"Superior central", L"Superior direito", L"Centro da tela (Spotlight)",
@@ -14008,7 +14252,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Lingua di visualizzazione", L"Attivato", L"Disattivato",
         L"Ripristina", L"Automatico (angolo classico o in basso al centro)", L"Scegli",
         L"Apri", L"Rimuovi", L"Cancella",
-        L"Colori e arrotondamento personalizzati", L"Windows 11 Blur", L"Automatico",
+        L"Colori e arrotondamento personalizzati", L"Automatico",
         L"Modalità scura", L"Modalità chiara", L"In basso a sinistra (Windows classico)",
         L"In basso al centro", L"In basso a destra", L"In alto a sinistra",
         L"In alto al centro", L"In alto a destra", L"Al centro dello schermo (Spotlight)",
@@ -14035,7 +14279,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Мова інтерфейсу", L"Увімкнено", L"Вимкнено",
         L"Скинути", L"Автоматично (класичний кут або знизу по центру)", L"Вибрати",
         L"Відкрити", L"Видалити", L"Очистити",
-        L"Власні кольори й заокруглення", L"Windows 11 Blur", L"Автоматично",
+        L"Власні кольори й заокруглення", L"Автоматично",
         L"Темний", L"Світлий", L"Знизу ліворуч (як у Windows)",
         L"Знизу по центру", L"Знизу праворуч", L"Зверху ліворуч",
         L"Зверху по центру", L"Зверху праворуч", L"У центрі екрана (Spotlight)",
@@ -14062,7 +14306,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Język wyświetlania", L"Wł.", L"Wył.",
         L"Resetuj", L"Automatycznie (klasyczny róg lub na dole pośrodku)", L"Wybierz",
         L"Otwórz", L"Usuń", L"Wyczyść",
-        L"Własne kolory i zaokrąglenia", L"Windows 11 Blur", L"Automatycznie",
+        L"Własne kolory i zaokrąglenia", L"Automatycznie",
         L"Tryb ciemny", L"Tryb jasny", L"Lewy dolny róg (klasyczny Windows)",
         L"Na dole pośrodku", L"Prawy dolny róg", L"Lewy górny róg",
         L"U góry pośrodku", L"Prawy górny róg", L"Środek ekranu (Spotlight)",
@@ -14089,7 +14333,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Weergavetaal", L"Aan", L"Uit",
         L"Opnieuw instellen", L"Automatisch (klassieke hoek of midden onder)", L"Kiezen",
         L"Openen", L"Verwijderen", L"Wissen",
-        L"Aangepaste kleuren en hoekafronding", L"Windows 11 Blur", L"Automatisch",
+        L"Aangepaste kleuren en hoekafronding", L"Automatisch",
         L"Donkere modus", L"Lichte modus", L"Linksonder (klassiek Windows)",
         L"Midden onder", L"Rechtsonder", L"Linksboven",
         L"Midden boven", L"Rechtsboven", L"Midden van het scherm (Spotlight)",
@@ -14116,7 +14360,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Görüntüleme dili", L"Açık", L"Kapalı",
         L"Sıfırla", L"Otomatik (klasik köşe veya alt orta)", L"Seç",
         L"Aç", L"Kaldır", L"Temizle",
-        L"Özel renkler ve köşe yarıçapı", L"Windows 11 Blur", L"Otomatik",
+        L"Özel renkler ve köşe yarıçapı", L"Otomatik",
         L"Koyu", L"Açık", L"Sol alt (klasik Windows)",
         L"Alt orta", L"Sağ alt", L"Sol üst",
         L"Üst orta", L"Sağ üst", L"Ekranın ortası (Spotlight)",
@@ -14143,7 +14387,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"प्रदर्शन की भाषा", L"चालू", L"बंद",
         L"रीसेट करें", L"अपने आप (क्लासिक कोना या नीचे बीच में)", L"चुनें",
         L"खोलें", L"हटाएँ", L"साफ़ करें",
-        L"कस्टम रंग और कोनों की गोलाई", L"Windows 11 Blur", L"अपने आप",
+        L"कस्टम रंग और कोनों की गोलाई", L"अपने आप",
         L"गहरा", L"हल्का", L"नीचे बाईं ओर (क्लासिक Windows)",
         L"नीचे बीच में", L"नीचे दाईं ओर", L"ऊपर बाईं ओर",
         L"ऊपर बीच में", L"ऊपर दाईं ओर", L"स्क्रीन के बीच में (Spotlight)",
@@ -14170,7 +14414,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"لغة العرض", L"تشغيل", L"إيقاف",
         L"إعادة تعيين", L"تلقائي (الزاوية الكلاسيكية أو منتصف الأسفل)", L"اختيار",
         L"فتح", L"إزالة", L"مسح",
-        L"ألوان واستدارة زوايا مخصصة", L"Windows 11 Blur", L"تلقائي",
+        L"ألوان واستدارة زوايا مخصصة", L"تلقائي",
         L"داكن", L"فاتح", L"أسفل اليسار (Windows الكلاسيكي)",
         L"منتصف الأسفل", L"أسفل اليمين", L"أعلى اليسار",
         L"منتصف الأعلى", L"أعلى اليمين", L"منتصف الشاشة (Spotlight)",
@@ -14197,7 +14441,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Display language", L"On", L"Off",
         L"Reset", L"Auto (Classic Corner / Bottom-Center)", L"Choose",
         L"Open", L"Remove", L"Clear",
-        L"Custom Colors & Corner Radius", L"Windows 11 Blur", L"Auto",
+        L"Custom Colors & Corner Radius", L"Auto",
         L"Dark Mode", L"Light Mode", L"Bottom Left (Windows Classic)",
         L"Bottom Center", L"Bottom Right", L"Top Left",
         L"Top Center", L"Top Right", L"Screen Center (Spotlight)",
@@ -15039,6 +15283,21 @@ AliasSettingsStrings GetAliasSettingsStrings(const std::wstring& code) {
     };
 }
 
+void DrawSettingsChoiceLabel(ID2D1RenderTarget* target, std::wstring_view label, IDWriteTextFormat* format,
+                             const D2D1_RECT_F& bounds, ID2D1Brush* brush) {
+    if (!format || !brush || label.empty() || bounds.right <= bounds.left || bounds.bottom <= bounds.top) return;
+    winrt::com_ptr<IDWriteTextLayout> layout;
+    if (FAILED(g_pDWriteFactory->CreateTextLayout(label.data(), static_cast<UINT32>(label.size()), format,
+            bounds.right - bounds.left, bounds.bottom - bounds.top, layout.put()))) return;
+    layout->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
+    winrt::com_ptr<IDWriteInlineObject> ellipsis;
+    if (SUCCEEDED(g_pDWriteFactory->CreateEllipsisTrimmingSign(format, ellipsis.put()))) {
+        const DWRITE_TRIMMING trimming{DWRITE_TRIMMING_GRANULARITY_CHARACTER, 0, 0};
+        layout->SetTrimming(&trimming, ellipsis.get());
+    }
+    DrawCenteredTextLayout(target, layout.get(), bounds, brush);
+}
+
 void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
     if (!hWnd) return;
     PAINTSTRUCT ps = {};
@@ -15220,6 +15479,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         struct NavDef { int tab; const wchar_t* glyph; const wchar_t* label; };
         const auto languageCode = ResolveEffectiveLanguageCode(st->settings.language);
         const auto aliases = GetAliasSettingsStrings(languageCode);
+        const auto& optionDetails = GetSettingsOptionDetails(st->settings.language);
         NavDef kNavs[] = {
             { 0, L"\uE790", ls.nav0 },
             { 1, L"\uE740", ls.nav1 },
@@ -15356,10 +15616,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             drawSettingRowHeader(grpRc, rowTop, rowH, glyph, title, desc, pBrSub);
             const auto rcCombo = settingsControl(grpRc, rowTop, rowH);
             drawControl(rcCombo, id);
-            if (pFmtNav) {
-                DrawCenteredText(pRT, curValueLabel.c_str(), (UINT32)curValueLabel.size(), pFmtNav,
-                              D2D1::RectF(rcCombo.left + S(12), rcCombo.top, rcCombo.right - S(28), rcCombo.bottom), pBrText);
-            }
+            DrawSettingsChoiceLabel(pRT, curValueLabel, pFmtNav,
+                D2D1::RectF(rcCombo.left + S(12), rcCombo.top, rcCombo.right - S(28), rcCombo.bottom), pBrText);
             drawSettingsGlyph(L"\uE70D", D2D1::RectF(rcCombo.right - S(26), rcCombo.top, rcCombo.right - S(6), rcCombo.bottom), pBrSub);
             addHit(id, rcCombo);
         };
@@ -15431,11 +15689,11 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             auto [g1, y1, themeExpanded] = beginGroupCard(SettingsGroup::Theme,
                 ls.gThemeTitle, ls.gThemeSub, 3 * rH);
             if (themeExpanded) {
-                const auto& preset = kThemePresets[GetThemePresetIndex(st->settings.themePreset)];
+                const size_t themeIndex = GetThemePresetIndex(st->settings.themePreset);
                 drawDropdownRowInGroup(g1, y1, rH, 2000, L"\uE790",
                     ls.themeTitle,
                     ls.themeSub,
-                    preset.label ? preset.label : ls.custom);
+                    GetThemeSettingLabel(themeIndex, optionDetails, ls.custom));
                 std::wstring cmLbl = (st->settings.colorMode == ColorMode::Dark) ? ls.colorDark
                                    : ((st->settings.colorMode == ColorMode::Light) ? ls.colorLight
                                                                                    : ls.colorAuto);
@@ -15542,7 +15800,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 drawDropdownRowInGroup(g1, y1 + rH * 5, rH, 2410, L"\uE71E",
                     ls.scaleTitle,
                     ls.scaleSub,
-                    std::to_wstring(st->settings.uiScalePercent) + L"%");
+                    GetInterfaceScaleLabel(st->settings.uiScalePercent, optionDetails));
             }
             const auto actions = GetActionButtonStrings(st->settings.language);
             auto [buttonGroup, rowY, actionbuttonsExpanded] = beginGroupCard(SettingsGroup::ActionButtons,
@@ -15815,7 +16073,7 @@ static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
             pRT->FillRoundedRectangle(D2D1::RoundedRect(rPill, S(1.5f), S(1.5f)), pBrAccent);
         }
         if (pFmt && pBrText) {
-            DrawCenteredText(pRT, s->items[i].second.c_str(), (UINT32)s->items[i].second.size(), pFmt,
+            DrawSettingsChoiceLabel(pRT, s->items[i].second, pFmt,
                 D2D1::RectF(rRow.left + S(12.0f), rRow.top, rRow.right - S(10.0f), rRow.bottom), pBrText);
         }
         curY += rowH;
@@ -15966,8 +16224,12 @@ int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<st
     int popH = (std::min)(totalH, maxVisH);
     session.maxScrollY = (std::max)(0, totalH - popH);
 
-    int comboW = rcCombo.right - rcCombo.left;
-    int popW = (std::max)(comboW + DpiScale(28, session.dpi), DpiScale(228, session.dpi));
+    const int comboW = rcCombo.right - rcCombo.left;
+    int contentWidth = 228;
+    for (const auto& item : items) {
+        contentWidth = (std::max)(contentWidth, MeasureButtonWidthAt96Dpi(item.second.c_str(), 0));
+    }
+    int popW = (std::max)(comboW + DpiScale(28, session.dpi), DpiScale(contentWidth, session.dpi));
 
     POINT ptTopLeft = { rcCombo.left, rcCombo.bottom + DpiScale(4, session.dpi) };
     ClientToScreen(hOwner, &ptTopLeft);
@@ -15975,6 +16237,7 @@ int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<st
     HMONITOR hMon = MonitorFromPoint(ptTopLeft, MONITOR_DEFAULTTONEAREST);
     MONITORINFO mi = { sizeof(mi) };
     if (GetMonitorInfoW(hMon, &mi)) {
+        popW = (std::min)(popW, (std::max)(1, static_cast<int>(mi.rcWork.right - mi.rcWork.left) - 16));
         if (ptTopLeft.y + popH > mi.rcWork.bottom - 8) {
             POINT ptAbove = { rcCombo.left, rcCombo.top - DpiScale(4, session.dpi) };
             ClientToScreen(hOwner, &ptAbove);
@@ -16445,12 +16708,11 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     return 0;
                 }
                 if (id == 2000) {
+                    const auto& optionDetails = GetSettingsOptionDetails(st->settings.language);
                     std::vector<std::pair<int, std::wstring>> opts;
                     opts.reserve(std::size(kThemePresets));
                     for (size_t i = 0; i < std::size(kThemePresets); ++i) {
-                        const auto& preset = kThemePresets[i];
-                        const wchar_t* label = i == 0 ? ls.blurDefault : (preset.label ? preset.label : ls.custom);
-                        opts.emplace_back(static_cast<int>(i + 1), label);
+                        opts.emplace_back(static_cast<int>(i + 1), GetThemeSettingLabel(i, optionDetails, ls.custom));
                     }
                     const int selected = static_cast<int>(GetThemePresetIndex(st->settings.themePreset) + 1);
                     const int choice = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, selected, st->isLight, st->dpi, rtl);
@@ -16650,9 +16912,12 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogWidthPreset").c_str(), keys[sel - 1]);
                     }
                 } else if (id == 2410) {
-                    std::vector<std::pair<int, std::wstring>> opts = {
-                        { 85, L"85%" }, { 90, L"90%" }, { 100, L"100%" }, { 110, L"110%" }, { 120, L"120%" }
-                    };
+                    const auto& optionDetails = GetSettingsOptionDetails(st->settings.language);
+                    std::vector<std::pair<int, std::wstring>> opts;
+                    opts.reserve(kInterfaceScaleChoices.size());
+                    for (size_t i = 0; i < kInterfaceScaleChoices.size(); ++i) {
+                        opts.emplace_back(kInterfaceScaleChoices[i], GetInterfaceScaleLabel(kInterfaceScaleChoices[i], optionDetails));
+                    }
                     int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, st->settings.uiScalePercent, st->isLight, st->dpi, rtl);
                     if (sel >= 85 && sel <= 120) {
                         Wh_SetIntValue(GetUserOverrideKey(L"uiScalePercent").c_str(), sel);
@@ -17245,9 +17510,19 @@ void RecomputeDialogMetrics(RunDialogState* state) {
     state->totalHeight   = state->topAreaHeight + barH;
 }
 
+void RefreshRunDialogMetrics(RunDialogState* state) {
+    const int oldHeight = state->totalHeight;
+    RecomputeDialogMetrics(state);
+    if (state->totalHeight != oldHeight) {
+        ResizeDialogPreservingBottomAnchor(state, oldHeight);
+    }
+    RefreshDialogVisual(state->hDlg, state);
+}
+
 void ScheduleDeferredInputUpdate(RunDialogState* state) {
     if (!state || !state->hDlg || !IsWindow(state->hDlg)) return;
     if (!state->suppressSuggestionUpdate) {
+        state->selectedRow = -1;
         state->tabCompMatches.clear();
         state->tabCompIndex = -1;
     }
@@ -17433,13 +17708,8 @@ RunEnterAction GetCurrentEnterAction(const RunDialogState* state) {
 
 void UpdateRunElevationPreview(RunDialogState* state, RunEnterAction action) {
     if (!state || state->enterPreview == action) return;
-    const int oldHeight = state->totalHeight;
     state->enterPreview = action;
-    RecomputeDialogMetrics(state);
-    if (state->totalHeight != oldHeight) {
-        ResizeDialogPreservingBottomAnchor(state, oldHeight);
-    }
-    RefreshDialogVisual(state->hDlg, state);
+    RefreshRunDialogMetrics(state);
 }
 
 LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
@@ -17494,21 +17764,20 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
             return 0;
         }
         if (wParam == VK_TAB) {
-            bool shiftDown = (GetKeyState(VK_SHIFT) & 0x8000) != 0;
-            if (TryTabCompletePathOrEnv(hWnd, state, shiftDown)) {
+            const auto* item = GetSelectedRunItem(state);
+            if (!item && TryTabCompletePathOrEnv(hWnd, state, shiftDown)) {
                 return 0;
             }
             const auto& activeRows = GetActiveRowItems(state);
-            if (!activeRows.empty()) {
-                int idx = (state->selectedRow >= 0 && state->selectedRow < (int)activeRows.size())
-                          ? state->selectedRow : state->scrollOffset;
-                idx = std::clamp(idx, 0, (int)activeRows.size() - 1);
-                std::wstring fillCmd = activeRows[idx].cmd;
-                state->suppressSuggestionUpdate = true;
+            if (!item && !activeRows.empty()) {
+                item = &activeRows[std::clamp(state->scrollOffset, 0, static_cast<int>(activeRows.size()) - 1)];
+            }
+            if (item) {
+                const std::wstring fillCmd = item->cmd;
                 SetWindowTextW(hWnd, fillCmd.c_str());
-                SendMessageW(hWnd, EM_SETSEL, fillCmd.size(), fillCmd.size());
-                state->suppressSuggestionUpdate = false;
-                RefreshDialogVisual(state->hDlg, state);
+                if (CanContinueRunDialog(state)) {
+                    SendMessageW(hWnd, EM_SETSEL, fillCmd.size(), fillCmd.size());
+                }
                 return 0;
             }
         }
@@ -17550,14 +17819,7 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
                     }
                 }
                 EnsureRowVisible(state, state->selectedRow);
-                if (!state->showingSuggestions) {
-                    const auto& cmd = activeRows[state->selectedRow].cmd;
-                    state->suppressSuggestionUpdate = true;
-                    SetWindowTextW(hWnd, cmd.c_str());
-                    SendMessageW(hWnd, EM_SETSEL, cmd.size(), cmd.size());
-                    state->suppressSuggestionUpdate = false;
-                }
-                RefreshDialogVisual(state->hDlg, state);
+                RefreshRunDialogMetrics(state);
                 return 0;
             }
         }
@@ -18768,7 +19030,8 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 if (!state->suppressSuggestionUpdate) {
                     state->scrollOffset = 0;
                     UpdateAppSuggestionsForQuery(state, curText);
-                    RefreshDialogVisual(hWnd, state);
+                    if (!CanContinueRunDialog(state)) break;
+                    RefreshRunDialogMetrics(state);
                 } else {
                     RefreshDialogVisual(hWnd, state);
                 }

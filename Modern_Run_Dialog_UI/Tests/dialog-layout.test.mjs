@@ -1224,6 +1224,31 @@ test('all declared languages have settings and runtime translations', () => {
     assert.doesNotMatch(schema, /\d+ (?:пкс|piksel|पिक्सेल|بكسل)/u);
 });
 
+test('history and suggestion navigation preserve the query and activate the selected row', () => {
+    const arrows = source.match(/if \(wParam == VK_UP \|\| wParam == VK_DOWN \|\| wParam == VK_PRIOR[\s\S]*?(?=    if \(uMsg == WM_CHAR)/)?.[0];
+    const launch = source.match(/^void TriggerRunCommand\([^;]+?\) \{[\s\S]*?^\}/m)?.[0];
+    const inputUpdate = source.match(/^void ScheduleDeferredInputUpdate\([^;]+?\) \{[\s\S]*?^\}/m)?.[0];
+    const tab = source.match(/if \(wParam == VK_TAB\) \{[\s\S]*?(?=        if \(wParam == VK_DELETE)/)?.[0];
+    assert.ok(arrows && launch && inputUpdate && tab);
+    assert.match(arrows, /EnsureRowVisible\(state, state->selectedRow\)/);
+    assert.doesNotMatch(arrows, /SetWindowTextW|EM_SETSEL/);
+    assert.match(launch, /GetSelectedRunItem\(state\)/);
+    assert.match(inputUpdate, /if \(!state->suppressSuggestionUpdate\) \{[\s\S]*?state->selectedRow = -1;/);
+    assert.match(tab, /GetSelectedRunItem\(state\)[\s\S]*?!item && TryTabCompletePathOrEnv[\s\S]*?SetWindowTextW/);
+});
+
+test('Windhawk keeps the detailed theme and scale choices offered in Modern Run', () => {
+    const themeSchema = source.match(/^  - themePreset:[\s\S]*?(?=^  - colorMode:)/m)?.[0];
+    const scaleSchema = source.match(/^  - uiScalePercent:[\s\S]*?(?=^  \$name:)/m)?.[0];
+    assert.ok(themeSchema && scaleSchema);
+    assert.match(themeSchema, /- windows_blur: Windows 11 Blur \(Recommended Default\)/);
+    assert.match(themeSchema, /- liquid_glass: Liquid Glass \(Refractive Glass\)/);
+    assert.equal((scaleSchema.match(/^    \$options(?::[\w-]+)?:$/gm) ?? []).length, 21);
+    assert.match(scaleSchema, /- "100": 100%/);
+    assert.match(source, /GetThemeSettingLabel\(themeIndex, optionDetails, ls.custom\)/);
+    assert.match(source, /opts.emplace_back\(kInterfaceScaleChoices\[i\], GetInterfaceScaleLabel\(/);
+});
+
 function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });
