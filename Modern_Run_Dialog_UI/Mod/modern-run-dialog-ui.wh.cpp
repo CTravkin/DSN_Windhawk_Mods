@@ -1,46 +1,26 @@
 // ==WindhawkMod==
 // @id              modern-run-dialog-ui
-// @name Modern Run Dialog UI For Windows 10 & 11
+// @name Modern Run Dialog UI
 // @description Replaces Run (Win + R) and the Run new task dialog in Task Manager, adding themes, history, suggestions, and custom commands
-// @name:ru-RU Modern Run Dialog UI для Windows 10 и 11
 // @description:ru-RU Заменяет окно «Выполнить» (Win + R) и диалог запуска новой задачи в Диспетчере задач, добавляя темы, историю, подсказки и собственные команды
-// @name:vi-VN Modern Run Dialog UI cho Windows 10 và 11
 // @description:vi-VN Thay thế hộp thoại Chạy (Win + R) và Chạy tác vụ mới trong Trình quản lý Tác vụ, bổ sung chủ đề, lịch sử, gợi ý và lệnh tùy chỉnh
-// @name:zh-CN 适用于 Windows 10 和 11 的 Modern Run Dialog UI
 // @description:zh-CN 替换“运行”（Win + R）和任务管理器中的“运行新任务”对话框，添加主题、历史记录、建议和自定义命令
-// @name:zh-TW 適用於 Windows 10 和 11 的 Modern Run Dialog UI
 // @description:zh-TW 取代「執行」（Win + R）和工作管理員的「執行新工作」對話方塊，新增佈景主題、歷程記錄、建議與自訂命令
-// @name:ja-JP Windows 10・11 向けの Modern Run Dialog UI
 // @description:ja-JP 「ファイル名を指定して実行」（Win + R）とタスク マネージャーの「新しいタスクを実行する」を置き換え、テーマ、履歴、候補、カスタム コマンドを追加します
-// @name:ko-KR Windows 10 및 11용 Modern Run Dialog UI
 // @description:ko-KR 실행(Win + R)과 작업 관리자의 ‘새 작업 실행’ 대화 상자를 대체하고 테마, 기록, 제안, 사용자 지정 명령을 추가합니다
-// @name:th-TH Modern Run Dialog UI สำหรับ Windows 10 และ 11
 // @description:th-TH แทนที่กล่องโต้ตอบเรียกใช้ (Win + R) และเรียกใช้งานใหม่ในตัวจัดการงาน พร้อมธีม ประวัติ คำแนะนำ และคำสั่งแบบกำหนดเอง
-// @name:id-ID Modern Run Dialog UI untuk Windows 10 dan 11
 // @description:id-ID Menggantikan dialog Jalankan (Win + R) dan Jalankan tugas baru di Manajer Tugas, serta menambahkan tema, riwayat, saran, dan perintah khusus
-// @name:ms-MY Modern Run Dialog UI untuk Windows 10 dan 11
 // @description:ms-MY Menggantikan dialog Jalankan (Win + R) dan Jalankan tugas baharu dalam Pengurus Tugas, serta menambah tema, sejarah, cadangan dan arahan tersuai
-// @name:fr-FR Modern Run Dialog UI pour Windows 10 et 11
 // @description:fr-FR Remplace les fenêtres Exécuter (Win + R) et Exécuter une nouvelle tâche du Gestionnaire des tâches, avec des thèmes, un historique, des suggestions et des commandes personnalisées
-// @name:de-DE Modern Run Dialog UI für Windows 10 und 11
 // @description:de-DE Ersetzt „Ausführen“ (Win + R) und „Neuen Task ausführen“ im Task-Manager und ergänzt Designs, Verlauf, Vorschläge und benutzerdefinierte Befehle
-// @name:es-ES Modern Run Dialog UI para Windows 10 y 11
 // @description:es-ES Reemplaza Ejecutar (Win + R) y el cuadro Ejecutar nueva tarea del Administrador de tareas y añade temas, historial, sugerencias y comandos personalizados
-// @name:pt-BR Modern Run Dialog UI para Windows 10 e 11
 // @description:pt-BR Substitui Executar (Win + R) e a janela Executar nova tarefa do Gerenciador de Tarefas e adiciona temas, histórico, sugestões e comandos personalizados
-// @name:it-IT Modern Run Dialog UI per Windows 10 e 11
 // @description:it-IT Sostituisce Esegui (Win + R) e la finestra Esegui nuova attività di Gestione attività, aggiungendo temi, cronologia, suggerimenti e comandi personalizzati
-// @name:uk-UA Modern Run Dialog UI для Windows 10 і 11
 // @description:uk-UA Замінює вікно «Виконати» (Win + R) і діалог запуску нового завдання в диспетчері завдань, додаючи теми, журнал команд, підказки й власні команди
-// @name:pl-PL Modern Run Dialog UI dla Windows 10 i 11
 // @description:pl-PL Zastępuje okna Uruchamianie (Win + R) i Uruchom nowe zadanie w Menedżerze zadań, dodając motywy, historię, sugestie i własne polecenia
-// @name:nl-NL Modern Run Dialog UI voor Windows 10 en 11
 // @description:nl-NL Vervangt Uitvoeren (Win + R) en het venster Nieuwe taak uitvoeren in Taakbeheer en voegt thema’s, geschiedenis, suggesties en aangepaste opdrachten toe
-// @name:tr-TR Windows 10 ve 11 için Modern Run Dialog UI
 // @description:tr-TR Çalıştır (Win + R) ve Görev Yöneticisi’ndeki Yeni görev çalıştır pencerelerinin yerine geçerek temalar, geçmiş, öneriler ve özel komutlar ekler
-// @name:hi-IN Windows 10 और 11 के लिए Modern Run Dialog UI
 // @description:hi-IN रन (Win + R) और कार्य प्रबंधक के «नया कार्य चलाएँ» संवाद की जगह थीम, इतिहास, सुझाव और कस्टम कमांड वाला संवाद देता है
-// @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
 // @description:ar يستبدل نافذة «تشغيل» (Win + R) ومربع حوار «تشغيل مهمة جديدة» في إدارة المهام ويضيف نُسقًا وسجلًا واقتراحات وأوامر مخصصة
 // @version         6.10.15
 // @author          caotu2005, CTravkin
@@ -54,7 +34,7 @@
 
 // ==WindhawkModReadme==
 /*
-# Modern Run Dialog UI For Windows 10 & 11
+# Modern Run Dialog UI
 
 **English** · [Tiếng Việt](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Modern_Run_Dialog_UI/README.vi.md) · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Modern_Run_Dialog_UI/README.ru.md)
 
@@ -62,11 +42,19 @@ Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run
 
 ## Layouts and themes
 
-| | | |
-| --- | :---: | :---: |
-| **Classic** | [![Classic · Windows 11 Blur](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-history.png)&#8232;Windows 11 Blur | [![Classic · Warm Paper](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-idle.png)&#8232;Warm Paper&#8232;&#8232;[![Classic · Dracula Velvet](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-elevation.png)&#8232;Dracula Velvet |
-| **Compact Mini-Pill** | [![Compact Mini-Pill · Fluent Solid](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-history.png)&#8232;Fluent Solid | [![Compact Mini-Pill · Liquid Glass](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-idle.png)&#8232;Liquid Glass&#8232;&#8232;[![Compact Mini-Pill · Emerald Slate](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-minimal.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-minimal.png)&#8232;Emerald Slate |
-| **Fluent** | [![Fluent · Catppuccin Mocha](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-history.png)&#8232;Catppuccin Mocha | [![Fluent · Windows 11 Mica](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-idle.png)&#8232;Windows 11 Mica&#8232;&#8232;[![Fluent · Nord Frost](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-elevation.png)&#8232;Nord Frost |
+| **Classic** | [![Classic · Windows 11 Blur](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-history.png) | [![Classic · Warm Paper](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-idle.png) |
+| :--- | :---: | :---: |
+| | Windows 11 Blur | Warm Paper |
+| | | [![Classic · Dracula Velvet](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/classic-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-elevation.png) |
+| | | Dracula Velvet |
+| **Compact Mini-Pill** | [![Compact Mini-Pill · Fluent Solid](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-history.png) | [![Compact Mini-Pill · Liquid Glass](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-idle.png) |
+| | Fluent Solid | Liquid Glass |
+| | | [![Compact Mini-Pill · Emerald Slate](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/pill-minimal.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-minimal.png) |
+| | | Emerald Slate |
+| **Fluent** | [![Fluent · Catppuccin Mocha](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-history.png) | [![Fluent · Windows 11 Mica](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-idle.png) |
+| | Catppuccin Mocha | Windows 11 Mica |
+| | | [![Fluent · Nord Frost](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/Thumbnails/fluent-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-elevation.png) |
+| | | Nord Frost |
 
 ## Features
 

@@ -1,27 +1,27 @@
 # Modern Run Dialog UI
 
-[English](README.md) · **Tiếng Việt** · [Русский](README.ru.md) · [DSN Windhawk Mods (English)](../README.md)
+[English](README.md) · **Tiếng Việt** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
 Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp thoại **Chạy tác vụ mới** trong Trình quản lý Tác vụ bằng cửa sổ có thể tùy chỉnh để mở ứng dụng, tệp và chạy lệnh.
 
 ## Bố cục và chủ đề
 
-<table>
+<table align="center" width="100%">
   <tbody>
     <tr>
       <td valign="middle"><strong>Classic</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Classic · Windows 11 Blur"></a><br>Windows 11 Blur</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-elevation.png"><img src="Assets/Previews/classic-elevation.png" width="386" alt="Classic · Dracula Velvet"></a><br>Dracula Velvet</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Classic · Windows 11 Blur"></a><br>Windows 11 Blur</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-elevation.png"><img src="Assets/Previews/classic-elevation.png" width="497" alt="Classic · Dracula Velvet"></a><br>Dracula Velvet</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Compact Mini-Pill</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Compact Mini-Pill · Fluent Solid"></a><br>Fluent Solid</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="202" alt="Compact Mini-Pill · Liquid Glass"></a><br>Liquid Glass<br><br><a href="Assets/Previews/pill-minimal.png"><img src="Assets/Previews/pill-minimal.png" width="171" alt="Compact Mini-Pill · Emerald Slate"></a><br>Emerald Slate</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Compact Mini-Pill · Fluent Solid"></a><br>Fluent Solid</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="259" alt="Compact Mini-Pill · Liquid Glass"></a><br>Liquid Glass<br><br><a href="Assets/Previews/pill-minimal.png"><img src="Assets/Previews/pill-minimal.png" width="220" alt="Compact Mini-Pill · Emerald Slate"></a><br>Emerald Slate</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Fluent</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha"></a><br>Catppuccin Mocha</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Nord Frost"></a><br>Nord Frost</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha"></a><br>Catppuccin Mocha</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Nord Frost"></a><br>Nord Frost</td>
     </tr>
   </tbody>
 </table>
@@ -35,7 +35,7 @@ Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp tho�
 
 ## Cài đặt
 
-![Cửa sổ cài đặt Modern Run ở trang Cá nhân hóa](Assets/Previews/settings.png)
+<p align="center"><img src="Assets/Previews/settings.png" alt="Cửa sổ cài đặt Modern Run ở trang Cá nhân hóa"></p>
 
 Các tùy chọn chung có trong cài đặt Modern Run và Windhawk. Cài đặt trong mod áp dụng cho người dùng hiện tại. Khi sửa một tùy chọn trong Windhawk, giá trị mới sẽ thay giá trị đã đặt trong mod cho tùy chọn đó.
 
