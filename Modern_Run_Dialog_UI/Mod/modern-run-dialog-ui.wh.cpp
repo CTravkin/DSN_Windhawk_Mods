@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.10.3
+// @version         6.10.5
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 53
+// Build: 55
 
 // ==WindhawkModReadme==
 /*
@@ -3806,17 +3806,27 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
 
 // --- Per-User Command, Timestamp & Hidden-MRU Storage in Windhawk Mod Storage ---
 
-std::wstring TrimCommandString(const std::wstring& cmd) {
-    wchar_t buf[MAX_PATH] = {};
-    wcsncpy_s(buf, cmd.c_str(), _TRUNCATE);
-    PathRemoveBlanksW(buf);
-    std::wstring res = buf;
-    for (wchar_t& ch : res) {
-        if (ch == L'\t' || ch == L'\r' || ch == L'\n') {
-            ch = L' ';
-        }
+constexpr size_t kMaxRunTextLength = 65535;
+
+std::wstring TrimCommandString(std::wstring_view cmd) {
+    const auto first = cmd.find_first_not_of(L" \t\r\n");
+    if (first == std::wstring_view::npos) return {};
+    const auto last = cmd.find_last_not_of(L" \t\r\n");
+    std::wstring result(cmd.substr(first, last - first + 1));
+    std::replace(result.begin(), result.end(), L'\r', L' ');
+    std::replace(result.begin(), result.end(), L'\n', L' ');
+    return result;
+}
+
+std::wstring ReadStoredRunText(const std::wstring& key) {
+    wchar_t small[512]{};
+    if (const size_t copied = Wh_GetStringValue(key.c_str(), small, std::size(small))) {
+        return std::wstring(small, copied);
     }
-    return res;
+    // Windhawk returns zero both for a missing value and for an insufficient buffer.
+    std::wstring value(kMaxRunTextLength + 1, L'\0');
+    value.resize(Wh_GetStringValue(key.c_str(), value.data(), value.size()));
+    return value;
 }
 
 std::wstring ToLowerString(std::wstring_view sv) {
@@ -3828,7 +3838,9 @@ std::wstring ToLowerString(std::wstring_view sv) {
 }
 
 std::wstring NormalizeCmdKey(const std::wstring& cmd) {
-    return ToLowerString(TrimCommandString(cmd));
+    auto key = ToLowerString(TrimCommandString(cmd));
+    std::replace(key.begin(), key.end(), L'\t', L' ');
+    return key;
 }
 
 std::wstring GetCurrentUserSidString() {
@@ -3915,13 +3927,9 @@ std::vector<std::wstring> LoadHiddenMruCommands() {
     std::vector<std::wstring> hiddenKeys;
     int count = std::clamp(Wh_GetIntValue(GetHiddenMruCountStorageKey().c_str(), 0), 0, (int)kMaxHiddenMruEntries);
     for (int i = 0; i < count; ++i) {
-        wchar_t buf[MAX_PATH + 32] = {};
-        std::wstring itemKey = GetHiddenMruItemStorageKey((size_t)i);
-        if (Wh_GetStringValue(itemKey.c_str(), buf, ARRAYSIZE(buf)) > 0 && buf[0] != L'\0') {
-            std::wstring norm = NormalizeCmdKey(buf);
-            if (!norm.empty() && std::find(hiddenKeys.begin(), hiddenKeys.end(), norm) == hiddenKeys.end()) {
-                hiddenKeys.push_back(std::move(norm));
-            }
+        auto norm = NormalizeCmdKey(ReadStoredRunText(GetHiddenMruItemStorageKey(static_cast<size_t>(i))));
+        if (!norm.empty() && std::find(hiddenKeys.begin(), hiddenKeys.end(), norm) == hiddenKeys.end()) {
+            hiddenKeys.push_back(std::move(norm));
         }
     }
     return hiddenKeys;
@@ -4459,11 +4467,9 @@ void LoadSettings(bool fromSettingsChanged = false) {
     if (aliasCountOv >= 0) {
         int lim = std::clamp(aliasCountOv, 0, 64);
         for (int i = 0; i < lim; ++i) {
-            wchar_t aBuf[128] = {}, cBuf[MAX_PATH * 2] = {};
-            Wh_GetStringValue(GetUserOverrideKey((L"aliasName_" + std::to_wstring(i)).c_str()).c_str(), aBuf, ARRAYSIZE(aBuf));
-            Wh_GetStringValue(GetUserOverrideKey((L"aliasCmd_" + std::to_wstring(i)).c_str()).c_str(), cBuf, ARRAYSIZE(cBuf));
-            std::wstring a = TrimWsLocal(aBuf);
-            std::wstring c = TrimWsLocal(cBuf);
+            const auto suffix = std::to_wstring(i);
+            auto a = TrimWsLocal(ReadStoredRunText(GetUserOverrideKey((L"aliasName_" + suffix).c_str())).c_str());
+            auto c = TrimWsLocal(ReadStoredRunText(GetUserOverrideKey((L"aliasCmd_" + suffix).c_str())).c_str());
             if (!a.empty() && !c.empty()) {
                 CommandAlias ca;
                 ca.alias = a;
@@ -5861,7 +5867,10 @@ struct RunDialogState {
     bool gearPressed = false;
     bool caretVisible = true;
 
-    bool isTriggeringRun = false;
+    unsigned callbackDepth = 0;
+    bool detached = false;
+    bool launching = false;
+    bool forwardNativeOk = false;
     bool isBrowsingFile = false;
     bool suppressSuggestionUpdate = false;
     bool inputUpdateQueued = false;
@@ -5902,7 +5911,7 @@ const std::vector<HistoryItem>& GetActiveRowItems(const RunDialogState* state) {
 // Atomic state shared safely across threads
 std::atomic<HWND> g_hActiveRunDlg{nullptr};
 std::atomic<HWND> g_hTrackedRunDlg{nullptr};
-std::atomic<bool> g_dialogSubclassInstalled{false};
+std::atomic<unsigned> g_runCallbacksInFlight{0};
 std::atomic<ULONGLONG> g_openTick{0};
 std::atomic<ULONGLONG> g_lastToggleTick{0};
 std::atomic<bool> g_isBrowsingFile{false};
@@ -5910,6 +5919,33 @@ std::atomic<bool> g_unloading{false};
 std::atomic<bool> g_dlgIsForeground{false};
 std::atomic<ULONGLONG> g_deactivatedByTaskbarTick{0};
 thread_local bool g_internalActivation = false;
+
+void ReleaseDialogState(RunDialogState* state);
+
+// Both subclasses run on the dialog thread. A nested WM_NCDESTROY can remove
+// them immediately, while an outer callback still owns the state and resources.
+class RunDialogCallback {
+public:
+    explicit RunDialogCallback(RunDialogState* state = nullptr) : state_(state) {
+        g_runCallbacksInFlight.fetch_add(1);
+        if (state_) ++state_->callbackDepth;
+    }
+
+    ~RunDialogCallback() {
+        if (state_ && --state_->callbackDepth == 0 && state_->detached) ReleaseDialogState(state_);
+        g_runCallbacksInFlight.fetch_sub(1);
+    }
+
+    RunDialogCallback(const RunDialogCallback&) = delete;
+    RunDialogCallback& operator=(const RunDialogCallback&) = delete;
+
+private:
+    RunDialogState* state_;
+};
+
+bool CanContinueRunDialog(const RunDialogState* state) {
+    return state && !state->detached && !state->pendingUninit && !g_unloading.load();
+}
 
 inline bool IsActiveRunDialogAlive(HWND hDlg) {
     return hDlg && IsWindow(hDlg) && (IsWindowVisible(hDlg) || IsIconic(hDlg));
@@ -5960,7 +5996,7 @@ bool ShouldMinimizeOnTaskbarClick(HWND hWnd, ULONGLONG now) {
 bool ResolveDialogLightContrast(const RunDialogState* state);
 void ApplyWindowAppearance(HWND hDlg, RunDialogState* state);
 bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h);
-void PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents = true,
+bool PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents = true,
                          int overrideX = -999999, int overrideY = -999999);
 void RefreshDialogVisual(HWND hWnd, RunDialogState* state, bool redrawContents = true);
 void CloseActiveGearMenu();
@@ -7029,7 +7065,7 @@ void RestoreRunDialog(RunDialogState* state) {
 }
 
 void OpenBrowseExecutableDialog(RunDialogState* state, bool autoExecute = false) {
-    if (!state || !state->hDlg || state->isBrowsingFile) return;
+    if (!CanContinueRunDialog(state) || !state->hDlg || state->isBrowsingFile) return;
     HWND hDlg = state->hDlg;
     state->isBrowsingFile = true;
     g_isBrowsingFile.store(true);
@@ -7048,19 +7084,9 @@ void OpenBrowseExecutableDialog(RunDialogState* state, bool autoExecute = false)
 
     BOOL picked = GetOpenFileNameW(&ofn);
 
-    if (g_hActiveRunDlg.load() != hDlg || !IsWindow(hDlg)) {
-        g_isBrowsingFile.store(false);
-        return;
-    }
-
-    if (state->pendingUninit || g_unloading.load()) {
-        g_isBrowsingFile.store(false);
-        state->isBrowsingFile = false;
-        return;
-    }
-
     g_isBrowsingFile.store(false);
     state->isBrowsingFile = false;
+    if (!CanContinueRunDialog(state) || g_hActiveRunDlg.load() != hDlg) return;
 
     if (picked && filePath[0] != L'\0') {
         std::wstring formattedPath = filePath;
@@ -7107,8 +7133,6 @@ std::vector<StoredTimestampEntry> LoadStoredTimestamps() {
     int count = std::clamp(Wh_GetIntValue(GetHistoryCountStorageKey().c_str(), 0), 0, (int)kMaxMruEntries);
     for (int i = 0; i < count; ++i) {
         wchar_t timeBuf[64] = {};
-        wchar_t keyBuf[MAX_PATH + 32] = {};
-        wchar_t cmdBuf[MAX_PATH + 32] = {};
 
         std::wstring kTime = GetHistoryItemFieldKey(L"Time", (size_t)i);
         std::wstring kKey  = GetHistoryItemFieldKey(L"Key",  (size_t)i);
@@ -7117,15 +7141,14 @@ std::vector<StoredTimestampEntry> LoadStoredTimestamps() {
         if (Wh_GetStringValue(kTime.c_str(), timeBuf, ARRAYSIZE(timeBuf)) == 0 || timeBuf[0] == L'\0') {
             continue;
         }
-        if (Wh_GetStringValue(kKey.c_str(), keyBuf, ARRAYSIZE(keyBuf)) == 0 || keyBuf[0] == L'\0') {
-            continue;
-        }
-        Wh_GetStringValue(kCmd.c_str(), cmdBuf, ARRAYSIZE(cmdBuf));
+        const auto savedKey = ReadStoredRunText(kKey);
+        if (savedKey.empty()) continue;
+        const auto savedCommand = ReadStoredRunText(kCmd);
 
         wchar_t* endPtr = nullptr;
         ULONGLONG ftVal = wcstoull(timeBuf, &endPtr, 10);
-        std::wstring key = NormalizeCmdKey(keyBuf);
-        std::wstring origCmd = TrimCommandString(cmdBuf[0] != L'\0' ? cmdBuf : keyBuf);
+        std::wstring key = NormalizeCmdKey(savedKey);
+        std::wstring origCmd = TrimCommandString(savedCommand.empty() ? savedKey : savedCommand);
         if (ftVal != 0 && !key.empty()) {
             if (origCmd.empty()) origCmd = key;
             entries.push_back({ ftVal, std::move(key), std::move(origCmd) });
@@ -7272,15 +7295,19 @@ std::wstring LookupOrInitTimestamp(const std::wstring& cmd,
 void CloseRunDialog(HWND hDlg) {
     CloseActiveGearMenu();
     if (!hDlg || !IsWindow(hDlg)) return;
+    const bool sameThread = GetWindowThreadProcessId(hDlg, nullptr) == GetCurrentThreadId();
+    auto* state = sameThread ? reinterpret_cast<RunDialogState*>(GetPropW(hDlg, L"WindhawkModernRunState")) : nullptr;
+    RunDialogCallback callback(state);
     DisableWindowDwmTransitions(hDlg);
-    if (GetWindowThreadProcessId(hDlg, nullptr) == GetCurrentThreadId()) {
-        auto* state = reinterpret_cast<RunDialogState*>(GetPropW(hDlg, L"WindhawkModernRunState"));
-        if (state && !state->pendingUninit && !g_unloading.load()) {
+    if (sameThread) {
+        if (CanContinueRunDialog(state)) {
             SaveDialogAnchorPosition(state);
             PlayDialogCloseAnimationSync(hDlg, state);
+            if (state->detached) return;
             state->animAlpha = 0.0f;
             PresentDialogWindow(hDlg, state, false, state->renderX, state->renderY);
         }
+        if (state && state->detached) return;
         SetWindowDwmCloak(hDlg, true);
         DwmFlush();
         g_internalActivation = true;
@@ -7297,9 +7324,9 @@ void CloseRunDialog(HWND hDlg) {
     g_hActiveRunDlg.compare_exchange_strong(expected, nullptr);
     HWND hCancel = GetDlgItem(hDlg, IDCANCEL);
     if (hCancel) EnableWindow(hCancel, TRUE);
-    if (GetWindowThreadProcessId(hDlg, nullptr) == GetCurrentThreadId()) {
+    if (sameThread) {
         SendMessageW(hDlg, WM_COMMAND, MAKEWPARAM(IDCANCEL, BN_CLICKED), (LPARAM)hCancel);
-        if (IsWindow(hDlg)) {
+        if ((!state || !state->detached) && IsWindow(hDlg)) {
             EndDialog(hDlg, IDCANCEL);
             PostMessageW(hDlg, WM_NULL, 0, 0);
         }
@@ -7734,19 +7761,6 @@ std::wstring BuildWebSearchUrl(const std::wstring& query) {
         : (L"https://www.google.com/search?q=" + encoded);
 }
 
-bool LaunchWebSearchCommand(HWND, int, const std::wstring& query) {
-    std::wstring url = BuildWebSearchUrl(query);
-
-    // Open directly in the user's default system browser
-    SHELLEXECUTEINFOW sei = { sizeof(sei) };
-    sei.fMask = SEE_MASK_DOENVSUBST;
-    sei.hwnd = nullptr;
-    sei.lpVerb = L"open";
-    sei.lpFile = url.c_str();
-    sei.nShow = SW_SHOWNORMAL;
-    return ShellExecuteExW(&sei) != FALSE;
-}
-
 void SyncNativeAdminCheckbox(RunDialogState* state, bool elevated) {
     if (!state || !state->hDlg || !state->hAdminCheck || !IsWindow(state->hAdminCheck)) return;
     EnableWindow(state->hAdminCheck, TRUE);
@@ -7768,7 +7782,8 @@ std::wstring ResolveRunExecutablePath(const std::wstring& exeToken) {
     for (const wchar_t* ext : exts) {
         if (hasExt && ext != nullptr) continue;
         wchar_t found[MAX_PATH] = {};
-        if (SearchPathW(nullptr, exeToken.c_str(), ext, ARRAYSIZE(found), found, nullptr) > 0 &&
+        const DWORD length = SearchPathW(nullptr, exeToken.c_str(), ext, ARRAYSIZE(found), found, nullptr);
+        if (length > 0 && length < ARRAYSIZE(found) &&
             found[0] != L'\0' && !PathIsDirectoryW(found)) {
             return found;
         }
@@ -7791,29 +7806,62 @@ std::wstring ResolveRunExecutablePath(const std::wstring& exeToken) {
     return L"";
 }
 
-bool LaunchCommandElevated(HWND hDlg, const std::wstring& rawCmd, bool* outCancelledByUser) {
-    if (outCancelledByUser) *outCancelledByUser = false;
-    std::wstring trimmed = TrimCommandString(rawCmd);
-    if (trimmed.empty()) return false;
+// The native Run delegate has no documented command-line contract. Keep the
+// established MAX_PATH-sized handoff, and use ShellExecute for longer Explorer commands.
+constexpr size_t kMaxNativeRunCommandLength = MAX_PATH - 1;
+constexpr size_t kMaxProcessCommandLine = 32766; // CreateProcessW limit excluding NUL.
+constexpr size_t kMaxCommandPromptLine = 8191;
 
-    wchar_t expandedBuf[2048] = {};
-    DWORD expLen = ExpandEnvironmentStringsW(trimmed.c_str(), expandedBuf, ARRAYSIZE(expandedBuf));
-    std::wstring cmdLine = (expLen > 0 && expLen < ARRAYSIZE(expandedBuf)) ? expandedBuf : trimmed;
+struct ShellLaunchTarget {
+    std::wstring file;
+    std::wstring arguments;
+    DWORD preparationError = ERROR_SUCCESS;
+    bool isLocation = false;
+};
 
-    std::wstring lowerCmd = ToLowerString(cmdLine);
-    if (lowerCmd.rfind(L"http://", 0) == 0 || lowerCmd.rfind(L"https://", 0) == 0 ||
-        lowerCmd.rfind(L"mailto:", 0) == 0 || lowerCmd.rfind(L"shell:", 0) == 0 ||
-        lowerCmd.rfind(L"ms-settings:", 0) == 0) {
-        return false;
-    }
+std::wstring QuoteExecutable(std::wstring_view executable) {
+    return L"\"" + std::wstring(executable) + L"\"";
+}
 
-    std::wstring unquotedWhole = cmdLine;
-    if (unquotedWhole.size() >= 2 && unquotedWhole.front() == L'"' && unquotedWhole.back() == L'"') {
-        unquotedWhole = unquotedWhole.substr(1, unquotedWhole.size() - 2);
+std::wstring ShellTargetCommandLine(const ShellLaunchTarget& target) {
+    auto line = QuoteExecutable(target.file);
+    if (!target.arguments.empty()) line += L" " + target.arguments;
+    return line;
+}
+
+bool IsShellLocation(const std::wstring& command) {
+    const auto lower = ToLowerString(command);
+    if (lower.starts_with(L"http://") || lower.starts_with(L"https://") ||
+        lower.starts_with(L"mailto:") || lower.starts_with(L"shell:") || lower.starts_with(L"ms-settings:")) {
+        return true;
     }
-    if (PathIsDirectoryW(unquotedWhole.c_str())) {
-        return false;
+    return PathIsDirectoryW(command.c_str()) != FALSE;
+}
+
+ShellLaunchTarget BuildShellLaunchTarget(const std::wstring& command, bool elevated) {
+
+    std::wstring cmdLine = command;
+    if (command.find(L'%') != std::wstring::npos) {
+        const auto required = ExpandEnvironmentStringsW(command.c_str(), nullptr, 0);
+        if (required > 0 && required <= kMaxProcessCommandLine + 1) {
+            std::wstring expanded(required, L'\0');
+            const auto written = ExpandEnvironmentStringsW(command.c_str(), expanded.data(), required);
+            if (written > 0 && written <= required) {
+                expanded.resize(written - 1);
+                cmdLine = std::move(expanded);
+            }
+        } else if (required > kMaxProcessCommandLine + 1) {
+            return {command, {}, ERROR_FILENAME_EXCED_RANGE};
+        }
     }
+    if (cmdLine.size() >= 2 && cmdLine.front() == L'"' && cmdLine.back() == L'"') {
+        // Only unwrap a complete location. Arguments may contain quoted strings too.
+        auto whole = cmdLine.substr(1, cmdLine.size() - 2);
+        if (whole.find(L'"') == std::wstring::npos && IsShellLocation(whole)) {
+            return {std::move(whole), {}, ERROR_SUCCESS, true};
+        }
+    }
+    if (IsShellLocation(cmdLine)) return {std::move(cmdLine), {}, ERROR_SUCCESS, true};
 
     std::wstring exePart;
     std::wstring argsPart;
@@ -7823,7 +7871,7 @@ bool LaunchCommandElevated(HWND hDlg, const std::wstring& rawCmd, bool* outCance
             exePart = cmdLine.substr(1, closeQuote - 1);
             argsPart = TrimCommandString(cmdLine.substr(closeQuote + 1));
         } else {
-            exePart = cmdLine.substr(1);
+            return {command, {}, ERROR_INVALID_PARAMETER};
         }
     } else {
         std::wstring wholeResolved = ResolveRunExecutablePath(cmdLine);
@@ -7845,38 +7893,47 @@ bool LaunchCommandElevated(HWND hDlg, const std::wstring& rawCmd, bool* outCance
     std::wstring finalArgs = argsPart;
 
     std::wstring extLower = ToLowerString(PathFindExtensionW(finalFile.c_str()));
-    if (extLower == L".msc") {
+    if (elevated && extLower == L".msc") {
         finalArgs = L"\"" + finalFile + L"\"" + (argsPart.empty() ? L"" : (L" " + argsPart));
         finalFile = L"mmc.exe";
-    } else if (extLower == L".cpl") {
+    } else if (elevated && extLower == L".cpl") {
         finalArgs = L"\"" + finalFile + L"\"" + (argsPart.empty() ? L"" : (L" " + argsPart));
         finalFile = L"control.exe";
-    } else if (extLower == L".msi") {
+    } else if (elevated && extLower == L".msi") {
         finalArgs = L"/i \"" + finalFile + L"\"" + (argsPart.empty() ? L"" : (L" " + argsPart));
         finalFile = L"msiexec.exe";
-    } else if (extLower == L".ps1") {
+    } else if (elevated && extLower == L".ps1") {
         finalArgs = L"-File \"" + finalFile + L"\"" + (argsPart.empty() ? L"" : (L" " + argsPart));
         finalFile = L"powershell.exe";
     }
 
-    SHELLEXECUTEINFOW sei = { sizeof(sei) };
-    sei.fMask = SEE_MASK_DOENVSUBST;
-    sei.hwnd = hDlg;
-    sei.lpVerb = L"runas";
-    sei.lpFile = finalFile.c_str();
-    sei.lpParameters = finalArgs.empty() ? nullptr : finalArgs.c_str();
-    sei.nShow = SW_SHOWNORMAL;
-
-    SetLastError(0);
-    if (ShellExecuteExW(&sei)) {
-        return true;
-    }
-    DWORD err = GetLastError();
-    if (err == ERROR_CANCELLED) {
-        if (outCancelledByUser) *outCancelledByUser = true;
-    }
-    return false;
+    return {std::move(finalFile), std::move(finalArgs)};
 }
+
+DWORD ExecuteShellTarget(HWND owner, const ShellLaunchTarget& target, bool elevated, bool openVerb = false) {
+    if (target.preparationError != ERROR_SUCCESS) return target.preparationError;
+    if (target.file.empty()) return ERROR_INVALID_PARAMETER;
+    const size_t length = ShellTargetCommandLine(target).size();
+    if (length > kMaxProcessCommandLine) return ERROR_FILENAME_EXCED_RANGE;
+    const auto extension = ToLowerString(PathFindExtensionW(target.file.c_str()));
+    if ((extension == L".bat" || extension == L".cmd") &&
+        length + std::wstring_view(L"cmd.exe /c ").size() > kMaxCommandPromptLine) {
+        return ERROR_FILENAME_EXCED_RANGE;
+    }
+
+    SHELLEXECUTEINFOW request = {sizeof(request)};
+    request.fMask = SEE_MASK_DOENVSUBST | SEE_MASK_FLAG_NO_UI;
+    request.hwnd = owner;
+    request.lpVerb = elevated ? L"runas" : (openVerb ? L"open" : nullptr);
+    request.lpFile = target.file.c_str();
+    request.lpParameters = target.arguments.empty() ? nullptr : target.arguments.c_str();
+    request.nShow = SW_SHOWNORMAL;
+    SetLastError(ERROR_SUCCESS);
+    if (ShellExecuteExW(&request)) return ERROR_SUCCESS;
+    const DWORD error = GetLastError();
+    return error ? error : ERROR_GEN_FAILURE;
+}
+
 
 bool ResolveCustomAlias(const ModSettings& settings, const std::wstring& rawCmd,
                         std::wstring* outExpandedCmd, bool* outRunAsAdmin) {
@@ -7916,9 +7973,7 @@ std::vector<std::wstring> LoadPinnedCommands() {
     std::vector<std::wstring> out;
     int count = std::clamp(Wh_GetIntValue(GetUserOverrideKey(L"pinnedCount").c_str(), 0), 0, kMaxPinnedCommands);
     for (int i = 0; i < count; ++i) {
-        wchar_t buf[1024] = {};
-        if (Wh_GetStringValue(GetPinnedItemKey(i).c_str(), buf, ARRAYSIZE(buf)) == 0) continue;
-        std::wstring line = TrimCommandString(buf);
+        std::wstring line = TrimCommandString(ReadStoredRunText(GetPinnedItemKey(i)));
         if (line.empty()) continue;
         bool dup = false;
         std::wstring key = NormalizeCmdKey(line);
@@ -8056,10 +8111,7 @@ void OpenFileLocationInExplorer(const std::wstring& path, bool isDir) {
     }
 }
 
-bool BuildTerminalLaunchSpec(const std::wstring& rawCmd, std::wstring* outFile, std::wstring* outParams) {
-    std::wstring trimmed = TrimCommandString(rawCmd);
-    if (trimmed.empty()) return false;
-
+ShellLaunchTarget BuildTerminalLaunchTarget(const std::wstring& trimmed) {
     std::wstring lower = ToLowerString(trimmed);
     bool isPowerShell =
         lower.rfind(L"powershell", 0) == 0 ||
@@ -8079,11 +8131,17 @@ bool BuildTerminalLaunchSpec(const std::wstring& rawCmd, std::wstring* outFile, 
         lower.rfind(L"foreach-", 0) == 0 ||
         (!trimmed.empty() && trimmed.front() == L'$');
 
-    wchar_t wtPath[MAX_PATH] = {};
-    bool hasWt = (SearchPathW(nullptr, L"wt.exe", nullptr, ARRAYSIZE(wtPath), wtPath, nullptr) > 0);
+    if (!isPowerShell && trimmed.size() + std::wstring_view(L"cmd.exe /k ").size() > kMaxCommandPromptLine) {
+        return {{}, {}, ERROR_FILENAME_EXCED_RANGE};
+    }
 
-    std::wstring fileToRun;
-    std::wstring params;
+    wchar_t wtPath[MAX_PATH] = {};
+    const DWORD wtLength = SearchPathW(nullptr, L"wt.exe", nullptr, ARRAYSIZE(wtPath), wtPath, nullptr);
+    const bool hasWt = wtLength > 0 && wtLength < ARRAYSIZE(wtPath);
+
+    ShellLaunchTarget target;
+    auto& fileToRun = target.file;
+    auto& params = target.arguments;
     if (hasWt) {
         fileToRun = wtPath;
         if (isPowerShell) {
@@ -8099,218 +8157,221 @@ bool BuildTerminalLaunchSpec(const std::wstring& rawCmd, std::wstring* outFile, 
         params = L"/k " + trimmed;
     }
 
-    if (outFile) *outFile = std::move(fileToRun);
-    if (outParams) *outParams = std::move(params);
-    return true;
+    return target;
 }
 
-bool LaunchCommandInTerminal(HWND hOwner, const std::wstring& rawCmd, bool runAsAdmin) {
-    std::wstring fileToRun;
-    std::wstring params;
-    if (!BuildTerminalLaunchSpec(rawCmd, &fileToRun, &params)) return false;
+class RunLaunchScope {
+public:
+    explicit RunLaunchScope(RunDialogState* state) {
+        if (!CanContinueRunDialog(state) || !state->hDlg || state->launching || state->isBrowsingFile) return;
+        state_ = state;
+        state_->launching = true;
+        state_->isBrowsingFile = true;
+        g_isBrowsingFile.store(true);
+    }
 
-    SHELLEXECUTEINFOW sei = { sizeof(sei) };
-    sei.fMask = SEE_MASK_DOENVSUBST;
-    sei.hwnd = hOwner;
-    sei.lpVerb = runAsAdmin ? L"runas" : nullptr;
-    sei.lpFile = fileToRun.c_str();
-    sei.lpParameters = params.c_str();
-    sei.nShow = SW_SHOWNORMAL;
-    return ShellExecuteExW(&sei) != FALSE;
+    ~RunLaunchScope() {
+        if (!state_) return;
+        state_->forwardNativeOk = false;
+        state_->launching = false;
+        state_->isBrowsingFile = false;
+        g_isBrowsingFile.store(false);
+    }
+
+    RunLaunchScope(const RunLaunchScope&) = delete;
+    RunLaunchScope& operator=(const RunLaunchScope&) = delete;
+    explicit operator bool() const { return state_ != nullptr; }
+
+private:
+    RunDialogState* state_ = nullptr;
+};
+
+struct RunLaunchRequest {
+    std::wstring historyCommand;
+    std::wstring target;
+    std::wstring webQuery;
+    bool isWebSearch;
+    bool isShortcut;
+    bool elevated;
+    RunEnterAction action;
+};
+
+RunLaunchRequest ResolveRunLaunchRequest(const ModSettings& settings, const HistoryItem& item, RunEnterAction action) {
+    std::wstring target = TrimCommandString(item.execTarget.empty() ? item.cmd : item.execTarget);
+    bool aliasAdmin = item.isAlias && item.aliasRunAsAdmin;
+    if (!item.isShortcutFile) {
+        std::wstring expanded;
+        bool expandedAdmin = false;
+        if (ResolveCustomAlias(settings, target, &expanded, &expandedAdmin)) {
+            target = TrimCommandString(expanded);
+            aliasAdmin = aliasAdmin || expandedAdmin;
+        }
+    }
+    std::wstring query = item.webSearchQuery;
+    const bool webSearch = item.webSearchKind != 0 || ParseWebSearchCommand(target, &query) != 0;
+    return {item.cmd.empty() ? target : item.cmd, std::move(target), std::move(query), webSearch,
+            item.isShortcutFile && !item.execTarget.empty(), ResolveRunElevation(settings.runAsAdmin || aliasAdmin, action), action};
 }
 
-void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& item,
-                                    RunEnterAction action = RunEnterAction::Normal) {
-    if (!state || !state->hDlg || state->isTriggeringRun) return;
+void ShowRunLaunchError(RunDialogState* state, DWORD error) {
+    if (!CanContinueRunDialog(state)) return;
+    if (error != ERROR_CANCELLED) {
+        wchar_t message[512]{};
+        if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error,
+                           0, message, ARRAYSIZE(message), nullptr) == 0) {
+            swprintf_s(message, L"0x%08lX", error);
+        }
+        MessageBoxW(state->hDlg, message, L"Modern Run", MB_OK | MB_ICONERROR);
+    }
+    if (CanContinueRunDialog(state) && state->hModernEdit) {
+        SetFocus(state->hModernEdit);
+        RefreshDialogVisual(state->hDlg, state);
+    }
+}
+
+void FinishShellLaunch(RunDialogState* state, const RunLaunchRequest& request, DWORD error) {
+    if (error == ERROR_SUCCESS) {
+        SaveCommandTimestamp(request.historyCommand);
+        if (CanContinueRunDialog(state)) CloseRunDialog(state->hDlg);
+    } else {
+        ShowRunLaunchError(state, error);
+    }
+}
+
+void SubmitNativeRunCommand(RunDialogState* state, const RunLaunchRequest& request) {
+    if (request.target.size() > kMaxNativeRunCommandLength) {
+        ShowRunLaunchError(state, ERROR_FILENAME_EXCED_RANGE);
+        return;
+    }
+
+    const HWND dialog = state->hDlg;
+    SyncNativeAdminCheckbox(state, request.elevated);
+    if (!CanContinueRunDialog(state)) return;
+    if (state->hCombo) EnableWindow(state->hCombo, TRUE);
+    if (state->hOrigEdit) EnableWindow(state->hOrigEdit, TRUE);
+    SyncInputToNativeCombo(state, request.target.c_str());
+    if (!CanContinueRunDialog(state)) return;
+    if (state->hCombo) {
+        const int comboId = GetDlgCtrlID(state->hCombo);
+        SendMessageW(dialog, WM_COMMAND, MAKEWPARAM(comboId, CBN_EDITCHANGE), reinterpret_cast<LPARAM>(state->hCombo));
+        if (!CanContinueRunDialog(state)) return;
+        SendMessageW(dialog, WM_COMMAND, MAKEWPARAM(comboId, CBN_EDITUPDATE), reinterpret_cast<LPARAM>(state->hCombo));
+    }
+    if (!CanContinueRunDialog(state)) return;
+    const HWND nativeInput = state->hOrigEdit ? state->hOrigEdit : state->hCombo;
+    if (GetEffectiveInputText(nativeInput) != request.target) {
+        ShowRunLaunchError(state, ERROR_INVALID_DATA);
+        if (CanContinueRunDialog(state)) SyncNativeAdminCheckbox(state, state->settings.runAsAdmin);
+        return;
+    }
+
+    const HWND ok = state->hOkBtn ? state->hOkBtn : GetDlgItem(dialog, IDOK);
+    if (ok) EnableWindow(ok, TRUE);
+    if (!CanContinueRunDialog(state)) return;
+    SaveCommandTimestamp(request.historyCommand);
+    state->forwardNativeOk = true;
+    SendMessageW(dialog, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), reinterpret_cast<LPARAM>(ok));
+    if (!CanContinueRunDialog(state)) return;
+
+    if (!IsWindowVisible(dialog) && !IsIconic(dialog)) {
+        HWND expected = dialog;
+        g_hActiveRunDlg.compare_exchange_strong(expected, nullptr);
+        EndDialog(dialog, IDOK);
+        PostMessageW(dialog, WM_NULL, 0, 0);
+    } else {
+        SyncNativeAdminCheckbox(state, state->settings.runAsAdmin);
+    }
+}
+
+void ExecuteRunItem(RunDialogState* state, const HistoryItem& item, RunEnterAction action) {
     CloseActiveGearMenu();
-
     if (item.isMathResult && !item.mathResultValue.empty()) {
         ApplyMathResultToDialog(state, item.mathResultValue);
         return;
     }
-    std::wstring directMathRes;
-    if (TryEvaluateMathExpression(!item.execTarget.empty() ? item.execTarget : item.cmd, &directMathRes)) {
-        ApplyMathResultToDialog(state, directMathRes);
+    std::wstring mathResult;
+    if (TryEvaluateMathExpression(item.execTarget.empty() ? item.cmd : item.execTarget, &mathResult)) {
+        ApplyMathResultToDialog(state, mathResult);
         return;
     }
 
-    bool hasNativeAdminCheckbox = (g_isTaskManagerProcess && state->hAdminCheck && IsWindow(state->hAdminCheck));
-
-    // Expand user-defined Custom Command Aliases (e.g. hosts, env, ws)
-    HistoryItem resolvedItem = item;
-    bool aliasAdmin = item.isAlias && item.aliasRunAsAdmin;
-    if (!item.isShortcutFile) {
-        std::wstring expandedAliasCmd;
-        bool expandedAliasAdmin = false;
-        const std::wstring& rawAliasCheck = !item.execTarget.empty() ? item.execTarget : item.cmd;
-        if (ResolveCustomAlias(state->settings, rawAliasCheck, &expandedAliasCmd, &expandedAliasAdmin)) {
-            resolvedItem.execTarget = expandedAliasCmd;
-            aliasAdmin = aliasAdmin || expandedAliasAdmin;
-        }
-    }
-    const bool wantAdmin = ResolveRunElevation(state->settings.runAsAdmin || aliasAdmin, action);
-
-    // Handle google:<keyword> — in elevated Task Manager when not requesting admin, delegate the URL
-    // through Task Manager's native Run box so it launches de-elevated with Task Manager's own token!
-    std::wstring parsedSearchQuery = item.webSearchQuery;
-    int searchKind = item.webSearchKind;
-    if (searchKind == 0) {
-        searchKind = ParseWebSearchCommand(!resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd, &parsedSearchQuery);
-    }
-    if (searchKind != 0) {
-        if (g_isTaskManagerProcess && !wantAdmin) {
-            resolvedItem.execTarget = BuildWebSearchUrl(parsedSearchQuery);
-        } else {
-            std::wstring recordCmd = !item.cmd.empty() ? item.cmd : item.execTarget;
-            SaveCommandTimestamp(recordCmd);
-            if (LaunchWebSearchCommand(nullptr, searchKind, parsedSearchQuery)) {
-                CloseRunDialog(state->hDlg);
-                return;
-            }
-        }
-    }
-
-    // Shift + Enter: Run command inside Windows Terminal (wt.exe) or CMD/PowerShell keeping window open for logs.
-    // In elevated Task Manager when not requesting admin, delegate the composed command line to Task Manager's native Run box.
-    if (action == RunEnterAction::Terminal) {
-        const std::wstring& termTarget = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
-        std::wstring trimmedTerm = TrimCommandString(termTarget);
-        if (trimmedTerm.empty()) return;
-        if (g_isTaskManagerProcess && !wantAdmin) {
-            std::wstring termFile, termParams;
-            if (BuildTerminalLaunchSpec(trimmedTerm, &termFile, &termParams)) {
-                if (termFile.find(L' ') != std::wstring::npos && termFile.front() != L'"') {
-                    termFile = L"\"" + termFile + L"\"";
-                }
-                resolvedItem.execTarget = termFile + L" " + termParams;
-            }
-        } else {
-            SaveCommandTimestamp(item.cmd.empty() ? trimmedTerm : item.cmd);
-            if (LaunchCommandInTerminal(state->hDlg, trimmedTerm, wantAdmin)) {
-                CloseRunDialog(state->hDlg);
-                return;
-            }
-        }
-    }
-
-    // When Run-as-Admin (or Ctrl + Shift + Enter) is active and not delegating to Task Manager's native checkbox,
-    // elevate directly via ShellExecuteExW("runas")
-    if (wantAdmin && !hasNativeAdminCheckbox) {
-        const std::wstring& elevTarget = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
-        std::wstring trimmedElev = TrimCommandString(elevTarget);
-        if (trimmedElev.empty()) return;
-
-        state->isBrowsingFile = true;
-        g_isBrowsingFile.store(true);
-        bool cancelledUac = false;
-        bool launchedElevated = LaunchCommandElevated(state->hDlg, trimmedElev, &cancelledUac);
-        g_isBrowsingFile.store(false);
-        if (!IsWindow(state->hDlg)) return;
-        state->isBrowsingFile = false;
-
-        if (launchedElevated) {
-            SaveCommandTimestamp(item.cmd.empty() ? trimmedElev : item.cmd);
-            CloseRunDialog(state->hDlg);
-            return;
-        }
-        if (cancelledUac) {
-            if (state->hModernEdit && IsWindow(state->hModernEdit)) {
-                SetFocus(state->hModernEdit);
-            }
-            RefreshDialogVisual(state->hDlg, state);
+    auto request = ResolveRunLaunchRequest(state->settings, item, action);
+    if (request.target.empty()) return;
+    const bool nativeAdmin = g_isTaskManagerProcess && state->hAdminCheck && IsWindow(state->hAdminCheck);
+    const bool delegateWithoutElevation = g_isTaskManagerProcess && !request.elevated;
+    if (request.isWebSearch) {
+        request.target = BuildWebSearchUrl(request.webQuery);
+        if (!delegateWithoutElevation) {
+            FinishShellLaunch(state, request, ExecuteShellTarget(state->hDlg, {request.target, {}}, false, true));
             return;
         }
     }
 
-    // For Start Menu shortcut files (.lnk / .appref-ms), launch directly via ShellExecuteExW
-    // ONLY when not de-elevating inside an elevated Task Manager process.
-    if (item.isShortcutFile && !item.execTarget.empty() && !(g_isTaskManagerProcess && !wantAdmin)) {
-        SaveCommandTimestamp(item.cmd);
-        SHELLEXECUTEINFOW sei = { sizeof(sei) };
-        sei.fMask = SEE_MASK_DOENVSUBST;
-        sei.hwnd = nullptr;
-        sei.lpVerb = wantAdmin ? L"runas" : nullptr;
-        sei.lpFile = item.execTarget.c_str();
-        sei.nShow = SW_SHOWNORMAL;
-        if (ShellExecuteExW(&sei)) {
-            CloseRunDialog(state->hDlg);
+    if (request.action == RunEnterAction::Terminal) {
+        const auto terminal = BuildTerminalLaunchTarget(request.target);
+        if (!delegateWithoutElevation) {
+            FinishShellLaunch(state, request, ExecuteShellTarget(state->hDlg, terminal, request.elevated));
+            return;
+        }
+        if (terminal.preparationError != ERROR_SUCCESS) {
+            ShowRunLaunchError(state, terminal.preparationError);
+            return;
+        }
+        request.target = ShellTargetCommandLine(terminal);
+    } else if (request.isShortcut && !delegateWithoutElevation) {
+        const DWORD error = ExecuteShellTarget(state->hDlg, {request.target, {}}, request.elevated);
+        if (error == ERROR_SUCCESS || error == ERROR_CANCELLED || request.elevated ||
+            request.target.size() > kMaxNativeRunCommandLength) {
+            FinishShellLaunch(state, request, error);
+            return;
+        }
+        if (!CanContinueRunDialog(state)) return;
+    } else if (!delegateWithoutElevation && !(nativeAdmin && request.elevated) &&
+               (request.elevated || (request.target.size() > kMaxNativeRunCommandLength && !g_isTaskManagerProcess))) {
+        const auto shellTarget = BuildShellLaunchTarget(request.target, request.elevated);
+        if (!shellTarget.isLocation || request.target.size() > kMaxNativeRunCommandLength) {
+            const bool elevated = request.elevated && !shellTarget.isLocation;
+            FinishShellLaunch(state, request, ExecuteShellTarget(state->hDlg, shellTarget, elevated));
             return;
         }
     }
 
-    const std::wstring& targetCmd = !resolvedItem.execTarget.empty() ? resolvedItem.execTarget : resolvedItem.cmd;
-    state->isTriggeringRun = true;
+    SubmitNativeRunCommand(state, request);
+}
 
-    wchar_t rawBuf[MAX_PATH] = {};
-    wcsncpy_s(rawBuf, targetCmd.c_str(), _TRUNCATE);
-    PathRemoveBlanksW(rawBuf);
-
-    if (rawBuf[0] == L'\0') {
-        state->isTriggeringRun = false;
-        return;
-    }
-
-    SaveCommandTimestamp(item.cmd.empty() ? rawBuf : item.cmd);
-
-    SyncNativeAdminCheckbox(state, wantAdmin);
-    if (state->hCombo) EnableWindow(state->hCombo, TRUE);
-    if (state->hOrigEdit) EnableWindow(state->hOrigEdit, TRUE);
-    SyncInputToNativeCombo(state, rawBuf);
-    if (state->hCombo) {
-        int comboId = GetDlgCtrlID(state->hCombo);
-        SendMessageW(state->hDlg, WM_COMMAND, MAKEWPARAM(comboId, CBN_EDITCHANGE), (LPARAM)state->hCombo);
-        SendMessageW(state->hDlg, WM_COMMAND, MAKEWPARAM(comboId, CBN_EDITUPDATE), (LPARAM)state->hCombo);
-    }
-
-    HWND hDlg = state->hDlg;
-    HWND hOk = state->hOkBtn ? state->hOkBtn : GetDlgItem(hDlg, IDOK);
-    if (hOk) EnableWindow(hOk, TRUE);
-
-    SendMessageW(hDlg, WM_COMMAND, MAKEWPARAM(IDOK, BN_CLICKED), (LPARAM)hOk);
-
-    if (IsWindow(hDlg)) {
-        if (!IsWindowVisible(hDlg) && !IsIconic(hDlg)) {
-            HWND expected = hDlg;
-            g_hActiveRunDlg.compare_exchange_strong(expected, nullptr);
-            EndDialog(hDlg, IDOK);
-            PostMessageW(hDlg, WM_NULL, 0, 0);
-        } else if (g_hActiveRunDlg.load() == hDlg) {
-            state->isTriggeringRun = false;
-            SyncNativeAdminCheckbox(state, state->settings.runAsAdmin);
-            if (state->pendingUninit || g_unloading.load()) {
-                return;
-            }
-        }
-    }
+void ExecuteHistoryOrSuggestionItem(RunDialogState* state, const HistoryItem& item,
+                                    RunEnterAction action = RunEnterAction::Normal) {
+    RunLaunchScope launch(state);
+    if (launch) ExecuteRunItem(state, item, action);
 }
 
 void ExecuteCommandImmediate(RunDialogState* state, const std::wstring& rawCommand, RunEnterAction action) {
-    HistoryItem tempItem;
-    tempItem.cmd = rawCommand;
-    tempItem.execTarget = rawCommand;
-    ExecuteHistoryOrSuggestionItem(state, tempItem, action);
+    HistoryItem item;
+    item.cmd = rawCommand;
+    ExecuteHistoryOrSuggestionItem(state, item, action);
 }
 
 void TriggerRunCommand(RunDialogState* state, RunEnterAction action = RunEnterAction::Normal) {
-    if (!state || !state->hDlg || state->isTriggeringRun) return;
+    RunLaunchScope launch(state);
+    if (!launch) return;
 
-    if (state->hModernEdit) {
-        HIMC hImc = ImmGetContext(state->hModernEdit);
-        if (hImc) {
-            ImmNotifyIME(hImc, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
-            ImmReleaseContext(state->hModernEdit, hImc);
+    const HWND edit = state->hModernEdit;
+    if (edit) {
+        if (HIMC composition = ImmGetContext(edit)) {
+            ImmNotifyIME(composition, NI_COMPOSITIONSTR, CPS_COMPLETE, 0);
+            ImmReleaseContext(edit, composition);
         }
     }
+    if (!CanContinueRunDialog(state)) return;
 
-    const auto& activeRows = GetActiveRowItems(state);
-    if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < (int)activeRows.size()) {
-        HistoryItem chosen = activeRows[state->selectedRow];
-        ExecuteHistoryOrSuggestionItem(state, chosen, action);
-        return;
+    const auto& rows = GetActiveRowItems(state);
+    HistoryItem item;
+    if (state->showingSuggestions && state->selectedRow >= 0 && state->selectedRow < static_cast<int>(rows.size())) {
+        item = rows[state->selectedRow];
+    } else {
+        item.cmd = GetEffectiveInputText(edit);
     }
-
-    std::wstring effectiveText = GetEffectiveInputText(state->hModernEdit);
-    ExecuteCommandImmediate(state, effectiveText, action);
+    if (CanContinueRunDialog(state)) ExecuteRunItem(state, item, action);
 }
 
 bool ResolveDialogLightContrast(const RunDialogState* state) {
@@ -9219,7 +9280,7 @@ void LoadHistoryItems(RunDialogState* state) {
         int count = (int)SendMessageW(state->hCombo, CB_GETCOUNT, 0, 0);
         for (int i = 0; i < count && (int)state->history.size() < maxItems; ++i) {
             int len = (int)SendMessageW(state->hCombo, CB_GETLBTEXTLEN, i, 0);
-            if (len > 0 && len < MAX_PATH) {
+            if (len > 0 && static_cast<size_t>(len) <= kMaxRunTextLength) {
                 std::wstring text(len + 1, L'\0');
                 SendMessageW(state->hCombo, CB_GETLBTEXT, i, (LPARAM)text.data());
                 text.resize(wcslen(text.c_str()));
@@ -9238,15 +9299,14 @@ void LoadHistoryItems(RunDialogState* state) {
             if (RegGetValueW(hKey, nullptr, L"MRUList", RRF_RT_REG_SZ, nullptr, mruList, &cbList) == ERROR_SUCCESS) {
                 for (int i = 0; mruList[i] != L'\0' && (int)state->history.size() < maxItems; ++i) {
                     wchar_t valName[2] = { mruList[i], L'\0' };
-                    wchar_t cmdBuf[MAX_PATH] = {};
-                    DWORD cbCmd = sizeof(cmdBuf);
-                    if (RegGetValueW(hKey, nullptr, valName, RRF_RT_REG_SZ, nullptr, cmdBuf, &cbCmd) == ERROR_SUCCESS) {
-                        size_t len = wcslen(cmdBuf);
-                        if (len >= 2 && cmdBuf[len - 2] == L'\\' && cmdBuf[len - 1] == L'1') {
-                            cmdBuf[len - 2] = L'\0';
-                        }
-                        addUniqueCommand(cmdBuf, true);
-                    }
+                    DWORD bytes = 0;
+                    if (RegGetValueW(hKey, nullptr, valName, RRF_RT_REG_SZ, nullptr, nullptr, &bytes) != ERROR_SUCCESS ||
+                        bytes < sizeof(wchar_t) || bytes > (kMaxRunTextLength + 3) * sizeof(wchar_t)) continue;
+                    std::wstring command(bytes / sizeof(wchar_t), L'\0');
+                    if (RegGetValueW(hKey, nullptr, valName, RRF_RT_REG_SZ, nullptr, command.data(), &bytes) != ERROR_SUCCESS) continue;
+                    command.resize(wcslen(command.c_str()));
+                    if (command.ends_with(L"\\1")) command.resize(command.size() - 2);
+                    addUniqueCommand(command, true);
                 }
             }
             RegCloseKey(hKey);
@@ -11279,7 +11339,7 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 53)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 55)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -13265,6 +13325,13 @@ static LRESULT CALLBACK CommandEditorWndProc(HWND hWnd, UINT uMsg, WPARAM wParam
                     SetFocus(name.empty() ? s->name : s->target);
                     return 0;
                 }
+                if (name.size() > kMaxRunTextLength || target.size() > kMaxRunTextLength) {
+                    wchar_t error[512]{};
+                    FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                   nullptr, ERROR_FILENAME_EXCED_RANGE, 0, error, ARRAYSIZE(error), nullptr);
+                    MessageBoxW(hWnd, error, s->editIndex >= 0 ? s->strings.edit : s->strings.newAlias, MB_OK | MB_ICONERROR);
+                    return 0;
+                }
                 if (s->editIndex >= 0) {
                     for (size_t i = 0; i < s->commands.size(); ++i) {
                         if (i != static_cast<size_t>(s->editIndex) &&
@@ -14537,6 +14604,8 @@ void UpdateRunElevationPreview(RunDialogState* state, RunEnterAction action) {
 LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                         UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
     auto* state = reinterpret_cast<RunDialogState*>(dwRefData);
+    RunDialogCallback callback(state);
+    if (!state || state->detached) return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 
     if (uMsg == WM_GETDLGCODE) {
         return DLGC_WANTALLKEYS | DLGC_WANTCHARS | DLGC_WANTARROWS | DLGC_HASSETSEL;
@@ -14661,7 +14730,7 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     // Let RICHEDIT50W / TSF process all keystrokes, Vietnamese Telex/VNI compositions, and Space 100% natively!
     LRESULT res = DefSubclassProc(hWnd, uMsg, wParam, lParam);
 
-    if (state) {
+    if (CanContinueRunDialog(state)) {
         if (uMsg == WM_IME_COMPOSITION || uMsg == WM_IME_ENDCOMPOSITION || uMsg == WM_IME_CHAR ||
             uMsg == WM_CHAR || uMsg == WM_PASTE || uMsg == WM_CUT || uMsg == WM_SETTEXT) {
             ScheduleDeferredInputUpdate(state);
@@ -14673,6 +14742,7 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
     if (uMsg == WM_NCDESTROY) {
         RemoveWindowSubclass(hWnd, ModernEditSubclassProc, uIdSubclass);
+        if (state->hModernEdit == hWnd) state->hModernEdit = nullptr;
     }
     return res;
 }
@@ -14680,96 +14750,87 @@ LRESULT CALLBACK ModernEditSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
                                     UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
 
-void CleanupDialogState(HWND hWnd, RunDialogState* state) {
+void DetachDialogState(HWND hWnd, RunDialogState* state, bool restoreIcons) {
+    if (!state || state->detached) return;
+    state->detached = true;
     RemoveWindowSubclass(hWnd, RunDlgSubclassProc, 1);
-    if (state && state->taskbarButtonManuallyAdded) SetRunTaskbarButtonVisible(state, false);
-    if (state) FinishSettingsOpenRequest(state);
+    if (const HWND edit = std::exchange(state->hModernEdit, nullptr); edit && GetParent(edit) == hWnd) {
+        RemoveWindowSubclass(edit, ModernEditSubclassProc, 1);
+        DestroyWindow(edit);
+    }
+    if (const HWND tooltip = std::exchange(state->hAdminTooltip, nullptr)) DestroyWindow(tooltip);
+    if (state->taskbarButtonManuallyAdded) SetRunTaskbarButtonVisible(state, false);
+    FinishSettingsOpenRequest(state);
     CloseActiveGearMenu();
     KillTimer(hWnd, kTimerCaret);
     KillTimer(hWnd, kTimerLuminance);
     KillTimer(hWnd, kTimerBgMedia);
     HWND expectedActive = hWnd;
     g_hActiveRunDlg.compare_exchange_strong(expectedActive, nullptr);
-    HWND expectedTracked = hWnd;
-    g_hTrackedRunDlg.compare_exchange_strong(expectedTracked, nullptr);
     g_isBrowsingFile.store(false);
-    ReleaseBackdropSnapshot();
     KillTimer(hWnd, kTimerOpenAnim);
     RemovePropW(hWnd, L"WindhawkModernRunState");
     RemovePropW(hWnd, L"WindhawkModernRunApplied");
-    RemovePropW(hWnd, L"WindhawkOrigShellDlgProc");
-
-    if (state) {
-        ReleaseCustomBackgroundMedia(state);
-        if (state->hAdminTooltip) {
-            DestroyWindow(state->hAdminTooltip);
-            state->hAdminTooltip = nullptr;
-        }
-        if (state->hModernEdit && IsWindow(state->hModernEdit)) {
-            RemoveWindowSubclass(state->hModernEdit, ModernEditSubclassProc, 1);
-            DestroyWindow(state->hModernEdit);
-            state->hModernEdit = nullptr;
-        }
-        for (auto& item : state->history) {
-            if (item.hIcon && item.ownsIcon) DestroyIcon(item.hIcon);
-        }
-        state->history.clear();
-        ClearSuggestionItems(state->suggestions);
-        if (state->hFontEditCtl) {
-            DeleteObject(state->hFontEditCtl);
-            state->hFontEditCtl = nullptr;
-        }
-        if (state->pCachedRT) {
-            state->pCachedRT->Release();
-            state->pCachedRT = nullptr;
-        }
-        if (state->hCachedMemDC) {
-            if (state->hOldCachedBmp) {
-                SelectObject(state->hCachedMemDC, state->hOldCachedBmp);
-                state->hOldCachedBmp = nullptr;
-            }
-            if (state->hCachedBmp) {
-                DeleteObject(state->hCachedBmp);
-                state->hCachedBmp = nullptr;
-            }
-            DeleteDC(state->hCachedMemDC);
-            state->hCachedMemDC = nullptr;
-        }
-        state->cachedDibPixels = nullptr;
-        if (hWnd && IsWindow(hWnd)) {
-            g_internalIconChange = true;
-            ApplyWindowTaskbarIconIdentity(hWnd, true);
-            SendMessageW(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(state->hOrigIconSmall));
-            SendMessageW(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(state->hOrigIconBig));
-            g_internalIconChange = false;
-        }
-        if (state->hTaskbarIconSmall) {
-            DestroyIcon(state->hTaskbarIconSmall);
-            state->hTaskbarIconSmall = nullptr;
-        }
-        if (state->hTaskbarIconBig) {
-            DestroyIcon(state->hTaskbarIconBig);
-            state->hTaskbarIconBig = nullptr;
-        }
-        if (state->hRunIcon) {
-            DestroyIcon(state->hRunIcon);
-            state->hRunIcon = nullptr;
-        }
-        delete state;
+    if (restoreIcons && IsWindow(hWnd)) {
+        g_internalIconChange = true;
+        ApplyWindowTaskbarIconIdentity(hWnd, true);
+        SendMessageW(hWnd, WM_SETICON, ICON_SMALL, reinterpret_cast<LPARAM>(state->hOrigIconSmall));
+        SendMessageW(hWnd, WM_SETICON, ICON_BIG, reinterpret_cast<LPARAM>(state->hOrigIconBig));
+        g_internalIconChange = false;
     }
+    HWND expectedTracked = hWnd;
+    g_hTrackedRunDlg.compare_exchange_strong(expectedTracked, nullptr);
+    state->hDlg = nullptr;
+}
 
-    g_dialogSubclassInstalled.store(false, std::memory_order_release);
+void ReleaseDialogState(RunDialogState* state) {
+    ReleaseBackdropSnapshot();
+    ReleaseCustomBackgroundMedia(state);
+    for (auto& item : state->history) {
+        if (item.hIcon && item.ownsIcon) DestroyIcon(item.hIcon);
+    }
+    state->history.clear();
+    ClearSuggestionItems(state->suggestions);
+    if (state->hFontEditCtl) {
+        DeleteObject(state->hFontEditCtl);
+        state->hFontEditCtl = nullptr;
+    }
+    if (state->pCachedRT) {
+        state->pCachedRT->Release();
+        state->pCachedRT = nullptr;
+    }
+    if (state->hCachedMemDC) {
+        if (state->hOldCachedBmp) {
+            SelectObject(state->hCachedMemDC, state->hOldCachedBmp);
+            state->hOldCachedBmp = nullptr;
+        }
+        if (state->hCachedBmp) {
+            DeleteObject(state->hCachedBmp);
+            state->hCachedBmp = nullptr;
+        }
+        DeleteDC(state->hCachedMemDC);
+        state->hCachedMemDC = nullptr;
+    }
+    state->cachedDibPixels = nullptr;
+    if (state->hTaskbarIconSmall) {
+        DestroyIcon(state->hTaskbarIconSmall);
+        state->hTaskbarIconSmall = nullptr;
+    }
+    if (state->hTaskbarIconBig) {
+        DestroyIcon(state->hTaskbarIconBig);
+        state->hTaskbarIconBig = nullptr;
+    }
+    if (state->hRunIcon) {
+        DestroyIcon(state->hRunIcon);
+        state->hRunIcon = nullptr;
+    }
+    delete state;
 }
 
 void PerformDialogUninit(HWND hWnd, RunDialogState* state) {
     DisableWindowDwmTransitions(hWnd);
     SetWindowDwmCloak(hWnd, true);
-    RemoveWindowSubclass(hWnd, RunDlgSubclassProc, 1);
-    auto origProc = reinterpret_cast<DLGPROC>(GetPropW(hWnd, L"WindhawkOrigShellDlgProc"));
-    if (origProc) {
-        SetWindowLongPtrW(hWnd, DWLP_DLGPROC, reinterpret_cast<LONG_PTR>(origProc));
-    }
-    CleanupDialogState(hWnd, state);
+    DetachDialogState(hWnd, state, true);
     if (IsWindow(hWnd)) {
         EndDialog(hWnd, IDCANCEL);
         PostMessageW(hWnd, WM_CLOSE, 0, 0);
@@ -15720,12 +15781,12 @@ bool RenderDialogToCachedBitmap(HWND hWnd, RunDialogState* state, int w, int h) 
             return false;
 }
 
-void PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, int overrideX, int overrideY) {
-    if (!state || !hWnd || !IsWindow(hWnd) || IsIconic(hWnd) || state->isPresenting) return;
+bool PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, int overrideX, int overrideY) {
+    if (!state || state->detached || !hWnd || !IsWindow(hWnd) || IsIconic(hWnd) || state->isPresenting) return false;
 
     int w = GetDlgWidth(state);
     int h = state->totalHeight;
-    if (w <= 0 || h <= 0) return;
+    if (w <= 0 || h <= 0) return false;
 
     state->isPresenting = true;
     struct PresentScopeReset {
@@ -15742,9 +15803,10 @@ void PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, 
                       !state->cachedDibPixels || state->cachedDibW != w || state->cachedDibH != h;
     if (needRender) {
         if (!RenderDialogToCachedBitmap(hWnd, state, w, h)) {
-            return;
+            return false;
         }
     }
+    if (state->detached) return false;
 
     if (state->useLayeredPresentation) {
         LONG_PTR exStyle = GetWindowLongPtrW(hWnd, GWL_EXSTYLE);
@@ -15757,18 +15819,18 @@ void PresentDialogWindow(HWND hWnd, RunDialogState* state, bool redrawContents, 
         SIZE szWnd = { w, h };
         POINT ptSrc = { 0, 0 };
         BLENDFUNCTION bf = { AC_SRC_OVER, 0, alphaByte, AC_SRC_ALPHA };
-        UpdateLayeredWindow(hWnd, nullptr, &ptDst, &szWnd, state->hCachedMemDC, &ptSrc, 0, &bf, ULW_ALPHA);
-        // Never fall back to BitBlt on a layered window: blitting premultiplied transparent black (0x00000000)
-        // directly to a window DC flashes a solid black rectangle on open/close!
-        return;
+        // Blitting premultiplied pixels directly would flash a black rectangle.
+        return UpdateLayeredWindow(hWnd, nullptr, &ptDst, &szWnd, state->hCachedMemDC, &ptSrc, 0, &bf, ULW_ALPHA) != FALSE;
     }
 
     // Defensive fallback if layered presentation is disabled
     HDC hdc = GetDC(hWnd);
     if (hdc) {
-        BitBlt(hdc, 0, 0, w, h, state->hCachedMemDC, 0, 0, SRCCOPY);
+        const BOOL presented = BitBlt(hdc, 0, 0, w, h, state->hCachedMemDC, 0, 0, SRCCOPY);
         ReleaseDC(hWnd, hdc);
+        return presented != FALSE;
     }
+    return false;
 }
 
 void UpdateAdminIndicatorTooltip(RunDialogState* state) {
@@ -15813,8 +15875,10 @@ void RefreshDialogVisual(HWND hWnd, RunDialogState* state, bool redrawContents) 
 }
 
 LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam,
-                                    UINT_PTR uIdSubclass, DWORD_PTR dwRefData) {
+                                    UINT_PTR, DWORD_PTR dwRefData) {
     auto* state = reinterpret_cast<RunDialogState*>(dwRefData);
+    RunDialogCallback callback(state);
+    if (!state || state->detached) return DefSubclassProc(hWnd, uMsg, wParam, lParam);
 
     if (g_msgTaskbarButtonCreated && uMsg == g_msgTaskbarButtonCreated &&
         state && state->settings.taskbarIconMode == TaskbarIconMode::Hidden) {
@@ -15822,11 +15886,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
     }
 
     if (uMsg == g_msgUninit && g_msgUninit != 0) {
-        if (!state) {
-            g_dialogSubclassInstalled.store(false, std::memory_order_release);
-            return 1;
-        }
-        if (state->isBrowsingFile || state->isTriggeringRun) {
+        if (state->callbackDepth > 1) {
             state->pendingUninit = true;
             CloseActiveGearMenu();
             HWND hPopup = GetWindow(hWnd, GW_ENABLEDPOPUP);
@@ -16141,7 +16201,8 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 }
                 return 0;
             }
-            if (LOWORD(wParam) == IDOK && state && !state->isTriggeringRun) {
+            if (LOWORD(wParam) == IDOK) {
+                if (std::exchange(state->forwardNativeOk, false)) break;
                 TriggerRunCommand(state);
                 return 0;
             }
@@ -16168,7 +16229,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                 CloseActiveGearMenu();
                 UpdateRunElevationPreview(state, RunEnterAction::Normal);
                 if (state && state->settings.closeOnClickOutside &&
-                    IsWindowVisible(hWnd) && !IsIconic(hWnd) && !state->isTriggeringRun &&
+                    IsWindowVisible(hWnd) && !IsIconic(hWnd) && !state->launching &&
                     (!state->isBrowsingFile || g_hActiveGearMenu.load() != nullptr)) {
                     if (GetTickCount64() - g_openTick.load() > 300) {
                         CloseRunDialog(hWnd);
@@ -16566,12 +16627,13 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
             if (state->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent) {
                 nativeCommand = RunWindowsFluentMenu(hWnd, state->isLightMode, state->settings.iconSet, ctxItems, ptScreen);
             }
-            UINT cmd = nativeCommand ? *nativeCommand
-                                     : RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
+            UINT cmd = nativeCommand.value_or(0);
+            if (!nativeCommand && CanContinueRunDialog(state)) {
+                cmd = RunFluentPopupMenu(state, std::move(ctxItems), ptScreen);
+            }
             g_isBrowsingFile.store(false);
-            if (!IsWindow(hWnd) || g_hActiveRunDlg.load() != hWnd) return 0;
             state->isBrowsingFile = false;
-            if (state->pendingUninit || g_unloading.load()) return 0;
+            if (!CanContinueRunDialog(state) || g_hActiveRunDlg.load() != hWnd) return 0;
 
             if (cmd >= kHiddenActionMenuBase &&
                 cmd < kHiddenActionMenuBase + static_cast<UINT>(kRunActionCount)) {
@@ -16636,8 +16698,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
         }
 
         case WM_NCDESTROY: {
-            RemoveWindowSubclass(hWnd, RunDlgSubclassProc, uIdSubclass);
-            CleanupDialogState(hWnd, state);
+            DetachDialogState(hWnd, state, false);
             break;
         }
     }
@@ -16678,15 +16739,50 @@ bool EnsureGraphicsAndIconsInitialized() {
     return true;
 }
 
-void TransformRunDialog(HWND hDlg) {
-    if (g_unloading.load()) return;
-    if (!hDlg || !IsWindow(hDlg)) return;
-    if (GetPropW(hDlg, L"WindhawkModernRunApplied")) return;
-    SetPropW(hDlg, L"WindhawkModernRunApplied", (HANDLE)1);
+static bool PrepareRunDialogAttachment(RunDialogState* state) {
+    const HWND dialog = state->hDlg;
+    static HMODULE richEditModule = LoadLibraryW(L"msftedit.dll");
+    const auto createInput = [&](const wchar_t* className) {
+        return CreateWindowExW(0, className, L"",
+            WS_CHILD | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,
+            -32000, -32000, DpiScale(800, state->dpi), DpiScale(28, state->dpi),
+            dialog, reinterpret_cast<HMENU>(static_cast<INT_PTR>(kModernEditId)),
+            GetModuleHandleW(nullptr), nullptr);
+    };
 
-    EnsureGraphicsAndIconsInitialized();
+    if (richEditModule) state->hModernEdit = createInput(L"RICHEDIT50W");
+    if (state->hModernEdit) {
+        SendMessageW(state->hModernEdit, WM_USER + 89 /*EM_SETTEXTMODE*/, 1 | 32, 0);
+        SendMessageW(state->hModernEdit, WM_USER + 69 /*EM_SETEVENTMASK*/, 0, 0x00000001 /*ENM_CHANGE*/);
+    } else {
+        state->hModernEdit = createInput(L"EDIT");
+    }
+    if (!state->hModernEdit) return false;
 
-    auto* state = new RunDialogState();
+    const auto ref = reinterpret_cast<DWORD_PTR>(state);
+    if (SetWindowSubclass(state->hModernEdit, ModernEditSubclassProc, 1, ref) &&
+        SetPropW(dialog, L"WindhawkModernRunApplied", reinterpret_cast<HANDLE>(1)) &&
+        SetPropW(dialog, L"WindhawkModernRunState", reinterpret_cast<HANDLE>(state)) &&
+        SetWindowSubclass(dialog, RunDlgSubclassProc, 1, ref)) {
+        return true;
+    }
+
+    RemovePropW(dialog, L"WindhawkModernRunState");
+    RemovePropW(dialog, L"WindhawkModernRunApplied");
+    RemoveWindowSubclass(state->hModernEdit, ModernEditSubclassProc, 1);
+    DestroyWindow(state->hModernEdit);
+    state->hModernEdit = nullptr;
+    return false;
+}
+
+bool TransformRunDialog(HWND hDlg) {
+    RunDialogCallback entry;
+    if (g_unloading.load() || g_runCallbacksInFlight.load() != 1 || g_hTrackedRunDlg.load()) return false;
+    if (!hDlg || !IsWindow(hDlg) || GetPropW(hDlg, L"WindhawkModernRunApplied")) return false;
+    if (!EnsureGraphicsAndIconsInitialized()) return false;
+
+    auto preparedState = std::make_unique<RunDialogState>();
+    auto* state = preparedState.get();
     state->hDlg = hDlg;
     state->dpi  = GetDpiForWindow(hDlg);
     if (state->dpi == 0) state->dpi = 96;
@@ -16697,6 +16793,18 @@ void TransformRunDialog(HWND hDlg) {
         std::lock_guard<std::mutex> lock(g_settingsMutex);
         state->settings = g_settings;
         state->i18n = g_i18n;
+    }
+
+    state->hOrigIconSmall = reinterpret_cast<HICON>(SendMessageW(hDlg, WM_GETICON, ICON_SMALL, 0));
+    state->hOrigIconBig = reinterpret_cast<HICON>(SendMessageW(hDlg, WM_GETICON, ICON_BIG, 0));
+    if (g_unloading.load() || !PrepareRunDialogAttachment(state)) return false;
+
+    preparedState.release();
+    RunDialogCallback callback(state);
+    g_hTrackedRunDlg.store(hDlg);
+    if (!CanContinueRunDialog(state)) {
+        DetachDialogState(hDlg, state, false);
+        return false;
     }
 
     DisableWindowDwmTransitions(hDlg);
@@ -16725,6 +16833,7 @@ void TransformRunDialog(HWND hDlg) {
     SetWindowLongPtrW(hDlg, GWL_EXSTYLE, exStyle | WS_EX_LAYERED);
 
     for (HWND hChild = GetWindow(hDlg, GW_CHILD); hChild != nullptr; hChild = GetWindow(hChild, GW_HWNDNEXT)) {
+        if (hChild == state->hModernEdit) continue;
         wchar_t cls[64] = {};
         GetClassNameW(hChild, cls, ARRAYSIZE(cls));
         int id = GetDlgCtrlID(hChild);
@@ -16784,12 +16893,6 @@ void TransformRunDialog(HWND hDlg) {
         g_internalActivation = false;
     }
 
-    state->hOrigIconSmall      = reinterpret_cast<HICON>(SendMessageW(hDlg, WM_GETICON, ICON_SMALL, 0));
-    state->hOrigIconBig        = reinterpret_cast<HICON>(SendMessageW(hDlg, WM_GETICON, ICON_BIG, 0));
-
-    g_hTrackedRunDlg.store(hDlg);
-    g_dialogSubclassInstalled.store(true, std::memory_order_release);
-    SetWindowSubclass(hDlg, RunDlgSubclassProc, 1, (DWORD_PTR)state);
     if (g_msgTaskbarButtonCreated && g_isTaskManagerProcess) {
         ChangeWindowMessageFilterEx(hDlg, g_msgTaskbarButtonCreated, MSGFLT_ALLOW, nullptr);
     }
@@ -16802,8 +16905,6 @@ void TransformRunDialog(HWND hDlg) {
     UpdateDialogEditFont(state);
     RecomputeDialogMetrics(state);
     ReloadCustomBackgroundMedia(state, false);
-
-    SetPropW(hDlg, L"WindhawkModernRunState", reinterpret_cast<HANDLE>(state));
 
     int dlgW = GetDlgWidth(state);
     int newX = 100;
@@ -16842,44 +16943,21 @@ void TransformRunDialog(HWND hDlg) {
 
     ApplyWindowAppearance(hDlg, state);
 
-    // Use Windows RichEdit50W (MSFTEDIT_CLASS from msftedit.dll) off-screen at (-32000, -32000):
-    // RichEdit50W implements native Windows 11 TSF (ITextStoreACP) inline Vietnamese composition
-    // so built-in Windows Vietnamese Telex/VNI never opens a legacy white box, never jumps/shifts
-    // characters across multiple words, and commits Space in 0.0ms!
-    static HMODULE s_hMsftEdit = LoadLibraryW(L"msftedit.dll");
-    (void)s_hMsftEdit;
-    state->hModernEdit = CreateWindowExW(
-        0, L"RICHEDIT50W", L"",
-        WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,
-        -32000, -32000, DpiScale(800, state->dpi), DpiScale(28, state->dpi),
-        hDlg, (HMENU)(INT_PTR)kModernEditId, GetModuleHandleW(nullptr), nullptr
-    );
-    if (state->hModernEdit) {
-        // TM_PLAINTEXT (1) | TM_MULTICODEPAGE (32), and ENM_CHANGE (1) so EN_CHANGE fires on every edit
-        SendMessageW(state->hModernEdit, WM_USER + 89 /*EM_SETTEXTMODE*/, 1 | 32, 0);
-        SendMessageW(state->hModernEdit, WM_USER + 69 /*EM_SETEVENTMASK*/, 0, 0x00000001 /*ENM_CHANGE*/);
-    } else {
-        state->hModernEdit = CreateWindowExW(
-            0, L"EDIT", L"",
-            WS_CHILD | WS_VISIBLE | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,
-            -32000, -32000, DpiScale(800, state->dpi), DpiScale(28, state->dpi),
-            hDlg, (HMENU)(INT_PTR)kModernEditId, GetModuleHandleW(nullptr), nullptr
-        );
+    if (!CanContinueRunDialog(state)) {
+        if (!state->detached) PerformDialogUninit(hDlg, state);
+        return true;
     }
 
-    // App catalog is populated lazily on first keystroke under g_catalogMutex (no detached warmup thread)
-
     if (state->hModernEdit) {
-        SendMessageW(state->hModernEdit, EM_SETLIMITTEXT, 65535, 0);
+        SendMessageW(state->hModernEdit, EM_SETLIMITTEXT, kMaxRunTextLength, 0);
         SendMessageW(state->hModernEdit, WM_SETFONT, (WPARAM)state->hFontEditCtl, FALSE);
 
         state->suppressSuggestionUpdate = true;
         if (state->settings.clearInitialInput) {
             SetWindowTextW(state->hModernEdit, L"");
         } else if (state->hCombo) {
-            wchar_t initBuf[MAX_PATH] = {};
-            GetWindowTextW(state->hCombo, initBuf, MAX_PATH);
-            SetWindowTextW(state->hModernEdit, initBuf);
+            const auto initialText = GetEffectiveInputText(state->hOrigEdit ? state->hOrigEdit : state->hCombo);
+            SetWindowTextW(state->hModernEdit, initialText.c_str());
             SendMessageW(state->hModernEdit, EM_SETSEL, 0, -1);
         } else if (!state->history.empty()) {
             const std::wstring& latestCmd = state->history.front().cmd;
@@ -16887,7 +16965,7 @@ void TransformRunDialog(HWND hDlg) {
             SendMessageW(state->hModernEdit, EM_SETSEL, 0, -1);
         }
         state->suppressSuggestionUpdate = false;
-        SetWindowSubclass(state->hModernEdit, ModernEditSubclassProc, 1, (DWORD_PTR)state);
+        ShowWindow(state->hModernEdit, SW_SHOWNA);
     }
 
     SetTimer(hDlg, kTimerCaret, 530, nullptr);
@@ -16906,7 +16984,11 @@ void TransformRunDialog(HWND hDlg) {
     state->isInternalMove = false;
 
     // 2. Upload the per-pixel alpha surface to the finalized geometry BEFORE showing
-    PresentDialogWindow(hDlg, state, true, state->renderX, state->renderY);
+    const bool firstFrame = PresentDialogWindow(hDlg, state, true, state->renderX, state->renderY);
+    if (!firstFrame || !CanContinueRunDialog(state)) {
+        if (!state->detached) PerformDialogUninit(hDlg, state);
+        return true;
+    }
 
     // 3. Show while still cloaked, re-commit layered surface so DWM has a valid frame, then uncloak cleanly
     g_internalActivation = true;
@@ -16916,7 +16998,10 @@ void TransformRunDialog(HWND hDlg) {
         ShowWindow(hDlg, SW_SHOW);
     }
     g_internalActivation = false;
-    PresentDialogWindow(hDlg, state, false, state->renderX, state->renderY);
+    if (!CanContinueRunDialog(state) || !PresentDialogWindow(hDlg, state, false, state->renderX, state->renderY)) {
+        if (!state->detached) PerformDialogUninit(hDlg, state);
+        return true;
+    }
     SetWindowDwmCloak(hDlg, false);
     NotifyTaskbarRedrawWindowIcon(hDlg);
 
@@ -16926,7 +17011,6 @@ void TransformRunDialog(HWND hDlg) {
     g_isBrowsingFile.store(false);
     g_dlgIsForeground.store(true);
     g_deactivatedByTaskbarTick.store(0);
-    g_hTrackedRunDlg.store(hDlg);
     g_hActiveRunDlg.store(hDlg);
 
     ForceFocusModernEdit(hDlg, state);
@@ -16934,6 +17018,7 @@ void TransformRunDialog(HWND hDlg) {
         PostMessageW(hDlg, WM_NEXTDLGCTL, reinterpret_cast<WPARAM>(state->hModernEdit), TRUE);
     }
     RefreshDialogVisual(hDlg, state);
+    return true;
 }
 
 // --- Zero-Hang Non-Blocking Run Dialog Interception (Safe for Mod Update / Reload / Uninit) ---
@@ -16989,8 +17074,7 @@ BOOL WINAPI ShowWindow_Hook(HWND hWnd, int nCmdShow) {
         (GetWindowLongW(hWnd, GWL_STYLE) & WS_CHILD) == 0 &&
         !GetPropW(hWnd, L"WindhawkModernRunApplied") &&
         IsRunDialogWindow(hWnd)) {
-        TransformRunDialog(hWnd);
-        return TRUE;
+        if (TransformRunDialog(hWnd)) return TRUE;
     }
     if (!g_internalActivation && hActive && hWnd == hActive) {
         if (nCmdShow == SW_MINIMIZE || nCmdShow == SW_SHOWMINIMIZED || nCmdShow == SW_FORCEMINIMIZE) {
@@ -17095,25 +17179,20 @@ void ReleaseGlobalResources() {
 }
 
 void WaitUntilDialogSubclassRemoved() {
-    HWND hDlg = g_hTrackedRunDlg.load();
-    if (!hDlg) hDlg = g_hActiveRunDlg.load();
-    while (g_dialogSubclassInstalled.load(std::memory_order_acquire) && hDlg && IsWindow(hDlg)) {
-        CloseActiveGearMenu();
-        HWND hPopup = GetWindow(hDlg, GW_ENABLEDPOPUP);
-        if (hPopup && hPopup != hDlg && IsWindow(hPopup)) {
-            PostMessageW(hPopup, WM_COMMAND, MAKEWPARAM(IDCANCEL, BN_CLICKED), 0);
-            PostMessageW(hPopup, WM_CLOSE, 0, 0);
-        }
-        DWORD_PTR dwRes = 0;
-        if (SendMessageTimeoutW(hDlg, g_msgUninit, 0, 0, SMTO_NORMAL, 200, &dwRes) && dwRes == 1) {
-            break;
-        }
-        if (!IsWindow(hDlg)) {
-            break;
+    for (;;) {
+        HWND dialog = g_hTrackedRunDlg.load();
+        const auto callbacks = g_runCallbacksInFlight.load();
+        if (!dialog && callbacks == 0) return;
+
+        if (dialog && GetPropW(dialog, L"WindhawkModernRunState")) {
+            CloseActiveGearMenu();
+            DWORD_PTR result = 0;
+            SendMessageTimeoutW(dialog, g_msgUninit, 0, 0, SMTO_NORMAL, 200, &result);
+        } else if (dialog && callbacks == 0) {
+            g_hTrackedRunDlg.compare_exchange_strong(dialog, nullptr);
         }
         Sleep(20);
     }
-    g_dialogSubclassInstalled.store(false, std::memory_order_release);
 }
 
 void StopSettingsHostCleanly() {
@@ -17155,6 +17234,12 @@ BOOL RunDialogModInit() {
     g_unloading.store(false);
     g_glassCpuSupported = DetectGlassCpuSupport();
 
+    g_msgUninit = RegisterWindowMessageW(L"Windhawk_Uninit_" WH_MOD_ID);
+    g_msgToggle = RegisterWindowMessageW(L"Windhawk_Toggle_" WH_MOD_ID);
+    g_msgOpenSettings = RegisterWindowMessageW(L"Windhawk_OpenRunSettings_" WH_MOD_ID);
+    g_msgTaskbarButtonCreated = RegisterWindowMessageW(L"TaskbarButtonCreated");
+    if (!g_msgUninit || !g_msgToggle) return FALSE;
+
     WNDCLASSEXW wc = { sizeof(wc) };
     wc.style = 0;
     wc.lpfnWndProc = FluentMenuWndProc;
@@ -17169,12 +17254,6 @@ BOOL RunDialogModInit() {
     }
 
     LoadSettings(false);
-    g_msgUninit       = RegisterWindowMessageW(L"Windhawk_Uninit_" WH_MOD_ID);
-    g_msgToggle       = RegisterWindowMessageW(L"Windhawk_Toggle_" WH_MOD_ID);
-    g_msgOpenSettings = RegisterWindowMessageW(L"Windhawk_OpenRunSettings_" WH_MOD_ID);
-    g_msgTaskbarButtonCreated = RegisterWindowMessageW(L"TaskbarButtonCreated");
-
-
     WindhawkUtils::SetFunctionHook(ShowWindow, ShowWindow_Hook, &ShowWindow_Orig);
     WindhawkUtils::SetFunctionHook(SetForegroundWindow, SetForegroundWindow_Hook, &SetForegroundWindow_Orig);
     WindhawkUtils::SetFunctionHook(SwitchToThisWindow, SwitchToThisWindow_Hook, &SwitchToThisWindow_Orig);

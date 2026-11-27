@@ -954,6 +954,246 @@ test('the settings window is shown on the first request from a hidden tool proce
     `, true, ['-luser32']);
 });
 
+test('command normalization keeps long arguments, quotes, and UTF-16 pairs', () => {
+    const trim = source.match(/std::wstring TrimCommandString\([^;\n]+\{[\s\S]*?\n\}/)?.[0];
+    assert.ok(trim);
+    compileChecks(String.raw`
+        #include <windows.h>
+        #include <shlwapi.h>
+        #include <algorithm>
+        #include <cassert>
+        #include <string>
+        #include <string_view>
+        ${trim}
+        int main() {
+            const std::wstring prefix = L"\"C:\\Program Files\\App\\app.exe\" \"" +
+                std::wstring(300, L'x') + L"\t";
+            const auto first = prefix + L"\xD83D\xDE00 one\"";
+            const auto second = prefix + L"\xD83D\xDE00 two\"";
+            assert(TrimCommandString(L"  " + first + L" \r\n") == first);
+            assert(TrimCommandString(second) == second);
+            assert(TrimCommandString(first) != TrimCommandString(second));
+            assert(TrimCommandString(L" \t\r\n ").empty());
+        }
+    `, true, ['-lshlwapi']);
+});
+
+test('dialog destruction defers resource release through nested callbacks', () => {
+    const guard = source.match(/class RunDialogCallback \{[\s\S]*?\n\};/)?.[0];
+    const launch = source.match(/class RunLaunchScope \{[\s\S]*?\n\};/)?.[0];
+    const canContinue = source.match(/bool CanContinueRunDialog\([^\n]+\{[\s\S]*?\n\}/)?.[0];
+    assert.ok(guard && launch && canContinue);
+    const callbacks = [...source.matchAll(/reinterpret_cast<RunDialogState\*>\(dwRefData\);\r?\n    RunDialogCallback callback\(state\);/g)];
+    assert.equal(callbacks.length, 2);
+    compileChecks(`
+        #include <atomic>
+        #include <cassert>
+        struct RunDialogState {
+            unsigned callbackDepth = 0;
+            int hDlg = 1;
+            bool detached = false;
+            bool pendingUninit = false;
+            bool launching = false;
+            bool isBrowsingFile = false;
+            bool forwardNativeOk = false;
+        };
+        std::atomic<unsigned> g_runCallbacksInFlight{0};
+        std::atomic<bool> g_unloading{false};
+        std::atomic<bool> g_isBrowsingFile{false};
+        int releases = 0;
+        void ReleaseDialogState(RunDialogState* state) {
+            assert(state->detached && state->callbackDepth == 0);
+            assert(g_runCallbacksInFlight.load() > 0);
+            ++releases;
+        }
+        ${guard}
+        ${canContinue}
+        ${launch}
+        int main() {
+            RunDialogState state;
+            {
+                RunDialogCallback outer(&state);
+                RunLaunchScope execution(&state);
+                assert(execution && state.launching && g_isBrowsingFile.load());
+                RunLaunchScope duplicate(&state);
+                assert(!duplicate);
+                assert(state.callbackDepth == 1);
+                {
+                    RunDialogCallback destroy(&state);
+                    state.detached = true;
+                    state.pendingUninit = true;
+                    assert(state.callbackDepth == 2);
+                    assert(!CanContinueRunDialog(&state));
+                }
+                assert(releases == 0 && g_runCallbacksInFlight.load() == 1);
+            }
+            assert(releases == 1 && g_runCallbacksInFlight.load() == 0);
+            assert(!state.launching && !g_isBrowsingFile.load());
+        }
+    `, true);
+});
+
+test('unload waits for native callbacks and failed attachment falls back to ShowWindow', () => {
+    const transform = source.match(/bool TransformRunDialog\(HWND hDlg\) \{[\s\S]*?\n\}/)?.[0];
+    const wait = source.match(/void WaitUntilDialogSubclassRemoved\(\) \{[\s\S]*?\n\}/)?.[0];
+    assert.ok(transform && wait);
+    assert.match(transform, /if \(!EnsureGraphicsAndIconsInitialized\(\)\) return false;/);
+    const preparation = transform.indexOf('PrepareRunDialogAttachment(');
+    assert.ok(preparation >= 0 && preparation < transform.indexOf('DisableWindowDwmTransitions('));
+    assert.match(wait, /g_runCallbacksInFlight\.load/);
+    assert.match(source, /if \(TransformRunDialog\(hWnd\)\) return TRUE;/);
+});
+
+test('attachment failures remove the prepared edit, its hook and window properties', () => {
+    const prepare = source.match(/static bool PrepareRunDialogAttachment\([^\n]+\{[\s\S]*?\n\}/)?.[0];
+    assert.ok(prepare);
+    compileChecks(`
+        #include <windows.h>
+        #include <commctrl.h>
+        #include <cassert>
+        #include <cwchar>
+        struct RunDialogState { HWND hDlg = reinterpret_cast<HWND>(1); HWND hModernEdit = nullptr; UINT dpi = 96; };
+        constexpr int kModernEditId = 9901;
+        int DpiScale(int amount, UINT) { return amount; }
+        void ModernEditSubclassProc() {}
+        void RunDlgSubclassProc() {}
+        int failedStep = 0;
+        bool editLive = false, editHook = false, parentHook = false, applied = false, property = false;
+        HMODULE LoadLibraryFake(const wchar_t*) { return reinterpret_cast<HMODULE>(1); }
+        HMODULE GetModuleHandleFake(const wchar_t*) { return nullptr; }
+        HWND CreateFake(DWORD, const wchar_t* klass, const wchar_t*, DWORD style, int, int, int, int,
+                        HWND, HMENU, HINSTANCE, void*) {
+            assert((style & WS_VISIBLE) == 0);
+            if (failedStep == 1 || (failedStep == 6 && wcscmp(klass, L"RICHEDIT50W") == 0)) return nullptr;
+            editLive = true;
+            return reinterpret_cast<HWND>(2);
+        }
+        LRESULT SendFake(HWND, UINT, WPARAM, LPARAM) { return 0; }
+        bool SubclassFake(HWND h, void(*)(), UINT_PTR, DWORD_PTR) {
+            const bool edit = h == reinterpret_cast<HWND>(2);
+            if (failedStep == (edit ? 2 : 5)) return false;
+            (edit ? editHook : parentHook) = true;
+            return true;
+        }
+        bool SetPropFake(HWND, const wchar_t* name, HANDLE) {
+            const bool marker = wcscmp(name, L"WindhawkModernRunApplied") == 0;
+            if (failedStep == (marker ? 3 : 4)) return false;
+            (marker ? applied : property) = true;
+            return true;
+        }
+        void RemovePropFake(HWND, const wchar_t* name) {
+            (wcscmp(name, L"WindhawkModernRunApplied") == 0 ? applied : property) = false;
+        }
+        void RemoveSubclassFake(HWND, void(*)(), UINT_PTR) { editHook = false; }
+        void DestroyFake(HWND) { assert(!editHook); editLive = false; }
+        #define LoadLibraryW LoadLibraryFake
+        #define GetModuleHandleW GetModuleHandleFake
+        #define CreateWindowExW CreateFake
+        #define SendMessageW SendFake
+        #define SetWindowSubclass SubclassFake
+        #define SetPropW SetPropFake
+        #define RemovePropW RemovePropFake
+        #define RemoveWindowSubclass RemoveSubclassFake
+        #define DestroyWindow DestroyFake
+        ${prepare}
+        int main() {
+            for (failedStep = 1; failedStep <= 5; ++failedStep) {
+                RunDialogState state;
+                assert(!PrepareRunDialogAttachment(&state));
+                assert(!state.hModernEdit && !editLive && !editHook && !parentHook && !applied && !property);
+            }
+            RunDialogState state;
+            assert(PrepareRunDialogAttachment(&state));
+            assert(state.hModernEdit && editLive && editHook && parentHook && applied && property);
+        }
+    `, true);
+});
+
+test('Windhawk command storage reads the full value with the existing key contract', () => {
+    const limit = source.match(/constexpr size_t kMaxRunTextLength[^\n]+/)?.[0];
+    const read = source.match(/std::wstring ReadStoredRunText\([^\n]+\{[\s\S]*?\n\}/)?.[0];
+    assert.ok(limit && read);
+    compileChecks(`
+        #include <algorithm>
+        #include <cassert>
+        #include <string>
+        #include <iterator>
+        std::wstring saved;
+        size_t Wh_GetStringValue(const wchar_t*, wchar_t* result, size_t chars) {
+            if (saved.size() >= chars) return 0;
+            std::copy(saved.begin(), saved.end(), result);
+            result[saved.size()] = 0;
+            return saved.size();
+        }
+        ${limit}
+        ${read}
+        int main() {
+            for (const size_t chars : {0, 127, 128, 511, 512, 519, 520, 32766, 65535}) {
+                saved.assign(chars, L'X');
+                assert(ReadStoredRunText(L"persistedKey") == saved);
+            }
+        }
+    `, true);
+});
+
+test('the Windows shell receives complete long arguments and expanded locations stay locations', () => {
+    const trim = source.match(/std::wstring TrimCommandString\([^;\n]+\{[\s\S]*?\n\}/)?.[0];
+    const lower = source.match(/std::wstring ToLowerString\([^;\n]+\{[\s\S]*?\n\}/)?.[0];
+    const shell = source.match(/constexpr size_t kMaxNativeRunCommandLength[\s\S]*?(?=bool ResolveCustomAlias)/)?.[0];
+    assert.ok(trim && lower && shell);
+    compileChecks(String.raw`
+        #include <windows.h>
+        #include <objbase.h>
+        #include <shellapi.h>
+        #include <shlwapi.h>
+        #include <algorithm>
+        #include <cassert>
+        #include <cwctype>
+        #include <string>
+        #include <string_view>
+        ${trim}
+        ${lower}
+        std::wstring ResolveRunExecutablePath(const std::wstring&) { return {}; }
+        ${shell}
+        std::wstring ExpectedArgument() {
+            return std::wstring(500, L'x') + L"\t trailing \xD83D\xDE00";
+        }
+        int wmain(int argc, wchar_t** argv) {
+            if (argc > 1) {
+                if (argc != 3 || ExpectedArgument() != argv[2]) return 2;
+                HANDLE event = OpenEventW(EVENT_MODIFY_STATE, FALSE, argv[1]);
+                if (!event) return 3;
+                SetEvent(event);
+                CloseHandle(event);
+                return 0;
+            }
+            const auto apartment = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+            assert(SUCCEEDED(apartment));
+            wchar_t executable[MAX_PATH]{};
+            assert(GetModuleFileNameW(nullptr, executable, MAX_PATH));
+            assert(SetEnvironmentVariableW(L"MODERN_RUN_TEST_LOCATION", L"https://example.invalid/fixture"));
+            const auto location = BuildShellLaunchTarget(L"%MODERN_RUN_TEST_LOCATION%", true);
+            assert(location.isLocation && location.file == L"https://example.invalid/fixture");
+
+            const auto eventName = L"Local\\ModernRunLaunchArguments_" + std::to_wstring(GetCurrentProcessId());
+            HANDLE event = CreateEventW(nullptr, TRUE, FALSE, eventName.c_str());
+            assert(event);
+            const auto input = QuoteExecutable(executable) + L" " + QuoteExecutable(eventName) +
+                               L" " + QuoteExecutable(ExpectedArgument());
+            const auto target = BuildShellLaunchTarget(input, false);
+            assert(target.file == executable && target.arguments.size() > MAX_PATH);
+            assert(ExecuteShellTarget(nullptr, target, false) == ERROR_SUCCESS);
+            assert(WaitForSingleObject(event, 8000) == WAIT_OBJECT_0);
+            CloseHandle(event);
+            assert(ExecuteShellTarget(nullptr, {executable, std::wstring(32767, L'x')}, false) ==
+                   ERROR_FILENAME_EXCED_RANGE);
+            assert(ExecuteShellTarget(nullptr, {L"fixture.cmd", std::wstring(8192, L'x')}, false) ==
+                   ERROR_FILENAME_EXCED_RANGE);
+            CoUninitialize();
+        }
+    `, true, ['-municode', '-lshlwapi', '-lshell32', '-lole32']);
+});
+
 function compileChecks(checks, run = false, libraries = []) {
     const buildRoot = join(process.cwd(), 'Builds/Modern_Run_Dialog_UI');
     mkdirSync(buildRoot, { recursive: true });
