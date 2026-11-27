@@ -1,6 +1,6 @@
 # Modern Run Dialog UI
 
-[English](README.md) · **Tiếng Việt** · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
+[English](README.md) · **Tiếng Việt** · [Русский](README.ru.md)
 
 Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp thoại **Chạy tác vụ mới** trong Trình quản lý Tác vụ bằng cửa sổ có thể tùy chỉnh để mở ứng dụng, tệp và chạy lệnh.
 

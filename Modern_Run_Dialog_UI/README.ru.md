@@ -1,6 +1,6 @@
 # Modern Run Dialog UI
 
-[English](README.md) · [Tiếng Việt](README.vi.md) · **Русский** · [DSN Windhawk Mods](../README.ru.md)
+[English](README.md) · [Tiếng Việt](README.vi.md) · **Русский**
 
 Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R**) и окно запуска новой задачи в Диспетчере задач. В нем можно запускать приложения, открывать файлы и выполнять команды.
 

@@ -1,6 +1,6 @@
 # Modern Run Dialog UI
 
-**English** · [Tiếng Việt](README.vi.md) · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
+**English** · [Tiếng Việt](README.vi.md) · [Русский](README.ru.md)
 
 Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run new task** in Task Manager with a customizable launcher for apps, files, and commands.
 
