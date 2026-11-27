@@ -56,117 +56,51 @@
 /*
 # Modern Run Dialog UI For Windows 10 & 11
 
-> ℹ️ **Compatibility Note (Smart App Control) / Lưu ý tương thích:**
-> - **🌐 English:** Like all Windhawk mods, this mod is compiled locally into an unsigned `.dll` file and loaded into `explorer.exe`. If Windows **Smart App Control** is active on your PC, Windows will block the compiled `.dll` and the mod will not load.
-> - **🇻🇳 Tiếng Việt:** Giống như mọi bản mod trên Windhawk, mod này được biên dịch cục bộ thành tệp `.dll` không có chữ ký số để nạp vào `explorer.exe`. Nếu máy đang bật **Smart App Control (Kiểm soát Ứng dụng Thông minh)**, Windows sẽ chặn tệp `.dll` này khiến mod không thể hoạt động.
+**English** · [Tiếng Việt](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Modern_Run_Dialog_UI/README.vi.md) · [Русский](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/Modern_Run_Dialog_UI/README.ru.md)
 
-![Modern Run Dialog UI Preview (Minimal Mode)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010compact.png)
+Modern Run Dialog UI is a Windhawk mod by caotu2005 for Windows 10 and 11. It replaces the classic **Run** dialog opened with **Win + R** and **Run new task** in Task Manager with a customizable launcher for apps, files, and commands.
 
-*Compact Mini-Pill Mode*
+## Features
 
-![Modern Run Dialog UI Preview (Liquid Glass)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010liquidglass.png)
+### Layouts and appearance
 
-*Liquid Glass mode*
+Choose **Classic**, **Compact Mini-Pill**, or **Fluent**. Classic is the default. Compact Mini-Pill uses icon buttons and starts with history collapsed. Use **↑** to open it. Fluent places actions beside the input and opens history and suggestions above it. The layout, theme, action buttons, and history can be configured independently.
 
-![Modern Run Dialog UI Preview (Windows Blur)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010windowsblur.png)
+| Layout | History open | History closed | Calculator, suggestions, or elevation |
+| --- | --- | --- | --- |
+| **Classic** | [![Classic, Windows 11 Blur, pinned cmd in an open history](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-history.png)<br>Windows 11 Blur | [![Classic, Warm Paper, empty input with history closed](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-idle.png)<br>Warm Paper | [![Classic, Dracula Velvet, calculator result](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-suggestions.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/classic-suggestions.png)<br>Dracula Velvet |
+| **Compact Mini-Pill** | [![Compact Mini-Pill, Nord Frost, pinned cmd in an open history](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-history.png)<br>Nord Frost | [![Compact Mini-Pill, Classic Win11, empty input with history closed](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-idle.png)<br>Classic Win11 | [![Compact Mini-Pill, Emerald Slate, Paint suggestion](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-suggestions.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/pill-suggestions.png)<br>Emerald Slate |
+| **Fluent** | [![Fluent, Catppuccin Mocha, pinned cmd in an open history](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-history.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-history.png)<br>Catppuccin Mocha | [![Fluent, Windows 11 Mica, empty input with history closed](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-idle.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-idle.png)<br>Windows 11 Mica | [![Fluent, Fluent Solid, administrator shield in the input bar](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-elevation.png)](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/fluent-elevation.png)<br>Fluent Solid |
 
-*Windows 11 Blur mode*
+- Choose light or dark mode, window position, width, height, font size, and scale. Adjust background color and opacity, corner radii, and borders. Use a static image or animated GIF up to 25 MB.
+- Hide any action button. Its command stays available in the right-click menu. Choose the icon set and context menu style separately.
 
-![Modern Run Dialog UI Preview (App Suggestions)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010appsuggestion.png)
+### Commands and history
 
-*App & command suggestions*
+- Search for apps and Windows tools as you type. Add custom commands to run programs, open files, or start elevated tasks by short name.
+- Keep up to 50 recent commands, pin or remove entries, and show timestamps in the Windows regional format. Use **↑** and **↓** to select a row, **Tab** to fill the input, and **Enter** to run it.
+- Calculate expressions such as `sqrt(144)` and `2^10` directly in the input. Select the result to copy it to the clipboard and insert it into the field. Enter `google:<query>` to search in the default browser.
 
-![Modern Run Dialog UI Preview (Google Search)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010googlesearch.png)
+### Administrator launch
 
-*Google Search (`google:`)*
+Hold **Ctrl + Shift** to preview the privilege level and press **Enter** to switch it for the current launch. With elevation enabled by default, the same shortcut launches with standard privileges. Choose a separate status panel or an inline shield icon. **Shift + Enter** runs in a terminal by default and can be reassigned to switch privileges. When Task Manager starts an elevated task, its elevation request is honored.
 
-![Modern Run Dialog UI Preview (Menu Mod)](https://raw.githubusercontent.com/caotu2k5/windhawk-mods-resources/main/modernrun/6010appsettings.png)
+## Platforms
 
-*In-App Settings*
+Requires Windows 10 or Windows 11 and [Windhawk](https://windhawk.net/). Run uses Direct2D and DirectWrite, supports inline input through Windows IMEs, including Vietnamese keyboards, and provides 21 interface languages. The mod can be blocked by Windows Smart App Control because Windhawk compiles it locally into an unsigned DLL. The mod needs no shell32 PDB symbols.
 
----
+## Usage
 
-## 🌐 English
+Press **Win + R** or choose **Run new task** in Task Manager. Use **Ctrl + O** to browse for a file, **Ctrl + ,** to open Modern Run Settings, and **Esc** to close Run.
 
-Replaces the classic Win32 **Run (`Win + R`)** and **Task Manager "Create new task"** dialogs with a modern **Direct2D & DirectWrite** launcher (`Segoe UI Variable Text`). Works across **Windows 10** and **Windows 11** (including Insider Canary/Dev `.dll.mui` builds) without requiring `shell32.pdb`.
+![English Modern Run Settings window open to Personalization](https://raw.githubusercontent.com/CTravkin/DSN_Windhawk_Mods/main/Modern_Run_Dialog_UI/Assets/Previews/settings.png)
 
-### What's New & Key Features
+Shared options are also available on the mod’s **Settings** tab in Windhawk. A change there replaces the corresponding in-app setting. In-app changes apply to Run and are stored per user.
 
-- **Dialog Layout (v6.1.0):** Choose Classic, Compact Mini-Pill, or Fluent in the Run settings window or in Windhawk. Fluent puts actions to the right of the input and opens lists above it, with a bottom-left Auto position. Changing the layout keeps your theme, history, and startup input settings.
+## Links
 
-- **Bug Fixes in v6.0.2.0:**
-  - **Fixed Position Anchoring When Typing:** Fixed a bug where the Run dialog could jump or drift from fixed positions (such as **Bottom Left**) when app suggestions expanded or shrank as you typed—especially in **Compact Mini-Pill Mode**. Dialog resizing now atomically preserves the configured anchor and rejects unsolicited external window moves.
-  - **Working Background Opacity on Windows 11 Blur & All Themes:** Wired **Background Opacity (`12–100%`)** so it now visibly adjusts the translucency/tint of **Windows 11 Blur**, **Liquid Glass**, and solid themes even when no custom background image/GIF is selected.
-
-- **Dedicated WinUI 3 Settings Window (Hosted in `windhawk.exe`):**
-  - Clicking the `⚙️` button automatically closes the Run dialog (zero overlap) and opens a standalone **Windows 11 Settings–style** window hosted in a dedicated `windhawk.exe -tool-mod` process rather than `explorer.exe`.
-  - Built end-to-end with Direct2D WinUI 3 controls: grouped SettingsExpander cards, WinUI 3 ComboBox flyouts with vertical accent indicators, a native-style WinUI 3 ColorPicker, and a dedicated **Aliases** manager.
-  - **Settings Precedence:** You can configure options from either the in-app WinUI 3 Settings window or Windhawk's Mod Settings page. Changes from either source take effect immediately; per setting, whichever source you modified most recently wins without resetting your other in-app choices.
-
-- **13 Built-In Themes & Full Visual Customization:**
-  - Defaults to **Windows 11 Blur** (authentic frosted Fluent Acrylic with balanced opacity, crisp `14px` corners, and subtle hairline border for clean readability on any wallpaper), with **Liquid Glass** (refractive 3D glass pill) and 11 more curated themes (**Windows 11 Mica**, **Fluent Solid**, **Classic Win11**, **Midnight OLED**, **Nord Frost**, **Catppuccin Mocha**, **Dracula Velvet**, **Rosé Pine**, **Emerald Slate**, **Warm Paper**, and **Custom**) one click away.
-  - Customize **Background Color**, **Border Color**, **Corner Radius (`0–28 px`)**, and **Dialog Position** (Auto taskbar-aware, Bottom/Top Left/Center/Right, or Screen Center).
-  - **Custom Static Image & Animated GIF Background:** Choose any `.png`, `.jpg`, `.bmp`, `.webp`, or **animated `.gif`** (up to 25 MB, auto-scaled for low memory) with unified seamless rendering across both the history card and input bar, adjustable opacity (`12–100%`), and a subtle readability scrim.
-
-- **Classic Default + Optional Compact Mini-Pill (`360px`):**
-  - **Classic is the default layout** with full **Browse / Run / Exit / Settings** buttons.
-  - Choose **Compact Mini-Pill (`360px`)** for circular icon-only buttons and hidden idle history, with live suggestions and calculator results as you type.
-
-- **Task Manager Support, Pinning, Custom Aliases & Safe Elevation:**
-  - Supports **Task Manager → Run new task** while respecting Task Manager's own elevation checkbox (including for `google:` and `Shift + Enter` terminal launches).
-  - Supports **Pinned Commands**, **Custom Command Aliases** (e.g., `hosts`), and optional **Remember Last Window Position**.
-  - Hold **Ctrl + Shift** to preview the opposite privilege level, then press **Enter** to use it for the current command. **Shift + Enter** runs in a terminal by default and can also be configured to switch privileges.
-
-- **Instant Math Calculator, Live App Suggestions & Web Search (`google:`):**
-  - Evaluate math expressions directly in the Run box (`1+1`, `(25*4)/2`, `sqrt(144)`, `sin(pi/2)`, `2^10`) and click or press `Enter` to copy/insert the result.
-  - Instant suggestions for Start Menu apps, Registry `App Paths`, and system tools (`cmd`, `powershell`, `regedit`, `wt`, `.cpl`, `.msc`), plus `google:<query>` quick web search.
-
-- **Lightweight 20-Item History, Native Vietnamese IME & 21 Languages:**
-  - Scrollable 5-row history card (20 items by default, up to 50) with timestamps, pinning, and right-click/`Delete` removal.
-  - Uses `RICHEDIT50W` (`msftedit.dll`) for smooth inline TSF composition on Windows Vietnamese keyboard (Telex/VNI) and third-party IMEs (UniKey/EVKey) with auto-focus on `Win + R`.
-  - Auto-detects or lets you choose from **21 built-in languages** across the Run dialog and WinUI 3 Settings window.
-
----
-
-## 🇻🇳 Tiếng Việt
-
-Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong Task Manager** cổ điển bằng trình chạy lệnh hiện đại vẽ bằng **Direct2D & DirectWrite** (`Segoe UI Variable Text`). Tương thích mượt mà trên **Windows 10** và **Windows 11** (bao gồm bản Insider `.dll.mui`) mà không cần tải `shell32.pdb`.
-
-### Điểm mới & Tính năng chính
-
-- **Bố cục hộp thoại (v6.1.0):** Chọn Cổ điển, Thu gọn (Pill) hoặc Fluent trong cửa sổ cài đặt Run hoặc Windhawk. Fluent đặt các nút bên phải ô nhập và hiển thị danh sách phía trên. Vị trí tự động của Fluent nằm ở góc dưới bên trái. Đổi bố cục vẫn giữ chủ đề, lịch sử và cài đặt ô nhập khi mở.
-
-- **Bản vá lỗi trong v6.0.2.0:**
-  - **Sửa lỗi lệch/nhảy vị trí hộp thoại khi gõ lệnh:** Khắc phục triệt để lỗi hộp thoại Run bị nhảy ra giữa màn hình hoặc lệch khỏi vị trí cố định (như **Dưới – Trái**) khi danh sách gợi ý mở rộng hoặc thu gọn lúc gõ, đặc biệt ở **Chế độ thu nhỏ (Compact Mini-Pill)**. Quá trình đổi kích thước nay cập nhật nguyên tử theo đúng điểm neo đã chọn và chặn các tác động di chuyển ngoài ý muốn.
-  - **Hỗ trợ chỉnh độ mờ đục (Opacity) cho Windows 11 Blur & mọi chủ đề:** Kết nối thanh chỉnh **Độ đậm nền (`12–100%`)** để thay đổi trực tiếp độ mờ/độ trong suốt của **Windows 11 Blur**, **Liquid Glass** và các chủ đề màu đặc ngay cả khi không chọn ảnh/GIF nền.
-
-- **Cửa sổ Cài đặt WinUI 3 độc lập (chạy trong tiến trình `windhawk.exe`):**
-  - Khi bấm biểu tượng `⚙️`, hộp thoại Run tự đóng ngay (không chồng lấn) và mở cửa sổ **Cài đặt Modern Run** phong cách Windows 11 chạy riêng trong tiến trình `windhawk.exe -tool-mod` thay vì `explorer.exe`.
-  - Đồng bộ hoàn toàn theo phong cách WinUI 3: thẻ nhóm SettingsExpander, menu thả xuống ComboBox Flyout có thanh nhấn dọc, hộp thoại chọn màu WinUI 3 và mục quản lý **Bí danh (Aliases)** riêng.
-  - **Ưu tiên cài đặt:** Bạn có thể chỉnh tùy chọn từ cả cửa sổ Cài đặt WinUI 3 lẫn trang Cài đặt của Windhawk. Thay đổi ở đâu có hiệu lực ngay lập tức; với từng mục riêng lẻ, nơi bạn vừa chỉnh gần nhất sẽ được ưu tiên mà không làm mất các tùy chỉnh khác.
-
-- **13 Chủ đề giao diện có sẵn & Tùy chỉnh cá nhân hóa toàn diện:**
-  - Mặc định sử dụng **Windows 11 Blur** (hiệu ứng Acrylic mờ đục dịu mắt, bo góc `14px` và viền mảnh chuẩn Windows 11 giúp chữ luôn rõ trên mọi hình nền), đồng thời giữ **Liquid Glass** (viên thuốc kính khúc xạ 3D) cùng 11 chủ đề khác (**Windows 11 Mica**, **Fluent Solid**, **Classic Win11**, **Midnight OLED**, **Nord Frost**, **Catppuccin Mocha**, **Dracula Velvet**, **Rosé Pine**, **Emerald Slate**, **Warm Paper** và **Tự tùy chỉnh**).
-  - Tùy chỉnh trực tiếp **Màu nền**, **Màu viền**, **Bán kính bo góc (`0–28 px`)** và **Vị trí hiển thị hộp thoại** (Tự động theo Taskbar, Dưới/Trên Trái/Giữa/Phải hoặc Giữa màn hình).
-  - **Hình nền tĩnh & Ảnh động GIF tùy chỉnh:** Hỗ trợ chọn ảnh `.png`, `.jpg`, `.bmp`, `.webp` và **ảnh động `.gif`** (tối đa 25 MB, tự tối ưu kích thước) hiển thị liền mạch xuyên suốt cả thẻ lịch sử và thanh nhập, chỉnh được độ đậm nền (`12–100%`) kèm lớp phủ bảo toàn độ rõ chữ.
-
-- **Cổ điển mặc định và Thu gọn (`360px`):**
-  - Bố cục **Cổ điển** có đủ nút **Duyệt / Chạy / Thoát / Cài đặt**.
-  - Chọn **Thu gọn (`360px`)** để dùng các nút tròn dạng biểu tượng, ẩn lịch sử ban đầu và vẫn hiện gợi ý, kết quả tính toán khi nhập.
-
-- **Hỗ trợ Task Manager, Ghim lệnh, Bí danh (Alias) & Chạy Admin an toàn:**
-  - Hoạt động đồng bộ trên cả `Win + R` lẫn **Task Manager → Chạy tác vụ mới** và tôn trọng đúng tùy chọn quyền quản trị của Task Manager (kể cả với `google:` và `Shift + Enter`).
-  - Hỗ trợ **ghim lệnh yêu thích**, **bí danh lệnh tùy chỉnh** (ví dụ `hosts`) và tùy chọn **Nhớ vị trí cửa sổ lần cuối**.
-  - Giữ **Ctrl + Shift** để xem trước mức quyền ngược lại, rồi nhấn **Enter** để dùng cho lệnh hiện tại. **Shift + Enter** mặc định chạy lệnh trong terminal và có thể được cấu hình để đổi quyền.
-
-- **Máy tính nhanh, Gợi ý ứng dụng tức thì & Tìm kiếm Google (`google:`):**
-  - Gõ trực tiếp phép tính (`1+1`, `(25*4)/2`, `sqrt(144)`, `sin(pi/2)`, `2^10`) để xem kết quả ngay trên đầu danh sách; nhấn `Enter` hoặc nhấp chuột để chép/điền kết quả.
-  - Gợi ý tức thì ứng dụng Start Menu, `App Paths` và công cụ hệ thống (`cmd`, `powershell`, `regedit`, `wt`, `.cpl`, `.msc`), cùng cú pháp `google:<từ khóa>` để tìm kiếm nhanh bằng trình duyệt mặc định.
-
-- **Lịch sử mặc định 20 mục, tối đa 50, Bộ gõ Tiếng Việt mượt mà & 21 Ngôn ngữ:**
-  - Khung lịch sử cuộn 5 dòng (tối đa 20 lệnh) kèm thời gian chạy, ghim lệnh và chuột phải/`Delete` để xóa từng mục.
-  - Dùng `RICHEDIT50W` (`msftedit.dll`) tương thích tốt với cả bàn phím Tiếng Việt mặc định Windows (Telex/VNI) lẫn UniKey/EVKey, tự động focus ô nhập ngay khi bấm `Win + R`.
-  - Tự nhận diện hoặc tùy chọn trong **21 ngôn ngữ hiển thị** đồng bộ cho cả hộp thoại Run và cửa sổ Cài đặt WinUI 3.
+- [Original mod source by caotu2005](https://github.com/caotu2005/windhawk-mods/blob/modernrunui/mods/modern-run-dialog-ui.wh.cpp)
+- [Modern Run Dialog UI in DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Modern_Run_Dialog_UI)
 */
 // ==/WindhawkModReadme==
 
