@@ -1,47 +1,47 @@
 // ==WindhawkMod==
 // @id              modern-run-dialog-ui
 // @name Modern Run Dialog UI For Windows 10 & 11
-// @description A modern Run dialog for Win + R and Run new task in Task Manager, with themes, command history, custom commands, app suggestions, and a calculator
+// @description Replaces Run (Win + R) and the Run new task dialog in Task Manager, adding themes, history, suggestions, and custom commands
 // @name:ru-RU Modern Run Dialog UI для Windows 10 и 11
-// @description:ru-RU Современное окно «Выполнить» для Win + R и запуска новой задачи из Диспетчера задач. Поддерживает темы, историю, собственные команды, подсказки приложений и калькулятор
+// @description:ru-RU Заменяет окно «Выполнить» (Win + R) и диалог запуска новой задачи в Диспетчере задач, добавляя темы, историю, подсказки и собственные команды
 // @name:vi-VN Modern Run Dialog UI cho Windows 10 và 11
-// @description:vi-VN Hộp thoại Chạy hiện đại cho Win + R và mục Chạy tác vụ mới trong Trình quản lý Tác vụ, với chủ đề, lịch sử lệnh, lệnh tùy chỉnh, gợi ý ứng dụng và máy tính
+// @description:vi-VN Thay thế hộp thoại Chạy (Win + R) và Chạy tác vụ mới trong Trình quản lý Tác vụ, bổ sung chủ đề, lịch sử, gợi ý và lệnh tùy chỉnh
 // @name:zh-CN 适用于 Windows 10 和 11 的 Modern Run Dialog UI
-// @description:zh-CN 为 Win + R 和任务管理器中的“运行新任务”提供现代运行对话框，支持主题、命令历史记录、自定义命令、应用建议和计算器
+// @description:zh-CN 替换“运行”（Win + R）和任务管理器中的“运行新任务”对话框，添加主题、历史记录、建议和自定义命令
 // @name:zh-TW 適用於 Windows 10 和 11 的 Modern Run Dialog UI
-// @description:zh-TW 為 Win + R 與工作管理員中的「執行新工作」提供現代化執行對話方塊，支援佈景主題、命令歷程記錄、自訂命令、應用程式建議與小算盤
+// @description:zh-TW 取代「執行」（Win + R）和工作管理員的「執行新工作」對話方塊，新增佈景主題、歷程記錄、建議與自訂命令
 // @name:ja-JP Windows 10・11 向けの Modern Run Dialog UI
-// @description:ja-JP Win + R やタスク マネージャーの「新しいタスクを実行する」で開く新しい実行ダイアログです。テーマ、コマンド履歴、カスタム コマンド、アプリの候補、電卓を備えています
+// @description:ja-JP 「ファイル名を指定して実行」（Win + R）とタスク マネージャーの「新しいタスクを実行する」を置き換え、テーマ、履歴、候補、カスタム コマンドを追加します
 // @name:ko-KR Windows 10 및 11용 Modern Run Dialog UI
-// @description:ko-KR Win + R 또는 작업 관리자의 ‘새 작업 실행’에서 열리는 새 실행 대화 상자입니다. 테마, 명령 기록, 사용자 지정 명령, 앱 추천 및 계산기를 제공합니다
+// @description:ko-KR 실행(Win + R)과 작업 관리자의 ‘새 작업 실행’ 대화 상자를 대체하고 테마, 기록, 제안, 사용자 지정 명령을 추가합니다
 // @name:th-TH Modern Run Dialog UI สำหรับ Windows 10 และ 11
-// @description:th-TH กล่องโต้ตอบเรียกใช้โฉมใหม่สำหรับ Win + R และคำสั่ง “เรียกใช้งานใหม่” ในตัวจัดการงาน พร้อมธีม ประวัติคำสั่ง คำสั่งแบบกำหนดเอง คำแนะนำแอป และเครื่องคิดเลข
+// @description:th-TH แทนที่กล่องโต้ตอบเรียกใช้ (Win + R) และเรียกใช้งานใหม่ในตัวจัดการงาน พร้อมธีม ประวัติ คำแนะนำ และคำสั่งแบบกำหนดเอง
 // @name:id-ID Modern Run Dialog UI untuk Windows 10 dan 11
-// @description:id-ID Dialog Jalankan modern untuk Win + R dan Jalankan tugas baru di Manajer Tugas. Dilengkapi tema, riwayat perintah, perintah khusus, saran aplikasi, dan kalkulator
+// @description:id-ID Menggantikan dialog Jalankan (Win + R) dan Jalankan tugas baru di Manajer Tugas, serta menambahkan tema, riwayat, saran, dan perintah khusus
 // @name:ms-MY Modern Run Dialog UI untuk Windows 10 dan 11
-// @description:ms-MY Dialog Jalankan moden untuk Win + R dan Jalankan tugas baharu dalam Pengurus Tugas. Dilengkapi tema, sejarah arahan, arahan tersuai, cadangan aplikasi dan kalkulator
+// @description:ms-MY Menggantikan dialog Jalankan (Win + R) dan Jalankan tugas baharu dalam Pengurus Tugas, serta menambah tema, sejarah, cadangan dan arahan tersuai
 // @name:fr-FR Modern Run Dialog UI pour Windows 10 et 11
-// @description:fr-FR Une boîte de dialogue Exécuter moderne pour Win + R et l’action Exécuter une nouvelle tâche du Gestionnaire des tâches, avec des thèmes, un historique, des commandes personnalisées, des suggestions d’applications et une calculatrice
+// @description:fr-FR Remplace les fenêtres Exécuter (Win + R) et Exécuter une nouvelle tâche du Gestionnaire des tâches, avec des thèmes, un historique, des suggestions et des commandes personnalisées
 // @name:de-DE Modern Run Dialog UI für Windows 10 und 11
-// @description:de-DE Modernes Dialogfeld für Win + R und „Neuen Task ausführen“ im Task-Manager mit Designs, Befehlsverlauf, benutzerdefinierten Befehlen, App-Vorschlägen und Rechner
+// @description:de-DE Ersetzt „Ausführen“ (Win + R) und „Neuen Task ausführen“ im Task-Manager und ergänzt Designs, Verlauf, Vorschläge und benutzerdefinierte Befehle
 // @name:es-ES Modern Run Dialog UI para Windows 10 y 11
-// @description:es-ES Un cuadro de diálogo Ejecutar moderno para Win + R y Ejecutar nueva tarea en el Administrador de tareas, con temas, historial de comandos, comandos personalizados, sugerencias de aplicaciones y calculadora
+// @description:es-ES Reemplaza Ejecutar (Win + R) y el cuadro Ejecutar nueva tarea del Administrador de tareas y añade temas, historial, sugerencias y comandos personalizados
 // @name:pt-BR Modern Run Dialog UI para Windows 10 e 11
-// @description:pt-BR Uma janela Executar moderna para Win + R e Executar nova tarefa no Gerenciador de Tarefas, com temas, histórico de comandos, comandos personalizados, sugestões de aplicativos e calculadora
+// @description:pt-BR Substitui Executar (Win + R) e a janela Executar nova tarefa do Gerenciador de Tarefas e adiciona temas, histórico, sugestões e comandos personalizados
 // @name:it-IT Modern Run Dialog UI per Windows 10 e 11
-// @description:it-IT Una finestra Esegui moderna per Win + R ed Esegui nuova attività in Gestione attività, con temi, cronologia dei comandi, comandi personalizzati, suggerimenti di app e calcolatrice
+// @description:it-IT Sostituisce Esegui (Win + R) e la finestra Esegui nuova attività di Gestione attività, aggiungendo temi, cronologia, suggerimenti e comandi personalizzati
 // @name:uk-UA Modern Run Dialog UI для Windows 10 і 11
-// @description:uk-UA Сучасне вікно «Виконати» для Win + R і дії «Запустити нове завдання» в диспетчері завдань. Містить теми, журнал команд, власні команди, підказки програм і калькулятор
+// @description:uk-UA Замінює вікно «Виконати» (Win + R) і діалог запуску нового завдання в диспетчері завдань, додаючи теми, журнал команд, підказки й власні команди
 // @name:pl-PL Modern Run Dialog UI dla Windows 10 i 11
-// @description:pl-PL Nowoczesne okno Uruchamianie dla skrótu Win + R i opcji Uruchom nowe zadanie w Menedżerze zadań, z motywami, historią poleceń, własnymi poleceniami, sugestiami aplikacji i kalkulatorem
+// @description:pl-PL Zastępuje okna Uruchamianie (Win + R) i Uruchom nowe zadanie w Menedżerze zadań, dodając motywy, historię, sugestie i własne polecenia
 // @name:nl-NL Modern Run Dialog UI voor Windows 10 en 11
-// @description:nl-NL Een modern dialoogvenster voor Win + R en Nieuwe taak uitvoeren in Taakbeheer, met thema’s, opdrachtgeschiedenis, aangepaste opdrachten, app-suggesties en een rekenmachine
+// @description:nl-NL Vervangt Uitvoeren (Win + R) en het venster Nieuwe taak uitvoeren in Taakbeheer en voegt thema’s, geschiedenis, suggesties en aangepaste opdrachten toe
 // @name:tr-TR Windows 10 ve 11 için Modern Run Dialog UI
-// @description:tr-TR Win + R ve Görev Yöneticisi’ndeki Yeni görev çalıştır için modern Çalıştır penceresi. Temalar, komut geçmişi, özel komutlar, uygulama önerileri ve hesap makinesi içerir
+// @description:tr-TR Çalıştır (Win + R) ve Görev Yöneticisi’ndeki Yeni görev çalıştır pencerelerinin yerine geçerek temalar, geçmiş, öneriler ve özel komutlar ekler
 // @name:hi-IN Windows 10 और 11 के लिए Modern Run Dialog UI
-// @description:hi-IN Win + R और कार्य प्रबंधक में «नया कार्य चलाएँ» के लिए आधुनिक रन डायलॉग। इसमें थीम, कमांड का इतिहास, कस्टम कमांड, ऐप के सुझाव और कैलकुलेटर हैं
+// @description:hi-IN रन (Win + R) और कार्य प्रबंधक के «नया कार्य चलाएँ» संवाद की जगह थीम, इतिहास, सुझाव और कस्टम कमांड वाला संवाद देता है
 // @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
-// @description:ar مربع حوار «تشغيل» عصري للاختصار Win + R ولخيار «تشغيل مهمة جديدة» في إدارة المهام. يتضمن نُسقًا وسجل الأوامر وأوامر مخصصة واقتراحات للتطبيقات وآلة حاسبة
+// @description:ar يستبدل نافذة «تشغيل» (Win + R) ومربع حوار «تشغيل مهمة جديدة» في إدارة المهام ويضيف نُسقًا وسجلًا واقتراحات وأوامر مخصصة
 // @version         6.10.11
 // @author          caotu2005, CTravkin
 // @github          https://github.com/caotu2005
