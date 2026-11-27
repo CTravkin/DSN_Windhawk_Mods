@@ -4,7 +4,7 @@
 // @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
 // @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
 // @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.10.5
+// @version         6.10.6
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +12,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 55
+// Build: 56
 
 // ==WindhawkModReadme==
 /*
@@ -3342,6 +3342,7 @@ struct RunSupplementalStrings {
     const wchar_t* deleteHistoryItem;
     const wchar_t* ggSearchEmptyHint;
     const wchar_t* ggSearchQueryPrefix;
+    const wchar_t* commandTooLong;
 };
 
 const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
@@ -3358,6 +3359,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Xóa mục này khỏi lịch sử",
             L"Gõ từ khóa để tìm kiếm trên Google (Trình duyệt mặc định)",
             L"Tìm trên Google: \"",
+            L"Đã vượt quá giới hạn độ dài của lệnh.",
         }},
         {L"zh_tw", {
             L"輸入指令",
@@ -3367,6 +3369,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"從歷史記錄中刪除此項",
             L"輸入關鍵字使用 Chrome 進行 Google 搜尋",
             L"Google 搜尋 (Chrome): \"",
+            L"指令長度已超過上限。",
         }},
         {L"zh_cn", {
             L"输入命令",
@@ -3376,6 +3379,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"从历史记录中删除此项",
             L"输入关键词使用 Chrome 进行 Google 搜索",
             L"Google 搜索 (Chrome): \"",
+            L"命令长度已超出限制。",
         }},
         {L"ja", {
             L"コマンドを入力",
@@ -3385,6 +3389,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"履歴からこの項目を削除",
             L"キーワードを入力して Chrome で Google 検索",
             L"Google 検索 (Chrome): \"",
+            L"コマンドの長さが上限を超えています。",
         }},
         {L"ko", {
             L"명령어 입력",
@@ -3394,6 +3399,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"기록에서 이 항목 삭제",
             L"Chrome에서 Google 검색할 키워드 입력",
             L"Google 검색 (Chrome): \"",
+            L"명령 길이가 제한을 초과했습니다.",
         }},
         {L"th", {
             L"พิมพ์คำสั่ง",
@@ -3403,6 +3409,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"ลบรายการนี้ออกจากประวัติ",
             L"พิมพ์คำค้นหาเพื่อค้นหา Google ใน Chrome",
             L"ค้นหา Google (Chrome): \"",
+            L"คำสั่งยาวเกินขีดจำกัด",
         }},
         {L"id", {
             L"Ketik perintah",
@@ -3412,6 +3419,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Hapus item ini dari riwayat",
             L"Ketik kata kunci untuk mencari di Google (Chrome)",
             L"Cari di Google (Chrome): \"",
+            L"Panjang perintah melebihi batas.",
         }},
         {L"ms", {
             L"Taip arahan",
@@ -3421,6 +3429,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Padam item ini daripada sejarah",
             L"Taip kata kunci untuk mencari di Google (Chrome)",
             L"Cari di Google (Chrome): \"",
+            L"Panjang arahan melebihi had.",
         }},
         {L"fr", {
             L"Commande...",
@@ -3430,6 +3439,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Supprimer cet élément de l'historique",
             L"Tapez un mot-clé pour rechercher sur Google (Chrome)",
             L"Recherche Google (Chrome) : \"",
+            L"La commande dépasse la longueur maximale autorisée.",
         }},
         {L"de", {
             L"Befehl eingeben",
@@ -3439,6 +3449,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Eintrag aus Verlauf löschen",
             L"Suchbegriff für Google-Suche in Chrome eingeben",
             L"Google-Suche (Chrome): \"",
+            L"Die maximale Befehlslänge wurde überschritten.",
         }},
         {L"es", {
             L"Escribir comando",
@@ -3448,6 +3459,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Eliminar este elemento del historial",
             L"Escriba una palabra clave para buscar en Google (Chrome)",
             L"Buscar en Google (Chrome): \"",
+            L"La longitud del comando supera el límite.",
         }},
         {L"pt", {
             L"Digite comando",
@@ -3457,6 +3469,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Remover este item do histórico",
             L"Digite uma palavra-chave para pesquisar no Google (Chrome)",
             L"Pesquisar no Google (Chrome): \"",
+            L"O comando excede o limite de comprimento.",
         }},
         {L"it", {
             L"Digita comando",
@@ -3466,6 +3479,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Elimina questo elemento dalla cronologia",
             L"Digita una parola chiave per cercare su Google (Chrome)",
             L"Cerca su Google (Chrome): \"",
+            L"Il comando supera la lunghezza massima consentita.",
         }},
         {L"ru", {
             L"Введите команду",
@@ -3475,6 +3489,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Удалить из истории",
             L"Введите запрос для поиска в Google через Chrome",
             L"Поиск Google (Chrome): \"",
+            L"Превышен лимит длины команды.",
         }},
         {L"uk", {
             L"Введіть команду",
@@ -3484,6 +3499,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Видалити цей елемент з історії",
             L"Введіть запит для пошуку в Google через Chrome",
             L"Пошук Google (Chrome): \"",
+            L"Перевищено обмеження довжини команди.",
         }},
         {L"pl", {
             L"Wpisz polecenie",
@@ -3493,6 +3509,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Usuń ten element z historii",
             L"Wpisz słowo kluczowe, aby wyszukać w Google (Chrome)",
             L"Szukaj w Google (Chrome): \"",
+            L"Przekroczono limit długości polecenia.",
         }},
         {L"nl", {
             L"Typ opdracht",
@@ -3502,6 +3519,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Verwijder dit item uit de geschiedenis",
             L"Typ een trefwoord om met Google in Chrome te zoeken",
             L"Zoeken op Google (Chrome): \"",
+            L"De maximale lengte van de opdracht is overschreden.",
         }},
         {L"tr", {
             L"Komut yazın",
@@ -3511,6 +3529,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Bu öğeyi geçmişten sil",
             L"Chrome ile Google'da aramak için anahtar kelime yazın",
             L"Google'da Ara (Chrome): \"",
+            L"Komut uzunluğu sınırı aşıldı.",
         }},
         {L"hi", {
             L"कमांड लिखें",
@@ -3520,6 +3539,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"इतिहास से इसे हटाएं",
             L"Chrome में Google खोजने के लिए कीवर्ड टाइप करें",
             L"Google खोज (Chrome): \"",
+            L"कमांड की लंबाई निर्धारित सीमा से अधिक है।",
         }},
         {L"ar", {
             L"اكتب أمراً",
@@ -3529,6 +3549,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"حذف هذا العنصر من السجل",
             L"اكتب كلمة مفتاحية للبحث في Google عبر Chrome",
             L"بحث Google (Chrome): \"",
+            L"تجاوز الأمر الحد الأقصى للطول.",
         }},
         {L"en", {
             L"Type command",
@@ -3538,6 +3559,7 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
             L"Delete from history",
             L"Type a keyword to search on Google (Default Browser)",
             L"Search Google: \"",
+            L"The command exceeds the length limit.",
         }},
     };
 
@@ -8216,10 +8238,13 @@ RunLaunchRequest ResolveRunLaunchRequest(const ModSettings& settings, const Hist
 void ShowRunLaunchError(RunDialogState* state, DWORD error) {
     if (!CanContinueRunDialog(state)) return;
     if (error != ERROR_CANCELLED) {
-        wchar_t message[512]{};
-        if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error,
-                           0, message, ARRAYSIZE(message), nullptr) == 0) {
-            swprintf_s(message, L"0x%08lX", error);
+        wchar_t systemMessage[512]{};
+        const wchar_t* message = systemMessage;
+        if (error == ERROR_FILENAME_EXCED_RANGE) {
+            message = GetRunSupplementalStrings(state->settings.language).commandTooLong;
+        } else if (FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, error,
+                                  0, systemMessage, ARRAYSIZE(systemMessage), nullptr) == 0) {
+            swprintf_s(systemMessage, L"0x%08lX", error);
         }
         MessageBoxW(state->hDlg, message, L"Modern Run", MB_OK | MB_ICONERROR);
     }
@@ -11339,7 +11364,7 @@ const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& 
     return strings[0];
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 55)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 56)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
