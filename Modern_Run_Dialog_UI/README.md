@@ -2,49 +2,67 @@
 
 **English** · [Tiếng Việt](README.vi.md) · [Русский](README.ru.md) · [DSN Windhawk Mods](../README.md)
 
-Modern Run Dialog UI is a Windhawk mod by caotu2005 for Windows 10 and 11. It replaces the classic **Run** dialog opened with **Win + R** and **Run new task** in Task Manager with a customizable launcher for apps, files, and commands.
+Modern Run Dialog UI replaces the Windows **Run** dialog (**Win + R**) and **Run new task** in Task Manager with a customizable launcher for apps, files, and commands.
+
+## Layouts
+
+<table>
+  <tbody>
+    <tr>
+      <th scope="row" valign="middle">Classic</th>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Classic · Windows 11 Blur · Pinned command"></a><br>Windows 11 Blur · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Classic · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-suggestions.png"><img src="Assets/Previews/classic-suggestions.png" width="497" alt="Classic · Dracula Velvet · Calculator"></a><br>Dracula Velvet · Calculator</td>
+    </tr>
+    <tr>
+      <th scope="row" valign="middle">Compact Mini-Pill</th>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Compact Mini-Pill · Nord Frost · Pinned command"></a><br>Nord Frost · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="220" alt="Compact Mini-Pill · Classic Win11"></a><br>Classic Win11<br><br><a href="Assets/Previews/pill-suggestions.png"><img src="Assets/Previews/pill-suggestions.png" width="259" alt="Compact Mini-Pill · Emerald Slate · Paint suggestion"></a><br>Emerald Slate · Paint suggestion</td>
+    </tr>
+    <tr>
+      <th scope="row" valign="middle">Fluent</th>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha · Pinned command"></a><br>Catppuccin Mocha · Pinned command</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Fluent Solid · Administrator indicator"></a><br>Fluent Solid · Administrator indicator</td>
+    </tr>
+  </tbody>
+</table>
 
 ## Features
 
-### Three layouts
+- **Custom commands and suggestions.** Search for apps and Windows tools by typing their names. Add short names for your own commands, programs, and files. A custom command can request administrator privileges.
+- **Command history.** Keep up to 50 recent commands, pin entries, and remove them individually. Browse history and suggestions with **↑** and **↓**. Press **Tab** to fill the input or **Enter** to run the selected command.
+- **Calculator and web search.** Enter an expression such as `sqrt(144)` or `2^10` and select the result to insert it and copy it to the clipboard. Type `google:<query>` to search in your default browser.
+- **Run as administrator.** By default, **Ctrl + Shift + Enter** switches privileges for the current launch. If elevation is enabled by default, the same shortcut runs with standard privileges. The mod also honors the elevation option in Task Manager.
 
-Choose **Classic**, **Compact Mini-Pill**, or **Fluent**. Classic is the default. Compact Mini-Pill uses icon buttons and starts with history collapsed. Use **↑** to open it. Fluent places actions beside the input and opens history and suggestions above it. The layout, theme, action buttons, and history can be configured independently.
+## Settings
 
-| Layout | History open | History closed | Calculator, suggestions, or elevation |
-| --- | --- | --- | --- |
-| **Classic** | [![Classic, Windows 11 Blur, pinned cmd in an open history](Assets/Previews/classic-history.png)](Assets/Previews/classic-history.png)<br>Windows 11 Blur | [![Classic, Warm Paper, empty input with history closed](Assets/Previews/classic-idle.png)](Assets/Previews/classic-idle.png)<br>Warm Paper | [![Classic, Dracula Velvet, calculator result](Assets/Previews/classic-suggestions.png)](Assets/Previews/classic-suggestions.png)<br>Dracula Velvet |
-| **Compact Mini-Pill** | [![Compact Mini-Pill, Nord Frost, pinned cmd in an open history](Assets/Previews/pill-history.png)](Assets/Previews/pill-history.png)<br>Nord Frost | [![Compact Mini-Pill, Classic Win11, empty input with history closed](Assets/Previews/pill-idle.png)](Assets/Previews/pill-idle.png)<br>Classic Win11 | [![Compact Mini-Pill, Emerald Slate, Paint suggestion](Assets/Previews/pill-suggestions.png)](Assets/Previews/pill-suggestions.png)<br>Emerald Slate |
-| **Fluent** | [![Fluent, Catppuccin Mocha, pinned cmd in an open history](Assets/Previews/fluent-history.png)](Assets/Previews/fluent-history.png)<br>Catppuccin Mocha | [![Fluent, Windows 11 Mica, empty input with history closed](Assets/Previews/fluent-idle.png)](Assets/Previews/fluent-idle.png)<br>Windows 11 Mica | [![Fluent, Fluent Solid, administrator shield in the input bar](Assets/Previews/fluent-elevation.png)](Assets/Previews/fluent-elevation.png)<br>Fluent Solid |
+![Modern Run Settings open to Personalization](Assets/Previews/settings.png)
 
-### Settings
+Open Modern Run Settings with **Ctrl + ,**. Shared options are also available in Windhawk. In-app settings apply to the current user. Changing an option in Windhawk replaces the in-app choice for that option.
 
-![English Modern Run Settings window open to Personalization](Assets/Previews/settings.png)
+### Personalization
 
-Open the dedicated settings window from Run with **Ctrl + ,**. Use **Commands** to edit your custom commands. Shared options are also available on the mod's **Settings** tab in Windhawk. In-app changes are saved per user and apply to Run. The Windhawk tab displays its own values. Changing a shared option in Windhawk replaces the in-app override for that option.
+- Choose a built-in theme, follow the Windows color mode or pick light or dark, and select the default icons or **Windows (Fluent)**.
+- Adjust the background color, opacity, and corner radii for panels and highlighted rows. Use a PNG, JPEG, BMP, WebP, or animated GIF as the background (up to 25 MB).
+- Set the border color. Window borders can use the theme, follow Windows, or be turned off. The standard context menu also has its own border setting and can inherit the window border.
 
-### Appearance
+### Layout and position
 
-- Pick a theme such as **Windows 11 Blur**, **Liquid Glass**, **Nord Frost**, or **Warm Paper**, and follow Windows colors or choose a light or dark mode.
-- Customize background color, opacity, outer and inner corner radii, and borders. Set a static PNG, JPEG, BMP, or WebP background or an animated GIF up to 25 MB.
-- Set the window position, width, height, font size, and scale. Position can be remembered across launches.
-- Hide **Browse**, **Run**, **Close**, and **Settings** independently in every layout. Hidden actions remain available in the right-click menu. The menu style and icon set can be selected separately.
-- Choose whether the taskbar icon minimizes and restores Run, closes it, or stays hidden.
+- Choose a layout, set the window position, and optionally remember it. Width can follow the layout or use **Narrow**, **Wide**, or a custom value. Adjust the window height, font size, and interface scale separately.
+- Hide **Browse**, **Run**, **Close**, or **Settings** in any layout. Hidden actions move to the right-click menu, which has **Standard** and **Windows (Fluent)** styles.
 
-### Commands and history
+### Behavior
 
-- Search for apps and Windows tools as you type. Add a custom command with a short name and a program, command line, or file to open. A custom command can request administrator privileges.
-- Keep up to 50 recent commands. Pin entries, remove them individually, and show dates and times in the Windows regional format. Set the history length to zero to hide it.
-- Use **↑** and **↓** to browse history and suggestions. Press **Tab** to put the selection in the input field, or **Enter** to run it.
-- Use **Ctrl + O** to browse for a file and **Esc** to close Run.
-- Enter an expression such as `sqrt(144)` or `2^10` to calculate a result. Select the result to insert it and copy it to the clipboard. Use `google:<query>` to search the web in the default browser.
+- Set the number of stored and visible history entries, hide history, or show timestamps in the Windows regional format.
+- Clear the input when Run opens or close Run by clicking outside it. The taskbar icon can minimize and restore the window, close it, or be hidden.
+- Enable elevation by default and choose a separate indicator panel or a shield in the input row. **Shift + Enter** normally runs the command in a terminal and can be assigned to switch privileges.
 
-### Administrator launch
+### Display language
 
-Hold **Ctrl + Shift** to preview the privilege level and press **Enter** to switch it for the current launch. With elevation enabled by default, the same shortcut launches with standard privileges. Choose a separate status panel or an inline shield icon. **Shift + Enter** runs in a terminal by default and can be reassigned to switch privileges. When Task Manager starts an elevated task, its elevation request is honored.
+Follow the Windows display language or choose Arabic, Chinese (Simplified or Traditional), Dutch, English, French, German, Hindi, Indonesian, Italian, Japanese, Korean, Malay, Polish, Portuguese (Brazil), Russian, Spanish, Thai, Turkish, Ukrainian, or Vietnamese.
 
 ## Platforms
 
-Requires Windows 10 or Windows 11 and [Windhawk](https://windhawk.net/). Run uses Direct2D and DirectWrite, supports inline input through Windows IMEs, including Vietnamese keyboards, and provides 21 interface languages. The mod can be blocked by Windows Smart App Control because Windhawk compiles it locally into an unsigned DLL. The mod needs no shell32 PDB symbols.
+Requires Windows 10 or 11 and [Windhawk](https://windhawk.net/). Smart App Control can block the unsigned DLL that Windhawk compiles locally.
 
 ## Operations
 
@@ -62,7 +80,7 @@ In Windhawk, open **Explore**, search for **Modern Run Dialog UI**, and select *
 
 ### Usage
 
-Press **Win + R** or choose **Run new task** in Task Manager. In Run, right-click to access menu actions. Use **Ctrl + ,** to open the mod settings.
+Use **Ctrl + O** to browse for a file, **Esc** to close Run, or right-click to open the context menu. Open **Commands** in Modern Run Settings to add, edit, or remove a custom command.
 
 ### Verification
 
@@ -71,7 +89,3 @@ Run the layout, settings, and localization checks from the repository root with 
 ```powershell
 node --test Modern_Run_Dialog_UI/Tests/dialog-layout.test.mjs
 ```
-
-## License
-
-Modern Run Dialog UI is distributed under the [MIT license](LICENSE).
