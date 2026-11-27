@@ -72,6 +72,14 @@ it are incompatible. One example is [Windows 10 Win+X restorer on Win11 24H2](ht
 
 ### Installation
 
+#### Windhawk catalog (recommended)
+
+In Windhawk, open **Explore**, search for **Quick Link Menu**, open its page, and select **Install**.
+
+[Mod page in the Windhawk catalog](https://windhawk.net/mods/quick-link-menu)
+
+#### From source (manual)
+
 1. Open Windhawk and choose **Create a New Mod**.
 2. Replace the contents of `mod.wh.cpp` with the complete [mod source](Mod/quick-link-menu.wh.cpp).
 3. Select **Compile Mod** or press `Ctrl+B` with the Windhawk sidebar open. Exit

@@ -4,6 +4,8 @@
 
 Modern Run Dialog UI thay hộp thoại **Chạy** (**Win + R**) và hộp thoại **Chạy tác vụ mới** trong Trình quản lý Tác vụ bằng cửa sổ có thể tùy chỉnh để mở ứng dụng, tệp và chạy lệnh.
 
+Phiên bản này dựa trên [bản mod gốc của caotu2005](https://github.com/caotu2005/windhawk-mods/blob/modernrunui/mods/modern-run-dialog-ui.wh.cpp).
+
 ## Bố cục và chủ đề
 
 <table align="center" width="100%">
