@@ -121,7 +121,7 @@ Use **Commands** in Modern Run Settings to add, edit, or remove custom commands.
 ## Links
 
 - [Original mod source by caotu2005](https://github.com/caotu2005/windhawk-mods/blob/modernrunui/mods/modern-run-dialog-ui.wh.cpp)
-- [Modern Run Dialog UI in DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/tree/main/Modern_Run_Dialog_UI)
+- [DSN Windhawk Mods](https://github.com/CTravkin/DSN_Windhawk_Mods/blob/main/README.md)
 */
 // ==/WindhawkModReadme==
 
