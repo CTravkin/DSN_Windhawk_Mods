@@ -276,10 +276,11 @@ test('the optional Ctrl+Enter gesture preserves terminal and standard elevation 
         static_assert(ResolveRunElevation(false, InvertElevation));
         static_assert(!ResolveRunElevation(true, InvertElevation));
         static_assert(ResolveRunElevation(true, Terminal));
-        static_assert(ResolveRunElevationIndicator(true, Normal));
-        static_assert(ResolveRunElevationIndicator(false, InvertElevation));
-        static_assert(!ResolveRunElevationIndicator(false, Terminal));
-        static_assert(!ResolveRunElevationIndicator(true, Terminal));
+        static_assert(ResolveRunElevationIndicator(true, Normal, true));
+        static_assert(ResolveRunElevationIndicator(false, InvertElevation, false));
+        static_assert(!ResolveRunElevationIndicator(false, Terminal, false));
+        static_assert(ResolveRunElevationIndicator(true, Terminal, false));
+        static_assert(!ResolveRunElevationIndicator(true, Terminal, true));
     `);
 });
 

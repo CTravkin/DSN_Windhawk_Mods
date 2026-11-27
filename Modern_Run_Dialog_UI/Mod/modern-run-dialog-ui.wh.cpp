@@ -42,7 +42,7 @@
 // @description:hi-IN रन (Win + R) और कार्य प्रबंधक के «नया कार्य चलाएँ» संवाद की जगह थीम, इतिहास, सुझाव और कस्टम कमांड वाला संवाद देता है
 // @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
 // @description:ar يستبدل نافذة «تشغيل» (Win + R) ومربع حوار «تشغيل مهمة جديدة» في إدارة المهام ويضيف نُسقًا وسجلًا واقتراحات وأوامر مخصصة
-// @version         6.10.14
+// @version         6.10.15
 // @author          caotu2005, CTravkin
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -50,7 +50,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 64
+// Build: 65
 
 // ==WindhawkModReadme==
 /*
@@ -3978,8 +3978,8 @@ constexpr bool ResolveRunElevation(bool defaultAdmin, RunEnterAction action) {
     return defaultAdmin != (action == RunEnterAction::InvertElevation);
 }
 
-constexpr bool ResolveRunElevationIndicator(bool defaultAdmin, RunEnterAction action) {
-    return action != RunEnterAction::Terminal && ResolveRunElevation(defaultAdmin, action);
+constexpr bool ResolveRunElevationIndicator(bool defaultAdmin, RunEnterAction action, bool inlineIndicator) {
+    return (!inlineIndicator || action != RunEnterAction::Terminal) && ResolveRunElevation(defaultAdmin, action);
 }
 
 constexpr int GetLayoutWidthDip(DialogLayout layout, DialogWidthPreset preset) {
@@ -11519,7 +11519,7 @@ bool ShouldShowRunElevation(const RunDialogState* state) {
             ResolveCustomAlias(state->settings, GetEffectiveInputText(state->hModernEdit), nullptr, &defaultAdmin);
         }
     }
-    return ResolveRunElevationIndicator(defaultAdmin, state->enterPreview);
+    return ResolveRunElevationIndicator(defaultAdmin, state->enterPreview, state->settings.inlineAdminIndicator);
 }
 
 int GetAdminBannerHeight(const RunDialogState* state) {
@@ -13791,7 +13791,7 @@ std::wstring GetInterfaceScaleLabel(int percent, const SettingsOptionDetails& de
     return label;
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 64)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 65)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
