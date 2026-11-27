@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         1.2.1
+// @version         1.2.2
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 49
+// Build: 50
 
 // ==WindhawkModReadme==
 /*
@@ -276,7 +276,8 @@ struct MenuSession {
 };
 
 [[clang::no_destroy]] std::unique_ptr<MenuSession> session;
-[[clang::no_destroy]] std::vector<SubmenuCleanup> pendingSubmenuCleanups;
+// Holds XAML references that must be released on the taskbar thread.
+[[clang::no_destroy]] std::optional<std::vector<SubmenuCleanup>> pendingSubmenuCleanups;
 std::mutex captionLock;
 std::array<std::wstring, std::size(catalog)> systemCaptionCache;
 std::mutex settingsLock;
@@ -1481,28 +1482,29 @@ UINT_PTR SubmenuCleanupTimerId() noexcept {
 }
 
 void ClosePendingSubmenuPopups(bool retry = true) noexcept {
+    if (!pendingSubmenuCleanups) return;
     // Closing a XAML popup may dispatch another flyout event.
-    auto pending = std::exchange(pendingSubmenuCleanups, {});
+    auto pending = std::exchange(*pendingSubmenuCleanups, {});
     for (auto& cleanup : pending) {
         try { ClosePopupWindows(FindSubmenuPopups(cleanup)); }
         catch (...) { Wh_Log(L"Could not identify the detached Win+X submenu popups"); }
 
         // XAML can publish the popup after this message has already run.
-        if (retry && !unloading && GetTickCount64() < cleanup.retryUntil) {
-            try { pendingSubmenuCleanups.push_back(std::move(cleanup)); }
+        if (pendingSubmenuCleanups && retry && !unloading && GetTickCount64() < cleanup.retryUntil) {
+            try { pendingSubmenuCleanups->push_back(std::move(cleanup)); }
             catch (...) { Wh_Log(L"Could not retain the detached Win+X submenu cleanup"); }
         }
     }
-    if (pendingSubmenuCleanups.empty() && trayWindow)
+    if (pendingSubmenuCleanups && pendingSubmenuCleanups->empty() && trayWindow)
         KillTimer(trayWindow, SubmenuCleanupTimerId());
 }
 
 void QueueSubmenuCleanup(SubmenuCleanup&& cleanup) noexcept {
-    if (cleanup.items.empty()) return;
+    if (!pendingSubmenuCleanups || cleanup.items.empty()) return;
     try {
-        const bool first = pendingSubmenuCleanups.empty();
+        const bool first = pendingSubmenuCleanups->empty();
         cleanup.retryUntil = GetTickCount64() + submenuCleanupWindow;
-        pendingSubmenuCleanups.push_back(std::move(cleanup));
+        pendingSubmenuCleanups->push_back(std::move(cleanup));
         if (unloading || !trayWindow ||
             (first && !SetTimer(trayWindow, SubmenuCleanupTimerId(), submenuSweepInterval, nullptr))) {
             ClosePendingSubmenuPopups(false);
@@ -1842,7 +1844,10 @@ TaskbarSetup InstallHooks() {
     }
     const bool optionsHook = WindhawkUtils::SetFunctionHook(
         reinterpret_cast<ShowAtOptions>(showOptions), HookShowAtOptions, &originalShowAtOptions);
-    if (optionsHook && Wh_ApplyHookOperations()) return TaskbarSetup::Ready;
+    if (optionsHook && Wh_ApplyHookOperations()) {
+        pendingSubmenuCleanups.emplace();
+        return TaskbarSetup::Ready;
+    }
 
     Wh_Log(L"Quick Link Menu hook setup failed during %ls",
            optionsHook ? L"hook application" : L"ShowAt with options registration");
@@ -1888,7 +1893,8 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
             Wh_Log(L"Quick Link Menu taskbar cleanup failed");
         }
         Restore();
-        ClosePendingSubmenuPopups();
+        ClosePendingSubmenuPopups(false);
+        pendingSubmenuCleanups.reset();
         return 0;
     }
     if (window == trayWindow) {
@@ -1898,7 +1904,7 @@ LRESULT CALLBACK TraySubclass(HWND window, UINT message, WPARAM action, LPARAM d
         }
         if (message == WM_NCDESTROY) {
             KillTimer(window, SubmenuCleanupTimerId());
-            pendingSubmenuCleanups.clear();
+            pendingSubmenuCleanups.reset();
         }
     }
     return DefSubclassProc(window, message, action, data);

@@ -84,7 +84,7 @@ addOption('submenuHover', 'immediate',
   ]);
 addOption('quickLaunchKeys', 'none',
   ['Quick launch keys', 'Клавиши быстрого запуска', 'Teclas de acceso', 'Zugriffstasten', 'Teclas de acesso', '菜单访问键'],
-  ['Underlines the letters assigned to commands in the standard Windows menu', 'Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows', 'Subraya las letras asignadas a los comandos en el menú estándar de Windows', 'Unterstreicht die Buchstaben, die Befehlen im Standardmenü von Windows zugeordnet sind', 'Sublinha as letras atribuídas a comandos no menu padrão do Windows', '在命令名称中用下划线标出 Windows 标准菜单为其分配的字母'], [
+  ['Use the underlined letters from the standard Win+X menu to run commands, focus items, or open submenus', 'Подчеркнутые буквы из штатного меню Win+X позволяют запускать команды, выделять пункты или открывать подменю', 'Las letras subrayadas del menú Win+X estándar permiten ejecutar comandos, poner el foco en elementos o abrir submenús', 'Mit den unterstrichenen Buchstaben aus dem Win+X-Standardmenü lassen sich Befehle ausführen, Einträge fokussieren oder Untermenüs öffnen', 'As letras sublinhadas do menu Win+X padrão permitem executar comandos, colocar o foco em itens ou abrir submenus', '使用标准 Win+X 菜单中带下划线的字母可运行命令、将焦点移到菜单项或打开子菜单'], [
     ['none', ['None', 'Нет', 'Ninguna', 'Keine', 'Nenhuma', '无']],
     ['visible', ['Visible only', 'Только видимые', 'Solo elementos visibles', 'Nur sichtbare Einträge', 'Somente itens visíveis', '仅可见项']],
     ['all', ['All commands', 'Все команды', 'Todos los comandos', 'Alle Befehle', 'Todos os comandos', '所有命令']],
