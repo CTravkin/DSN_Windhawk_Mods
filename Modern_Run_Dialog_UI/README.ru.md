@@ -6,22 +6,22 @@ Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R
 
 ## Макеты и темы
 
-<table>
+<table align="center" width="100%">
   <tbody>
     <tr>
       <td valign="middle"><strong>Классический</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="336" alt="Классический · Windows 11 Blur"></a><br>Windows 11 Blur</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="286" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-elevation.png"><img src="Assets/Previews/classic-elevation.png" width="386" alt="Классический · Dracula Velvet"></a><br>Dracula Velvet</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-history.png"><img src="Assets/Previews/classic-history.png" width="432" alt="Классический · Windows 11 Blur"></a><br>Windows 11 Blur</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/classic-idle.png"><img src="Assets/Previews/classic-idle.png" width="367" alt="Классический · Warm Paper"></a><br>Warm Paper<br><br><a href="Assets/Previews/classic-elevation.png"><img src="Assets/Previews/classic-elevation.png" width="497" alt="Классический · Dracula Velvet"></a><br>Dracula Velvet</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Компактный (Pill)</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="232" alt="Компактный (Pill) · Fluent Solid"></a><br>Fluent Solid</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="202" alt="Компактный (Pill) · Liquid Glass"></a><br>Liquid Glass<br><br><a href="Assets/Previews/pill-minimal.png"><img src="Assets/Previews/pill-minimal.png" width="171" alt="Компактный (Pill) · Emerald Slate"></a><br>Emerald Slate</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-history.png"><img src="Assets/Previews/pill-history.png" width="298" alt="Компактный (Pill) · Fluent Solid"></a><br>Fluent Solid</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/pill-idle.png"><img src="Assets/Previews/pill-idle.png" width="259" alt="Компактный (Pill) · Liquid Glass"></a><br>Liquid Glass<br><br><a href="Assets/Previews/pill-minimal.png"><img src="Assets/Previews/pill-minimal.png" width="220" alt="Компактный (Pill) · Emerald Slate"></a><br>Emerald Slate</td>
     </tr>
     <tr>
       <td valign="middle"><strong>Fluent</strong></td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="322" alt="Fluent · Catppuccin Mocha"></a><br>Catppuccin Mocha</td>
-      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="238" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="280" alt="Fluent · Nord Frost"></a><br>Nord Frost</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-history.png"><img src="Assets/Previews/fluent-history.png" width="414" alt="Fluent · Catppuccin Mocha"></a><br>Catppuccin Mocha</td>
+      <td align="center" valign="middle"><a href="Assets/Previews/fluent-idle.png"><img src="Assets/Previews/fluent-idle.png" width="306" alt="Fluent · Windows 11 Mica"></a><br>Windows 11 Mica<br><br><a href="Assets/Previews/fluent-elevation.png"><img src="Assets/Previews/fluent-elevation.png" width="360" alt="Fluent · Nord Frost"></a><br>Nord Frost</td>
     </tr>
   </tbody>
 </table>
@@ -35,7 +35,7 @@ Modern Run Dialog UI заменяет окно «Выполнить» (**Win + R
 
 ## Настройки
 
-![Окно настроек Modern Run на странице персонализации](Assets/Previews/settings.png)
+<p align="center"><img src="Assets/Previews/settings.png" alt="Окно настроек Modern Run на странице персонализации"></p>
 
 Общие параметры доступны в настройках Modern Run и Windhawk. Настройки окна мода применяются для текущего пользователя. Изменение параметра в Windhawk заменяет значение, заданное для него в окне мода.
 

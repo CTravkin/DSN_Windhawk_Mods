@@ -1223,12 +1223,11 @@ test('all declared languages have settings and runtime translations', () => {
     const schema = source.split('// ==WindhawkModSettings==')[1].split('// ==/WindhawkModSettings==')[0];
     const runtimeLookups = ['GetLocalizedStringsForLanguage', 'GetSettingsLocalizedStrings',
         'GetActionButtonStrings', 'GetAliasSettingsStrings', 'GetTaskbarIconStrings'];
+    assert.match(source, /^\/\/ @name Modern Run Dialog UI$/m);
+    assert.doesNotMatch(source, /^\/\/ @name:/m);
     for (const [language, tag] of Object.entries(languages)) {
         if (!tag) continue;
-        for (const field of ['name', 'description']) {
-            assert.match(source, new RegExp(`^// @${field}:${tag} .+`, 'm'));
-        }
-        assert.match(source, new RegExp(`^// @name:${tag} [^\\r\\n]*Modern Run Dialog UI[^\\r\\n]*$`, 'm'));
+        assert.match(source, new RegExp(`^// @description:${tag} .+`, 'm'));
         for (const field of ['name', 'description', 'options']) {
             const count = suffix => [...schema.matchAll(new RegExp(`^ +\\$${field}${suffix}:(?=\\s|$)`, 'gm'))].length;
             assert.equal(count(`:${tag}`), count(''), `${tag} coverage for ${field}`);
