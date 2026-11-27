@@ -2,47 +2,47 @@
 // @id              modern-run-dialog-ui
 // @name Modern Run Dialog UI For Windows 10 & 11
 // @description A modern Run dialog for Win + R and Run new task in Task Manager, with themes, command history, custom commands, app suggestions, and a calculator
-// @name:ru-RU Современное окно «Выполнить» для Windows 10 и 11
+// @name:ru-RU Modern Run Dialog UI для Windows 10 и 11
 // @description:ru-RU Современное окно «Выполнить» для Win + R и запуска новой задачи из Диспетчера задач. Поддерживает темы, историю, собственные команды, подсказки приложений и калькулятор
-// @name:vi-VN Giao diện hộp thoại Chạy hiện đại cho Windows 10 và 11
+// @name:vi-VN Modern Run Dialog UI cho Windows 10 và 11
 // @description:vi-VN Hộp thoại Chạy hiện đại cho Win + R và mục Chạy tác vụ mới trong Trình quản lý Tác vụ, với chủ đề, lịch sử lệnh, lệnh tùy chỉnh, gợi ý ứng dụng và máy tính
-// @name:zh-CN 适用于 Windows 10 和 11 的现代运行对话框
+// @name:zh-CN 适用于 Windows 10 和 11 的 Modern Run Dialog UI
 // @description:zh-CN 为 Win + R 和任务管理器中的“运行新任务”提供现代运行对话框，支持主题、命令历史记录、自定义命令、应用建议和计算器
-// @name:zh-TW 適用於 Windows 10 和 11 的現代化執行對話方塊
+// @name:zh-TW 適用於 Windows 10 和 11 的 Modern Run Dialog UI
 // @description:zh-TW 為 Win + R 與工作管理員中的「執行新工作」提供現代化執行對話方塊，支援佈景主題、命令歷程記錄、自訂命令、應用程式建議與小算盤
-// @name:ja-JP Windows 10・11 向けの新しい「ファイル名を指定して実行」
+// @name:ja-JP Windows 10・11 向けの Modern Run Dialog UI
 // @description:ja-JP Win + R やタスク マネージャーの「新しいタスクを実行する」で開く新しい実行ダイアログです。テーマ、コマンド履歴、カスタム コマンド、アプリの候補、電卓を備えています
-// @name:ko-KR Windows 10 및 11용 새 실행 대화 상자
+// @name:ko-KR Windows 10 및 11용 Modern Run Dialog UI
 // @description:ko-KR Win + R 또는 작업 관리자의 ‘새 작업 실행’에서 열리는 새 실행 대화 상자입니다. 테마, 명령 기록, 사용자 지정 명령, 앱 추천 및 계산기를 제공합니다
-// @name:th-TH กล่องโต้ตอบเรียกใช้โฉมใหม่สำหรับ Windows 10 และ 11
+// @name:th-TH Modern Run Dialog UI สำหรับ Windows 10 และ 11
 // @description:th-TH กล่องโต้ตอบเรียกใช้โฉมใหม่สำหรับ Win + R และคำสั่ง “เรียกใช้งานใหม่” ในตัวจัดการงาน พร้อมธีม ประวัติคำสั่ง คำสั่งแบบกำหนดเอง คำแนะนำแอป และเครื่องคิดเลข
-// @name:id-ID Dialog Jalankan modern untuk Windows 10 dan 11
+// @name:id-ID Modern Run Dialog UI untuk Windows 10 dan 11
 // @description:id-ID Dialog Jalankan modern untuk Win + R dan Jalankan tugas baru di Manajer Tugas. Dilengkapi tema, riwayat perintah, perintah khusus, saran aplikasi, dan kalkulator
-// @name:ms-MY Dialog Jalankan moden untuk Windows 10 dan 11
+// @name:ms-MY Modern Run Dialog UI untuk Windows 10 dan 11
 // @description:ms-MY Dialog Jalankan moden untuk Win + R dan Jalankan tugas baharu dalam Pengurus Tugas. Dilengkapi tema, sejarah arahan, arahan tersuai, cadangan aplikasi dan kalkulator
-// @name:fr-FR Interface moderne pour la boîte de dialogue Exécuter de Windows 10 et 11
+// @name:fr-FR Modern Run Dialog UI pour Windows 10 et 11
 // @description:fr-FR Une boîte de dialogue Exécuter moderne pour Win + R et l’action Exécuter une nouvelle tâche du Gestionnaire des tâches, avec des thèmes, un historique, des commandes personnalisées, des suggestions d’applications et une calculatrice
-// @name:de-DE Modernes Dialogfeld „Ausführen“ für Windows 10 und 11
+// @name:de-DE Modern Run Dialog UI für Windows 10 und 11
 // @description:de-DE Modernes Dialogfeld für Win + R und „Neuen Task ausführen“ im Task-Manager mit Designs, Befehlsverlauf, benutzerdefinierten Befehlen, App-Vorschlägen und Rechner
-// @name:es-ES Cuadro de diálogo Ejecutar moderno para Windows 10 y 11
+// @name:es-ES Modern Run Dialog UI para Windows 10 y 11
 // @description:es-ES Un cuadro de diálogo Ejecutar moderno para Win + R y Ejecutar nueva tarea en el Administrador de tareas, con temas, historial de comandos, comandos personalizados, sugerencias de aplicaciones y calculadora
-// @name:pt-BR Janela Executar moderna para Windows 10 e 11
+// @name:pt-BR Modern Run Dialog UI para Windows 10 e 11
 // @description:pt-BR Uma janela Executar moderna para Win + R e Executar nova tarefa no Gerenciador de Tarefas, com temas, histórico de comandos, comandos personalizados, sugestões de aplicativos e calculadora
-// @name:it-IT Finestra di dialogo Esegui moderna per Windows 10 e 11
+// @name:it-IT Modern Run Dialog UI per Windows 10 e 11
 // @description:it-IT Una finestra Esegui moderna per Win + R ed Esegui nuova attività in Gestione attività, con temi, cronologia dei comandi, comandi personalizzati, suggerimenti di app e calcolatrice
-// @name:uk-UA Сучасне вікно «Виконати» для Windows 10 і 11
+// @name:uk-UA Modern Run Dialog UI для Windows 10 і 11
 // @description:uk-UA Сучасне вікно «Виконати» для Win + R і дії «Запустити нове завдання» в диспетчері завдань. Містить теми, журнал команд, власні команди, підказки програм і калькулятор
-// @name:pl-PL Nowoczesne okno Uruchamianie dla Windows 10 i 11
+// @name:pl-PL Modern Run Dialog UI dla Windows 10 i 11
 // @description:pl-PL Nowoczesne okno Uruchamianie dla skrótu Win + R i opcji Uruchom nowe zadanie w Menedżerze zadań, z motywami, historią poleceń, własnymi poleceniami, sugestiami aplikacji i kalkulatorem
-// @name:nl-NL Modern dialoogvenster Uitvoeren voor Windows 10 en 11
+// @name:nl-NL Modern Run Dialog UI voor Windows 10 en 11
 // @description:nl-NL Een modern dialoogvenster voor Win + R en Nieuwe taak uitvoeren in Taakbeheer, met thema’s, opdrachtgeschiedenis, aangepaste opdrachten, app-suggesties en een rekenmachine
-// @name:tr-TR Windows 10 ve 11 için modern Çalıştır penceresi
+// @name:tr-TR Windows 10 ve 11 için Modern Run Dialog UI
 // @description:tr-TR Win + R ve Görev Yöneticisi’ndeki Yeni görev çalıştır için modern Çalıştır penceresi. Temalar, komut geçmişi, özel komutlar, uygulama önerileri ve hesap makinesi içerir
-// @name:hi-IN Windows 10 और 11 के लिए आधुनिक रन डायलॉग
+// @name:hi-IN Windows 10 और 11 के लिए Modern Run Dialog UI
 // @description:hi-IN Win + R और कार्य प्रबंधक में «नया कार्य चलाएँ» के लिए आधुनिक रन डायलॉग। इसमें थीम, कमांड का इतिहास, कस्टम कमांड, ऐप के सुझाव और कैलकुलेटर हैं
-// @name:ar مربع حوار «تشغيل» عصري لـ Windows 10 و11
+// @name:ar Modern Run Dialog UI لنظامي Windows 10 و11
 // @description:ar مربع حوار «تشغيل» عصري للاختصار Win + R ولخيار «تشغيل مهمة جديدة» في إدارة المهام. يتضمن نُسقًا وسجل الأوامر وأوامر مخصصة واقتراحات للتطبيقات وآلة حاسبة
-// @version         6.10.9
+// @version         6.10.10
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -50,7 +50,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 59
+// Build: 60
 
 // ==WindhawkModReadme==
 /*
@@ -816,19 +816,19 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:ja-JP: "範囲は -1 ～ 28 px。-1 はテーマに従い、0 は直角、14 は Windows 風の角、27 はカプセル型になります"
     $description:ko-KR: "범위는 -1~28 px입니다. -1은 테마 설정, 0은 직각, 14는 Windows 스타일, 27은 캡슐 모양입니다"
     $description:th-TH: "ตั้งได้ตั้งแต่ -1 ถึง 28 px โดย -1 ใช้ค่าของธีม, 0 เป็นมุมฉาก, 14 เป็นมุมแบบ Windows และ 27 เป็นทรงแคปซูล"
-    $description:id-ID: "Antara -1 dan 28 piksel. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul"
-    $description:ms-MY: "Antara -1 hingga 28 piksel. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul"
+    $description:id-ID: "Antara -1 dan 28 px. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul"
+    $description:ms-MY: "Antara -1 hingga 28 px. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul"
     $description:fr-FR: "De -1 à 28 px. -1 suit le thème, 0 donne des angles droits, 14 reprend le style Windows et 27 donne une forme de capsule"
     $description:de-DE: "Von -1 bis 28 px. -1 übernimmt das Design, 0 ergibt rechte Winkel, 14 entspricht dem Windows-Stil und 27 ergibt eine Kapselform"
     $description:es-ES: "De -1 a 28 px. -1 sigue el tema, 0 da esquinas rectas, 14 usa el estilo de Windows y 27 da forma de cápsula"
     $description:pt-BR: "De -1 a 28 px. -1 segue o tema, 0 deixa os cantos retos, 14 usa o estilo do Windows e 27 dá formato de cápsula"
     $description:it-IT: "Da -1 a 28 px. -1 segue il tema, 0 lascia gli angoli retti, 14 usa lo stile di Windows e 27 crea una forma a capsula"
-    $description:uk-UA: "Від -1 до 28 пкс. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула"
+    $description:uk-UA: "Від -1 до 28 px. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула"
     $description:pl-PL: "Od -1 do 28 px. -1 używa ustawienia motywu, 0 daje ostre narożniki, 14 odpowiada stylowi systemu Windows, a 27 nadaje kształt kapsuły"
     $description:nl-NL: "Van -1 tot 28 px. -1 volgt het thema, 0 geeft rechte hoeken, 14 gebruikt de Windows-stijl en 27 geeft een capsulevorm"
-    $description:tr-TR: "-1 ile 28 piksel arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir"
-    $description:hi-IN: "-1 से 28 पिक्सेल। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार"
-    $description:ar: "من ‎-1‎ إلى 28 بكسل. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة"
+    $description:tr-TR: "-1 ile 28 px arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir"
+    $description:hi-IN: "-1 से 28 px। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार"
+    $description:ar: "من ‎-1‎ إلى ‎28 px‎. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة"
   - innerCornerRadius: "-1"
     $name: "Inner Corner Radius"
     $name:ru-RU: "Радиус внутренних углов"
@@ -859,19 +859,19 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:ja-JP: "履歴、候補一覧、コンテキスト メニューの強調表示行の角の丸み。範囲は -1 ～ 28 px"
     $description:ko-KR: "기록, 추천 목록 및 상황에 맞는 메뉴에서 강조 표시되는 행의 모서리입니다. 범위는 -1~28 px입니다"
     $description:th-TH: "ความโค้งของมุมแถวที่ไฮไลต์ในประวัติ รายการแนะนำ และเมนูบริบท ตั้งได้ตั้งแต่ -1 ถึง 28 px"
-    $description:id-ID: "Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 piksel"
-    $description:ms-MY: "Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 piksel"
+    $description:id-ID: "Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 px"
+    $description:ms-MY: "Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 px"
     $description:fr-FR: "Angles des lignes mises en évidence dans l’historique, les suggestions et le menu contextuel. De -1 à 28 px"
     $description:de-DE: "Ecken der hervorgehobenen Zeilen im Verlauf, in Vorschlägen und im Kontextmenü. Von -1 bis 28 px"
     $description:es-ES: "Esquinas de las filas resaltadas en el historial, las sugerencias y el menú contextual. De -1 a 28 px"
     $description:pt-BR: "Cantos das linhas realçadas no histórico, nas sugestões e no menu de contexto. De -1 a 28 px"
     $description:it-IT: "Angoli delle righe evidenziate nella cronologia, nei suggerimenti e nel menu di scelta rapida. Da -1 a 28 px"
-    $description:uk-UA: "Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 пкс"
+    $description:uk-UA: "Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 px"
     $description:pl-PL: "Narożniki wyróżnionych wierszy w historii, sugestiach i menu kontekstowym. Od -1 do 28 px"
     $description:nl-NL: "Hoeken van gemarkeerde rijen in de geschiedenis, suggesties en het snelmenu. Van -1 tot 28 px"
-    $description:tr-TR: "Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 piksel arası"
-    $description:hi-IN: "इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 पिक्सेल"
-    $description:ar: "زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى 28 بكسل"
+    $description:tr-TR: "Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 px arası"
+    $description:hi-IN: "इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 px"
+    $description:ar: "زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى ‎28 px‎"
   - customBackgroundPath: ""
     $name: "Background Image"
     $name:ru-RU: "Фоновое изображение"
@@ -2492,19 +2492,19 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:ja-JP: "範囲は 360 ～ 1200 px。0 はインターフェイスの拡大率に従います"
     $description:ko-KR: "범위는 360~1200 px입니다. 0으로 설정하면 인터페이스 배율을 따릅니다"
     $description:th-TH: "ตั้งได้ตั้งแต่ 360 ถึง 1200 px หากตั้งเป็น 0 จะใช้ค่าตามอัตราส่วนอินเทอร์เฟซ"
-    $description:id-ID: "Antara 360 dan 1200 piksel. Nilai 0 mengikuti skala antarmuka"
-    $description:ms-MY: "Antara 360 hingga 1200 piksel. Nilai 0 mengikut skala antara muka"
+    $description:id-ID: "Antara 360 dan 1200 px. Nilai 0 mengikuti skala antarmuka"
+    $description:ms-MY: "Antara 360 hingga 1200 px. Nilai 0 mengikut skala antara muka"
     $description:fr-FR: "De 360 à 1200 px. À 0, suit l’échelle de l’interface"
     $description:de-DE: "Von 360 bis 1200 px. Bei 0 gilt die Skalierung der Oberfläche"
     $description:es-ES: "De 360 a 1200 px. Con 0, se usa la escala de la interfaz"
     $description:pt-BR: "De 360 a 1200 px. O valor 0 segue a escala da interface"
     $description:it-IT: "Da 360 a 1200 px. Con 0 segue il ridimensionamento dell’interfaccia"
-    $description:uk-UA: "Від 360 до 1200 пкс. За значення 0 діє масштаб інтерфейсу"
+    $description:uk-UA: "Від 360 до 1200 px. За значення 0 діє масштаб інтерфейсу"
     $description:pl-PL: "Od 360 do 1200 px. Przy wartości 0 obowiązuje skala interfejsu"
     $description:nl-NL: "Van 360 tot 1200 px. Bij 0 geldt de schaal van de interface"
-    $description:tr-TR: "360 ile 1200 piksel arası. 0 seçilirse arayüz ölçeği kullanılır"
-    $description:hi-IN: "360 से 1200 पिक्सेल। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
-    $description:ar: "من 360 إلى 1200 بكسل. عند تعيين 0، يُستخدم مقياس الواجهة"
+    $description:tr-TR: "360 ile 1200 px arası. 0 seçilirse arayüz ölçeği kullanılır"
+    $description:hi-IN: "360 से 1200 px। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
+    $description:ar: "من 360 إلى ‎1200 px‎. عند تعيين 0، يُستخدم مقياس الواجهة"
   - customBarHeight: 0
     $name: "Input Field Height"
     $name:ru-RU: "Высота поля ввода"
@@ -2535,19 +2535,19 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:ja-JP: "範囲は 36 ～ 96 px。0 はインターフェイスの拡大率に従います"
     $description:ko-KR: "범위는 36~96 px입니다. 0으로 설정하면 인터페이스 배율을 따릅니다"
     $description:th-TH: "ตั้งได้ตั้งแต่ 36 ถึง 96 px หากตั้งเป็น 0 จะใช้ค่าตามอัตราส่วนอินเทอร์เฟซ"
-    $description:id-ID: "Antara 36 dan 96 piksel. Nilai 0 mengikuti skala antarmuka"
-    $description:ms-MY: "Antara 36 hingga 96 piksel. Nilai 0 mengikut skala antara muka"
+    $description:id-ID: "Antara 36 dan 96 px. Nilai 0 mengikuti skala antarmuka"
+    $description:ms-MY: "Antara 36 hingga 96 px. Nilai 0 mengikut skala antara muka"
     $description:fr-FR: "De 36 à 96 px. À 0, suit l’échelle de l’interface"
     $description:de-DE: "Von 36 bis 96 px. Bei 0 gilt die Skalierung der Oberfläche"
     $description:es-ES: "De 36 a 96 px. Con 0, se usa la escala de la interfaz"
     $description:pt-BR: "De 36 a 96 px. O valor 0 segue a escala da interface"
     $description:it-IT: "Da 36 a 96 px. Con 0 segue il ridimensionamento dell’interfaccia"
-    $description:uk-UA: "Від 36 до 96 пкс. За значення 0 діє масштаб інтерфейсу"
+    $description:uk-UA: "Від 36 до 96 px. За значення 0 діє масштаб інтерфейсу"
     $description:pl-PL: "Od 36 do 96 px. Przy wartości 0 obowiązuje skala interfejsu"
     $description:nl-NL: "Van 36 tot 96 px. Bij 0 geldt de schaal van de interface"
-    $description:tr-TR: "36 ile 96 piksel arası. 0 seçilirse arayüz ölçeği kullanılır"
-    $description:hi-IN: "36 से 96 पिक्सेल। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
-    $description:ar: "من 36 إلى 96 بكسل. عند تعيين 0، يُستخدم مقياس الواجهة"
+    $description:tr-TR: "36 ile 96 px arası. 0 seçilirse arayüz ölçeği kullanılır"
+    $description:hi-IN: "36 से 96 px। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
+    $description:ar: "من 36 إلى ‎96 px‎. عند تعيين 0، يُستخدم مقياس الواجهة"
   - customFontSize: 0
     $name: "Font Size"
     $name:ru-RU: "Размер шрифта"
@@ -2623,7 +2623,7 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     $description:th-TH: "ขนาดโดยรวมของหน้าต่าง ตัวควบคุม และข้อความ"
     $description:id-ID: "Ukuran keseluruhan jendela, kontrol, dan teks"
     $description:ms-MY: "Saiz keseluruhan tetingkap, kawalan dan teks"
-    $description:fr-FR: "Taille de la fenêtre, des commandes et du texte"
+    $description:fr-FR: "Taille de la fenêtre, des éléments d’interface et du texte"
     $description:de-DE: "Größe von Fenster, Steuerelementen und Text"
     $description:es-ES: "Tamaño de la ventana, los controles y el texto"
     $description:pt-BR: "Tamanho da janela, dos controles e do texto"
@@ -13286,19 +13286,19 @@ CornerRadiusStrings GetCornerRadiusStrings(const std::wstring& rawLang) {
     if (code == L"ja") return { L"外側の角の半径", L"内側の角の半径", L"履歴、候補一覧、コンテキスト メニューの強調表示行の角の丸み。範囲は -1 ～ 28 px" };
     if (code == L"ko") return { L"바깥쪽 모서리 반경", L"안쪽 모서리 반경", L"기록, 추천 목록 및 상황에 맞는 메뉴에서 강조 표시되는 행의 모서리입니다. 범위는 -1~28 px입니다" };
     if (code == L"th") return { L"รัศมีมุมด้านนอก", L"รัศมีมุมด้านใน", L"ความโค้งของมุมแถวที่ไฮไลต์ในประวัติ รายการแนะนำ และเมนูบริบท ตั้งได้ตั้งแต่ -1 ถึง 28 px" };
-    if (code == L"id") return { L"Radius sudut luar", L"Radius sudut dalam", L"Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 piksel" };
-    if (code == L"ms") return { L"Jejari sudut luar", L"Jejari sudut dalam", L"Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 piksel" };
+    if (code == L"id") return { L"Radius sudut luar", L"Radius sudut dalam", L"Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 px" };
+    if (code == L"ms") return { L"Jejari sudut luar", L"Jejari sudut dalam", L"Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 px" };
     if (code == L"fr") return { L"Rayon des angles extérieurs", L"Rayon des angles intérieurs", L"Angles des lignes mises en évidence dans l’historique, les suggestions et le menu contextuel. De -1 à 28 px" };
     if (code == L"de") return { L"Äußerer Eckenradius", L"Innerer Eckenradius", L"Ecken der hervorgehobenen Zeilen im Verlauf, in Vorschlägen und im Kontextmenü. Von -1 bis 28 px" };
     if (code == L"es") return { L"Radio de las esquinas exteriores", L"Radio de las esquinas interiores", L"Esquinas de las filas resaltadas en el historial, las sugerencias y el menú contextual. De -1 a 28 px" };
     if (code == L"pt") return { L"Raio dos cantos externos", L"Raio dos cantos internos", L"Cantos das linhas realçadas no histórico, nas sugestões e no menu de contexto. De -1 a 28 px" };
     if (code == L"it") return { L"Raggio degli angoli esterni", L"Raggio degli angoli interni", L"Angoli delle righe evidenziate nella cronologia, nei suggerimenti e nel menu di scelta rapida. Da -1 a 28 px" };
-    if (code == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 пкс" };
+    if (code == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 px" };
     if (code == L"pl") return { L"Promień narożników zewnętrznych", L"Promień narożników wewnętrznych", L"Narożniki wyróżnionych wierszy w historii, sugestiach i menu kontekstowym. Od -1 do 28 px" };
     if (code == L"nl") return { L"Radius van buitenhoeken", L"Radius van binnenhoeken", L"Hoeken van gemarkeerde rijen in de geschiedenis, suggesties en het snelmenu. Van -1 tot 28 px" };
-    if (code == L"tr") return { L"Dış köşe yarıçapı", L"İç köşe yarıçapı", L"Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 piksel arası" };
-    if (code == L"hi") return { L"बाहरी कोनों की गोलाई", L"भीतरी कोनों की गोलाई", L"इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 पिक्सेल" };
-    if (code == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى 28 بكسل" };
+    if (code == L"tr") return { L"Dış köşe yarıçapı", L"İç köşe yarıçapı", L"Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 px arası" };
+    if (code == L"hi") return { L"बाहरी कोनों की गोलाई", L"भीतरी कोनों की गोलाई", L"इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 px" };
+    if (code == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى ‎28 px‎" };
     return { L"Outer Corner Radius", L"Inner Corner Radius", L"Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px" };
 }
 
@@ -13569,7 +13569,7 @@ RunDisplaySettingStrings GetRunDisplaySettingStrings(const std::wstring& languag
     };
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 59)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 60)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
@@ -13854,7 +13854,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Kombinasi siap pakai untuk warna, latar belakang, dan radius sudut", L"Mode warna", L"Mengikuti pengaturan Windows atau mode yang dipilih secara manual",
         L"Warna, latar belakang, dan sudut", L"", L"Warna latar belakang",
         L"Warna dalam format #RRGGBB, misalnya #1E1E24. Jika kosong, warna tema digunakan", L"Warna bingkai", L"Warna bingkai pada mode default. Gunakan format #RRGGBB, misalnya #4C566A. Jika kosong, warna tema digunakan",
-        L"Antara -1 dan 28 piksel. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul", L"Gambar latar belakang", L"PNG, JPG, BMP, WebP, atau GIF hingga 25 MB",
+        L"Antara -1 dan 28 px. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul", L"Gambar latar belakang", L"PNG, JPG, BMP, WebP, atau GIF hingga 25 MB",
         L"File aktif: ", L"Opasitas latar belakang", L"Opasitas gambar dan latar belakang jendela, termasuk saat gambar belum dipilih. 12–100% (default 84%)",
         L"Tata letak dan posisi", L"", L"Posisi jendela",
         L"Dalam mode otomatis, posisi ditentukan oleh tata letak", L"Ingat posisi jendela", L"Jendela dibuka pada posisi terakhir yang disimpan. Ctrl + 0 mereset posisi",
@@ -13881,7 +13881,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Gabungan warna, latar belakang dan jejari sudut yang telah ditetapkan", L"Mod warna", L"Mengikut tetapan Windows atau mod yang dipilih secara manual",
         L"Warna, latar belakang dan sudut", L"", L"Warna latar belakang",
         L"Warna dalam format #RRGGBB, contohnya #1E1E24. Jika kosong, warna tema digunakan", L"Warna sempadan", L"Warna sempadan dalam mod lalai. Gunakan format #RRGGBB, contohnya #4C566A. Jika kosong, warna tema digunakan",
-        L"Antara -1 hingga 28 piksel. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul", L"Imej latar belakang", L"PNG, JPG, BMP, WebP atau GIF sehingga 25 MB",
+        L"Antara -1 hingga 28 px. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul", L"Imej latar belakang", L"PNG, JPG, BMP, WebP atau GIF sehingga 25 MB",
         L"Fail aktif: ", L"Kelegapan latar belakang", L"Kelegapan imej dan latar belakang tetingkap, walaupun tiada imej dipilih. 12–100% (lalai 84%)",
         L"Susun atur dan kedudukan", L"", L"Kedudukan tetingkap",
         L"Dalam mod automatik, kedudukan ditentukan oleh susun atur", L"Ingat kedudukan tetingkap", L"Tetingkap dibuka pada kedudukan terakhir yang disimpan. Ctrl + 0 menetapkan semula kedudukan",
@@ -13912,7 +13912,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"En cours : ", L"Opacité de l’arrière-plan", L"Opacité de l’image et du fond de la fenêtre, même sans image. 12–100 % (84 % par défaut)",
         L"Disposition et position", L"", L"Position de la fenêtre",
         L"En mode automatique, la disposition détermine la position", L"Mémoriser la position de la fenêtre", L"Rouvre la fenêtre à la dernière position enregistrée. Ctrl + 0 la réinitialise",
-        L"Échelle de l’interface", L"Taille de la fenêtre, des commandes et du texte", L"Historique et fermeture",
+        L"Échelle de l’interface", L"Taille de la fenêtre, des éléments d’interface et du texte", L"Historique et fermeture",
         L"", L"Afficher l'historique", L"Commandes récentes et épinglées dans la liste",
         L"Vider le champ de saisie à l’ouverture", L"Le champ de saisie est vide à l’ouverture", L"Effacer l’historique",
         L"Supprime les commandes récentes de cette liste", L"Langue d’affichage", L"Choisir une couleur",
@@ -14043,7 +14043,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Готове поєднання кольорів, фону й заокруглення кутів", L"Колірний режим", L"За параметрами Windows або за вибором користувача",
         L"Кольори, фон і кути", L"", L"Колір фону",
         L"Колір у форматі #RRGGBB, наприклад #1E1E24. Якщо поле порожнє, використовується колір теми", L"Колір рамки", L"Колір рамки в режимі за замовчуванням. Формат #RRGGBB, наприклад #4C566A. Якщо поле порожнє, використовується колір теми",
-        L"Від -1 до 28 пкс. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула", L"Фонове зображення", L"PNG, JPG, BMP, WebP або GIF, до 25 МБ",
+        L"Від -1 до 28 px. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула", L"Фонове зображення", L"PNG, JPG, BMP, WebP або GIF, до 25 МБ",
         L"Поточний файл: ", L"Непрозорість фону", L"Непрозорість зображення й фону вікна, зокрема без зображення. 12–100% (за замовчуванням 84%)",
         L"Макет і розташування", L"", L"Розташування вікна",
         L"В автоматичному режимі розташування залежить від макета", L"Запам’ятовувати розташування вікна", L"Відкриває вікно в останньому збереженому місці. Ctrl + 0 скидає розташування",
@@ -14124,7 +14124,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"Renk, arka plan ve köşe yuvarlaklığı için hazır ayarlar", L"Renk modu", L"Windows ayarlarını veya elle seçilen modu kullanır",
         L"Renkler, arka plan ve köşeler", L"", L"Arka plan rengi",
         L"#RRGGBB biçiminde bir renk, örneğin #1E1E24. Boş bırakılırsa tema rengi kullanılır", L"Kenarlık rengi", L"Varsayılan moddaki kenarlık rengi. #RRGGBB biçimini kullanın, örneğin #4C566A. Boş bırakılırsa tema rengi kullanılır",
-        L"-1 ile 28 piksel arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir", L"Arka plan resmi", L"25 MB’a kadar PNG, JPG, BMP, WebP veya GIF",
+        L"-1 ile 28 px arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir", L"Arka plan resmi", L"25 MB’a kadar PNG, JPG, BMP, WebP veya GIF",
         L"Etkin dosya: ", L"Arka plan opaklığı", L"Resmin ve pencere arka planının opaklığı. Resim seçilmediğinde de geçerlidir. %12–100 (varsayılan %84)",
         L"Düzen ve konum", L"", L"Pencere konumu",
         L"Otomatik modda konumu pencere düzeni belirler", L"Pencere konumunu hatırla", L"Pencere son kaydedilen konumda açılır. Ctrl + 0 konumu sıfırlar",
@@ -14151,7 +14151,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"रंग, पृष्ठभूमि और कोनों की गोलाई का तैयार संयोजन", L"रंग मोड", L"Windows की सेटिंग या मैन्युअल रूप से चुना गया मोड",
         L"रंग, पृष्ठभूमि और कोने", L"", L"पृष्ठभूमि का रंग",
         L"#RRGGBB फ़ॉर्मैट में रंग, जैसे #1E1E24। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा", L"बॉर्डर का रंग", L"डिफ़ॉल्ट मोड में बॉर्डर का रंग। #RRGGBB फ़ॉर्मैट इस्तेमाल करें, जैसे #4C566A। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा",
-        L"-1 से 28 पिक्सेल। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार", L"पृष्ठभूमि की छवि", L"25 MB तक की PNG, JPG, BMP, WebP या GIF फ़ाइल",
+        L"-1 से 28 px। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार", L"पृष्ठभूमि की छवि", L"25 MB तक की PNG, JPG, BMP, WebP या GIF फ़ाइल",
         L"मौजूदा फ़ाइल: ", L"पृष्ठभूमि की अपारदर्शिता", L"छवि और विंडो की पृष्ठभूमि की अपारदर्शिता। छवि न चुने जाने पर भी लागू। 12–100% (डिफ़ॉल्ट 84%)",
         L"लेआउट और स्थान", L"", L"विंडो का स्थान",
         L"स्वचालित मोड में लेआउट से विंडो का स्थान तय होता है", L"विंडो का स्थान याद रखें", L"विंडो पिछली बार सहेजे गए स्थान पर खुलती है। Ctrl + 0 स्थान रीसेट करता है",
@@ -14178,7 +14178,7 @@ static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& 
         L"مجموعة جاهزة من الألوان والخلفية واستدارة الزوايا", L"وضع الألوان", L"يتبع إعدادات Windows أو الوضع المحدد يدويًا",
         L"الألوان والخلفية والزوايا", L"", L"لون الخلفية",
         L"لون بالتنسيق ‎#RRGGBB‎، مثل ‎#1E1E24‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا", L"لون الإطار", L"لون الإطار في الوضع الافتراضي. استخدم التنسيق ‎#RRGGBB‎، مثل ‎#4C566A‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا",
-        L"من ‎-1‎ إلى 28 بكسل. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة", L"صورة الخلفية", L"ملف PNG أو JPG أو BMP أو WebP أو GIF بحجم يصل إلى 25 ميغابايت",
+        L"من ‎-1‎ إلى ‎28 px‎. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة", L"صورة الخلفية", L"ملف PNG أو JPG أو BMP أو WebP أو GIF بحجم يصل إلى 25 ميغابايت",
         L"الملف الحالي: ", L"عتامة الخلفية", L"عتامة الصورة وخلفية النافذة حتى عند عدم تعيين صورة. من 12٪ إلى 100٪ (الافتراضي 84٪)",
         L"التخطيط والموضع", L"", L"موضع النافذة",
         L"يحدد التخطيط موضع النافذة في الوضع التلقائي", L"تذكّر موضع النافذة", L"تُفتح النافذة في آخر موضع محفوظ. يعيد Ctrl + 0 تعيين الموضع",

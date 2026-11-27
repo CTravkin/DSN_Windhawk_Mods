@@ -1209,6 +1209,7 @@ test('all declared languages have settings and runtime translations', () => {
         for (const field of ['name', 'description']) {
             assert.match(source, new RegExp(`^// @${field}:${tag} .+`, 'm'));
         }
+        assert.match(source, new RegExp(`^// @name:${tag} [^\\r\\n]*Modern Run Dialog UI[^\\r\\n]*$`, 'm'));
         for (const field of ['name', 'description', 'options']) {
             const count = suffix => [...schema.matchAll(new RegExp(`^ +\\$${field}${suffix}:(?=\\s|$)`, 'gm'))].length;
             assert.equal(count(`:${tag}`), count(''), `${tag} coverage for ${field}`);
@@ -1220,6 +1221,7 @@ test('all declared languages have settings and runtime translations', () => {
     }
     assert.match(source, /if \(lang == L"zh-cn"\) return L"zh_cn";/);
     assert.match(source, /if \(lang == L"zh-tw"\) return L"zh_tw";/);
+    assert.doesNotMatch(schema, /\d+ (?:пкс|piksel|पिक्सेल|بكسل)/u);
 });
 
 function compileChecks(checks, run = false, libraries = []) {
