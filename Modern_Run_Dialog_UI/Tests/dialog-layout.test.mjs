@@ -128,7 +128,7 @@ test('settings show the current version and build number without a prefix', () =
     const build = source.match(/^\/\/ Build: (\d+)$/m)?.[1];
     assert.ok(build);
     assert.ok(source.includes('kSettingsVersion[] = WH_MOD_VERSION L" (build ' + build + ')"'));
-    assert.match(source, /L"Modern Run", kSettingsVersion/);
+    assert.match(source, /L"Modern Run", kSettingsVersion, true/);
 });
 
 test('the menu icon slot starts inside the hover and group dividers stay compact', () => {
@@ -1192,6 +1192,34 @@ test('the Windows shell receives complete long arguments and expanded locations 
             CoUninitialize();
         }
     `, true, ['-municode', '-lshlwapi', '-lshell32', '-lole32']);
+});
+
+test('all declared languages have settings and runtime translations', () => {
+    const languages = {
+        en: '', ru: 'ru-RU', vi: 'vi-VN', zh_cn: 'zh-CN', zh_tw: 'zh-TW', ja: 'ja-JP',
+        ko: 'ko-KR', th: 'th-TH', id: 'id-ID', ms: 'ms-MY', fr: 'fr-FR', de: 'de-DE',
+        es: 'es-ES', pt: 'pt-BR', it: 'it-IT', uk: 'uk-UA', pl: 'pl-PL', nl: 'nl-NL',
+        tr: 'tr-TR', hi: 'hi-IN', ar: 'ar',
+    };
+    const schema = source.split('// ==WindhawkModSettings==')[1].split('// ==/WindhawkModSettings==')[0];
+    const runtimeLookups = ['GetLocalizedStringsForLanguage', 'GetSettingsLocalizedStrings',
+        'GetActionButtonStrings', 'GetAliasSettingsStrings', 'GetTaskbarIconStrings'];
+    for (const [language, tag] of Object.entries(languages)) {
+        if (!tag) continue;
+        for (const field of ['name', 'description']) {
+            assert.match(source, new RegExp(`^// @${field}:${tag} .+`, 'm'));
+        }
+        for (const field of ['name', 'description', 'options']) {
+            const count = suffix => [...schema.matchAll(new RegExp(`^ +\\$${field}${suffix}:(?=\\s|$)`, 'gm'))].length;
+            assert.equal(count(`:${tag}`), count(''), `${tag} coverage for ${field}`);
+        }
+        for (const lookup of runtimeLookups) {
+            const body = source.slice(source.indexOf(`${lookup}(`)).split('\n}')[0];
+            assert.ok(body.includes(`== L"${language}"`), `${lookup} handles ${language}`);
+        }
+    }
+    assert.match(source, /if \(lang == L"zh-cn"\) return L"zh_cn";/);
+    assert.match(source, /if \(lang == L"zh-tw"\) return L"zh_tw";/);
 });
 
 function compileChecks(checks, run = false, libraries = []) {

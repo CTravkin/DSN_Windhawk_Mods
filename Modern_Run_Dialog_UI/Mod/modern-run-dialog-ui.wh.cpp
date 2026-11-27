@@ -1,10 +1,48 @@
 // ==WindhawkMod==
 // @id              modern-run-dialog-ui
-// @name            Modern Run Dialog UI For Windows 10 & 11
-// @name:vi-VN      Giao diện Hộp thoại Run Hiện đại cho Windows 10 & 11
-// @description     Replaces the Win + R and Task Manager "Run new task" dialogs with a modern launcher: 13 themes, a Settings window, custom colors and GIF backgrounds, Compact mode, pinning, aliases, a calculator and app suggestions.
-// @description:vi-VN Thay hộp thoại Win + R và Tạo tác vụ mới trong Task Manager bằng giao diện hiện đại: 13 chủ đề, cửa sổ Cài đặt, tùy chỉnh màu và hình nền GIF, chế độ thu nhỏ, ghim lệnh, bí danh, máy tính nhanh và gợi ý ứng dụng.
-// @version         6.10.6
+// @name Modern Run Dialog UI For Windows 10 & 11
+// @description A modern Run dialog for Win + R and Run new task in Task Manager, with themes, command history, custom commands, app suggestions, and a calculator
+// @name:ru-RU Современное окно «Выполнить» для Windows 10 и 11
+// @description:ru-RU Современное окно «Выполнить» для Win + R и запуска новой задачи из Диспетчера задач. Поддерживает темы, историю, собственные команды, подсказки приложений и калькулятор
+// @name:vi-VN Giao diện hộp thoại Chạy hiện đại cho Windows 10 và 11
+// @description:vi-VN Hộp thoại Chạy hiện đại cho Win + R và mục Chạy tác vụ mới trong Trình quản lý Tác vụ, với chủ đề, lịch sử lệnh, lệnh tùy chỉnh, gợi ý ứng dụng và máy tính
+// @name:zh-CN 适用于 Windows 10 和 11 的现代运行对话框
+// @description:zh-CN 为 Win + R 和任务管理器中的“运行新任务”提供现代运行对话框，支持主题、命令历史记录、自定义命令、应用建议和计算器
+// @name:zh-TW 適用於 Windows 10 和 11 的現代化執行對話方塊
+// @description:zh-TW 為 Win + R 與工作管理員中的「執行新工作」提供現代化執行對話方塊，支援佈景主題、命令歷程記錄、自訂命令、應用程式建議與小算盤
+// @name:ja-JP Windows 10・11 向けの新しい「ファイル名を指定して実行」
+// @description:ja-JP Win + R やタスク マネージャーの「新しいタスクを実行する」で開く新しい実行ダイアログです。テーマ、コマンド履歴、カスタム コマンド、アプリの候補、電卓を備えています
+// @name:ko-KR Windows 10 및 11용 새 실행 대화 상자
+// @description:ko-KR Win + R 또는 작업 관리자의 ‘새 작업 실행’에서 열리는 새 실행 대화 상자입니다. 테마, 명령 기록, 사용자 지정 명령, 앱 추천 및 계산기를 제공합니다
+// @name:th-TH กล่องโต้ตอบเรียกใช้โฉมใหม่สำหรับ Windows 10 และ 11
+// @description:th-TH กล่องโต้ตอบเรียกใช้โฉมใหม่สำหรับ Win + R และคำสั่ง “เรียกใช้งานใหม่” ในตัวจัดการงาน พร้อมธีม ประวัติคำสั่ง คำสั่งแบบกำหนดเอง คำแนะนำแอป และเครื่องคิดเลข
+// @name:id-ID Dialog Jalankan modern untuk Windows 10 dan 11
+// @description:id-ID Dialog Jalankan modern untuk Win + R dan Jalankan tugas baru di Manajer Tugas. Dilengkapi tema, riwayat perintah, perintah khusus, saran aplikasi, dan kalkulator
+// @name:ms-MY Dialog Jalankan moden untuk Windows 10 dan 11
+// @description:ms-MY Dialog Jalankan moden untuk Win + R dan Jalankan tugas baharu dalam Pengurus Tugas. Dilengkapi tema, sejarah arahan, arahan tersuai, cadangan aplikasi dan kalkulator
+// @name:fr-FR Interface moderne pour la boîte de dialogue Exécuter de Windows 10 et 11
+// @description:fr-FR Une boîte de dialogue Exécuter moderne pour Win + R et l’action Exécuter une nouvelle tâche du Gestionnaire des tâches, avec des thèmes, un historique, des commandes personnalisées, des suggestions d’applications et une calculatrice
+// @name:de-DE Modernes Dialogfeld „Ausführen“ für Windows 10 und 11
+// @description:de-DE Modernes Dialogfeld für Win + R und „Neuen Task ausführen“ im Task-Manager mit Designs, Befehlsverlauf, benutzerdefinierten Befehlen, App-Vorschlägen und Rechner
+// @name:es-ES Cuadro de diálogo Ejecutar moderno para Windows 10 y 11
+// @description:es-ES Un cuadro de diálogo Ejecutar moderno para Win + R y Ejecutar nueva tarea en el Administrador de tareas, con temas, historial de comandos, comandos personalizados, sugerencias de aplicaciones y calculadora
+// @name:pt-BR Janela Executar moderna para Windows 10 e 11
+// @description:pt-BR Uma janela Executar moderna para Win + R e Executar nova tarefa no Gerenciador de Tarefas, com temas, histórico de comandos, comandos personalizados, sugestões de aplicativos e calculadora
+// @name:it-IT Finestra di dialogo Esegui moderna per Windows 10 e 11
+// @description:it-IT Una finestra Esegui moderna per Win + R ed Esegui nuova attività in Gestione attività, con temi, cronologia dei comandi, comandi personalizzati, suggerimenti di app e calcolatrice
+// @name:uk-UA Сучасне вікно «Виконати» для Windows 10 і 11
+// @description:uk-UA Сучасне вікно «Виконати» для Win + R і дії «Запустити нове завдання» в диспетчері завдань. Містить теми, журнал команд, власні команди, підказки програм і калькулятор
+// @name:pl-PL Nowoczesne okno Uruchamianie dla Windows 10 i 11
+// @description:pl-PL Nowoczesne okno Uruchamianie dla skrótu Win + R i opcji Uruchom nowe zadanie w Menedżerze zadań, z motywami, historią poleceń, własnymi poleceniami, sugestiami aplikacji i kalkulatorem
+// @name:nl-NL Modern dialoogvenster Uitvoeren voor Windows 10 en 11
+// @description:nl-NL Een modern dialoogvenster voor Win + R en Nieuwe taak uitvoeren in Taakbeheer, met thema’s, opdrachtgeschiedenis, aangepaste opdrachten, app-suggesties en een rekenmachine
+// @name:tr-TR Windows 10 ve 11 için modern Çalıştır penceresi
+// @description:tr-TR Win + R ve Görev Yöneticisi’ndeki Yeni görev çalıştır için modern Çalıştır penceresi. Temalar, komut geçmişi, özel komutlar, uygulama önerileri ve hesap makinesi içerir
+// @name:hi-IN Windows 10 और 11 के लिए आधुनिक रन डायलॉग
+// @description:hi-IN Win + R और कार्य प्रबंधक में «नया कार्य चलाएँ» के लिए आधुनिक रन डायलॉग। इसमें थीम, कमांड का इतिहास, कस्टम कमांड, ऐप के सुझाव और कैलकुलेटर हैं
+// @name:ar مربع حوار «تشغيل» عصري لـ Windows 10 و11
+// @description:ar مربع حوار «تشغيل» عصري للاختصار Win + R ولخيار «تشغيل مهمة جديدة» في إدارة المهام. يتضمن نُسقًا وسجل الأوامر وأوامر مخصصة واقتراحات للتطبيقات وآلة حاسبة
+// @version         6.10.9
 // @author          caotu2005
 // @github          https://github.com/caotu2005
 // @include         explorer.exe
@@ -12,7 +50,7 @@
 // @include         windhawk.exe
 // @compilerOptions -ldwmapi -lgdi32 -luser32 -lshell32 -lshlwapi -lcomctl32 -lversion -limm32 -lcomdlg32 -ld2d1 -ldwrite -ladvapi32 -lole32 -luuid -lwindowscodecs -lruntimeobject -loleaut32
 // ==/WindhawkMod==
-// Build: 56
+// Build: 59
 
 // ==WindhawkModReadme==
 /*
@@ -136,51 +174,385 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 /*
 - appearanceGroup:
   - themePreset: windows_blur
-    $description:ru-RU: "Готовое сочетание цветов, фона и скругления углов"
-    $name:ru-RU: "Тема"
-    $description: "A preset of colors, background, and corner radius"
     $name: "Theme"
-    $name:vi-VN: Chủ đề giao diện (Theme Preset)
-    $description:vi-VN: Chọn trong 13 chủ đề có sẵn (mặc định Windows 11 Blur dễ đọc, hài hòa; hỗ trợ Liquid Glass, Mica, OLED, Nord, Catppuccin, Dracula và Tự tùy chỉnh).
-    $options:vi-VN:
-    - windows_blur: Windows 11 Blur (Mặc định khuyên dùng)
-    - liquid_glass: Liquid Glass (Kính trong suốt khúc xạ)
-    - mica_alt: Windows 11 Mica (Bề mặt Mica mềm mại)
-    - fluent_solid: Fluent Solid (Nền đặc Win11 hiện đại)
-    - classic_win11: Classic Win11 (Bo góc nhẹ, viền tinh giản)
-    - midnight_oled: Midnight OLED (Đen sâu tiết kiệm pin)
-    - nord_frost: Nord Frost (Xám Bắc Âu viền băng)
-    - catppuccin_mocha: Catppuccin Mocha (Tối dịu viền oải hương)
-    - dracula_velvet: Dracula Velvet (Tím than viền tím sáng)
-    - rose_pine: Rosé Pine (Tối trầm viền hồng vàng)
-    - emerald_slate: Emerald Slate (Xanh rừng sâu viền ngọc)
-    - warm_paper: Warm Paper (Nền giấy sáng dịu mắt)
-    - custom: Tự tùy chỉnh màu & bo góc (Custom)
+    $name:ru-RU: "Тема"
+    $name:vi-VN: "Chủ đề"
+    $name:zh-CN: "主题"
+    $name:zh-TW: "佈景主題"
+    $name:ja-JP: "テーマ"
+    $name:ko-KR: "테마"
+    $name:th-TH: "ธีม"
+    $name:id-ID: "Tema"
+    $name:ms-MY: "Tema"
+    $name:fr-FR: "Thème"
+    $name:de-DE: "Design"
+    $name:es-ES: "Tema"
+    $name:pt-BR: "Tema"
+    $name:it-IT: "Tema"
+    $name:uk-UA: "Тема"
+    $name:pl-PL: "Motyw"
+    $name:nl-NL: "Thema"
+    $name:tr-TR: "Tema"
+    $name:hi-IN: "थीम"
+    $name:ar: "النسق"
+    $description: "A preset of colors, background, and corner radius"
+    $description:ru-RU: "Готовое сочетание цветов, фона и скругления углов"
+    $description:vi-VN: "Bộ màu, nền và bán kính bo góc có sẵn"
+    $description:zh-CN: "预设配色、背景与圆角半径"
+    $description:zh-TW: "預設的配色、背景與圓角半徑"
+    $description:ja-JP: "配色、背景、角の丸みをまとめたプリセット"
+    $description:ko-KR: "색상, 배경 및 모서리 반경을 미리 설정한 테마"
+    $description:th-TH: "ชุดสี พื้นหลัง และรัศมีมุมที่กำหนดไว้ล่วงหน้า"
+    $description:id-ID: "Kombinasi siap pakai untuk warna, latar belakang, dan radius sudut"
+    $description:ms-MY: "Gabungan warna, latar belakang dan jejari sudut yang telah ditetapkan"
+    $description:fr-FR: "Ensemble prédéfini de couleurs, de fond et d’arrondis"
+    $description:de-DE: "Voreinstellung für Farben, Hintergrund und Eckenradius"
+    $description:es-ES: "Combinación predefinida de colores, fondo y redondeo de esquinas"
+    $description:pt-BR: "Combinação predefinida de cores, fundo e arredondamento dos cantos"
+    $description:it-IT: "Combinazione predefinita di colori, sfondo e arrotondamento degli angoli"
+    $description:uk-UA: "Готове поєднання кольорів, фону й заокруглення кутів"
+    $description:pl-PL: "Zestaw kolorów, tła i zaokrągleń narożników"
+    $description:nl-NL: "Voorinstelling voor kleuren, achtergrond en hoekafronding"
+    $description:tr-TR: "Renk, arka plan ve köşe yuvarlaklığı için hazır ayarlar"
+    $description:hi-IN: "रंग, पृष्ठभूमि और कोनों की गोलाई का तैयार संयोजन"
+    $description:ar: "مجموعة جاهزة من الألوان والخلفية واستدارة الزوايا"
     $options:
-    - windows_blur: Windows 11 Blur (Recommended Default)
-    - liquid_glass: Liquid Glass (Refractive Glass)
-    - mica_alt: Windows 11 Mica (Soft Native Mica)
-    - fluent_solid: Fluent Solid (Opaque Win11 Pill)
-    - classic_win11: Classic Win11 (Subtle Corners & Border)
-    - midnight_oled: Midnight OLED (Deep Black)
-    - nord_frost: Nord Frost (Arctic Slate & Ice)
-    - catppuccin_mocha: Catppuccin Mocha (Warm Dark & Lavender)
-    - dracula_velvet: Dracula Velvet (Deep Plum & Violet)
-    - rose_pine: Rosé Pine (Twilight & Rose Gold)
-    - emerald_slate: Emerald Slate (Deep Forest & Mint)
-    - warm_paper: Warm Paper (Soft Light Ivory)
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
     - custom: Custom Colors & Corner Radius
-  - colorMode: auto
-    $description:ru-RU: "Соответствие настройкам Windows или выбор вручную"
-    $name:ru-RU: "Цветовой режим"
-    $name: "Color Mode"
-    $name:vi-VN: Chế độ màu Sáng / Tối
-    $description: "Follows Windows settings or a manually selected mode"
-    $description:vi-VN: Tự động theo giao diện Sáng/Tối của Windows và độ sáng nền, hoặc chọn cố định.
+    $options:ru-RU:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Свои цвета и радиус углов
     $options:vi-VN:
-    - auto: Tự động theo Windows
-    - dark: Giao diện Tối (Dark)
-    - light: Giao diện Sáng (Light)
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Tùy chỉnh màu và độ bo góc
+    $options:zh-CN:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: 自定义颜色和圆角半径
+    $options:zh-TW:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: 自訂色彩與圓角半徑
+    $options:ja-JP:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: 色と角の丸みをカスタマイズ
+    $options:ko-KR:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: 사용자 지정 색상 및 모서리 반경
+    $options:th-TH:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: กำหนดสีและรัศมีมุมเอง
+    $options:id-ID:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Warna dan radius sudut khusus
+    $options:ms-MY:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Warna dan jejari sudut tersuai
+    $options:fr-FR:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Couleurs et rayon des angles personnalisés
+    $options:de-DE:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Benutzerdefinierte Farben und Eckenradien
+    $options:es-ES:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Colores y redondeo personalizados
+    $options:pt-BR:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Cores e arredondamento personalizados
+    $options:it-IT:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Colori e arrotondamento personalizzati
+    $options:uk-UA:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Власні кольори й заокруглення
+    $options:pl-PL:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Własne kolory i zaokrąglenia
+    $options:nl-NL:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Aangepaste kleuren en hoekafronding
+    $options:tr-TR:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: Özel renkler ve köşe yarıçapı
+    $options:hi-IN:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: कस्टम रंग और कोनों की गोलाई
+    $options:ar:
+    - windows_blur: Windows 11 Blur
+    - liquid_glass: Liquid Glass
+    - mica_alt: Windows 11 Mica
+    - fluent_solid: Fluent Solid
+    - classic_win11: Classic Win11
+    - midnight_oled: Midnight OLED
+    - nord_frost: Nord Frost
+    - catppuccin_mocha: Catppuccin Mocha
+    - dracula_velvet: Dracula Velvet
+    - rose_pine: Rosé Pine
+    - emerald_slate: Emerald Slate
+    - warm_paper: Warm Paper
+    - custom: ألوان واستدارة زوايا مخصصة
+  - colorMode: auto
+    $name: "Color Mode"
+    $name:ru-RU: "Цветовой режим"
+    $name:vi-VN: "Chế độ màu"
+    $name:zh-CN: "颜色模式"
+    $name:zh-TW: "色彩模式"
+    $name:ja-JP: "カラーモード"
+    $name:ko-KR: "색 모드"
+    $name:th-TH: "โหมดสี"
+    $name:id-ID: "Mode warna"
+    $name:ms-MY: "Mod warna"
+    $name:fr-FR: "Mode de couleur"
+    $name:de-DE: "Farbmodus"
+    $name:es-ES: "Modo de color"
+    $name:pt-BR: "Modo de cor"
+    $name:it-IT: "Modalità colore"
+    $name:uk-UA: "Колірний режим"
+    $name:pl-PL: "Tryb kolorów"
+    $name:nl-NL: "Kleurmodus"
+    $name:tr-TR: "Renk modu"
+    $name:hi-IN: "रंग मोड"
+    $name:ar: "وضع الألوان"
+    $description: "Follows Windows settings or a manually selected mode"
+    $description:ru-RU: "Соответствие настройкам Windows или выбор вручную"
+    $description:vi-VN: "Dùng chế độ màu của Windows hoặc chọn thủ công"
+    $description:zh-CN: "跟随 Windows 设置，也可手动选择模式"
+    $description:zh-TW: "依 Windows 設定，或手動選擇模式"
+    $description:ja-JP: "Windows の設定に従うか、モードを手動で選択"
+    $description:ko-KR: "Windows 설정을 따르거나 모드를 직접 선택"
+    $description:th-TH: "ใช้โหมดสีตาม Windows หรือเลือกโหมดเอง"
+    $description:id-ID: "Mengikuti pengaturan Windows atau mode yang dipilih secara manual"
+    $description:ms-MY: "Mengikut tetapan Windows atau mod yang dipilih secara manual"
+    $description:fr-FR: "Suit les paramètres de Windows ou utilise le mode sélectionné"
+    $description:de-DE: "Übernimmt die Windows-Einstellungen oder den ausgewählten Modus"
+    $description:es-ES: "Sigue la configuración de Windows o usa el modo seleccionado"
+    $description:pt-BR: "Segue as configurações do Windows ou usa o modo selecionado"
+    $description:it-IT: "Usa le impostazioni di Windows o la modalità selezionata"
+    $description:uk-UA: "За параметрами Windows або за вибором користувача"
+    $description:pl-PL: "Zgodnie z ustawieniami systemu Windows lub wybranym trybem"
+    $description:nl-NL: "Volgt de Windows-instellingen of gebruikt de gekozen modus"
+    $description:tr-TR: "Windows ayarlarını veya elle seçilen modu kullanır"
+    $description:hi-IN: "Windows की सेटिंग या मैन्युअल रूप से चुना गया मोड"
+    $description:ar: "يتبع إعدادات Windows أو الوضع المحدد يدويًا"
     $options:
     - auto: Auto
     - dark: Dark Mode
@@ -189,581 +561,1315 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - auto: Авто
     - dark: Темный
     - light: Светлый
+    $options:vi-VN:
+    - auto: Tự động
+    - dark: Tối
+    - light: Sáng
+    $options:zh-CN:
+    - auto: 自动
+    - dark: 深色
+    - light: 浅色
+    $options:zh-TW:
+    - auto: 自動
+    - dark: 深色
+    - light: 淺色
+    $options:ja-JP:
+    - auto: 自動
+    - dark: ダーク
+    - light: ライト
+    $options:ko-KR:
+    - auto: 자동
+    - dark: 어둡게
+    - light: 밝게
+    $options:th-TH:
+    - auto: อัตโนมัติ
+    - dark: มืด
+    - light: สว่าง
+    $options:id-ID:
+    - auto: Otomatis
+    - dark: Gelap
+    - light: Terang
+    $options:ms-MY:
+    - auto: Automatik
+    - dark: Gelap
+    - light: Cerah
+    $options:fr-FR:
+    - auto: Automatique
+    - dark: Mode sombre
+    - light: Mode clair
+    $options:de-DE:
+    - auto: Automatisch
+    - dark: Dunkler Modus
+    - light: Heller Modus
+    $options:es-ES:
+    - auto: Automático
+    - dark: Modo oscuro
+    - light: Modo claro
+    $options:pt-BR:
+    - auto: Automático
+    - dark: Modo escuro
+    - light: Modo claro
+    $options:it-IT:
+    - auto: Automatico
+    - dark: Modalità scura
+    - light: Modalità chiara
+    $options:uk-UA:
+    - auto: Автоматично
+    - dark: Темний
+    - light: Світлий
+    $options:pl-PL:
+    - auto: Automatycznie
+    - dark: Tryb ciemny
+    - light: Tryb jasny
+    $options:nl-NL:
+    - auto: Automatisch
+    - dark: Donkere modus
+    - light: Lichte modus
+    $options:tr-TR:
+    - auto: Otomatik
+    - dark: Koyu
+    - light: Açık
+    $options:hi-IN:
+    - auto: अपने आप
+    - dark: गहरा
+    - light: हल्का
+    $options:ar:
+    - auto: تلقائي
+    - dark: داكن
+    - light: فاتح
   - iconSet: default
-    $description:ru-RU: "Набор значков для окна и контекстного меню"
-    $description: "Icon set for the window and context menu"
     $name: "Icons"
+    $name:ru-RU: "Иконки"
+    $name:vi-VN: "Biểu tượng"
+    $name:zh-CN: "图标"
+    $name:zh-TW: "圖示"
+    $name:ja-JP: "アイコン"
+    $name:ko-KR: "아이콘"
+    $name:th-TH: "ไอคอน"
+    $name:id-ID: "Ikon"
+    $name:ms-MY: "Ikon"
+    $name:fr-FR: "Icônes"
+    $name:de-DE: "Symbole"
+    $name:es-ES: "Iconos"
+    $name:pt-BR: "Ícones"
+    $name:it-IT: "Icone"
+    $name:uk-UA: "Піктограми"
+    $name:pl-PL: "Ikony"
+    $name:nl-NL: "Pictogrammen"
+    $name:tr-TR: "Simgeler"
+    $name:hi-IN: "आइकन"
+    $name:ar: "الأيقونات"
+    $description: "Icon set for the window and context menu"
+    $description:ru-RU: "Набор значков для окна и контекстного меню"
+    $description:vi-VN: "Bộ biểu tượng cho cửa sổ và menu ngữ cảnh"
+    $description:zh-CN: "窗口和上下文菜单的图标组"
+    $description:zh-TW: "視窗與快顯功能表使用的圖示組"
+    $description:ja-JP: "ウィンドウとコンテキスト メニューで使用するアイコン"
+    $description:ko-KR: "창과 상황에 맞는 메뉴에 사용할 아이콘 모음"
+    $description:th-TH: "ชุดไอคอนสำหรับหน้าต่างและเมนูบริบท"
+    $description:id-ID: "Set ikon untuk jendela dan menu konteks"
+    $description:ms-MY: "Set ikon untuk tetingkap dan menu konteks"
+    $description:fr-FR: "Jeu d’icônes de la fenêtre et du menu contextuel"
+    $description:de-DE: "Symbolsatz für Fenster und Kontextmenü"
+    $description:es-ES: "Conjunto de iconos de la ventana y del menú contextual"
+    $description:pt-BR: "Conjunto de ícones da janela e do menu de contexto"
+    $description:it-IT: "Set di icone per la finestra e il menu di scelta rapida"
+    $description:uk-UA: "Набір піктограм для вікна й контекстного меню"
+    $description:pl-PL: "Zestaw ikon okna i menu kontekstowego"
+    $description:nl-NL: "Pictogrammenset voor het venster en het snelmenu"
+    $description:tr-TR: "Pencere ve bağlam menüsü simgeleri"
+    $description:hi-IN: "विंडो और संदर्भ मेनू के आइकन"
+    $description:ar: "مجموعة أيقونات النافذة وقائمة السياق"
     $options:
     - default: Default
     - windows_fluent: Windows (Fluent)
-    $name:vi-VN: Biểu tượng
-    $options:vi-VN:
-    - default: Biểu tượng của mod
-    - windows_fluent: Windows (Fluent)
-    $name:th-TH: ไอคอน
-    $options:th-TH:
-    - default: ไอคอนของม็อด
-    - windows_fluent: Windows (Fluent)
-    $name:id-ID: Ikon
-    $options:id-ID:
-    - default: Ikon mod
-    - windows_fluent: Windows (Fluent)
-    $name:ms-MY: Ikon
-    $options:ms-MY:
-    - default: Ikon mod
-    - windows_fluent: Windows (Fluent)
-    $name:ja-JP: アイコン
-    $options:ja-JP:
-    - default: Mod のアイコン
-    - windows_fluent: Windows (Fluent)
-    $name:zh-CN: 图标
-    $options:zh-CN:
-    - default: 模组图标
-    - windows_fluent: Windows (Fluent)
-    $name:zh-TW: 圖示
-    $options:zh-TW:
-    - default: 模組圖示
-    - windows_fluent: Windows (Fluent)
-    $name:ko-KR: 아이콘
-    $options:ko-KR:
-    - default: 모드 아이콘
-    - windows_fluent: Windows (Fluent)
-    $name:fr-FR: Icônes
-    $options:fr-FR:
-    - default: Icônes du mod
-    - windows_fluent: Windows (Fluent)
-    $name:de-DE: Symbole
-    $options:de-DE:
-    - default: Symbole des Mods
-    - windows_fluent: Windows (Fluent)
-    $name:es-ES: Iconos
-    $options:es-ES:
-    - default: Iconos del mod
-    - windows_fluent: Windows (Fluent)
-    $name:pt-BR: Ícones
-    $options:pt-BR:
-    - default: Ícones do mod
-    - windows_fluent: Windows (Fluent)
-    $name:it-IT: Icone
-    $options:it-IT:
-    - default: Icone della mod
-    - windows_fluent: Windows (Fluent)
-    $name:ru-RU: "Иконки"
     $options:ru-RU:
     - default: По умолчанию
     - windows_fluent: Windows (Fluent)
-    $name:uk-UA: Піктограми
+    $options:vi-VN:
+    - default: Mặc định
+    - windows_fluent: Windows (Fluent)
+    $options:zh-CN:
+    - default: 默认
+    - windows_fluent: Windows (Fluent)
+    $options:zh-TW:
+    - default: 預設
+    - windows_fluent: Windows (Fluent)
+    $options:ja-JP:
+    - default: 既定
+    - windows_fluent: Windows (Fluent)
+    $options:ko-KR:
+    - default: 기본값
+    - windows_fluent: Windows (Fluent)
+    $options:th-TH:
+    - default: ค่าเริ่มต้น
+    - windows_fluent: Windows (Fluent)
+    $options:id-ID:
+    - default: Default
+    - windows_fluent: Windows (Fluent)
+    $options:ms-MY:
+    - default: Lalai
+    - windows_fluent: Windows (Fluent)
+    $options:fr-FR:
+    - default: Par défaut
+    - windows_fluent: Windows (Fluent)
+    $options:de-DE:
+    - default: Standard
+    - windows_fluent: Windows (Fluent)
+    $options:es-ES:
+    - default: Predeterminado
+    - windows_fluent: Windows (Fluent)
+    $options:pt-BR:
+    - default: Padrão
+    - windows_fluent: Windows (Fluent)
+    $options:it-IT:
+    - default: Predefinito
+    - windows_fluent: Windows (Fluent)
     $options:uk-UA:
-    - default: Піктограми мода
+    - default: За замовчуванням
     - windows_fluent: Windows (Fluent)
-    $name:pl-PL: Ikony
     $options:pl-PL:
-    - default: Ikony moda
+    - default: Domyślne
     - windows_fluent: Windows (Fluent)
-    $name:nl-NL: Pictogrammen
     $options:nl-NL:
-    - default: Pictogrammen van de mod
+    - default: Standaard
     - windows_fluent: Windows (Fluent)
-    $name:tr-TR: Simgeler
     $options:tr-TR:
-    - default: Mod simgeleri
+    - default: Varsayılan
     - windows_fluent: Windows (Fluent)
-    $name:hi-IN: आइकन
     $options:hi-IN:
-    - default: मॉड के आइकन
+    - default: डिफ़ॉल्ट
     - windows_fluent: Windows (Fluent)
-    $name:ar: الأيقونات
     $options:ar:
-    - default: أيقونات التعديل
+    - default: افتراضي
     - windows_fluent: Windows (Fluent)
   - customBgColor: ""
-    $description:ru-RU: "Цвет в формате #RRGGBB, например #1E1E24. Пустое значение использует цвет темы"
-    $name:ru-RU: "Цвет фона"
-    $description: "Color in #RRGGBB format, for example #1E1E24. An empty value uses the theme color"
     $name: "Background Color"
-    $name:vi-VN: Màu nền tùy chỉnh (Hex, ví dụ #1E1E24)
-    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu nền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
+    $name:ru-RU: "Цвет фона"
+    $name:vi-VN: "Màu nền"
+    $name:zh-CN: "背景色"
+    $name:zh-TW: "背景色彩"
+    $name:ja-JP: "背景色"
+    $name:ko-KR: "배경색"
+    $name:th-TH: "สีพื้นหลัง"
+    $name:id-ID: "Warna latar belakang"
+    $name:ms-MY: "Warna latar belakang"
+    $name:fr-FR: "Couleur d’arrière-plan"
+    $name:de-DE: "Hintergrundfarbe"
+    $name:es-ES: "Color de fondo"
+    $name:pt-BR: "Cor de fundo"
+    $name:it-IT: "Colore di sfondo"
+    $name:uk-UA: "Колір фону"
+    $name:pl-PL: "Kolor tła"
+    $name:nl-NL: "Achtergrondkleur"
+    $name:tr-TR: "Arka plan rengi"
+    $name:hi-IN: "पृष्ठभूमि का रंग"
+    $name:ar: "لون الخلفية"
+    $description: "Color in #RRGGBB format, for example #1E1E24. An empty value uses the theme color"
+    $description:ru-RU: "Цвет в формате #RRGGBB, например #1E1E24. Пустое значение использует цвет темы"
+    $description:vi-VN: "Nhập màu theo định dạng #RRGGBB, ví dụ #1E1E24. Để trống để dùng màu của chủ đề"
+    $description:zh-CN: "使用 #RRGGBB 格式，例如 #1E1E24。留空则使用主题颜色"
+    $description:zh-TW: "使用 #RRGGBB 格式，例如 #1E1E24。留白時使用佈景主題的色彩"
+    $description:ja-JP: "#RRGGBB 形式で指定します (例: #1E1E24)。空欄の場合はテーマの色を使用します"
+    $description:ko-KR: "#RRGGBB 형식으로 입력합니다(예: #1E1E24). 비워 두면 테마 색상을 사용합니다"
+    $description:th-TH: "ระบุสีในรูปแบบ #RRGGBB เช่น #1E1E24 หากเว้นว่าง จะใช้สีของธีม"
+    $description:id-ID: "Warna dalam format #RRGGBB, misalnya #1E1E24. Jika kosong, warna tema digunakan"
+    $description:ms-MY: "Warna dalam format #RRGGBB, contohnya #1E1E24. Jika kosong, warna tema digunakan"
+    $description:fr-FR: "Couleur au format #RRGGBB, par exemple #1E1E24. Si le champ est vide, utilise la couleur du thème"
+    $description:de-DE: "Farbe im Format #RRGGBB, zum Beispiel #1E1E24. Ein leeres Feld übernimmt die Designfarbe"
+    $description:es-ES: "Color en formato #RRGGBB, por ejemplo #1E1E24. Si se deja vacío, se usa el color del tema"
+    $description:pt-BR: "Cor no formato #RRGGBB, por exemplo #1E1E24. Se o campo estiver vazio, usa a cor do tema"
+    $description:it-IT: "Colore in formato #RRGGBB, ad esempio #1E1E24. Lasciare vuoto per usare il colore del tema"
+    $description:uk-UA: "Колір у форматі #RRGGBB, наприклад #1E1E24. Якщо поле порожнє, використовується колір теми"
+    $description:pl-PL: "Kolor w formacie #RRGGBB, np. #1E1E24. Puste pole oznacza kolor motywu"
+    $description:nl-NL: "Kleur in de indeling #RRGGBB, bijvoorbeeld #1E1E24. Leeg gebruikt de themakleur"
+    $description:tr-TR: "#RRGGBB biçiminde bir renk, örneğin #1E1E24. Boş bırakılırsa tema rengi kullanılır"
+    $description:hi-IN: "#RRGGBB फ़ॉर्मैट में रंग, जैसे #1E1E24। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा"
+    $description:ar: "لون بالتنسيق ‎#RRGGBB‎، مثل ‎#1E1E24‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا"
   - customCornerRadius: -1
-    $description:ru-RU: "От -1 до 28 px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула"
     $name: "Outer Corner Radius"
-    $name:vi-VN: Bán kính góc ngoài
-    $name:th-TH: รัศมีมุมด้านนอก
-    $name:id-ID: Radius Sudut Luar
-    $name:ms-MY: Jejari Sudut Luar
-    $name:ja-JP: 外側の角の半径
-    $name:zh-CN: 外部圆角半径
-    $name:zh-TW: 外部圓角半徑
-    $name:ko-KR: 바깥쪽 모서리 반경
-    $name:fr-FR: Rayon des coins extérieurs
-    $name:de-DE: Äußerer Eckenradius
-    $name:es-ES: Radio de las esquinas exteriores
-    $name:pt-BR: Raio dos cantos externos
-    $name:it-IT: Raggio degli angoli esterni
     $name:ru-RU: "Радиус внешних углов"
-    $name:uk-UA: Радіус зовнішніх кутів
-    $name:pl-PL: Promień narożników zewnętrznych
-    $name:nl-NL: Buitenste hoekradius
-    $name:tr-TR: Dış Köşe Yarıçapı
-    $name:hi-IN: बाहरी कोनों की त्रिज्या
-    $name:ar-SA: نصف قطر الزوايا الخارجية
+    $name:vi-VN: "Bán kính bo góc ngoài"
+    $name:zh-CN: "外侧圆角半径"
+    $name:zh-TW: "外側圓角半徑"
+    $name:ja-JP: "外側の角の半径"
+    $name:ko-KR: "바깥쪽 모서리 반경"
+    $name:th-TH: "รัศมีมุมด้านนอก"
+    $name:id-ID: "Radius sudut luar"
+    $name:ms-MY: "Jejari sudut luar"
+    $name:fr-FR: "Rayon des angles extérieurs"
+    $name:de-DE: "Äußerer Eckenradius"
+    $name:es-ES: "Radio de las esquinas exteriores"
+    $name:pt-BR: "Raio dos cantos externos"
+    $name:it-IT: "Raggio degli angoli esterni"
+    $name:uk-UA: "Радіус зовнішніх кутів"
+    $name:pl-PL: "Promień narożników zewnętrznych"
+    $name:nl-NL: "Radius van buitenhoeken"
+    $name:tr-TR: "Dış köşe yarıçapı"
+    $name:hi-IN: "बाहरी कोनों की गोलाई"
+    $name:ar: "نصف قطر الزوايا الخارجية"
     $description: "From -1 to 28 px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape"
-    $description:vi-VN: Chỉnh độ bo góc theo pixel (0 = góc vuông, 8–12 = Win11 cổ điển, 24–28 = viên thuốc, -1 = theo chủ đề).
+    $description:ru-RU: "От -1 до 28 px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула"
+    $description:vi-VN: "Từ -1 đến 28 px. -1 dùng theo chủ đề, 0 cho góc vuông, 14 bo góc theo kiểu Windows, 27 tạo dạng viên nang"
+    $description:zh-CN: "范围为 -1 至 28 px。-1 跟随主题，0 为直角，14 为 Windows 样式，27 为胶囊形"
+    $description:zh-TW: "範圍為 -1 至 28 px。-1 依佈景主題，0 為直角，14 為 Windows 樣式，27 為膠囊形"
+    $description:ja-JP: "範囲は -1 ～ 28 px。-1 はテーマに従い、0 は直角、14 は Windows 風の角、27 はカプセル型になります"
+    $description:ko-KR: "범위는 -1~28 px입니다. -1은 테마 설정, 0은 직각, 14는 Windows 스타일, 27은 캡슐 모양입니다"
+    $description:th-TH: "ตั้งได้ตั้งแต่ -1 ถึง 28 px โดย -1 ใช้ค่าของธีม, 0 เป็นมุมฉาก, 14 เป็นมุมแบบ Windows และ 27 เป็นทรงแคปซูล"
+    $description:id-ID: "Antara -1 dan 28 piksel. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul"
+    $description:ms-MY: "Antara -1 hingga 28 piksel. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul"
+    $description:fr-FR: "De -1 à 28 px. -1 suit le thème, 0 donne des angles droits, 14 reprend le style Windows et 27 donne une forme de capsule"
+    $description:de-DE: "Von -1 bis 28 px. -1 übernimmt das Design, 0 ergibt rechte Winkel, 14 entspricht dem Windows-Stil und 27 ergibt eine Kapselform"
+    $description:es-ES: "De -1 a 28 px. -1 sigue el tema, 0 da esquinas rectas, 14 usa el estilo de Windows y 27 da forma de cápsula"
+    $description:pt-BR: "De -1 a 28 px. -1 segue o tema, 0 deixa os cantos retos, 14 usa o estilo do Windows e 27 dá formato de cápsula"
+    $description:it-IT: "Da -1 a 28 px. -1 segue il tema, 0 lascia gli angoli retti, 14 usa lo stile di Windows e 27 crea una forma a capsula"
+    $description:uk-UA: "Від -1 до 28 пкс. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула"
+    $description:pl-PL: "Od -1 do 28 px. -1 używa ustawienia motywu, 0 daje ostre narożniki, 14 odpowiada stylowi systemu Windows, a 27 nadaje kształt kapsuły"
+    $description:nl-NL: "Van -1 tot 28 px. -1 volgt het thema, 0 geeft rechte hoeken, 14 gebruikt de Windows-stijl en 27 geeft een capsulevorm"
+    $description:tr-TR: "-1 ile 28 piksel arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir"
+    $description:hi-IN: "-1 से 28 पिक्सेल। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार"
+    $description:ar: "من ‎-1‎ إلى 28 بكسل. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة"
   - innerCornerRadius: "-1"
     $name: "Inner Corner Radius"
-    $description: "Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px"
-    $name:vi-VN: Bán kính góc trong
-    $description:vi-VN: Bo góc vùng tô sáng trong lịch sử, gợi ý và menu của mod (-1 = Tự động, 0–28 px)
-    $name:th-TH: รัศมีมุมด้านใน
-    $description:th-TH: ปรับความโค้งของแถบไฮไลต์ในประวัติ คำแนะนำ และเมนูของม็อด (-1 = อัตโนมัติ, 0–28 px)
-    $name:id-ID: Radius Sudut Dalam
-    $description:id-ID: Atur sudut sorotan di riwayat, saran, dan menu mod (-1 = Otomatis, 0–28 px)
-    $name:ms-MY: Jejari Sudut Dalam
-    $description:ms-MY: Laras sudut serlahan dalam sejarah, cadangan dan menu mod (-1 = Auto, 0–28 px)
-    $name:ja-JP: 内側の角の半径
-    $description:ja-JP: 履歴、候補、Mod のメニューで強調表示する行の角を丸めます (-1 = 自動, 0–28 px)
-    $name:zh-CN: 内部圆角半径
-    $description:zh-CN: 调整历史记录、建议和模组菜单中高亮行的圆角 (-1 = 自动, 0–28 px)
-    $name:zh-TW: 內部圓角半徑
-    $description:zh-TW: 調整歷程記錄、建議和模組選單中醒目提示列的圓角 (-1 = 自動, 0–28 px)
-    $name:ko-KR: 안쪽 모서리 반경
-    $description:ko-KR: 기록, 제안 및 모드 메뉴에서 강조 표시의 모서리를 조정합니다 (-1 = 자동, 0–28 px)
-    $name:fr-FR: Rayon des coins intérieurs
-    $description:fr-FR: Arrondi des éléments surlignés dans l’historique, les suggestions et le menu du mod (-1 = Auto, 0–28 px)
-    $name:de-DE: Innerer Eckenradius
-    $description:de-DE: Rundung der Hervorhebung in Verlauf, Vorschlägen und Mod-Menü (-1 = Automatisch, 0–28 px)
-    $name:es-ES: Radio de las esquinas interiores
-    $description:es-ES: Redondeo del resaltado en el historial, las sugerencias y el menú del mod (-1 = Automático, 0–28 px)
-    $name:pt-BR: Raio dos cantos internos
-    $description:pt-BR: Arredondamento do realce no histórico, nas sugestões e no menu do mod (-1 = Automático, 0–28 px)
-    $name:it-IT: Raggio degli angoli interni
-    $description:it-IT: Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod (-1 = Automatico, 0–28 px)
     $name:ru-RU: "Радиус внутренних углов"
+    $name:vi-VN: "Bán kính bo góc trong"
+    $name:zh-CN: "内侧圆角半径"
+    $name:zh-TW: "內側圓角半徑"
+    $name:ja-JP: "内側の角の半径"
+    $name:ko-KR: "안쪽 모서리 반경"
+    $name:th-TH: "รัศมีมุมด้านใน"
+    $name:id-ID: "Radius sudut dalam"
+    $name:ms-MY: "Jejari sudut dalam"
+    $name:fr-FR: "Rayon des angles intérieurs"
+    $name:de-DE: "Innerer Eckenradius"
+    $name:es-ES: "Radio de las esquinas interiores"
+    $name:pt-BR: "Raio dos cantos internos"
+    $name:it-IT: "Raggio degli angoli interni"
+    $name:uk-UA: "Радіус внутрішніх кутів"
+    $name:pl-PL: "Promień narożników wewnętrznych"
+    $name:nl-NL: "Radius van binnenhoeken"
+    $name:tr-TR: "İç köşe yarıçapı"
+    $name:hi-IN: "भीतरी कोनों की गोलाई"
+    $name:ar: "نصف قطر الزوايا الداخلية"
+    $description: "Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px"
     $description:ru-RU: "Углы выделения строк в истории, подсказках и контекстном меню; от -1 до 28 px"
-    $name:uk-UA: Радіус внутрішніх кутів
-    $description:uk-UA: Заокруглення виділення в історії, підказках і меню мода (-1 = Авто, 0–28 px)
-    $name:pl-PL: Promień narożników wewnętrznych
-    $description:pl-PL: Zaokrąglenie podświetlenia w historii, sugestiach i menu moda (-1 = Auto, 0–28 px)
-    $name:nl-NL: Binnenste hoekradius
-    $description:nl-NL: Afronding van markeringen in geschiedenis, suggesties en het modmenu (-1 = Automatisch, 0–28 px)
-    $name:tr-TR: İç Köşe Yarıçapı
-    $description:tr-TR: Geçmişte, önerilerde ve mod menüsünde vurgulanan satırların yuvarlaklığı (-1 = Otomatik, 0–28 px)
-    $name:hi-IN: भीतरी कोनों की त्रिज्या
-    $description:hi-IN: इतिहास, सुझाव और मॉड मेनू में हाइलाइट का गोलाई स्तर (-1 = स्वचालित, 0–28 px)
-    $name:ar-SA: نصف قطر الزوايا الداخلية
-    $description:ar-SA: استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل (-1 = تلقائي, 0–28 px)
+    $description:vi-VN: "Độ bo góc của các dòng được tô sáng trong lịch sử, danh sách gợi ý và menu ngữ cảnh. Từ -1 đến 28 px"
+    $description:zh-CN: "历史记录、建议列表和上下文菜单中高亮行的圆角。范围为 -1 至 28 px"
+    $description:zh-TW: "歷程記錄、建議清單與快顯功能表中醒目提示列的圓角。範圍為 -1 至 28 px"
+    $description:ja-JP: "履歴、候補一覧、コンテキスト メニューの強調表示行の角の丸み。範囲は -1 ～ 28 px"
+    $description:ko-KR: "기록, 추천 목록 및 상황에 맞는 메뉴에서 강조 표시되는 행의 모서리입니다. 범위는 -1~28 px입니다"
+    $description:th-TH: "ความโค้งของมุมแถวที่ไฮไลต์ในประวัติ รายการแนะนำ และเมนูบริบท ตั้งได้ตั้งแต่ -1 ถึง 28 px"
+    $description:id-ID: "Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 piksel"
+    $description:ms-MY: "Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 piksel"
+    $description:fr-FR: "Angles des lignes mises en évidence dans l’historique, les suggestions et le menu contextuel. De -1 à 28 px"
+    $description:de-DE: "Ecken der hervorgehobenen Zeilen im Verlauf, in Vorschlägen und im Kontextmenü. Von -1 bis 28 px"
+    $description:es-ES: "Esquinas de las filas resaltadas en el historial, las sugerencias y el menú contextual. De -1 a 28 px"
+    $description:pt-BR: "Cantos das linhas realçadas no histórico, nas sugestões e no menu de contexto. De -1 a 28 px"
+    $description:it-IT: "Angoli delle righe evidenziate nella cronologia, nei suggerimenti e nel menu di scelta rapida. Da -1 a 28 px"
+    $description:uk-UA: "Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 пкс"
+    $description:pl-PL: "Narożniki wyróżnionych wierszy w historii, sugestiach i menu kontekstowym. Od -1 do 28 px"
+    $description:nl-NL: "Hoeken van gemarkeerde rijen in de geschiedenis, suggesties en het snelmenu. Van -1 tot 28 px"
+    $description:tr-TR: "Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 piksel arası"
+    $description:hi-IN: "इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 पिक्सेल"
+    $description:ar: "زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى 28 بكسل"
   - customBackgroundPath: ""
-    $description:ru-RU: "PNG, JPG, BMP, WebP или GIF до 25 МБ"
-    $name:ru-RU: "Фоновое изображение"
     $name: "Background Image"
-    $name:vi-VN: Hình nền / Ảnh động tùy chỉnh (PNG, JPG, GIF, WebP)
+    $name:ru-RU: "Фоновое изображение"
+    $name:vi-VN: "Ảnh nền"
+    $name:zh-CN: "背景图像"
+    $name:zh-TW: "背景圖片"
+    $name:ja-JP: "背景画像"
+    $name:ko-KR: "배경 이미지"
+    $name:th-TH: "รูปภาพพื้นหลัง"
+    $name:id-ID: "Gambar latar belakang"
+    $name:ms-MY: "Imej latar belakang"
+    $name:fr-FR: "Image d’arrière-plan"
+    $name:de-DE: "Hintergrundbild"
+    $name:es-ES: "Imagen de fondo"
+    $name:pt-BR: "Imagem de fundo"
+    $name:it-IT: "Immagine di sfondo"
+    $name:uk-UA: "Фонове зображення"
+    $name:pl-PL: "Obraz tła"
+    $name:nl-NL: "Achtergrondafbeelding"
+    $name:tr-TR: "Arka plan resmi"
+    $name:hi-IN: "पृष्ठभूमि की छवि"
+    $name:ar: "صورة الخلفية"
     $description: "PNG, JPG, BMP, WebP, or GIF up to 25 MB"
-    $description:vi-VN: Đường dẫn tệp ảnh tĩnh hoặc ảnh động GIF làm nền cho hộp thoại Run.
+    $description:ru-RU: "PNG, JPG, BMP, WebP или GIF до 25 МБ"
+    $description:vi-VN: "PNG, JPG, BMP, WebP hoặc GIF, tối đa 25 MB"
+    $description:zh-CN: "支持 PNG、JPG、BMP、WebP 或 GIF，最大 25 MB"
+    $description:zh-TW: "支援 PNG、JPG、BMP、WebP 或 GIF，上限為 25 MB"
+    $description:ja-JP: "PNG、JPG、BMP、WebP、GIF に対応 (最大 25 MB)"
+    $description:ko-KR: "PNG, JPG, BMP, WebP 또는 GIF(최대 25 MB)"
+    $description:th-TH: "รองรับ PNG, JPG, BMP, WebP หรือ GIF ขนาดไม่เกิน 25 MB"
+    $description:id-ID: "PNG, JPG, BMP, WebP, atau GIF hingga 25 MB"
+    $description:ms-MY: "PNG, JPG, BMP, WebP atau GIF sehingga 25 MB"
+    $description:fr-FR: "PNG, JPG, BMP, WebP ou GIF, jusqu’à 25 Mo"
+    $description:de-DE: "PNG, JPG, BMP, WebP oder GIF bis 25 MB"
+    $description:es-ES: "PNG, JPG, BMP, WebP o GIF de hasta 25 MB"
+    $description:pt-BR: "PNG, JPG, BMP, WebP ou GIF de até 25 MB"
+    $description:it-IT: "PNG, JPG, BMP, WebP o GIF fino a 25 MB"
+    $description:uk-UA: "PNG, JPG, BMP, WebP або GIF, до 25 МБ"
+    $description:pl-PL: "PNG, JPG, BMP, WebP lub GIF do 25 MB"
+    $description:nl-NL: "PNG, JPG, BMP, WebP of GIF tot 25 MB"
+    $description:tr-TR: "25 MB’a kadar PNG, JPG, BMP, WebP veya GIF"
+    $description:hi-IN: "25 MB तक की PNG, JPG, BMP, WebP या GIF फ़ाइल"
+    $description:ar: "ملف PNG أو JPG أو BMP أو WebP أو GIF بحجم يصل إلى 25 ميغابايت"
   - backgroundOpacityPercent: 84
-    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)"
-    $name:ru-RU: "Видимость фонового изображения"
-    $description: "Opacity of the image and window background, including when no image is set. 12–100% (default 84%)"
     $name: "Background Image Opacity"
-    $name:vi-VN: Độ đậm nền hộp thoại & hình nền (12–100%)
-    $description:vi-VN: Điều chỉnh độ đậm/trong suốt của nền hộp thoại (Windows 11 Blur, Liquid Glass, nền màu) và ảnh/GIF nền tùy chỉnh. Mặc định 84%.
+    $name:ru-RU: "Видимость фонового изображения"
+    $name:vi-VN: "Độ mờ đục của ảnh nền"
+    $name:zh-CN: "背景图像不透明度"
+    $name:zh-TW: "背景圖片不透明度"
+    $name:ja-JP: "背景画像の不透明度"
+    $name:ko-KR: "배경 이미지 불투명도"
+    $name:th-TH: "ความทึบของรูปภาพพื้นหลัง"
+    $name:id-ID: "Opasitas latar belakang"
+    $name:ms-MY: "Kelegapan latar belakang"
+    $name:fr-FR: "Opacité de l’arrière-plan"
+    $name:de-DE: "Deckkraft des Hintergrunds"
+    $name:es-ES: "Opacidad del fondo"
+    $name:pt-BR: "Opacidade do fundo"
+    $name:it-IT: "Opacità dello sfondo"
+    $name:uk-UA: "Непрозорість фону"
+    $name:pl-PL: "Krycie tła"
+    $name:nl-NL: "Dekking van de achtergrond"
+    $name:tr-TR: "Arka plan opaklığı"
+    $name:hi-IN: "पृष्ठभूमि की अपारदर्शिता"
+    $name:ar: "عتامة الخلفية"
+    $description: "Opacity of the image and window background, including when no image is set. 12–100% (default 84%)"
+    $description:ru-RU: "Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)"
+    $description:vi-VN: "Độ mờ đục của ảnh và nền cửa sổ, kể cả khi không đặt ảnh nền. 12–100% (mặc định 84%)"
+    $description:zh-CN: "图像和窗口背景的不透明度，未设置图像时也适用。12–100%（默认 84%）"
+    $description:zh-TW: "圖片與視窗背景的不透明度，即使未設定圖片也適用。12–100%（預設 84%）"
+    $description:ja-JP: "画像とウィンドウの背景の不透明度です。画像が未設定の場合にも適用されます。12～100% (既定値: 84%)"
+    $description:ko-KR: "이미지와 창 배경의 불투명도입니다. 이미지를 설정하지 않은 경우에도 적용됩니다. 12~100%(기본값: 84%)"
+    $description:th-TH: "ปรับความทึบของรูปภาพและพื้นหลังหน้าต่าง แม้ไม่ได้ตั้งรูปภาพพื้นหลัง ตั้งได้ 12–100% (ค่าเริ่มต้น 84%)"
+    $description:id-ID: "Opasitas gambar dan latar belakang jendela, termasuk saat gambar belum dipilih. 12–100% (default 84%)"
+    $description:ms-MY: "Kelegapan imej dan latar belakang tetingkap, walaupun tiada imej dipilih. 12–100% (lalai 84%)"
+    $description:fr-FR: "Opacité de l’image et du fond de la fenêtre, même sans image. 12–100 % (84 % par défaut)"
+    $description:de-DE: "Deckkraft von Bild und Fensterhintergrund, auch ohne Bild. 12–100 % (Standard: 84 %)"
+    $description:es-ES: "Opacidad de la imagen y del fondo de la ventana, incluso si no se ha elegido una imagen. 12–100 % (84 % de forma predeterminada)"
+    $description:pt-BR: "Opacidade da imagem e do fundo da janela, mesmo sem imagem. 12–100% (padrão: 84%)"
+    $description:it-IT: "Opacità dell’immagine e dello sfondo della finestra, anche senza immagine. 12–100% (84% per impostazione predefinita)"
+    $description:uk-UA: "Непрозорість зображення й фону вікна, зокрема без зображення. 12–100% (за замовчуванням 84%)"
+    $description:pl-PL: "Krycie obrazu i tła okna, także bez obrazu. 12–100% (domyślnie 84%)"
+    $description:nl-NL: "Dekking van de afbeelding en de vensterachtergrond, ook zonder afbeelding. 12–100% (standaard 84%)"
+    $description:tr-TR: "Resmin ve pencere arka planının opaklığı. Resim seçilmediğinde de geçerlidir. %12–100 (varsayılan %84)"
+    $description:hi-IN: "छवि और विंडो की पृष्ठभूमि की अपारदर्शिता। छवि न चुने जाने पर भी लागू। 12–100% (डिफ़ॉल्ट 84%)"
+    $description:ar: "عتامة الصورة وخلفية النافذة حتى عند عدم تعيين صورة. من 12٪ إلى 100٪ (الافتراضي 84٪)"
   - language: auto
-    $name:ru-RU: "Язык интерфейса"
     $name: "Display Language"
-    $name:vi-VN: Ngôn ngữ hiển thị
-    $options:vi-VN:
-    - auto: Tự động
-    - en: English (Tiếng Anh)
-    - vi: Tiếng Việt
-    - th: ไทย (Tiếng Thái)
-    - id: Bahasa Indonesia (Tiếng Indonesia)
-    - ms: Bahasa Melayu (Tiếng Mã Lai)
-    - ja: 日本語 (Tiếng Nhật)
-    - zh_cn: 简体中文 (Tiếng Trung Giản thể)
-    - zh_tw: 繁體中文 (Tiếng Trung Phồn thể)
-    - ko: 한국어 (Tiếng Hàn)
-    - fr: Français (Tiếng Pháp)
-    - de: Deutsch (Tiếng Đức)
-    - es: Español (Tiếng Tây Ban Nha)
-    - pt: Português (Portuguese)
-    - it: Italiano (Tiếng Ý)
-    - ru: Русский (Tiếng Nga)
-    - uk: Українська (Tiếng Ukraina)
-    - pl: Polski (Tiếng Ba Lan)
-    - nl: Nederlands (Tiếng Hà Lan)
-    - tr: Türkçe (Tiếng Thổ Nhĩ Kỳ)
-    - hi: हिन्दी (Tiếng Hindi)
-    - ar: العربية (Tiếng Ả Rập)
+    $name:ru-RU: "Язык интерфейса"
+    $name:vi-VN: "Ngôn ngữ hiển thị"
+    $name:zh-CN: "显示语言"
+    $name:zh-TW: "顯示語言"
+    $name:ja-JP: "表示言語"
+    $name:ko-KR: "표시 언어"
+    $name:th-TH: "ภาษาที่แสดง"
+    $name:id-ID: "Bahasa tampilan"
+    $name:ms-MY: "Bahasa paparan"
+    $name:fr-FR: "Langue d’affichage"
+    $name:de-DE: "Anzeigesprache"
+    $name:es-ES: "Idioma de visualización"
+    $name:pt-BR: "Idioma de exibição"
+    $name:it-IT: "Lingua di visualizzazione"
+    $name:uk-UA: "Мова інтерфейсу"
+    $name:pl-PL: "Język wyświetlania"
+    $name:nl-NL: "Weergavetaal"
+    $name:tr-TR: "Görüntüleme dili"
+    $name:hi-IN: "प्रदर्शन की भाषा"
+    $name:ar: "لغة العرض"
     $options:
     - auto: Automatically
     - en: English
-    - vi: Tiếng Việt (Vietnamese)
-    - th: ไทย (Thai)
-    - id: Bahasa Indonesia (Indonesian)
-    - ms: Bahasa Melayu (Malay)
-    - ja: 日本語 (Japanese)
-    - zh_cn: 简体中文 (Simplified Chinese)
-    - zh_tw: 繁體中文 (Traditional Chinese)
-    - ko: 한국어 (Korean)
-    - fr: Français (French)
-    - de: Deutsch (German)
-    - es: Español (Spanish)
-    - pt: Português (Portuguese)
-    - it: Italiano (Italian)
-    - ru: Русский (Russian)
-    - uk: Українська (Ukrainian)
-    - pl: Polski (Polish)
-    - nl: Nederlands (Dutch)
-    - tr: Türkçe (Turkish)
-    - hi: हिन्दी (Hindi)
-    - ar: العربية (Arabic)
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
     $options:ru-RU:
     - auto: Автоматически
     - en: English
-    - vi: Tiếng Việt (Vietnamese)
-    - th: ไทย (Thai)
-    - id: Bahasa Indonesia (Indonesian)
-    - ms: Bahasa Melayu (Malay)
-    - ja: 日本語 (Japanese)
-    - zh_cn: 简体中文 (Simplified Chinese)
-    - zh_tw: 繁體中文 (Traditional Chinese)
-    - ko: 한국어 (Korean)
-    - fr: Français (French)
-    - de: Deutsch (German)
-    - es: Español (Spanish)
-    - pt: Português (Portuguese)
-    - it: Italiano (Italian)
-    - ru: Русский (Russian)
-    - uk: Українська (Ukrainian)
-    - pl: Polski (Polish)
-    - nl: Nederlands (Dutch)
-    - tr: Türkçe (Turkish)
-    - hi: हिन्दी (Hindi)
-    - ar: العربية (Arabic)
-  $name: Personalization
-  $name:ru-RU: Персонализация
-  $name:vi-VN: Cá nhân hoá
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:vi-VN:
+    - auto: Tự động
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:zh-CN:
+    - auto: 自动
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:zh-TW:
+    - auto: 自動
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:ja-JP:
+    - auto: 自動
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:ko-KR:
+    - auto: 자동
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:th-TH:
+    - auto: อัตโนมัติ
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:id-ID:
+    - auto: Otomatis
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:ms-MY:
+    - auto: Automatik
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:fr-FR:
+    - auto: Automatique
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:de-DE:
+    - auto: Automatisch
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:es-ES:
+    - auto: Automático
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:pt-BR:
+    - auto: Automático
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:it-IT:
+    - auto: Automatico
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:uk-UA:
+    - auto: Автоматично
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:pl-PL:
+    - auto: Automatycznie
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:nl-NL:
+    - auto: Automatisch
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:tr-TR:
+    - auto: Otomatik
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:hi-IN:
+    - auto: अपने आप
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+    $options:ar:
+    - auto: تلقائي
+    - en: English
+    - vi: Tiếng Việt
+    - th: ไทย
+    - id: Bahasa Indonesia
+    - ms: Bahasa Melayu
+    - ja: 日本語
+    - zh_cn: 简体中文
+    - zh_tw: 繁體中文
+    - ko: 한국어
+    - fr: Français
+    - de: Deutsch
+    - es: Español
+    - pt: Português (Brasil)
+    - it: Italiano
+    - ru: Русский
+    - uk: Українська
+    - pl: Polski
+    - nl: Nederlands
+    - tr: Türkçe
+    - hi: हिन्दी
+    - ar: العربية
+  $name: "Personalization"
+  $name:ru-RU: "Персонализация"
+  $name:vi-VN: "Cá nhân hóa"
+  $name:zh-CN: "个性化"
+  $name:zh-TW: "個人化"
+  $name:ja-JP: "個人用設定"
+  $name:ko-KR: "개인 설정"
+  $name:th-TH: "การตั้งค่าส่วนบุคคล"
+  $name:id-ID: "Personalisasi"
+  $name:ms-MY: "Pemperibadian"
+  $name:fr-FR: "Personnalisation"
+  $name:de-DE: "Personalisierung"
+  $name:es-ES: "Personalización"
+  $name:pt-BR: "Personalização"
+  $name:it-IT: "Personalizzazione"
+  $name:uk-UA: "Персоналізація"
+  $name:pl-PL: "Personalizacja"
+  $name:nl-NL: "Persoonlijke instellingen"
+  $name:tr-TR: "Kişiselleştirme"
+  $name:hi-IN: "वैयक्तिकरण"
+  $name:ar: "التخصيص"
 
 - windowBordersGroup:
   - customBorderColor: ""
-    $description:ru-RU: "Цвет рамок в режиме по умолчанию. Формат #RRGGBB, например #4C566A. Пустое значение использует цвет темы"
-    $name:ru-RU: "Цвет рамок"
-    $description: "Border color in the default mode. Use #RRGGBB, for example #4C566A. An empty value uses the theme color"
     $name: "Border Color"
-    $name:vi-VN: Màu viền tùy chỉnh (Hex, ví dụ #4C566A)
-    $description:vi-VN: Mã màu hex (#RRGGBB) để tự đổi màu viền hộp thoại Run. Để trống để dùng theo Theme Preset đã chọn.
+    $name:ru-RU: "Цвет рамок"
+    $name:vi-VN: "Màu viền"
+    $name:zh-CN: "边框颜色"
+    $name:zh-TW: "邊框色彩"
+    $name:ja-JP: "枠線の色"
+    $name:ko-KR: "테두리 색"
+    $name:th-TH: "สีเส้นขอบ"
+    $name:id-ID: "Warna bingkai"
+    $name:ms-MY: "Warna sempadan"
+    $name:fr-FR: "Couleur de bordure"
+    $name:de-DE: "Rahmenfarbe"
+    $name:es-ES: "Color del borde"
+    $name:pt-BR: "Cor da borda"
+    $name:it-IT: "Colore del bordo"
+    $name:uk-UA: "Колір рамки"
+    $name:pl-PL: "Kolor obramowania"
+    $name:nl-NL: "Randkleur"
+    $name:tr-TR: "Kenarlık rengi"
+    $name:hi-IN: "बॉर्डर का रंग"
+    $name:ar: "لون الإطار"
+    $description: "Border color in the default mode. Use #RRGGBB, for example #4C566A. An empty value uses the theme color"
+    $description:ru-RU: "Цвет рамок в режиме по умолчанию. Формат #RRGGBB, например #4C566A. Пустое значение использует цвет темы"
+    $description:vi-VN: "Màu viền ở chế độ mặc định. Dùng định dạng #RRGGBB, ví dụ #4C566A. Để trống để dùng màu của chủ đề"
+    $description:zh-CN: "默认模式下的边框颜色。使用 #RRGGBB 格式，例如 #4C566A。留空则使用主题颜色"
+    $description:zh-TW: "預設模式的邊框色彩。使用 #RRGGBB 格式，例如 #4C566A。留白時使用佈景主題的色彩"
+    $description:ja-JP: "既定モードの枠線の色です。#RRGGBB 形式で指定します (例: #4C566A)。空欄の場合はテーマの色を使用します"
+    $description:ko-KR: "기본 모드의 테두리 색입니다. #RRGGBB 형식으로 입력합니다(예: #4C566A). 비워 두면 테마 색상을 사용합니다"
+    $description:th-TH: "สีเส้นขอบในโหมดเริ่มต้น ใช้รูปแบบ #RRGGBB เช่น #4C566A หากเว้นว่าง จะใช้สีของธีม"
+    $description:id-ID: "Warna bingkai pada mode default. Gunakan format #RRGGBB, misalnya #4C566A. Jika kosong, warna tema digunakan"
+    $description:ms-MY: "Warna sempadan dalam mod lalai. Gunakan format #RRGGBB, contohnya #4C566A. Jika kosong, warna tema digunakan"
+    $description:fr-FR: "Couleur de bordure dans le mode par défaut. Utilisez le format #RRGGBB, par exemple #4C566A. Si le champ est vide, utilise la couleur du thème"
+    $description:de-DE: "Rahmenfarbe im Standardmodus. Format #RRGGBB, zum Beispiel #4C566A. Ein leeres Feld übernimmt die Designfarbe"
+    $description:es-ES: "Color del borde en el modo predeterminado. Usa el formato #RRGGBB, por ejemplo #4C566A. Si se deja vacío, se usa el color del tema"
+    $description:pt-BR: "Cor da borda no modo padrão. Use o formato #RRGGBB, por exemplo #4C566A. Se o campo estiver vazio, usa a cor do tema"
+    $description:it-IT: "Colore del bordo nella modalità predefinita. Usare il formato #RRGGBB, ad esempio #4C566A. Lasciare vuoto per usare il colore del tema"
+    $description:uk-UA: "Колір рамки в режимі за замовчуванням. Формат #RRGGBB, наприклад #4C566A. Якщо поле порожнє, використовується колір теми"
+    $description:pl-PL: "Kolor obramowania w trybie domyślnym. Format #RRGGBB, np. #4C566A. Puste pole oznacza kolor motywu"
+    $description:nl-NL: "Randkleur in de standaardmodus. Gebruik #RRGGBB, bijvoorbeeld #4C566A. Leeg gebruikt de themakleur"
+    $description:tr-TR: "Varsayılan moddaki kenarlık rengi. #RRGGBB biçimini kullanın, örneğin #4C566A. Boş bırakılırsa tema rengi kullanılır"
+    $description:hi-IN: "डिफ़ॉल्ट मोड में बॉर्डर का रंग। #RRGGBB फ़ॉर्मैट इस्तेमाल करें, जैसे #4C566A। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा"
+    $description:ar: "لون الإطار في الوضع الافتراضي. استخدم التنسيق ‎#RRGGBB‎، مثل ‎#4C566A‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا"
   - windowBorderMode: default
-    $name: Window Borders
+    $name: "Window Borders"
+    $name:ru-RU: "Рамки окон"
+    $name:vi-VN: "Viền cửa sổ"
+    $name:zh-CN: "窗口边框"
+    $name:zh-TW: "視窗邊框"
+    $name:ja-JP: "ウィンドウの枠線"
+    $name:ko-KR: "창 테두리"
+    $name:th-TH: "เส้นขอบหน้าต่าง"
+    $name:id-ID: "Bingkai jendela"
+    $name:ms-MY: "Sempadan tetingkap"
+    $name:fr-FR: "Bordures de la fenêtre"
+    $name:de-DE: "Fensterrahmen"
+    $name:es-ES: "Bordes de la ventana"
+    $name:pt-BR: "Bordas da janela"
+    $name:it-IT: "Bordi della finestra"
+    $name:uk-UA: "Рамки вікна"
+    $name:pl-PL: "Obramowanie okna"
+    $name:nl-NL: "Vensterranden"
+    $name:tr-TR: "Pencere kenarlıkları"
+    $name:hi-IN: "विंडो के बॉर्डर"
+    $name:ar: "إطارات النافذة"
     $description: "Color of the outer outlines of the main panels"
+    $description:ru-RU: "Цвет внешних контуров основных панелей"
+    $description:vi-VN: "Màu viền ngoài của các khung chính"
+    $description:zh-CN: "主要面板外边框的颜色"
+    $description:zh-TW: "主要面板外框的色彩"
+    $description:ja-JP: "メイン パネルの外枠の色"
+    $description:ko-KR: "기본 패널의 바깥쪽 테두리 색"
+    $description:th-TH: "สีเส้นขอบด้านนอกของแผงหลัก"
+    $description:id-ID: "Warna garis luar panel utama"
+    $description:ms-MY: "Warna sempadan luar panel utama"
+    $description:fr-FR: "Couleur du contour des panneaux principaux"
+    $description:de-DE: "Farbe der Außenrahmen der Hauptbereiche"
+    $description:es-ES: "Color del contorno exterior de los paneles principales"
+    $description:pt-BR: "Cor do contorno externo dos painéis principais"
+    $description:it-IT: "Colore del contorno esterno dei pannelli principali"
+    $description:uk-UA: "Колір зовнішніх рамок основних панелей"
+    $description:pl-PL: "Kolor zewnętrznych obramowań głównych paneli"
+    $description:nl-NL: "Kleur van de buitenrand van de hoofdpanelen"
+    $description:tr-TR: "Ana panellerin dış kenarlık rengi"
+    $description:hi-IN: "मुख्य पैनल के बाहरी बॉर्डर का रंग"
+    $description:ar: "لون الإطارات الخارجية للوحات الرئيسية"
     $options:
     - default: Default
     - windows: Windows-defined
     - off: Off
-    $name:vi-VN: Chế độ viền
-    $description:vi-VN: Màu sắc và hiển thị viền các bảng
-    $options:vi-VN:
-    - default: Theo mod
-    - windows: Theo Windows
-    - off: Tắt
-    $name:th-TH: โหมดขอบ
-    $description:th-TH: สีและการแสดงขอบแผง
-    $options:th-TH:
-    - default: ตามม็อด
-    - windows: ตาม Windows
-    - off: ปิด
-    $name:id-ID: Mode Bingkai
-    $description:id-ID: Warna dan visibilitas garis luar panel
-    $options:id-ID:
-    - default: Sesuai mod
-    - windows: Sesuai Windows
-    - off: Nonaktif
-    $name:ms-MY: Mod Sempadan
-    $description:ms-MY: Warna dan keterlihatan sempadan panel
-    $options:ms-MY:
-    - default: Mengikut mod
-    - windows: Mengikut Windows
-    - off: Dimatikan
-    $name:ja-JP: 境界線モード
-    $description:ja-JP: パネルの境界線の色と表示
-    $options:ja-JP:
-    - default: Mod に従う
-    - windows: Windows に従う
-    - off: 表示しない
-    $name:zh-CN: 边框模式
-    $description:zh-CN: 面板边框的颜色和可见性
-    $options:zh-CN:
-    - default: 由模组决定
-    - windows: 由 Windows 决定
-    - off: 关闭
-    $name:zh-TW: 邊框模式
-    $description:zh-TW: 面板邊框的色彩和顯示
-    $options:zh-TW:
-    - default: 由模組決定
-    - windows: 由 Windows 決定
-    - off: 關閉
-    $name:ko-KR: 테두리 모드
-    $description:ko-KR: 패널 테두리의 색상과 표시 여부
-    $options:ko-KR:
-    - default: 모드 설정
-    - windows: Windows 설정
-    - off: 끔
-    $name:fr-FR: Mode des bordures
-    $description:fr-FR: Couleur et visibilité du contour des panneaux
-    $options:fr-FR:
-    - default: Selon le mod
-    - windows: Selon Windows
-    - off: Désactivées
-    $name:de-DE: Rahmenmodus
-    $description:de-DE: Farbe und Sichtbarkeit der Panelrahmen
-    $options:de-DE:
-    - default: Vom Mod festgelegt
-    - windows: Von Windows festgelegt
-    - off: Aus
-    $name:es-ES: Modo de borde
-    $description:es-ES: Color y visibilidad del contorno de los paneles
-    $options:es-ES:
-    - default: Según el mod
-    - windows: Según Windows
-    - off: Desactivados
-    $name:pt-BR: Modo das bordas
-    $description:pt-BR: Cor e visibilidade do contorno dos painéis
-    $options:pt-BR:
-    - default: Definido pelo mod
-    - windows: Definido pelo Windows
-    - off: Desativadas
-    $name:it-IT: Modalità dei bordi
-    $description:it-IT: Colore e visibilità del contorno dei riquadri
-    $options:it-IT:
-    - default: Secondo la mod
-    - windows: Secondo Windows
-    - off: Disattivati
-    $name:ru-RU: "Рамки окон"
-    $description:ru-RU: "Цвет внешних контуров основных панелей"
     $options:ru-RU:
     - default: По умолчанию
     - windows: Определено Windows
     - off: Отключены
-    $name:uk-UA: Режим рамок
-    $description:uk-UA: Колір і видимість зовнішніх контурів панелей
+    $options:vi-VN:
+    - default: Mặc định
+    - windows: Theo Windows
+    - off: Tắt
+    $options:zh-CN:
+    - default: 默认
+    - windows: 由 Windows 决定
+    - off: 关闭
+    $options:zh-TW:
+    - default: 預設
+    - windows: 依 Windows 設定
+    - off: 關閉
+    $options:ja-JP:
+    - default: 既定
+    - windows: Windows に従う
+    - off: オフ
+    $options:ko-KR:
+    - default: 기본값
+    - windows: Windows 설정 따르기
+    - off: 끔
+    $options:th-TH:
+    - default: ค่าเริ่มต้น
+    - windows: ตาม Windows
+    - off: ปิด
+    $options:id-ID:
+    - default: Default
+    - windows: Mengikuti Windows
+    - off: Nonaktif
+    $options:ms-MY:
+    - default: Lalai
+    - windows: Mengikut Windows
+    - off: Mati
+    $options:fr-FR:
+    - default: Par défaut
+    - windows: Définies par Windows
+    - off: Désactivées
+    $options:de-DE:
+    - default: Standard
+    - windows: Von Windows festgelegt
+    - off: Aus
+    $options:es-ES:
+    - default: Predeterminado
+    - windows: Según Windows
+    - off: Desactivados
+    $options:pt-BR:
+    - default: Padrão
+    - windows: Definidas pelo Windows
+    - off: Desativadas
+    $options:it-IT:
+    - default: Predefinito
+    - windows: Definiti da Windows
+    - off: Disattivati
     $options:uk-UA:
-    - default: Визначено модом
-    - windows: Визначено Windows
+    - default: За замовчуванням
+    - windows: За параметрами Windows
     - off: Вимкнено
-    $name:pl-PL: Tryb obramowania
-    $description:pl-PL: Kolor i widoczność obramowań paneli
     $options:pl-PL:
-    - default: Według moda
-    - windows: Według systemu Windows
+    - default: Domyślne
+    - windows: Według ustawień systemu Windows
     - off: Wyłączone
-    $name:nl-NL: Randmodus
-    $description:nl-NL: Kleur en zichtbaarheid van paneelranden
     $options:nl-NL:
-    - default: Volgens de mod
+    - default: Standaard
     - windows: Volgens Windows
     - off: Uit
-    $name:tr-TR: Kenarlık Modu
-    $description:tr-TR: Panel kenarlıklarının rengi ve görünürlüğü
     $options:tr-TR:
-    - default: Moda göre
+    - default: Varsayılan
     - windows: Windows’a göre
     - off: Kapalı
-    $name:hi-IN: सीमा मोड
-    $description:hi-IN: पैनल की बाहरी सीमाओं का रंग और दृश्यता
     $options:hi-IN:
-    - default: मॉड के अनुसार
+    - default: डिफ़ॉल्ट
     - windows: Windows के अनुसार
     - off: बंद
-    $name:ar: وضع الحدود
-    $description:ar: لون وحدود ظهور الحواف الخارجية للوحات
     $options:ar:
-    - default: حسب التعديل
+    - default: افتراضي
     - windows: حسب Windows
-    - off: معطلة
+    - off: إيقاف
   - menuBorderMode: default
-    $name: Menu Borders
+    $name: "Menu Borders"
+    $name:ru-RU: "Рамки меню"
+    $name:vi-VN: "Viền menu"
+    $name:zh-CN: "菜单边框"
+    $name:zh-TW: "功能表邊框"
+    $name:ja-JP: "メニューの枠線"
+    $name:ko-KR: "메뉴 테두리"
+    $name:th-TH: "เส้นขอบเมนู"
+    $name:id-ID: "Bingkai menu"
+    $name:ms-MY: "Sempadan menu"
+    $name:fr-FR: "Bordures du menu"
+    $name:de-DE: "Menürahmen"
+    $name:es-ES: "Bordes del menú"
+    $name:pt-BR: "Bordas do menu"
+    $name:it-IT: "Bordi del menu"
+    $name:uk-UA: "Рамка меню"
+    $name:pl-PL: "Obramowanie menu"
+    $name:nl-NL: "Menuranden"
+    $name:tr-TR: "Menü kenarlığı"
+    $name:hi-IN: "मेनू का बॉर्डर"
+    $name:ar: "إطار القائمة"
     $description: "Color and visibility of the context menu border"
+    $description:ru-RU: "Цвет и видимость рамки контекстного меню"
+    $description:vi-VN: "Màu và chế độ hiển thị viền menu ngữ cảnh"
+    $description:zh-CN: "上下文菜单边框的颜色和显示方式"
+    $description:zh-TW: "快顯功能表邊框的色彩與顯示方式"
+    $description:ja-JP: "コンテキスト メニューの枠線の色と表示設定"
+    $description:ko-KR: "상황에 맞는 메뉴의 테두리 색 및 표시 여부"
+    $description:th-TH: "สีและการแสดงเส้นขอบของเมนูบริบท"
+    $description:id-ID: "Warna dan visibilitas bingkai menu konteks"
+    $description:ms-MY: "Warna dan keterlihatan sempadan menu konteks"
+    $description:fr-FR: "Couleur et visibilité de la bordure du menu contextuel"
+    $description:de-DE: "Farbe und Sichtbarkeit des Kontextmenürahmens"
+    $description:es-ES: "Color y visibilidad del borde del menú contextual"
+    $description:pt-BR: "Cor e visibilidade da borda do menu de contexto"
+    $description:it-IT: "Colore e visibilità del bordo del menu di scelta rapida"
+    $description:uk-UA: "Колір і видимість рамки контекстного меню"
+    $description:pl-PL: "Kolor i widoczność obramowania menu kontekstowego"
+    $description:nl-NL: "Kleur en zichtbaarheid van de rand van het snelmenu"
+    $description:tr-TR: "Bağlam menüsü kenarlığının rengi ve görünürlüğü"
+    $description:hi-IN: "संदर्भ मेनू के बॉर्डर का रंग और दृश्यता"
+    $description:ar: "لون إطار قائمة السياق وظهوره"
     $options:
     - default: Default
     - window: Same as window
     - windows: Windows-defined
     - off: Off
-    $name:vi-VN: Viền menu ngữ cảnh
-    $description:vi-VN: Viền ngoài của menu kiểu mod
-    $options:vi-VN:
-    - default: Viền riêng
-    - window: Theo cài đặt cửa sổ
-    - windows: Theo Windows
-    - off: Tắt
-    $name:th-TH: ขอบเมนูบริบท
-    $description:th-TH: ขอบด้านนอกของเมนูแบบม็อด
-    $options:th-TH:
-    - default: ขอบของเมนู
-    - window: ตามการตั้งค่าหน้าต่าง
-    - windows: ตาม Windows
-    - off: ปิด
-    $name:id-ID: Bingkai Menu Konteks
-    $description:id-ID: Garis luar menu bergaya mod
-    $options:id-ID:
-    - default: Bingkai menu
-    - window: Sesuai pengaturan jendela
-    - windows: Sesuai Windows
-    - off: Nonaktif
-    $name:ms-MY: Sempadan Menu Konteks
-    $description:ms-MY: Sempadan luar menu gaya mod
-    $options:ms-MY:
-    - default: Sempadan menu
-    - window: Mengikut tetapan tetingkap
-    - windows: Mengikut Windows
-    - off: Dimatikan
-    $name:ja-JP: コンテキスト メニューの境界線
-    $description:ja-JP: Mod スタイルのメニューの外枠
-    $options:ja-JP:
-    - default: メニュー独自の境界線
-    - window: ウィンドウの設定に従う
-    - windows: Windows に従う
-    - off: 表示しない
-    $name:zh-CN: 右键菜单边框
-    $description:zh-CN: 模组样式菜单的外边框
-    $options:zh-CN:
-    - default: 菜单自带边框
-    - window: 由窗口设置决定
-    - windows: 由 Windows 决定
-    - off: 关闭
-    $name:zh-TW: 快顯選單邊框
-    $description:zh-TW: 模組樣式選單的外邊框
-    $options:zh-TW:
-    - default: 選單自帶邊框
-    - window: 由視窗設定決定
-    - windows: 由 Windows 決定
-    - off: 關閉
-    $name:ko-KR: 상황에 맞는 메뉴 테두리
-    $description:ko-KR: 모드 스타일 메뉴의 바깥 테두리
-    $options:ko-KR:
-    - default: 메뉴 고유 테두리
-    - window: 창 설정에 따름
-    - windows: Windows 설정
-    - off: 끔
-    $name:fr-FR: Bordures du menu contextuel
-    $description:fr-FR: Contour du menu dans le style du mod
-    $options:fr-FR:
-    - default: Bordure propre au menu
-    - window: Selon les paramètres de fenêtre
-    - windows: Selon Windows
-    - off: Désactivées
-    $name:de-DE: Kontextmenürahmen
-    $description:de-DE: Außenrahmen des Menüs im Mod-Stil
-    $options:de-DE:
-    - default: Eigener Rahmen
-    - window: Nach Fenstereinstellungen
-    - windows: Von Windows festgelegt
-    - off: Aus
-    $name:es-ES: Bordes del menú contextual
-    $description:es-ES: Contorno del menú con estilo del mod
-    $options:es-ES:
-    - default: Borde propio del menú
-    - window: Según los ajustes de ventana
-    - windows: Según Windows
-    - off: Desactivados
-    $name:pt-BR: Bordas do menu de contexto
-    $description:pt-BR: Contorno externo do menu no estilo do mod
-    $options:pt-BR:
-    - default: Borda própria do menu
-    - window: Conforme as configurações das janelas
-    - windows: Definido pelo Windows
-    - off: Desativadas
-    $name:it-IT: Bordi del menu contestuale
-    $description:it-IT: Contorno esterno del menu in stile mod
-    $options:it-IT:
-    - default: Bordo proprio del menu
-    - window: Secondo le impostazioni delle finestre
-    - windows: Secondo Windows
-    - off: Disattivati
-    $name:ru-RU: "Рамки меню"
-    $description:ru-RU: "Цвет и видимость рамки контекстного меню"
     $options:ru-RU:
     - default: По умолчанию
     - window: Как у окна
     - windows: Определено Windows
     - off: Отключены
-    $name:uk-UA: Рамки меню
-    $description:uk-UA: Зовнішній контур меню в стилі мода
+    $options:vi-VN:
+    - default: Mặc định
+    - window: Theo cửa sổ
+    - windows: Theo Windows
+    - off: Tắt
+    $options:zh-CN:
+    - default: 默认
+    - window: 与窗口相同
+    - windows: 由 Windows 决定
+    - off: 关闭
+    $options:zh-TW:
+    - default: 預設
+    - window: 與視窗相同
+    - windows: 依 Windows 設定
+    - off: 關閉
+    $options:ja-JP:
+    - default: 既定
+    - window: ウィンドウと同じ
+    - windows: Windows に従う
+    - off: オフ
+    $options:ko-KR:
+    - default: 기본값
+    - window: 창과 동일
+    - windows: Windows 설정 따르기
+    - off: 끔
+    $options:th-TH:
+    - default: ค่าเริ่มต้น
+    - window: เหมือนหน้าต่าง
+    - windows: ตาม Windows
+    - off: ปิด
+    $options:id-ID:
+    - default: Default
+    - window: Sama seperti jendela
+    - windows: Mengikuti Windows
+    - off: Nonaktif
+    $options:ms-MY:
+    - default: Lalai
+    - window: Sama seperti tetingkap
+    - windows: Mengikut Windows
+    - off: Mati
+    $options:fr-FR:
+    - default: Par défaut
+    - window: Comme la fenêtre
+    - windows: Définies par Windows
+    - off: Désactivées
+    $options:de-DE:
+    - default: Standard
+    - window: Wie beim Fenster
+    - windows: Von Windows festgelegt
+    - off: Aus
+    $options:es-ES:
+    - default: Predeterminado
+    - window: Igual que la ventana
+    - windows: Según Windows
+    - off: Desactivados
+    $options:pt-BR:
+    - default: Padrão
+    - window: Igual à janela
+    - windows: Definidas pelo Windows
+    - off: Desativadas
+    $options:it-IT:
+    - default: Predefinito
+    - window: Come per la finestra
+    - windows: Definiti da Windows
+    - off: Disattivati
     $options:uk-UA:
-    - default: Власна рамка
-    - window: Визначено параметрами вікон
-    - windows: Визначено Windows
+    - default: За замовчуванням
+    - window: Як у вікна
+    - windows: За параметрами Windows
     - off: Вимкнено
-    $name:pl-PL: Obramowanie menu kontekstowego
-    $description:pl-PL: Zewnętrzna ramka menu w stylu moda
     $options:pl-PL:
-    - default: Własne obramowanie
-    - window: Według ustawień okien
-    - windows: Według systemu Windows
+    - default: Domyślne
+    - window: Tak jak w oknie
+    - windows: Według ustawień systemu Windows
     - off: Wyłączone
-    $name:nl-NL: Randen van het snelmenu
-    $description:nl-NL: Buitenrand van het menu in de modstijl
     $options:nl-NL:
-    - default: Eigen rand
-    - window: Volgens de vensterinstellingen
+    - default: Standaard
+    - window: Zoals bij het venster
     - windows: Volgens Windows
     - off: Uit
-    $name:tr-TR: Bağlam Menüsü Kenarlıkları
-    $description:tr-TR: Mod stilindeki menünün dış kenarlığı
     $options:tr-TR:
-    - default: Menüye özel kenarlık
-    - window: Pencere ayarlarına göre
+    - default: Varsayılan
+    - window: Pencereyle aynı
     - windows: Windows’a göre
     - off: Kapalı
-    $name:hi-IN: संदर्भ मेनू की सीमाएँ
-    $description:hi-IN: मॉड शैली के मेनू की बाहरी सीमा
     $options:hi-IN:
-    - default: मेनू की अपनी सीमा
-    - window: विंडो सेटिंग के अनुसार
+    - default: डिफ़ॉल्ट
+    - window: विंडो जैसा
     - windows: Windows के अनुसार
     - off: बंद
-    $name:ar: حدود قائمة السياق
-    $description:ar: الحد الخارجي للقائمة بنمط التعديل
     $options:ar:
-    - default: حد خاص بالقائمة
-    - window: حسب إعدادات النوافذ
+    - default: افتراضي
+    - window: مثل النافذة
     - windows: حسب Windows
-    - off: معطلة
-  $name: Borders
-  $name:vi-VN: Viền cửa sổ
-  $name:th-TH: ขอบหน้าต่าง
-  $name:id-ID: Bingkai Jendela
-  $name:ms-MY: Sempadan Tetingkap
-  $name:ja-JP: ウィンドウの境界線
-  $name:zh-CN: 窗口边框
-  $name:zh-TW: 視窗邊框
-  $name:ko-KR: 창 테두리
-  $name:fr-FR: Bordures des fenêtres
-  $name:de-DE: Fensterrahmen
-  $name:es-ES: Bordes de las ventanas
-  $name:pt-BR: Bordas das janelas
-  $name:it-IT: Bordi delle finestre
-  $name:ru-RU: Рамки
-  $name:uk-UA: Рамки вікон
-  $name:pl-PL: Obramowania okien
-  $name:nl-NL: Vensterranden
-  $name:tr-TR: Pencere Kenarlıkları
-  $name:hi-IN: विंडो की सीमाएँ
-  $name:ar: حدود النوافذ
+    - off: إيقاف
+  $name: "Borders"
+  $name:ru-RU: "Рамки"
+  $name:vi-VN: "Viền"
+  $name:zh-CN: "边框"
+  $name:zh-TW: "邊框"
+  $name:ja-JP: "枠線"
+  $name:ko-KR: "테두리"
+  $name:th-TH: "เส้นขอบ"
+  $name:id-ID: "Bingkai"
+  $name:ms-MY: "Sempadan"
+  $name:fr-FR: "Bordures"
+  $name:de-DE: "Rahmen"
+  $name:es-ES: "Bordes"
+  $name:pt-BR: "Bordas"
+  $name:it-IT: "Bordi"
+  $name:uk-UA: "Рамки"
+  $name:pl-PL: "Obramowanie"
+  $name:nl-NL: "Randen"
+  $name:tr-TR: "Kenarlıklar"
+  $name:hi-IN: "बॉर्डर"
+  $name:ar: "الإطارات"
 
 - layoutGroup:
   - dialogPosition: auto
-    $description:ru-RU: "В автоматическом режиме определяется макетом"
     $name: "Window Position"
-    $name:vi-VN: Vị trí hiển thị hộp thoại
     $name:ru-RU: "Положение окна"
+    $name:vi-VN: "Vị trí cửa sổ"
+    $name:zh-CN: "窗口位置"
+    $name:zh-TW: "視窗位置"
+    $name:ja-JP: "ウィンドウの位置"
+    $name:ko-KR: "창 위치"
+    $name:th-TH: "ตำแหน่งหน้าต่าง"
+    $name:id-ID: "Posisi jendela"
+    $name:ms-MY: "Kedudukan tetingkap"
+    $name:fr-FR: "Position de la fenêtre"
+    $name:de-DE: "Fensterposition"
+    $name:es-ES: "Posición de la ventana"
+    $name:pt-BR: "Posição da janela"
+    $name:it-IT: "Posizione della finestra"
+    $name:uk-UA: "Розташування вікна"
+    $name:pl-PL: "Położenie okna"
+    $name:nl-NL: "Vensterpositie"
+    $name:tr-TR: "Pencere konumu"
+    $name:hi-IN: "विंडो का स्थान"
+    $name:ar: "موضع النافذة"
     $description: "The layout determines the position in Auto mode"
-    $description:vi-VN: Chọn vị trí mở hộp thoại Run trên màn hình (Tự động sẽ theo góc Classic hoặc chính giữa dưới).
-    $options:vi-VN:
-    - auto: Tự động (Theo chế độ Classic / Pill)
-    - bottom_left: Góc dưới bên trái (Mặc định Windows)
-    - bottom_center: Chính giữa phía dưới
-    - bottom_right: Góc dưới bên phải
-    - top_left: Góc trên bên trái
-    - top_center: Chính giữa phía trên
-    - top_right: Góc trên bên phải
-    - center: Chính giữa màn hình (Spotlight)
+    $description:ru-RU: "В автоматическом режиме определяется макетом"
+    $description:vi-VN: "Ở chế độ tự động, vị trí phụ thuộc vào bố cục"
+    $description:zh-CN: "自动模式下的位置由布局决定"
+    $description:zh-TW: "自動模式下的位置由版面配置決定"
+    $description:ja-JP: "自動モードではレイアウトに応じて位置が決まります"
+    $description:ko-KR: "자동 모드에서는 레이아웃에 따라 위치가 결정됩니다"
+    $description:th-TH: "ในโหมดอัตโนมัติ เค้าโครงจะกำหนดตำแหน่งหน้าต่าง"
+    $description:id-ID: "Dalam mode otomatis, posisi ditentukan oleh tata letak"
+    $description:ms-MY: "Dalam mod automatik, kedudukan ditentukan oleh susun atur"
+    $description:fr-FR: "En mode automatique, la disposition détermine la position"
+    $description:de-DE: "Im automatischen Modus bestimmt das Layout die Position"
+    $description:es-ES: "En el modo automático, la distribución determina la posición"
+    $description:pt-BR: "No modo automático, o layout determina a posição"
+    $description:it-IT: "In modalità automatica, il layout determina la posizione"
+    $description:uk-UA: "В автоматичному режимі розташування залежить від макета"
+    $description:pl-PL: "W trybie automatycznym położenie zależy od układu"
+    $description:nl-NL: "In de automatische modus bepaalt de indeling de positie"
+    $description:tr-TR: "Otomatik modda konumu pencere düzeni belirler"
+    $description:hi-IN: "स्वचालित मोड में लेआउट से विंडो का स्थान तय होता है"
+    $description:ar: "يحدد التخطيط موضع النافذة في الوضع التلقائي"
     $options:
     - auto: Auto (Classic Corner / Bottom-Center)
     - bottom_left: Bottom Left (Windows Classic)
@@ -773,604 +1879,1258 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - top_center: Top Center
     - top_right: Top Right
     - center: Screen Center (Spotlight)
+    $options:ru-RU:
+    - auto: Авто
+    - bottom_left: Снизу слева
+    - bottom_center: Снизу по центру
+    - bottom_right: Снизу справа
+    - top_left: Сверху слева
+    - top_center: Сверху по центру
+    - top_right: Сверху справа
+    - center: По центру экрана
+    $options:vi-VN:
+    - auto: Tự động (góc theo kiểu cổ điển hoặc giữa cạnh dưới)
+    - bottom_left: Góc dưới bên trái (kiểu Windows cổ điển)
+    - bottom_center: Giữa cạnh dưới
+    - bottom_right: Góc dưới bên phải
+    - top_left: Góc trên bên trái
+    - top_center: Giữa cạnh trên
+    - top_right: Góc trên bên phải
+    - center: Giữa màn hình (Spotlight)
+    $options:zh-CN:
+    - auto: 自动（经典角落或底部居中）
+    - bottom_left: 左下角（经典 Windows）
+    - bottom_center: 底部居中
+    - bottom_right: 右下角
+    - top_left: 左上角
+    - top_center: 顶部居中
+    - top_right: 右上角
+    - center: 屏幕中央（Spotlight）
+    $options:zh-TW:
+    - auto: 自動（傳統角落或底部置中）
+    - bottom_left: 左下角（傳統 Windows）
+    - bottom_center: 底部置中
+    - bottom_right: 右下角
+    - top_left: 左上角
+    - top_center: 頂端置中
+    - top_right: 右上角
+    - center: 螢幕中央（Spotlight）
+    $options:ja-JP:
+    - auto: 自動 (クラシックの隅または下中央)
+    - bottom_left: 左下 (Windows クラシック)
+    - bottom_center: 下中央
+    - bottom_right: 右下
+    - top_left: 左上
+    - top_center: 上中央
+    - top_right: 右上
+    - center: 画面中央 (Spotlight)
+    $options:ko-KR:
+    - auto: 자동(클래식 모서리 또는 하단 가운데)
+    - bottom_left: 왼쪽 아래(클래식 Windows)
+    - bottom_center: 하단 가운데
+    - bottom_right: 오른쪽 아래
+    - top_left: 왼쪽 위
+    - top_center: 상단 가운데
+    - top_right: 오른쪽 위
+    - center: 화면 가운데(Spotlight)
+    $options:th-TH:
+    - auto: อัตโนมัติ (มุมแบบคลาสสิกหรือตรงกลางด้านล่าง)
+    - bottom_left: มุมซ้ายล่าง (Windows แบบคลาสสิก)
+    - bottom_center: ตรงกลางด้านล่าง
+    - bottom_right: มุมขวาล่าง
+    - top_left: มุมซ้ายบน
+    - top_center: ตรงกลางด้านบน
+    - top_right: มุมขวาบน
+    - center: กลางหน้าจอ (Spotlight)
+    $options:id-ID:
+    - auto: Otomatis (sudut klasik atau tengah bawah)
+    - bottom_left: Kiri bawah (Windows klasik)
+    - bottom_center: Tengah bawah
+    - bottom_right: Kanan bawah
+    - top_left: Kiri atas
+    - top_center: Tengah atas
+    - top_right: Kanan atas
+    - center: Tengah layar (Spotlight)
+    $options:ms-MY:
+    - auto: Automatik (sudut klasik atau tengah bawah)
+    - bottom_left: Kiri bawah (Windows klasik)
+    - bottom_center: Tengah bawah
+    - bottom_right: Kanan bawah
+    - top_left: Kiri atas
+    - top_center: Tengah atas
+    - top_right: Kanan atas
+    - center: Tengah skrin (Spotlight)
+    $options:fr-FR:
+    - auto: Automatique (coin classique ou bas au centre)
+    - bottom_left: En bas à gauche (Windows classique)
+    - bottom_center: En bas au centre
+    - bottom_right: En bas à droite
+    - top_left: En haut à gauche
+    - top_center: En haut au centre
+    - top_right: En haut à droite
+    - center: Au centre de l’écran (Spotlight)
+    $options:de-DE:
+    - auto: Automatisch (klassische Ecke oder unten mittig)
+    - bottom_left: Unten links (klassisches Windows)
+    - bottom_center: Unten mittig
+    - bottom_right: Unten rechts
+    - top_left: Oben links
+    - top_center: Oben mittig
+    - top_right: Oben rechts
+    - center: Bildschirmmitte (Spotlight)
+    $options:es-ES:
+    - auto: Automático (esquina clásica o abajo en el centro)
+    - bottom_left: Abajo a la izquierda (Windows clásico)
+    - bottom_center: Abajo en el centro
+    - bottom_right: Abajo a la derecha
+    - top_left: Arriba a la izquierda
+    - top_center: Arriba en el centro
+    - top_right: Arriba a la derecha
+    - center: Centro de la pantalla (Spotlight)
+    $options:pt-BR:
+    - auto: Automático (canto clássico ou centro inferior)
+    - bottom_left: Inferior esquerdo (Windows clássico)
+    - bottom_center: Inferior central
+    - bottom_right: Inferior direito
+    - top_left: Superior esquerdo
+    - top_center: Superior central
+    - top_right: Superior direito
+    - center: Centro da tela (Spotlight)
+    $options:it-IT:
+    - auto: Automatico (angolo classico o in basso al centro)
+    - bottom_left: In basso a sinistra (Windows classico)
+    - bottom_center: In basso al centro
+    - bottom_right: In basso a destra
+    - top_left: In alto a sinistra
+    - top_center: In alto al centro
+    - top_right: In alto a destra
+    - center: Al centro dello schermo (Spotlight)
+    $options:uk-UA:
+    - auto: Автоматично (класичний кут або знизу по центру)
+    - bottom_left: Знизу ліворуч (як у Windows)
+    - bottom_center: Знизу по центру
+    - bottom_right: Знизу праворуч
+    - top_left: Зверху ліворуч
+    - top_center: Зверху по центру
+    - top_right: Зверху праворуч
+    - center: У центрі екрана (Spotlight)
+    $options:pl-PL:
+    - auto: Automatycznie (klasyczny róg lub na dole pośrodku)
+    - bottom_left: Lewy dolny róg (klasyczny Windows)
+    - bottom_center: Na dole pośrodku
+    - bottom_right: Prawy dolny róg
+    - top_left: Lewy górny róg
+    - top_center: U góry pośrodku
+    - top_right: Prawy górny róg
+    - center: Środek ekranu (Spotlight)
+    $options:nl-NL:
+    - auto: Automatisch (klassieke hoek of midden onder)
+    - bottom_left: Linksonder (klassiek Windows)
+    - bottom_center: Midden onder
+    - bottom_right: Rechtsonder
+    - top_left: Linksboven
+    - top_center: Midden boven
+    - top_right: Rechtsboven
+    - center: Midden van het scherm (Spotlight)
+    $options:tr-TR:
+    - auto: Otomatik (klasik köşe veya alt orta)
+    - bottom_left: Sol alt (klasik Windows)
+    - bottom_center: Alt orta
+    - bottom_right: Sağ alt
+    - top_left: Sol üst
+    - top_center: Üst orta
+    - top_right: Sağ üst
+    - center: Ekranın ortası (Spotlight)
+    $options:hi-IN:
+    - auto: अपने आप (क्लासिक कोना या नीचे बीच में)
+    - bottom_left: नीचे बाईं ओर (क्लासिक Windows)
+    - bottom_center: नीचे बीच में
+    - bottom_right: नीचे दाईं ओर
+    - top_left: ऊपर बाईं ओर
+    - top_center: ऊपर बीच में
+    - top_right: ऊपर दाईं ओर
+    - center: स्क्रीन के बीच में (Spotlight)
+    $options:ar:
+    - auto: تلقائي (الزاوية الكلاسيكية أو منتصف الأسفل)
+    - bottom_left: أسفل اليسار (Windows الكلاسيكي)
+    - bottom_center: منتصف الأسفل
+    - bottom_right: أسفل اليمين
+    - top_left: أعلى اليسار
+    - top_center: منتصف الأعلى
+    - top_right: أعلى اليمين
+    - center: منتصف الشاشة (Spotlight)
   - rememberPosition: false
-    $description:ru-RU: "Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение"
-    $description: "Opens at the last saved position. Ctrl + 0 resets it"
     $name: "Remember Window Position"
-    $name:vi-VN: Nhớ vị trí cửa sổ lần cuối
     $name:ru-RU: "Запоминать положение окна"
-    $description:vi-VN: Ghi nhớ vị trí bạn đã kéo thả hộp thoại Run và tự động mở lại ở đúng vị trí đó cho các lần Win + R tiếp theo.
+    $name:vi-VN: "Nhớ vị trí cửa sổ"
+    $name:zh-CN: "记住窗口位置"
+    $name:zh-TW: "記住視窗位置"
+    $name:ja-JP: "ウィンドウの位置を記憶する"
+    $name:ko-KR: "창 위치 기억"
+    $name:th-TH: "จดจำตำแหน่งหน้าต่าง"
+    $name:id-ID: "Ingat posisi jendela"
+    $name:ms-MY: "Ingat kedudukan tetingkap"
+    $name:fr-FR: "Mémoriser la position de la fenêtre"
+    $name:de-DE: "Fensterposition speichern"
+    $name:es-ES: "Recordar la posición de la ventana"
+    $name:pt-BR: "Lembrar a posição da janela"
+    $name:it-IT: "Memorizza la posizione della finestra"
+    $name:uk-UA: "Запам’ятовувати розташування вікна"
+    $name:pl-PL: "Zapamiętaj położenie okna"
+    $name:nl-NL: "Vensterpositie onthouden"
+    $name:tr-TR: "Pencere konumunu hatırla"
+    $name:hi-IN: "विंडो का स्थान याद रखें"
+    $name:ar: "تذكّر موضع النافذة"
+    $description: "Opens at the last saved position. Ctrl + 0 resets it"
+    $description:ru-RU: "Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение"
+    $description:vi-VN: "Mở tại vị trí đã lưu gần nhất. Nhấn Ctrl + 0 để đặt lại"
+    $description:zh-CN: "在上次保存的位置打开。按 Ctrl + 0 重置"
+    $description:zh-TW: "在上次儲存的位置開啟。按 Ctrl + 0 重設"
+    $description:ja-JP: "最後に保存した位置で開きます。Ctrl + 0 でリセットできます"
+    $description:ko-KR: "마지막으로 저장한 위치에서 열립니다. Ctrl + 0으로 초기화할 수 있습니다"
+    $description:th-TH: "เปิดที่ตำแหน่งที่บันทึกล่าสุด กด Ctrl + 0 เพื่อรีเซ็ตตำแหน่ง"
+    $description:id-ID: "Jendela dibuka pada posisi terakhir yang disimpan. Ctrl + 0 mereset posisi"
+    $description:ms-MY: "Tetingkap dibuka pada kedudukan terakhir yang disimpan. Ctrl + 0 menetapkan semula kedudukan"
+    $description:fr-FR: "Rouvre la fenêtre à la dernière position enregistrée. Ctrl + 0 la réinitialise"
+    $description:de-DE: "Öffnet das Fenster an der zuletzt gespeicherten Position. Strg + 0 setzt sie zurück"
+    $description:es-ES: "Abre la ventana en la última posición guardada. Ctrl + 0 la restablece"
+    $description:pt-BR: "Abre a janela na última posição salva. Ctrl + 0 a redefine"
+    $description:it-IT: "Apre la finestra nell’ultima posizione salvata. Ctrl + 0 la ripristina"
+    $description:uk-UA: "Відкриває вікно в останньому збереженому місці. Ctrl + 0 скидає розташування"
+    $description:pl-PL: "Otwiera okno w ostatnim zapisanym położeniu. Ctrl + 0 przywraca położenie domyślne"
+    $description:nl-NL: "Opent het venster op de laatst opgeslagen positie. Ctrl + 0 zet deze terug"
+    $description:tr-TR: "Pencere son kaydedilen konumda açılır. Ctrl + 0 konumu sıfırlar"
+    $description:hi-IN: "विंडो पिछली बार सहेजे गए स्थान पर खुलती है। Ctrl + 0 स्थान रीसेट करता है"
+    $description:ar: "تُفتح النافذة في آخر موضع محفوظ. يعيد Ctrl + 0 تعيين الموضع"
   - dialogLayout: classic
     $name: "Window Layout"
+    $name:ru-RU: "Макет окна"
+    $name:vi-VN: "Bố cục cửa sổ"
+    $name:zh-CN: "窗口布局"
+    $name:zh-TW: "視窗版面配置"
+    $name:ja-JP: "ウィンドウのレイアウト"
+    $name:ko-KR: "창 레이아웃"
+    $name:th-TH: "เค้าโครงหน้าต่าง"
+    $name:id-ID: "Tata letak jendela"
+    $name:ms-MY: "Susun atur tetingkap"
+    $name:fr-FR: "Disposition de la fenêtre"
+    $name:de-DE: "Fensterlayout"
+    $name:es-ES: "Distribución de la ventana"
+    $name:pt-BR: "Layout da janela"
+    $name:it-IT: "Layout della finestra"
+    $name:uk-UA: "Макет вікна"
+    $name:pl-PL: "Układ okna"
+    $name:nl-NL: "Vensterindeling"
+    $name:tr-TR: "Pencere düzeni"
+    $name:hi-IN: "विंडो का लेआउट"
+    $name:ar: "تخطيط النافذة"
     $description: "Arrangement of the input field, lists, and buttons with personalization applied"
+    $description:ru-RU: "Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"
+    $description:vi-VN: "Bố trí ô nhập, danh sách và các nút theo tùy chọn cá nhân hóa"
+    $description:zh-CN: "输入框、列表和按钮的排列方式，应用个性化设置"
+    $description:zh-TW: "輸入欄、清單和按鈕的排列方式，套用個人化設定"
+    $description:ja-JP: "個人用設定を反映した入力欄、一覧、ボタンの配置"
+    $description:ko-KR: "개인 설정을 적용한 입력란, 목록 및 단추의 배치"
+    $description:th-TH: "การจัดวางช่องป้อนข้อมูล รายการ และปุ่มตามการตั้งค่าส่วนบุคคล"
+    $description:id-ID: "Penataan kolom input, daftar, dan tombol dengan pengaturan personalisasi"
+    $description:ms-MY: "Susunan medan input, senarai dan butang mengikut tetapan pemperibadian"
+    $description:fr-FR: "Disposition du champ de saisie, des listes et des boutons, selon les paramètres de personnalisation"
+    $description:de-DE: "Anordnung von Eingabefeld, Listen und Schaltflächen mit den Personalisierungseinstellungen"
+    $description:es-ES: "Distribución del campo de entrada, las listas y los botones con la personalización aplicada"
+    $description:pt-BR: "Disposição do campo de entrada, das listas e dos botões com as configurações de personalização"
+    $description:it-IT: "Disposizione del campo di immissione, degli elenchi e dei pulsanti con le impostazioni di personalizzazione"
+    $description:uk-UA: "Розташування поля введення, списків і кнопок з урахуванням персоналізації"
+    $description:pl-PL: "Rozmieszczenie pola wprowadzania, list i przycisków z uwzględnieniem personalizacji"
+    $description:nl-NL: "Indeling van het invoerveld, de lijsten en de knoppen met de persoonlijke instellingen"
+    $description:tr-TR: "Giriş alanının, listelerin ve düğmelerin kişiselleştirme ayarlarına göre yerleşimi"
+    $description:hi-IN: "इनपुट फ़ील्ड, सूचियों और बटनों की व्यवस्था, वैयक्तिकरण की सेटिंग के साथ"
+    $description:ar: "ترتيب حقل الإدخال والقوائم والأزرار وفق إعدادات التخصيص"
     $options:
     - classic: Classic
     - pill: Compact Mini-Pill
     - fluent: Fluent
-    $name:vi-VN: Bố cục hộp thoại
-    $description:vi-VN: Bố cục cửa sổ cơ bản sử dụng các thiết lập cá nhân hóa
-    $options:vi-VN:
-    - classic: Cổ điển
-    - pill: Thu gọn (Pill)
-    - fluent: Fluent
-    $name:th-TH: รูปแบบกล่องโต้ตอบ
-    $description:th-TH: รูปแบบหน้าต่างพื้นฐานที่ใช้การตั้งค่าส่วนบุคคล
-    $options:th-TH:
-    - classic: คลาสสิก
-    - pill: กะทัดรัด (Pill)
-    - fluent: Fluent
-    $name:id-ID: Tata Letak Dialog
-    $description:id-ID: Tata letak dasar jendela yang menggunakan pengaturan personalisasi
-    $options:id-ID:
-    - classic: Klasik
-    - pill: Ringkas (Pill)
-    - fluent: Fluent
-    $name:ms-MY: Susun Atur Dialog
-    $description:ms-MY: Susun atur asas tetingkap yang menggunakan tetapan pemperibadian
-    $options:ms-MY:
-    - classic: Klasik
-    - pill: Padat (Pill)
-    - fluent: Fluent
-    $name:ja-JP: ダイアログのレイアウト
-    $description:ja-JP: 個人用設定を使用する基本的なウィンドウレイアウト
-    $options:ja-JP:
-    - classic: クラシック
-    - pill: コンパクト (Pill)
-    - fluent: Fluent
-    $name:zh-CN: 对话框布局
-    $description:zh-CN: 使用个性化设置的基本窗口布局
-    $options:zh-CN:
-    - classic: 经典
-    - pill: 紧凑（胶囊形）
-    - fluent: Fluent
-    $name:zh-TW: 對話方塊版面配置
-    $description:zh-TW: 使用個人化設定的基本視窗版面配置
-    $options:zh-TW:
-    - classic: 傳統
-    - pill: 精簡（膠囊形）
-    - fluent: Fluent
-    $name:ko-KR: 대화 상자 레이아웃
-    $description:ko-KR: 개인 설정을 사용하는 기본 창 레이아웃
-    $options:ko-KR:
-    - classic: 클래식
-    - pill: 간단히 (Pill)
-    - fluent: Fluent
-    $name:fr-FR: Disposition de la fenêtre
-    $description:fr-FR: Disposition de base de la fenêtre qui utilise les paramètres de personnalisation
-    $options:fr-FR:
-    - classic: Classique
-    - pill: Compact (Pill)
-    - fluent: Fluent
-    $name:de-DE: Dialoglayout
-    $description:de-DE: Grundlayout des Fensters unter Verwendung der Personalisierungseinstellungen
-    $options:de-DE:
-    - classic: Klassisch
-    - pill: Kompakt (Pill)
-    - fluent: Fluent
-    $name:es-ES: Diseño del cuadro de diálogo
-    $description:es-ES: Diseño básico de la ventana que usa la configuración de personalización
-    $options:es-ES:
-    - classic: Clásico
-    - pill: Compacto (Pill)
-    - fluent: Fluent
-    $name:pt-BR: Layout da janela
-    $description:pt-BR: Layout básico da janela que usa as configurações de personalização
-    $options:pt-BR:
-    - classic: Clássico
-    - pill: Compacto (Pill)
-    - fluent: Fluent
-    $name:it-IT: Layout della finestra
-    $description:it-IT: Layout di base della finestra che usa le impostazioni di personalizzazione
-    $options:it-IT:
-    - classic: Classico
-    - pill: Compatto (Pill)
-    - fluent: Fluent
-    $name:ru-RU: "Макет окна"
-    $description:ru-RU: "Расположение поля ввода, списков и кнопок, с учетом настроек персонализации"
     $options:ru-RU:
     - classic: Классический
     - pill: Компактный (Pill)
     - fluent: Современный (Fluent)
-    $name:uk-UA: Макет вікна
-    $description:uk-UA: Базове компонування вікна з урахуванням параметрів персоналізації
+    $options:vi-VN:
+    - classic: Cổ điển
+    - pill: Thu gọn (dạng viên nang)
+    - fluent: Fluent
+    $options:zh-CN:
+    - classic: 经典
+    - pill: 紧凑（胶囊形）
+    - fluent: Fluent
+    $options:zh-TW:
+    - classic: 傳統
+    - pill: 精簡（膠囊形）
+    - fluent: Fluent
+    $options:ja-JP:
+    - classic: クラシック
+    - pill: コンパクト (カプセル型)
+    - fluent: Fluent
+    $options:ko-KR:
+    - classic: 클래식
+    - pill: 간결한 캡슐형
+    - fluent: Fluent
+    $options:th-TH:
+    - classic: คลาสสิก
+    - pill: กะทัดรัด (ทรงแคปซูล)
+    - fluent: Fluent
+    $options:id-ID:
+    - classic: Klasik
+    - pill: Ringkas (kapsul)
+    - fluent: Fluent
+    $options:ms-MY:
+    - classic: Klasik
+    - pill: Padat (kapsul)
+    - fluent: Fluent
+    $options:fr-FR:
+    - classic: Classique
+    - pill: Capsule compacte
+    - fluent: Fluent
+    $options:de-DE:
+    - classic: Klassisch
+    - pill: Kompakte Kapselform
+    - fluent: Fluent
+    $options:es-ES:
+    - classic: Clásica
+    - pill: Cápsula compacta
+    - fluent: Fluent
+    $options:pt-BR:
+    - classic: Clássico
+    - pill: Cápsula compacta
+    - fluent: Fluent
+    $options:it-IT:
+    - classic: Classico
+    - pill: Capsula compatta
+    - fluent: Fluent
     $options:uk-UA:
     - classic: Класичний
-    - pill: Компактний (Pill)
+    - pill: Компактний (капсула)
     - fluent: Fluent
-    $name:pl-PL: Układ okna
-    $description:pl-PL: Podstawowy układ okna, który korzysta z ustawień personalizacji
     $options:pl-PL:
     - classic: Klasyczny
-    - pill: Kompaktowy (Pill)
+    - pill: Kompaktowa kapsuła
     - fluent: Fluent
-    $name:nl-NL: Vensterindeling
-    $description:nl-NL: Basisindeling van het venster met de instellingen voor persoonlijke voorkeur
     $options:nl-NL:
     - classic: Klassiek
-    - pill: Compact (Pill)
+    - pill: Compacte capsule
     - fluent: Fluent
-    $name:tr-TR: İletişim Kutusu Düzeni
-    $description:tr-TR: Kişiselleştirme ayarlarını kullanan temel pencere düzeni
     $options:tr-TR:
     - classic: Klasik
-    - pill: Kompakt (Pill)
+    - pill: Kompakt (kapsül)
     - fluent: Fluent
-    $name:hi-IN: डायलॉग का लेआउट
-    $description:hi-IN: वैयक्तिकरण सेटिंग का उपयोग करने वाला मूल विंडो लेआउट
     $options:hi-IN:
     - classic: क्लासिक
-    - pill: कॉम्पैक्ट (Pill)
+    - pill: कॉम्पैक्ट (कैप्सूल)
     - fluent: Fluent
-    $name:ar: تخطيط النافذة
-    $description:ar: التخطيط الأساسي للنافذة الذي يستخدم إعدادات التخصيص
     $options:ar:
     - classic: كلاسيكي
-    - pill: مدمج (Pill)
+    - pill: مدمج (كبسولة)
     - fluent: Fluent
   - contextMenuStyle: standard
     $name: "Context Menu Style"
+    $name:ru-RU: "Стиль контекстного меню"
+    $name:vi-VN: "Kiểu menu ngữ cảnh"
+    $name:zh-CN: "上下文菜单样式"
+    $name:zh-TW: "快顯功能表樣式"
+    $name:ja-JP: "コンテキスト メニューのスタイル"
+    $name:ko-KR: "상황에 맞는 메뉴 스타일"
+    $name:th-TH: "รูปแบบเมนูบริบท"
+    $name:id-ID: "Gaya menu konteks"
+    $name:ms-MY: "Gaya menu konteks"
+    $name:fr-FR: "Style du menu contextuel"
+    $name:de-DE: "Kontextmenüstil"
+    $name:es-ES: "Estilo del menú contextual"
+    $name:pt-BR: "Estilo do menu de contexto"
+    $name:it-IT: "Stile del menu di scelta rapida"
+    $name:uk-UA: "Стиль контекстного меню"
+    $name:pl-PL: "Styl menu kontekstowego"
+    $name:nl-NL: "Stijl van het snelmenu"
+    $name:tr-TR: "Bağlam menüsü stili"
+    $name:hi-IN: "संदर्भ मेनू की शैली"
+    $name:ar: "نمط قائمة السياق"
     $description: "Appearance of the right-click menu"
+    $description:ru-RU: "Оформление меню при нажатии правой кнопки мыши"
+    $description:vi-VN: "Giao diện của menu khi bấm chuột phải"
+    $description:zh-CN: "右键菜单的外观"
+    $description:zh-TW: "按右鍵時顯示的功能表外觀"
+    $description:ja-JP: "右クリック メニューの外観"
+    $description:ko-KR: "마우스 오른쪽 단추 메뉴의 모양"
+    $description:th-TH: "ลักษณะของเมนูที่เปิดด้วยการคลิกขวา"
+    $description:id-ID: "Tampilan menu klik kanan"
+    $description:ms-MY: "Rupa menu klik kanan"
+    $description:fr-FR: "Apparence du menu qui s’ouvre avec le clic droit"
+    $description:de-DE: "Darstellung des Menüs beim Rechtsklick"
+    $description:es-ES: "Apariencia del menú que se abre con el botón derecho"
+    $description:pt-BR: "Aparência do menu que abre com o botão direito"
+    $description:it-IT: "Aspetto del menu che si apre con il pulsante destro"
+    $description:uk-UA: "Вигляд меню, що відкривається правою кнопкою миші"
+    $description:pl-PL: "Wygląd menu otwieranego prawym przyciskiem myszy"
+    $description:nl-NL: "Uiterlijk van het snelmenu bij rechtsklikken"
+    $description:tr-TR: "Sağ tıklama menüsünün görünümü"
+    $description:hi-IN: "राइट-क्लिक मेनू का रूप"
+    $description:ar: "مظهر قائمة النقر بزر الماوس الأيمن"
     $options:
     - standard: Standard
     - windows_fluent: Windows (Fluent)
-    $name:vi-VN: Kiểu menu ngữ cảnh
-    $description:vi-VN: Đổi giao diện menu khi nhấp chuột phải
-    $options:vi-VN:
-    - standard: Kiểu của mod
-    - windows_fluent: Windows (Fluent)
-    $name:th-TH: รูปแบบเมนูบริบท
-    $description:th-TH: เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา
-    $options:th-TH:
-    - standard: รูปแบบของม็อด
-    - windows_fluent: Windows (Fluent)
-    $name:id-ID: Gaya Menu Konteks
-    $description:id-ID: Mengubah tampilan menu saat klik kanan
-    $options:id-ID:
-    - standard: Gaya Mod
-    - windows_fluent: Windows (Fluent)
-    $name:ms-MY: Gaya Menu Konteks
-    $description:ms-MY: Mengubah rupa menu apabila klik kanan
-    $options:ms-MY:
-    - standard: Gaya Mod
-    - windows_fluent: Windows (Fluent)
-    $name:ja-JP: コンテキスト メニューのスタイル
-    $description:ja-JP: 右クリック メニューの外観を変更します
-    $options:ja-JP:
-    - standard: Mod のスタイル
-    - windows_fluent: Windows (Fluent)
-    $name:zh-CN: 右键菜单样式
-    $description:zh-CN: 更改右键单击时显示的菜单外观
-    $options:zh-CN:
-    - standard: 模组样式
-    - windows_fluent: Windows (Fluent)
-    $name:zh-TW: 快顯選單樣式
-    $description:zh-TW: 變更按下滑鼠右鍵時顯示的選單外觀
-    $options:zh-TW:
-    - standard: 模組樣式
-    - windows_fluent: Windows (Fluent)
-    $name:ko-KR: 상황에 맞는 메뉴 스타일
-    $description:ko-KR: 마우스 오른쪽 클릭 메뉴의 모양을 변경합니다
-    $options:ko-KR:
-    - standard: 모드 스타일
-    - windows_fluent: Windows (Fluent)
-    $name:fr-FR: Style du menu contextuel
-    $description:fr-FR: Modifie l’apparence du menu du clic droit
-    $options:fr-FR:
-    - standard: Style du mod
-    - windows_fluent: Windows (Fluent)
-    $name:de-DE: Kontextmenüstil
-    $description:de-DE: Ändert das Aussehen des Menüs beim Rechtsklick
-    $options:de-DE:
-    - standard: Mod-Stil
-    - windows_fluent: Windows (Fluent)
-    $name:es-ES: Estilo del menú contextual
-    $description:es-ES: Cambia el aspecto del menú al hacer clic con el botón derecho
-    $options:es-ES:
-    - standard: Estilo del mod
-    - windows_fluent: Windows (Fluent)
-    $name:pt-BR: Estilo do menu de contexto
-    $description:pt-BR: Altera a aparência do menu do botão direito
-    $options:pt-BR:
-    - standard: Estilo do mod
-    - windows_fluent: Windows (Fluent)
-    $name:it-IT: Stile del menu contestuale
-    $description:it-IT: Modifica l’aspetto del menu del tasto destro
-    $options:it-IT:
-    - standard: Stile della mod
-    - windows_fluent: Windows (Fluent)
-    $name:ru-RU: "Стиль контекстного меню"
-    $description:ru-RU: "Оформление меню при нажатии правой кнопки мыши"
     $options:ru-RU:
     - standard: Обычный
     - windows_fluent: Windows (Fluent)
-    $name:uk-UA: Стиль контекстного меню
-    $description:uk-UA: Змінює вигляд меню при натисканні правою кнопкою миші
+    $options:vi-VN:
+    - standard: Tiêu chuẩn
+    - windows_fluent: Windows (Fluent)
+    $options:zh-CN:
+    - standard: 标准
+    - windows_fluent: Windows (Fluent)
+    $options:zh-TW:
+    - standard: 標準
+    - windows_fluent: Windows (Fluent)
+    $options:ja-JP:
+    - standard: 標準
+    - windows_fluent: Windows (Fluent)
+    $options:ko-KR:
+    - standard: 표준
+    - windows_fluent: Windows (Fluent)
+    $options:th-TH:
+    - standard: มาตรฐาน
+    - windows_fluent: Windows (Fluent)
+    $options:id-ID:
+    - standard: Standar
+    - windows_fluent: Windows (Fluent)
+    $options:ms-MY:
+    - standard: Standard
+    - windows_fluent: Windows (Fluent)
+    $options:fr-FR:
+    - standard: Standard
+    - windows_fluent: Windows (Fluent)
+    $options:de-DE:
+    - standard: Standard
+    - windows_fluent: Windows (Fluent)
+    $options:es-ES:
+    - standard: Estándar
+    - windows_fluent: Windows (Fluent)
+    $options:pt-BR:
+    - standard: Padrão
+    - windows_fluent: Windows (Fluent)
+    $options:it-IT:
+    - standard: Standard
+    - windows_fluent: Windows (Fluent)
     $options:uk-UA:
-    - standard: Стиль мода
+    - standard: Стандартний
     - windows_fluent: Windows (Fluent)
-    $name:pl-PL: Styl menu kontekstowego
-    $description:pl-PL: Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem
     $options:pl-PL:
-    - standard: Styl moda
+    - standard: Standardowy
     - windows_fluent: Windows (Fluent)
-    $name:nl-NL: Stijl van het snelmenu
-    $description:nl-NL: Wijzigt het uiterlijk van het menu bij rechtsklikken
     $options:nl-NL:
-    - standard: Stijl van de mod
+    - standard: Standaard
     - windows_fluent: Windows (Fluent)
-    $name:tr-TR: Bağlam menüsü stili
-    $description:tr-TR: Sağ tıklama menüsünün görünümünü değiştirir
     $options:tr-TR:
-    - standard: Mod stili
+    - standard: Standart
     - windows_fluent: Windows (Fluent)
-    $name:hi-IN: संदर्भ मेनू की शैली
-    $description:hi-IN: राइट-क्लिक मेनू का रूप बदलता है
     $options:hi-IN:
-    - standard: मॉड की शैली
+    - standard: मानक
     - windows_fluent: Windows (Fluent)
-    $name:ar: نمط قائمة السياق
-    $description:ar: يغير مظهر القائمة عند النقر بزر الماوس الأيمن
     $options:ar:
-    - standard: نمط التعديل
+    - standard: قياسي
     - windows_fluent: Windows (Fluent)
   - dialogWidthPreset: default
     $name: "Window Width"
-    $description: "The default width follows the window layout"
-    $options:
-    - default: "Default"
-    - narrow: "Narrow"
-    - wide: "Wide"
     $name:ru-RU: "Ширина окна"
-    $description:ru-RU: "Ширина по умолчанию зависит от макета окна"
-    $options:ru-RU:
-    - default: "По умолчанию"
-    - narrow: "Узкая"
-    - wide: "Широкая"
     $name:vi-VN: "Chiều rộng cửa sổ"
-    $description:vi-VN: "Đặt chiều rộng của cửa sổ Run"
-    $options:vi-VN:
-    - default: "Theo bố cục"
-    - narrow: "Hẹp hơn"
-    - wide: "Rộng hơn"
-    $name:th-TH: "ความกว้างหน้าต่าง"
-    $description:th-TH: "กำหนดความกว้างของหน้าต่าง Run"
-    $options:th-TH:
-    - default: "ตามเค้าโครง"
-    - narrow: "แคบลง"
-    - wide: "กว้างขึ้น"
-    $name:id-ID: "Lebar jendela"
-    $description:id-ID: "Atur lebar jendela Run"
-    $options:id-ID:
-    - default: "Sesuai tata letak"
-    - narrow: "Lebih sempit"
-    - wide: "Lebih lebar"
-    $name:ms-MY: "Lebar tetingkap"
-    $description:ms-MY: "Tetapkan lebar tetingkap Run"
-    $options:ms-MY:
-    - default: "Mengikut susun atur"
-    - narrow: "Lebih sempit"
-    - wide: "Lebih lebar"
-    $name:ja-JP: "ウィンドウの幅"
-    $description:ja-JP: "「ファイル名を指定して実行」のウィンドウ幅を設定"
-    $options:ja-JP:
-    - default: "レイアウトに従う"
-    - narrow: "より狭く"
-    - wide: "より広く"
     $name:zh-CN: "窗口宽度"
-    $description:zh-CN: "设置“运行”窗口的宽度"
-    $options:zh-CN:
-    - default: "由布局决定"
-    - narrow: "更窄"
-    - wide: "更宽"
     $name:zh-TW: "視窗寬度"
-    $description:zh-TW: "設定「執行」視窗的寬度"
-    $options:zh-TW:
-    - default: "依版面配置"
-    - narrow: "較窄"
-    - wide: "較寬"
+    $name:ja-JP: "ウィンドウの幅"
     $name:ko-KR: "창 너비"
-    $description:ko-KR: "실행 창의 너비를 설정"
-    $options:ko-KR:
-    - default: "레이아웃 기본값"
-    - narrow: "더 좁게"
-    - wide: "더 넓게"
+    $name:th-TH: "ความกว้างหน้าต่าง"
+    $name:id-ID: "Lebar jendela"
+    $name:ms-MY: "Lebar tetingkap"
     $name:fr-FR: "Largeur de la fenêtre"
-    $description:fr-FR: "Définit la largeur de la fenêtre Exécuter"
-    $options:fr-FR:
-    - default: "Selon la disposition"
-    - narrow: "Plus étroite"
-    - wide: "Plus large"
     $name:de-DE: "Fensterbreite"
-    $description:de-DE: "Legt die Breite des Fensters „Ausführen“ fest"
-    $options:de-DE:
-    - default: "Nach Layout"
-    - narrow: "Schmaler"
-    - wide: "Breiter"
-    $name:es-ES: "Ancho de ventana"
-    $description:es-ES: "Ajusta el ancho de la ventana Ejecutar"
-    $options:es-ES:
-    - default: "Según el diseño"
-    - narrow: "Más estrecha"
-    - wide: "Más ancha"
+    $name:es-ES: "Ancho de la ventana"
     $name:pt-BR: "Largura da janela"
-    $description:pt-BR: "Define a largura da janela Executar"
-    $options:pt-BR:
-    - default: "Conforme o layout"
-    - narrow: "Mais estreita"
-    - wide: "Mais larga"
     $name:it-IT: "Larghezza della finestra"
-    $description:it-IT: "Imposta la larghezza della finestra Esegui"
-    $options:it-IT:
-    - default: "Secondo il layout"
-    - narrow: "Più stretta"
-    - wide: "Più larga"
     $name:uk-UA: "Ширина вікна"
-    $description:uk-UA: "Задає ширину вікна «Виконати»"
-    $options:uk-UA:
-    - default: "За макетом"
-    - narrow: "Вужче"
-    - wide: "Ширше"
     $name:pl-PL: "Szerokość okna"
-    $description:pl-PL: "Ustawia szerokość okna Uruchamianie"
-    $options:pl-PL:
-    - default: "Zgodnie z układem"
-    - narrow: "Węższe"
-    - wide: "Szersze"
     $name:nl-NL: "Vensterbreedte"
-    $description:nl-NL: "Stelt de breedte van het venster Uitvoeren in"
-    $options:nl-NL:
-    - default: "Volgens indeling"
-    - narrow: "Smaller"
-    - wide: "Breder"
     $name:tr-TR: "Pencere genişliği"
-    $description:tr-TR: "Çalıştır penceresinin genişliğini ayarlar"
-    $options:tr-TR:
-    - default: "Düzene göre"
-    - narrow: "Daha dar"
-    - wide: "Daha geniş"
     $name:hi-IN: "विंडो की चौड़ाई"
-    $description:hi-IN: "रन विंडो की चौड़ाई सेट करें"
-    $options:hi-IN:
-    - default: "लेआउट के अनुसार"
-    - narrow: "और संकरा"
-    - wide: "और चौड़ा"
     $name:ar: "عرض النافذة"
-    $description:ar: "يضبط عرض نافذة تشغيل"
-    $options:ar:
-    - default: "حسب التخطيط"
-    - narrow: "أضيق"
-    - wide: "أعرض"
-  - customDialogWidth: 0
-    $description:ru-RU: "От 360 до 1200 px; при 0 зависит от масштаба интерфейса"
-    $name:ru-RU: "Точная ширина окна"
-    $name: "Exact Window Width"
-    $name:vi-VN: Chiều rộng hộp thoại tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 360–1200 px)
-    $description: "From 360 to 1200 px. At 0, follows the interface scale"
-    $description:vi-VN: Tự chỉnh chiều rộng hộp thoại Run theo pixel/DIP (ví dụ 560, 616, 720). Để 0 nếu muốn dùng theo mức 85%–120%.
-  - customBarHeight: 0
-    $description:ru-RU: "От 36 до 96 px, при 0 зависит от масштаба интерфейса"
-    $name:ru-RU: "Высота поля ввода"
-    $name: "Input Field Height"
-    $name:vi-VN: Chiều cao thanh nhập tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 36–96 px)
-    $description: "From 36 to 96 px. At 0, follows the interface scale"
-    $description:vi-VN: Tự chỉnh chiều cao thanh nhập lệnh (36–96 px, chuẩn 54 px). Để 0 để theo mức có sẵn.
-  - customFontSize: 0
-    $description:ru-RU: "От 9 до 24 DIP, при 0 зависит от масштаба интерфейса"
-    $name:ru-RU: "Размер шрифта"
-    $name: "Font Size"
-    $name:vi-VN: Cỡ chữ tùy chỉnh (0 = Theo thiết lập sẵn, hoặc 9–24 pt)
-    $description: "From 9 to 24 DIP. At 0, follows the interface scale"
-    $description:vi-VN: Tự chỉnh cỡ chữ hiển thị trong hộp thoại Run (9–24 pt, chuẩn 14). Để 0 để theo mức kích thước có sẵn.
-  - uiScalePercent: "100"
-    $description:ru-RU: "Общий размер окна, элементов управления и текста"
-    $name:ru-RU: "Масштаб интерфейса"
-    $description: "Overall size of the window, controls, and text"
-    $name: "Interface Scale"
-    $name:vi-VN: Tỷ lệ kích thước giao diện có sẵn (85% – 120%)
-    $description:vi-VN: Điều chỉnh tỷ lệ kích thước tổng thể của hộp thoại Run (85% Nhỏ gọn, 100% Mặc định, 110% Vừa, 120% Lớn).
-    $options:vi-VN:
-    - "85": 85% – Nhỏ gọn (Compact)
-    - "90": 90% – Hơi nhỏ
-    - "100": 100% – Mặc định (Chuẩn)
-    - "110": 110% – Lớn vừa (Medium)
-    - "120": 120% – Rất lớn (Large)
+    $description: "The default width follows the window layout"
+    $description:ru-RU: "Ширина по умолчанию зависит от макета окна"
+    $description:vi-VN: "Chiều rộng mặc định phụ thuộc vào bố cục cửa sổ"
+    $description:zh-CN: "默认宽度由窗口布局决定"
+    $description:zh-TW: "預設寬度由視窗版面配置決定"
+    $description:ja-JP: "既定の幅はウィンドウのレイアウトに応じて決まります"
+    $description:ko-KR: "기본 너비는 창 레이아웃에 따라 결정됩니다"
+    $description:th-TH: "ความกว้างเริ่มต้นขึ้นอยู่กับเค้าโครงหน้าต่าง"
+    $description:id-ID: "Lebar default mengikuti tata letak jendela"
+    $description:ms-MY: "Lebar lalai mengikut susun atur tetingkap"
+    $description:fr-FR: "La largeur par défaut dépend de la disposition de la fenêtre"
+    $description:de-DE: "Die Standardbreite richtet sich nach dem Fensterlayout"
+    $description:es-ES: "El ancho predeterminado depende de la distribución de la ventana"
+    $description:pt-BR: "A largura padrão segue o layout da janela"
+    $description:it-IT: "La larghezza predefinita dipende dal layout della finestra"
+    $description:uk-UA: "Типова ширина залежить від макета вікна"
+    $description:pl-PL: "Domyślna szerokość zależy od układu okna"
+    $description:nl-NL: "De standaardbreedte hangt af van de vensterindeling"
+    $description:tr-TR: "Varsayılan genişlik pencere düzenine göre belirlenir"
+    $description:hi-IN: "डिफ़ॉल्ट चौड़ाई विंडो के लेआउट पर निर्भर करती है"
+    $description:ar: "يحدد تخطيط النافذة العرض الافتراضي"
     $options:
-    - "85": 85% – Compact
-    - "90": 90% – Slightly Smaller
-    - "100": 100% – Default (Standard)
-    - "110": 110% – Medium Large
-    - "120": 120% – Large
-  $name: Layout & Position
-  $name:vi-VN: Bố cục & Vị trí
-  $name:ru-RU: Макет и положение
+    - default: Default
+    - narrow: Narrow
+    - wide: Wide
+    $options:ru-RU:
+    - default: По умолчанию
+    - narrow: Узкая
+    - wide: Широкая
+    $options:vi-VN:
+    - default: Mặc định
+    - narrow: Hẹp
+    - wide: Rộng
+    $options:zh-CN:
+    - default: 默认
+    - narrow: 较窄
+    - wide: 较宽
+    $options:zh-TW:
+    - default: 預設
+    - narrow: 窄
+    - wide: 寬
+    $options:ja-JP:
+    - default: 既定
+    - narrow: 狭い
+    - wide: 広い
+    $options:ko-KR:
+    - default: 기본값
+    - narrow: 좁게
+    - wide: 넓게
+    $options:th-TH:
+    - default: ค่าเริ่มต้น
+    - narrow: แคบ
+    - wide: กว้าง
+    $options:id-ID:
+    - default: Default
+    - narrow: Sempit
+    - wide: Lebar
+    $options:ms-MY:
+    - default: Lalai
+    - narrow: Sempit
+    - wide: Lebar
+    $options:fr-FR:
+    - default: Par défaut
+    - narrow: Étroite
+    - wide: Large
+    $options:de-DE:
+    - default: Standard
+    - narrow: Schmal
+    - wide: Breit
+    $options:es-ES:
+    - default: Predeterminado
+    - narrow: Estrecho
+    - wide: Ancho
+    $options:pt-BR:
+    - default: Padrão
+    - narrow: Estreita
+    - wide: Larga
+    $options:it-IT:
+    - default: Predefinito
+    - narrow: Stretta
+    - wide: Larga
+    $options:uk-UA:
+    - default: За замовчуванням
+    - narrow: Вузьке
+    - wide: Широке
+    $options:pl-PL:
+    - default: Domyślne
+    - narrow: Wąskie
+    - wide: Szerokie
+    $options:nl-NL:
+    - default: Standaard
+    - narrow: Smal
+    - wide: Breed
+    $options:tr-TR:
+    - default: Varsayılan
+    - narrow: Dar
+    - wide: Geniş
+    $options:hi-IN:
+    - default: डिफ़ॉल्ट
+    - narrow: संकरा
+    - wide: चौड़ा
+    $options:ar:
+    - default: افتراضي
+    - narrow: ضيّق
+    - wide: عريض
+  - customDialogWidth: 0
+    $name: "Exact Window Width"
+    $name:ru-RU: "Точная ширина окна"
+    $name:vi-VN: "Chiều rộng cửa sổ tùy chỉnh"
+    $name:zh-CN: "自定义窗口宽度"
+    $name:zh-TW: "自訂視窗寬度"
+    $name:ja-JP: "ウィンドウ幅を指定"
+    $name:ko-KR: "창 너비 직접 지정"
+    $name:th-TH: "ระบุความกว้างหน้าต่าง"
+    $name:id-ID: "Lebar jendela (piksel)"
+    $name:ms-MY: "Lebar tepat tetingkap"
+    $name:fr-FR: "Largeur exacte de la fenêtre"
+    $name:de-DE: "Genaue Fensterbreite"
+    $name:es-ES: "Ancho exacto de la ventana"
+    $name:pt-BR: "Largura exata da janela"
+    $name:it-IT: "Larghezza esatta della finestra"
+    $name:uk-UA: "Точна ширина вікна"
+    $name:pl-PL: "Dokładna szerokość okna"
+    $name:nl-NL: "Exacte vensterbreedte"
+    $name:tr-TR: "Kesin pencere genişliği"
+    $name:hi-IN: "विंडो की सटीक चौड़ाई"
+    $name:ar: "العرض الدقيق للنافذة"
+    $description: "From 360 to 1200 px. At 0, follows the interface scale"
+    $description:ru-RU: "От 360 до 1200 px; при 0 зависит от масштаба интерфейса"
+    $description:vi-VN: "Từ 360 đến 1200 px. Giá trị 0 dùng tỷ lệ giao diện"
+    $description:zh-CN: "范围为 360 至 1200 px。设为 0 时跟随界面缩放比例"
+    $description:zh-TW: "範圍為 360 至 1200 px。設為 0 時依介面縮放比例"
+    $description:ja-JP: "範囲は 360 ～ 1200 px。0 はインターフェイスの拡大率に従います"
+    $description:ko-KR: "범위는 360~1200 px입니다. 0으로 설정하면 인터페이스 배율을 따릅니다"
+    $description:th-TH: "ตั้งได้ตั้งแต่ 360 ถึง 1200 px หากตั้งเป็น 0 จะใช้ค่าตามอัตราส่วนอินเทอร์เฟซ"
+    $description:id-ID: "Antara 360 dan 1200 piksel. Nilai 0 mengikuti skala antarmuka"
+    $description:ms-MY: "Antara 360 hingga 1200 piksel. Nilai 0 mengikut skala antara muka"
+    $description:fr-FR: "De 360 à 1200 px. À 0, suit l’échelle de l’interface"
+    $description:de-DE: "Von 360 bis 1200 px. Bei 0 gilt die Skalierung der Oberfläche"
+    $description:es-ES: "De 360 a 1200 px. Con 0, se usa la escala de la interfaz"
+    $description:pt-BR: "De 360 a 1200 px. O valor 0 segue a escala da interface"
+    $description:it-IT: "Da 360 a 1200 px. Con 0 segue il ridimensionamento dell’interfaccia"
+    $description:uk-UA: "Від 360 до 1200 пкс. За значення 0 діє масштаб інтерфейсу"
+    $description:pl-PL: "Od 360 do 1200 px. Przy wartości 0 obowiązuje skala interfejsu"
+    $description:nl-NL: "Van 360 tot 1200 px. Bij 0 geldt de schaal van de interface"
+    $description:tr-TR: "360 ile 1200 piksel arası. 0 seçilirse arayüz ölçeği kullanılır"
+    $description:hi-IN: "360 से 1200 पिक्सेल। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
+    $description:ar: "من 360 إلى 1200 بكسل. عند تعيين 0، يُستخدم مقياس الواجهة"
+  - customBarHeight: 0
+    $name: "Input Field Height"
+    $name:ru-RU: "Высота поля ввода"
+    $name:vi-VN: "Chiều cao ô nhập"
+    $name:zh-CN: "输入框高度"
+    $name:zh-TW: "輸入欄高度"
+    $name:ja-JP: "入力欄の高さ"
+    $name:ko-KR: "입력란 높이"
+    $name:th-TH: "ความสูงช่องป้อนข้อมูล"
+    $name:id-ID: "Tinggi kolom input"
+    $name:ms-MY: "Ketinggian medan input"
+    $name:fr-FR: "Hauteur du champ de saisie"
+    $name:de-DE: "Höhe des Eingabefelds"
+    $name:es-ES: "Altura del campo de entrada"
+    $name:pt-BR: "Altura do campo de entrada"
+    $name:it-IT: "Altezza del campo di immissione"
+    $name:uk-UA: "Висота поля введення"
+    $name:pl-PL: "Wysokość pola wprowadzania"
+    $name:nl-NL: "Hoogte van het invoerveld"
+    $name:tr-TR: "Giriş alanı yüksekliği"
+    $name:hi-IN: "इनपुट फ़ील्ड की ऊँचाई"
+    $name:ar: "ارتفاع حقل الإدخال"
+    $description: "From 36 to 96 px. At 0, follows the interface scale"
+    $description:ru-RU: "От 36 до 96 px, при 0 зависит от масштаба интерфейса"
+    $description:vi-VN: "Từ 36 đến 96 px. Giá trị 0 dùng tỷ lệ giao diện"
+    $description:zh-CN: "范围为 36 至 96 px。设为 0 时跟随界面缩放比例"
+    $description:zh-TW: "範圍為 36 至 96 px。設為 0 時依介面縮放比例"
+    $description:ja-JP: "範囲は 36 ～ 96 px。0 はインターフェイスの拡大率に従います"
+    $description:ko-KR: "범위는 36~96 px입니다. 0으로 설정하면 인터페이스 배율을 따릅니다"
+    $description:th-TH: "ตั้งได้ตั้งแต่ 36 ถึง 96 px หากตั้งเป็น 0 จะใช้ค่าตามอัตราส่วนอินเทอร์เฟซ"
+    $description:id-ID: "Antara 36 dan 96 piksel. Nilai 0 mengikuti skala antarmuka"
+    $description:ms-MY: "Antara 36 hingga 96 piksel. Nilai 0 mengikut skala antara muka"
+    $description:fr-FR: "De 36 à 96 px. À 0, suit l’échelle de l’interface"
+    $description:de-DE: "Von 36 bis 96 px. Bei 0 gilt die Skalierung der Oberfläche"
+    $description:es-ES: "De 36 a 96 px. Con 0, se usa la escala de la interfaz"
+    $description:pt-BR: "De 36 a 96 px. O valor 0 segue a escala da interface"
+    $description:it-IT: "Da 36 a 96 px. Con 0 segue il ridimensionamento dell’interfaccia"
+    $description:uk-UA: "Від 36 до 96 пкс. За значення 0 діє масштаб інтерфейсу"
+    $description:pl-PL: "Od 36 do 96 px. Przy wartości 0 obowiązuje skala interfejsu"
+    $description:nl-NL: "Van 36 tot 96 px. Bij 0 geldt de schaal van de interface"
+    $description:tr-TR: "36 ile 96 piksel arası. 0 seçilirse arayüz ölçeği kullanılır"
+    $description:hi-IN: "36 से 96 पिक्सेल। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
+    $description:ar: "من 36 إلى 96 بكسل. عند تعيين 0، يُستخدم مقياس الواجهة"
+  - customFontSize: 0
+    $name: "Font Size"
+    $name:ru-RU: "Размер шрифта"
+    $name:vi-VN: "Cỡ chữ"
+    $name:zh-CN: "字号"
+    $name:zh-TW: "字型大小"
+    $name:ja-JP: "フォント サイズ"
+    $name:ko-KR: "글꼴 크기"
+    $name:th-TH: "ขนาดฟอนต์"
+    $name:id-ID: "Ukuran font"
+    $name:ms-MY: "Saiz fon"
+    $name:fr-FR: "Taille de police"
+    $name:de-DE: "Schriftgröße"
+    $name:es-ES: "Tamaño de fuente"
+    $name:pt-BR: "Tamanho da fonte"
+    $name:it-IT: "Dimensione del carattere"
+    $name:uk-UA: "Розмір шрифту"
+    $name:pl-PL: "Rozmiar czcionki"
+    $name:nl-NL: "Lettergrootte"
+    $name:tr-TR: "Yazı tipi boyutu"
+    $name:hi-IN: "फ़ॉन्ट का आकार"
+    $name:ar: "حجم الخط"
+    $description: "From 9 to 24 DIP. At 0, follows the interface scale"
+    $description:ru-RU: "От 9 до 24 DIP, при 0 зависит от масштаба интерфейса"
+    $description:vi-VN: "Từ 9 đến 24 DIP. Giá trị 0 dùng tỷ lệ giao diện"
+    $description:zh-CN: "范围为 9 至 24 DIP。设为 0 时跟随界面缩放比例"
+    $description:zh-TW: "範圍為 9 至 24 DIP。設為 0 時依介面縮放比例"
+    $description:ja-JP: "範囲は 9 ～ 24 DIP。0 はインターフェイスの拡大率に従います"
+    $description:ko-KR: "범위는 9~24 DIP입니다. 0으로 설정하면 인터페이스 배율을 따릅니다"
+    $description:th-TH: "ตั้งได้ตั้งแต่ 9 ถึง 24 DIP หากตั้งเป็น 0 จะใช้ค่าตามอัตราส่วนอินเทอร์เฟซ"
+    $description:id-ID: "Antara 9 dan 24 DIP. Nilai 0 mengikuti skala antarmuka"
+    $description:ms-MY: "Antara 9 hingga 24 DIP. Nilai 0 mengikut skala antara muka"
+    $description:fr-FR: "De 9 à 24 DIP. À 0, suit l’échelle de l’interface"
+    $description:de-DE: "Von 9 bis 24 DIP. Bei 0 gilt die Skalierung der Oberfläche"
+    $description:es-ES: "De 9 a 24 DIP. Con 0, se usa la escala de la interfaz"
+    $description:pt-BR: "De 9 a 24 DIP. O valor 0 segue a escala da interface"
+    $description:it-IT: "Da 9 a 24 DIP. Con 0 segue il ridimensionamento dell’interfaccia"
+    $description:uk-UA: "Від 9 до 24 DIP. За значення 0 діє масштаб інтерфейсу"
+    $description:pl-PL: "Od 9 do 24 DIP. Przy wartości 0 obowiązuje skala interfejsu"
+    $description:nl-NL: "Van 9 tot 24 DIP. Bij 0 geldt de schaal van de interface"
+    $description:tr-TR: "9 ile 24 DIP arası. 0 seçilirse arayüz ölçeği kullanılır"
+    $description:hi-IN: "9 से 24 DIP। 0 होने पर इंटरफ़ेस का स्केल लागू होता है"
+    $description:ar: "من 9 إلى 24 وحدة DIP. عند تعيين 0، يُستخدم مقياس الواجهة"
+  - uiScalePercent: "100"
+    $name: "Interface Scale"
+    $name:ru-RU: "Масштаб интерфейса"
+    $name:vi-VN: "Tỷ lệ giao diện"
+    $name:zh-CN: "界面缩放比例"
+    $name:zh-TW: "介面縮放比例"
+    $name:ja-JP: "インターフェイスの拡大率"
+    $name:ko-KR: "인터페이스 배율"
+    $name:th-TH: "อัตราส่วนอินเทอร์เฟซ"
+    $name:id-ID: "Skala antarmuka"
+    $name:ms-MY: "Skala antara muka"
+    $name:fr-FR: "Échelle de l’interface"
+    $name:de-DE: "Skalierung der Oberfläche"
+    $name:es-ES: "Escala de la interfaz"
+    $name:pt-BR: "Escala da interface"
+    $name:it-IT: "Ridimensionamento dell’interfaccia"
+    $name:uk-UA: "Масштаб інтерфейсу"
+    $name:pl-PL: "Skala interfejsu"
+    $name:nl-NL: "Schaal van de interface"
+    $name:tr-TR: "Arayüz ölçeği"
+    $name:hi-IN: "इंटरफ़ेस का स्केल"
+    $name:ar: "مقياس الواجهة"
+    $description: "Overall size of the window, controls, and text"
+    $description:ru-RU: "Общий размер окна, элементов управления и текста"
+    $description:vi-VN: "Kích thước tổng thể của cửa sổ, các thành phần điều khiển và văn bản"
+    $description:zh-CN: "窗口、控件和文字的整体大小"
+    $description:zh-TW: "視窗、控制項和文字的整體大小"
+    $description:ja-JP: "ウィンドウ、コントロール、テキスト全体のサイズ"
+    $description:ko-KR: "창, 컨트롤 및 텍스트의 전체 크기"
+    $description:th-TH: "ขนาดโดยรวมของหน้าต่าง ตัวควบคุม และข้อความ"
+    $description:id-ID: "Ukuran keseluruhan jendela, kontrol, dan teks"
+    $description:ms-MY: "Saiz keseluruhan tetingkap, kawalan dan teks"
+    $description:fr-FR: "Taille de la fenêtre, des commandes et du texte"
+    $description:de-DE: "Größe von Fenster, Steuerelementen und Text"
+    $description:es-ES: "Tamaño de la ventana, los controles y el texto"
+    $description:pt-BR: "Tamanho da janela, dos controles e do texto"
+    $description:it-IT: "Dimensione della finestra, dei controlli e del testo"
+    $description:uk-UA: "Загальний розмір вікна, елементів керування й тексту"
+    $description:pl-PL: "Rozmiar okna, elementów sterujących i tekstu"
+    $description:nl-NL: "Grootte van het venster, de bedieningselementen en de tekst"
+    $description:tr-TR: "Pencerenin, denetimlerin ve metnin genel boyutu"
+    $description:hi-IN: "विंडो, नियंत्रणों और टेक्स्ट का कुल आकार"
+    $description:ar: "الحجم الإجمالي للنافذة وعناصر التحكم والنص"
+  $name: "Layout & Position"
+  $name:ru-RU: "Макет и положение"
+  $name:vi-VN: "Bố cục và vị trí"
+  $name:zh-CN: "布局和位置"
+  $name:zh-TW: "版面配置與位置"
+  $name:ja-JP: "レイアウトと位置"
+  $name:ko-KR: "레이아웃 및 위치"
+  $name:th-TH: "เค้าโครงและตำแหน่ง"
+  $name:id-ID: "Tata letak dan posisi"
+  $name:ms-MY: "Susun atur dan kedudukan"
+  $name:fr-FR: "Disposition et position"
+  $name:de-DE: "Layout und Position"
+  $name:es-ES: "Distribución y posición"
+  $name:pt-BR: "Layout e posição"
+  $name:it-IT: "Layout e posizione"
+  $name:uk-UA: "Макет і розташування"
+  $name:pl-PL: "Układ i położenie"
+  $name:nl-NL: "Indeling en positie"
+  $name:tr-TR: "Düzen ve konum"
+  $name:hi-IN: "लेआउट और स्थान"
+  $name:ar: "التخطيط والموضع"
 
 - actionButtonsGroup:
   - hideBrowse: false
-    $description:ru-RU: "Ctrl + O"
-    $description: "Ctrl + O"
-    $name: Hide the Browse button
-    $name:vi-VN: Ẩn nút Duyệt
-    $name:th-TH: ซ่อนปุ่ม เรียกดู
-    $name:id-ID: Sembunyikan tombol Telusuri
-    $name:ms-MY: Sembunyikan butang Semak imbas
-    $name:ja-JP: 「参照」ボタンを非表示にする
-    $name:zh-CN: 隐藏“浏览”按钮
-    $name:zh-TW: 隱藏「瀏覽」按鈕
-    $name:ko-KR: 찾아보기 버튼 숨기기
-    $name:fr-FR: Masquer le bouton Parcourir
-    $name:de-DE: Schaltfläche „Durchsuchen“ ausblenden
-    $name:es-ES: Ocultar el botón Examinar
-    $name:pt-BR: Ocultar o botão Procurar
-    $name:it-IT: Nascondi il pulsante Sfoglia
+    $name: "Hide the Browse button"
     $name:ru-RU: "Скрывать кнопку «Обзор»"
-    $name:uk-UA: Приховати кнопку «Огляд»
-    $name:pl-PL: Ukryj przycisk „Przeglądaj”
-    $name:nl-NL: Knop Bladeren verbergen
-    $name:tr-TR: Gözat düğmesini gizle
-    $name:hi-IN: ब्राउज़ करें बटन छिपाएँ
-    $name:ar: إخفاء زر استعراض
+    $name:vi-VN: "Ẩn nút Duyệt"
+    $name:zh-CN: "隐藏“浏览”按钮"
+    $name:zh-TW: "隱藏「瀏覽」按鈕"
+    $name:ja-JP: "[参照] ボタンを非表示にする"
+    $name:ko-KR: "찾아보기 단추 숨기기"
+    $name:th-TH: "ซ่อนปุ่มเรียกดู"
+    $name:id-ID: "Sembunyikan tombol Telusuri"
+    $name:ms-MY: "Sembunyikan butang Semak imbas"
+    $name:fr-FR: "Masquer le bouton Parcourir"
+    $name:de-DE: "Schaltfläche „Durchsuchen“ ausblenden"
+    $name:es-ES: "Ocultar el botón Examinar"
+    $name:pt-BR: "Ocultar o botão Procurar"
+    $name:it-IT: "Nascondi il pulsante Sfoglia"
+    $name:uk-UA: "Приховати кнопку «Огляд»"
+    $name:pl-PL: "Ukryj przycisk „Przeglądaj”"
+    $name:nl-NL: "Knop Bladeren verbergen"
+    $name:tr-TR: "Gözat düğmesini gizle"
+    $name:hi-IN: "ब्राउज़ करें बटन छिपाएँ"
+    $name:ar: "إخفاء زر «استعراض»"
+    $description: "Ctrl + O"
+    $description:ru-RU: "Ctrl + O"
+    $description:vi-VN: "Ctrl + O"
+    $description:zh-CN: "Ctrl + O"
+    $description:zh-TW: "Ctrl + O"
+    $description:ja-JP: "Ctrl + O"
+    $description:ko-KR: "Ctrl + O"
+    $description:th-TH: "Ctrl + O"
+    $description:id-ID: "Ctrl + O"
+    $description:ms-MY: "Ctrl + O"
+    $description:fr-FR: "Ctrl + O"
+    $description:de-DE: "Strg + O"
+    $description:es-ES: "Ctrl + O"
+    $description:pt-BR: "Ctrl + O"
+    $description:it-IT: "Ctrl + O"
+    $description:uk-UA: "Ctrl + O"
+    $description:pl-PL: "Ctrl + O"
+    $description:nl-NL: "Ctrl + O"
+    $description:tr-TR: "Ctrl + O"
+    $description:hi-IN: "Ctrl + O"
+    $description:ar: "Ctrl + O"
   - hideRun: false
-    $description:ru-RU: "Enter"
-    $description: "Enter"
-    $name: Hide the Run button
-    $name:vi-VN: Ẩn nút Chạy
-    $name:th-TH: ซ่อนปุ่ม เรียกใช้
-    $name:id-ID: Sembunyikan tombol Jalankan
-    $name:ms-MY: Sembunyikan butang Jalankan
-    $name:ja-JP: 「実行」ボタンを非表示にする
-    $name:zh-CN: 隐藏“运行”按钮
-    $name:zh-TW: 隱藏「執行」按鈕
-    $name:ko-KR: 실행 버튼 숨기기
-    $name:fr-FR: Masquer le bouton Exécuter
-    $name:de-DE: Schaltfläche „Ausführen“ ausblenden
-    $name:es-ES: Ocultar el botón Ejecutar
-    $name:pt-BR: Ocultar o botão Executar
-    $name:it-IT: Nascondi il pulsante Esegui
+    $name: "Hide the Run button"
     $name:ru-RU: "Скрывать кнопку «Выполнить»"
-    $name:uk-UA: Приховати кнопку «Виконати»
-    $name:pl-PL: Ukryj przycisk „Uruchom”
-    $name:nl-NL: Knop Uitvoeren verbergen
-    $name:tr-TR: Çalıştır düğmesini gizle
-    $name:hi-IN: चलाएँ बटन छिपाएँ
-    $name:ar: إخفاء زر تشغيل
+    $name:vi-VN: "Ẩn nút Chạy"
+    $name:zh-CN: "隐藏“运行”按钮"
+    $name:zh-TW: "隱藏「執行」按鈕"
+    $name:ja-JP: "[実行] ボタンを非表示にする"
+    $name:ko-KR: "실행 단추 숨기기"
+    $name:th-TH: "ซ่อนปุ่มเรียกใช้"
+    $name:id-ID: "Sembunyikan tombol Jalankan"
+    $name:ms-MY: "Sembunyikan butang Jalankan"
+    $name:fr-FR: "Masquer le bouton Exécuter"
+    $name:de-DE: "Schaltfläche „Ausführen“ ausblenden"
+    $name:es-ES: "Ocultar el botón Ejecutar"
+    $name:pt-BR: "Ocultar o botão Executar"
+    $name:it-IT: "Nascondi il pulsante Esegui"
+    $name:uk-UA: "Приховати кнопку «Виконати»"
+    $name:pl-PL: "Ukryj przycisk „Uruchom”"
+    $name:nl-NL: "Knop Uitvoeren verbergen"
+    $name:tr-TR: "Çalıştır düğmesini gizle"
+    $name:hi-IN: "चलाएँ बटन छिपाएँ"
+    $name:ar: "إخفاء زر «تشغيل»"
+    $description: "Enter"
+    $description:ru-RU: "Enter"
+    $description:vi-VN: "Enter"
+    $description:zh-CN: "Enter"
+    $description:zh-TW: "Enter"
+    $description:ja-JP: "Enter"
+    $description:ko-KR: "Enter"
+    $description:th-TH: "Enter"
+    $description:id-ID: "Enter"
+    $description:ms-MY: "Enter"
+    $description:fr-FR: "Entrée"
+    $description:de-DE: "Eingabe"
+    $description:es-ES: "Entrar"
+    $description:pt-BR: "Enter"
+    $description:it-IT: "Invio"
+    $description:uk-UA: "Enter"
+    $description:pl-PL: "Enter"
+    $description:nl-NL: "Enter"
+    $description:tr-TR: "Enter"
+    $description:hi-IN: "Enter"
+    $description:ar: "Enter"
   - hideClose: false
-    $description:ru-RU: "Esc"
-    $description: "Esc"
-    $name: Hide the Close button
-    $name:vi-VN: Ẩn nút Đóng
-    $name:th-TH: ซ่อนปุ่ม ปิด
-    $name:id-ID: Sembunyikan tombol Tutup
-    $name:ms-MY: Sembunyikan butang Tutup
-    $name:ja-JP: 「閉じる」ボタンを非表示にする
-    $name:zh-CN: 隐藏“关闭”按钮
-    $name:zh-TW: 隱藏「關閉」按鈕
-    $name:ko-KR: 닫기 버튼 숨기기
-    $name:fr-FR: Masquer le bouton Fermer
-    $name:de-DE: Schaltfläche „Schließen“ ausblenden
-    $name:es-ES: Ocultar el botón Cerrar
-    $name:pt-BR: Ocultar o botão Fechar
-    $name:it-IT: Nascondi il pulsante Chiudi
+    $name: "Hide the Close button"
     $name:ru-RU: "Скрывать кнопку «Закрыть»"
-    $name:uk-UA: Приховати кнопку «Закрити»
-    $name:pl-PL: Ukryj przycisk „Zamknij”
-    $name:nl-NL: Knop Sluiten verbergen
-    $name:tr-TR: Kapat düğmesini gizle
-    $name:hi-IN: बंद करें बटन छिपाएँ
-    $name:ar: إخفاء زر إغلاق
+    $name:vi-VN: "Ẩn nút Đóng"
+    $name:zh-CN: "隐藏“关闭”按钮"
+    $name:zh-TW: "隱藏「關閉」按鈕"
+    $name:ja-JP: "[閉じる] ボタンを非表示にする"
+    $name:ko-KR: "닫기 단추 숨기기"
+    $name:th-TH: "ซ่อนปุ่มปิด"
+    $name:id-ID: "Sembunyikan tombol Tutup"
+    $name:ms-MY: "Sembunyikan butang Tutup"
+    $name:fr-FR: "Masquer le bouton Fermer"
+    $name:de-DE: "Schaltfläche „Schließen“ ausblenden"
+    $name:es-ES: "Ocultar el botón Cerrar"
+    $name:pt-BR: "Ocultar o botão Fechar"
+    $name:it-IT: "Nascondi il pulsante Chiudi"
+    $name:uk-UA: "Приховати кнопку «Закрити»"
+    $name:pl-PL: "Ukryj przycisk „Zamknij”"
+    $name:nl-NL: "Knop Sluiten verbergen"
+    $name:tr-TR: "Kapat düğmesini gizle"
+    $name:hi-IN: "बंद करें बटन छिपाएँ"
+    $name:ar: "إخفاء زر «إغلاق»"
+    $description: "Esc"
+    $description:ru-RU: "Esc"
+    $description:vi-VN: "Esc"
+    $description:zh-CN: "Esc"
+    $description:zh-TW: "Esc"
+    $description:ja-JP: "Esc"
+    $description:ko-KR: "Esc"
+    $description:th-TH: "Esc"
+    $description:id-ID: "Esc"
+    $description:ms-MY: "Esc"
+    $description:fr-FR: "Échap"
+    $description:de-DE: "Esc"
+    $description:es-ES: "Esc"
+    $description:pt-BR: "Esc"
+    $description:it-IT: "Esc"
+    $description:uk-UA: "Esc"
+    $description:pl-PL: "Esc"
+    $description:nl-NL: "Esc"
+    $description:tr-TR: "Esc"
+    $description:hi-IN: "Esc"
+    $description:ar: "Esc"
   - hideSettings: false
-    $description:ru-RU: "Ctrl + ,"
-    $description: "Ctrl + ,"
-    $name: Hide the Settings button
-    $name:vi-VN: Ẩn nút Cài đặt
-    $name:th-TH: ซ่อนปุ่ม การตั้งค่า
-    $name:id-ID: Sembunyikan tombol Pengaturan
-    $name:ms-MY: Sembunyikan butang Tetapan
-    $name:ja-JP: 「設定」ボタンを非表示にする
-    $name:zh-CN: 隐藏“设置”按钮
-    $name:zh-TW: 隱藏「設定」按鈕
-    $name:ko-KR: 설정 버튼 숨기기
-    $name:fr-FR: Masquer le bouton Paramètres
-    $name:de-DE: Schaltfläche „Einstellungen“ ausblenden
-    $name:es-ES: Ocultar el botón Configuración
-    $name:pt-BR: Ocultar o botão Configurações
-    $name:it-IT: Nascondi il pulsante Impostazioni
+    $name: "Hide the Settings button"
     $name:ru-RU: "Скрывать кнопку «Настройки»"
-    $name:uk-UA: Приховати кнопку «Налаштування»
-    $name:pl-PL: Ukryj przycisk „Ustawienia”
-    $name:nl-NL: Knop Instellingen verbergen
-    $name:tr-TR: Ayarlar düğmesini gizle
-    $name:hi-IN: सेटिंग्स बटन छिपाएँ
-    $name:ar: إخفاء زر الإعدادات
-  $name: Action Buttons
-  $description: Hidden actions are available in the right-click menu
-  $name:vi-VN: Nút thao tác
-  $description:vi-VN: Các thao tác đã ẩn có trong menu chuột phải
-  $name:th-TH: ปุ่มคำสั่ง
-  $description:th-TH: คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา
-  $name:id-ID: Tombol Tindakan
-  $description:id-ID: Tindakan tersembunyi tersedia di menu klik kanan
-  $name:ms-MY: Butang Tindakan
-  $description:ms-MY: Tindakan tersembunyi tersedia dalam menu klik kanan
-  $name:ja-JP: 操作ボタン
-  $description:ja-JP: 非表示にした操作は右クリックメニューに表示されます
-  $name:zh-CN: 操作按钮
-  $description:zh-CN: 隐藏按钮的操作可通过右键菜单使用
-  $name:zh-TW: 操作按鈕
-  $description:zh-TW: 隱藏按鈕的動作仍可從右鍵選單使用
-  $name:ko-KR: 동작 버튼
-  $description:ko-KR: 숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다
-  $name:fr-FR: Boutons d’action
-  $description:fr-FR: Les actions masquées restent accessibles via le menu contextuel
-  $name:de-DE: Aktionsschaltflächen
-  $description:de-DE: Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung
-  $name:es-ES: Botones de acción
-  $description:es-ES: Las acciones ocultas están disponibles en el menú contextual
-  $name:pt-BR: Botões de ação
-  $description:pt-BR: As ações ocultas ficam disponíveis no menu de contexto
-  $name:it-IT: Pulsanti di azione
-  $description:it-IT: Le azioni nascoste restano disponibili nel menu di scelta rapida
-  $name:ru-RU: Кнопки действий
-  $description:ru-RU: Действия скрытых кнопок доступны в контекстном меню
-  $name:uk-UA: Кнопки дій
-  $description:uk-UA: Дії прихованих кнопок доступні в контекстному меню
-  $name:pl-PL: Przyciski akcji
-  $description:pl-PL: Ukryte akcje są dostępne w menu kontekstowym
-  $name:nl-NL: Actieknoppen
-  $description:nl-NL: Verborgen acties staan in het snelmenu
-  $name:tr-TR: Eylem düğmeleri
-  $description:tr-TR: Gizlenen eylemler sağ tıklama menüsünde bulunur
-  $name:hi-IN: कार्रवाई बटन
-  $description:hi-IN: छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं
-  $name:ar: أزرار الإجراءات
-  $description:ar: تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن
+    $name:vi-VN: "Ẩn nút Cài đặt"
+    $name:zh-CN: "隐藏“设置”按钮"
+    $name:zh-TW: "隱藏「設定」按鈕"
+    $name:ja-JP: "[設定] ボタンを非表示にする"
+    $name:ko-KR: "설정 단추 숨기기"
+    $name:th-TH: "ซ่อนปุ่มการตั้งค่า"
+    $name:id-ID: "Sembunyikan tombol Pengaturan"
+    $name:ms-MY: "Sembunyikan butang Tetapan"
+    $name:fr-FR: "Masquer le bouton Paramètres"
+    $name:de-DE: "Schaltfläche „Einstellungen“ ausblenden"
+    $name:es-ES: "Ocultar el botón Configuración"
+    $name:pt-BR: "Ocultar o botão Configurações"
+    $name:it-IT: "Nascondi il pulsante Impostazioni"
+    $name:uk-UA: "Приховати кнопку «Параметри»"
+    $name:pl-PL: "Ukryj przycisk „Ustawienia”"
+    $name:nl-NL: "Knop Instellingen verbergen"
+    $name:tr-TR: "Ayarlar düğmesini gizle"
+    $name:hi-IN: "सेटिंग्स बटन छिपाएँ"
+    $name:ar: "إخفاء زر «الإعدادات»"
+    $description: "Ctrl + ,"
+    $description:ru-RU: "Ctrl + ,"
+    $description:vi-VN: "Ctrl + ,"
+    $description:zh-CN: "Ctrl + ,"
+    $description:zh-TW: "Ctrl + ,"
+    $description:ja-JP: "Ctrl + ,"
+    $description:ko-KR: "Ctrl + ,"
+    $description:th-TH: "Ctrl + ,"
+    $description:id-ID: "Ctrl + ,"
+    $description:ms-MY: "Ctrl + ,"
+    $description:fr-FR: "Ctrl + ,"
+    $description:de-DE: "Strg + ,"
+    $description:es-ES: "Ctrl + ,"
+    $description:pt-BR: "Ctrl + ,"
+    $description:it-IT: "Ctrl + ,"
+    $description:uk-UA: "Ctrl + ,"
+    $description:pl-PL: "Ctrl + ,"
+    $description:nl-NL: "Ctrl + ,"
+    $description:tr-TR: "Ctrl + ,"
+    $description:hi-IN: "Ctrl + ,"
+    $description:ar: "Ctrl + ,"
+  $name: "Action Buttons"
+  $name:ru-RU: "Кнопки действий"
+  $name:vi-VN: "Các nút thao tác"
+  $name:zh-CN: "操作按钮"
+  $name:zh-TW: "動作按鈕"
+  $name:ja-JP: "操作ボタン"
+  $name:ko-KR: "작업 단추"
+  $name:th-TH: "ปุ่มคำสั่ง"
+  $name:id-ID: "Tombol tindakan"
+  $name:ms-MY: "Butang tindakan"
+  $name:fr-FR: "Boutons d’action"
+  $name:de-DE: "Aktionsschaltflächen"
+  $name:es-ES: "Botones de acción"
+  $name:pt-BR: "Botões de ação"
+  $name:it-IT: "Pulsanti di azione"
+  $name:uk-UA: "Кнопки дій"
+  $name:pl-PL: "Przyciski akcji"
+  $name:nl-NL: "Actieknoppen"
+  $name:tr-TR: "Eylem düğmeleri"
+  $name:hi-IN: "कार्रवाई बटन"
+  $name:ar: "أزرار الإجراءات"
+  $description: "Hidden actions are available in the right-click menu"
+  $description:ru-RU: "Действия скрытых кнопок доступны в контекстном меню"
+  $description:vi-VN: "Các thao tác đã ẩn vẫn có trong menu chuột phải"
+  $description:zh-CN: "仍可从右键菜单执行已隐藏的操作"
+  $description:zh-TW: "仍可從右鍵功能表執行已隱藏的動作"
+  $description:ja-JP: "ボタンを非表示にしても、右クリック メニューから操作できます"
+  $description:ko-KR: "숨긴 작업은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다"
+  $description:th-TH: "คำสั่งที่ซ่อนไว้ยังใช้ได้จากเมนูคลิกขวา"
+  $description:id-ID: "Tindakan tersembunyi tersedia di menu klik kanan"
+  $description:ms-MY: "Tindakan tersembunyi tersedia dalam menu klik kanan"
+  $description:fr-FR: "Les actions masquées restent accessibles dans le menu contextuel"
+  $description:de-DE: "Ausgeblendete Aktionen bleiben im Kontextmenü verfügbar"
+  $description:es-ES: "Las acciones ocultas siguen disponibles en el menú contextual"
+  $description:pt-BR: "As ações ocultas continuam disponíveis no menu de contexto"
+  $description:it-IT: "Le azioni nascoste restano disponibili nel menu di scelta rapida"
+  $description:uk-UA: "Приховані дії доступні в контекстному меню"
+  $description:pl-PL: "Ukryte akcje pozostają dostępne w menu kontekstowym"
+  $description:nl-NL: "Verborgen acties blijven beschikbaar in het snelmenu"
+  $description:tr-TR: "Gizlenen eylemler sağ tıklama menüsünde kullanılabilir"
+  $description:hi-IN: "छिपी कार्रवाइयाँ राइट-क्लिक मेनू में मिलेंगी"
+  $description:ar: "تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن"
 
 - historyBehaviorGroup:
   - maxHistoryItems: 20
-    $description:ru-RU: "До 50 недавних команд, 0 — список отключен"
-    $name:ru-RU: "Лимит истории"
-    $description: "Up to 50 recent commands. Zero disables the list"
     $name: "History Limit"
-    $name:vi-VN: Số mục lịch sử lưu tối đa (0 = Tắt lịch sử, hoặc 1–50)
-    $description:vi-VN: Số lượng lệnh lịch sử hoặc gợi ý tối đa được lưu (0–50, mặc định 20 mục).
+    $name:ru-RU: "Лимит истории"
+    $name:vi-VN: "Giới hạn lịch sử"
+    $name:zh-CN: "历史记录上限"
+    $name:zh-TW: "歷程記錄上限"
+    $name:ja-JP: "履歴の上限"
+    $name:ko-KR: "기록 개수 제한"
+    $name:th-TH: "จำนวนรายการประวัติสูงสุด"
+    $name:id-ID: "Batas riwayat"
+    $name:ms-MY: "Had sejarah"
+    $name:fr-FR: "Taille maximale de l’historique"
+    $name:de-DE: "Maximale Verlaufslänge"
+    $name:es-ES: "Límite del historial"
+    $name:pt-BR: "Limite do histórico"
+    $name:it-IT: "Limite della cronologia"
+    $name:uk-UA: "Обмеження журналу"
+    $name:pl-PL: "Limit historii"
+    $name:nl-NL: "Maximale geschiedenisgrootte"
+    $name:tr-TR: "Geçmiş sınırı"
+    $name:hi-IN: "इतिहास की सीमा"
+    $name:ar: "الحد الأقصى للسجل"
+    $description: "Up to 50 recent commands. Zero disables the list"
+    $description:ru-RU: "До 50 недавних команд, 0 — список отключен"
+    $description:vi-VN: "Tối đa 50 lệnh gần đây. Đặt 0 để tắt danh sách"
+    $description:zh-CN: "最多保留 50 条近期命令。设为 0 可关闭列表"
+    $description:zh-TW: "最多保留 50 筆近期命令。設為 0 可關閉清單"
+    $description:ja-JP: "最近のコマンドを最大 50 件保持します。0 で一覧を無効にします"
+    $description:ko-KR: "최근 명령을 최대 50개까지 보관합니다. 0으로 설정하면 목록을 끕니다"
+    $description:th-TH: "เก็บคำสั่งล่าสุดได้สูงสุด 50 รายการ ตั้งเป็น 0 เพื่อปิดรายการ"
+    $description:id-ID: "Hingga 50 perintah terakhir. Nilai 0 menonaktifkan daftar"
+    $description:ms-MY: "Sehingga 50 arahan terbaru. Nilai 0 mematikan senarai"
+    $description:fr-FR: "Jusqu’à 50 commandes récentes. 0 désactive la liste"
+    $description:de-DE: "Bis zu 50 zuletzt verwendete Befehle. 0 deaktiviert die Liste"
+    $description:es-ES: "Hasta 50 comandos recientes. Con 0, se desactiva la lista"
+    $description:pt-BR: "Até 50 comandos recentes. O valor 0 desativa a lista"
+    $description:it-IT: "Fino a 50 comandi recenti. Con 0, l’elenco è disattivato"
+    $description:uk-UA: "До 50 останніх команд. За значення 0 список вимкнено"
+    $description:pl-PL: "Do 50 ostatnich poleceń. Wartość 0 wyłącza listę"
+    $description:nl-NL: "Maximaal 50 recente opdrachten. Bij 0 wordt de lijst uitgeschakeld"
+    $description:tr-TR: "En fazla 50 son komut. 0 seçilirse liste kapatılır"
+    $description:hi-IN: "हाल की 50 कमांड तक। 0 होने पर सूची बंद रहती है"
+    $description:ar: "ما يصل إلى 50 أمرًا حديثًا. يؤدي تعيين 0 إلى إيقاف القائمة"
   - visibleHistoryRows: 5
-    $description:ru-RU: "От 3 до 10 строк до появления прокрутки"
-    $name:ru-RU: "Видимые строки истории"
-    $description: "From 3 to 10 rows before scrolling"
     $name: "Visible History Rows"
-    $name:vi-VN: Số dòng lịch sử hiển thị cùng lúc trước khi cuộn (3–10)
-    $description:vi-VN: Số dòng hiển thị tối đa cùng lúc trước khi hiện thanh cuộn (mặc định 5 dòng).
+    $name:ru-RU: "Видимые строки истории"
+    $name:vi-VN: "Số dòng lịch sử hiển thị"
+    $name:zh-CN: "历史记录显示行数"
+    $name:zh-TW: "歷程記錄顯示列數"
+    $name:ja-JP: "履歴の表示行数"
+    $name:ko-KR: "기록 표시 행 수"
+    $name:th-TH: "จำนวนแถวประวัติที่แสดง"
+    $name:id-ID: "Baris riwayat yang terlihat"
+    $name:ms-MY: "Baris sejarah yang dipaparkan"
+    $name:fr-FR: "Lignes d’historique visibles"
+    $name:de-DE: "Sichtbare Verlaufszeilen"
+    $name:es-ES: "Filas visibles del historial"
+    $name:pt-BR: "Linhas visíveis do histórico"
+    $name:it-IT: "Righe visibili della cronologia"
+    $name:uk-UA: "Видимі рядки журналу"
+    $name:pl-PL: "Widoczne wiersze historii"
+    $name:nl-NL: "Zichtbare rijen in de geschiedenis"
+    $name:tr-TR: "Görünen geçmiş satırları"
+    $name:hi-IN: "इतिहास की दृश्यमान पंक्तियाँ"
+    $name:ar: "صفوف السجل الظاهرة"
+    $description: "From 3 to 10 rows before scrolling"
+    $description:ru-RU: "От 3 до 10 строк до появления прокрутки"
+    $description:vi-VN: "Từ 3 đến 10 dòng hiển thị cùng lúc trước khi cần cuộn"
+    $description:zh-CN: "滚动前可同时显示 3 至 10 行"
+    $description:zh-TW: "捲動前可同時顯示 3 至 10 列"
+    $description:ja-JP: "スクロールせずに表示する行数は 3 ～ 10 行"
+    $description:ko-KR: "스크롤 없이 표시할 행은 3~10개입니다"
+    $description:th-TH: "แสดงได้ 3 ถึง 10 แถวก่อนต้องเลื่อน"
+    $description:id-ID: "Antara 3 dan 10 baris sebelum perlu digulir"
+    $description:ms-MY: "Antara 3 hingga 10 baris sebelum perlu ditatal"
+    $description:fr-FR: "De 3 à 10 lignes sans défilement"
+    $description:de-DE: "3 bis 10 Zeilen ohne Scrollen"
+    $description:es-ES: "De 3 a 10 filas sin desplazamiento"
+    $description:pt-BR: "De 3 a 10 linhas sem rolagem"
+    $description:it-IT: "Da 3 a 10 righe visibili senza scorrere"
+    $description:uk-UA: "Від 3 до 10 рядків без прокручування"
+    $description:pl-PL: "Od 3 do 10 wierszy bez przewijania"
+    $description:nl-NL: "3 tot 10 rijen zichtbaar zonder te scrollen"
+    $description:tr-TR: "Kaydırmadan görünen 3 ile 10 satır"
+    $description:hi-IN: "स्क्रॉल किए बिना 3 से 10 पंक्तियाँ"
+    $description:ar: "من 3 إلى 10 صفوف قبل الحاجة إلى التمرير"
   - showTimestamp: true
-    $description:ru-RU: "Короткие форматы даты и времени в строках истории"
-    $name:ru-RU: "Дата и время в истории"
-    $description: "Short date and time formats in history"
     $name: "Date and Time in History"
-    $name:vi-VN: Hiển thị thời gian thực thi ở mỗi dòng lịch sử
-    $description:vi-VN: Hiển thị thời gian chạy lệnh gần nhất và biểu tượng đồng hồ ở mỗi dòng lịch sử.
+    $name:ru-RU: "Дата и время в истории"
+    $name:vi-VN: "Ngày và giờ trong lịch sử"
+    $name:zh-CN: "历史记录中的日期和时间"
+    $name:zh-TW: "歷程記錄中的日期與時間"
+    $name:ja-JP: "履歴の日付と時刻"
+    $name:ko-KR: "기록에 날짜 및 시간 표시"
+    $name:th-TH: "วันที่และเวลาในประวัติ"
+    $name:id-ID: "Tanggal dan waktu dalam riwayat"
+    $name:ms-MY: "Tarikh dan masa dalam sejarah"
+    $name:fr-FR: "Date et heure dans l’historique"
+    $name:de-DE: "Datum und Uhrzeit im Verlauf"
+    $name:es-ES: "Fecha y hora en el historial"
+    $name:pt-BR: "Data e hora no histórico"
+    $name:it-IT: "Data e ora nella cronologia"
+    $name:uk-UA: "Дата й час у журналі"
+    $name:pl-PL: "Data i godzina w historii"
+    $name:nl-NL: "Datum en tijd in de geschiedenis"
+    $name:tr-TR: "Geçmişte tarih ve saat"
+    $name:hi-IN: "इतिहास में तारीख और समय"
+    $name:ar: "التاريخ والوقت في السجل"
+    $description: "Short date and time formats in history"
+    $description:ru-RU: "Короткие форматы даты и времени в строках истории"
+    $description:vi-VN: "Ngày và giờ được hiển thị ở định dạng ngắn trong lịch sử"
+    $description:zh-CN: "在历史记录中使用简短的日期和时间格式"
+    $description:zh-TW: "在歷程記錄中使用簡短的日期與時間格式"
+    $description:ja-JP: "履歴の日時を短い形式で表示します"
+    $description:ko-KR: "기록에서 날짜와 시간을 간단한 형식으로 표시합니다"
+    $description:th-TH: "แสดงวันที่และเวลาในประวัติด้วยรูปแบบสั้น"
+    $description:id-ID: "Format tanggal dan waktu singkat dalam riwayat"
+    $description:ms-MY: "Format tarikh dan masa ringkas dalam sejarah"
+    $description:fr-FR: "Formats courts pour la date et l’heure dans l’historique"
+    $description:de-DE: "Kurzes Datums- und Uhrzeitformat im Verlauf"
+    $description:es-ES: "Formatos cortos de fecha y hora en el historial"
+    $description:pt-BR: "Formatos curtos de data e hora no histórico"
+    $description:it-IT: "Formati brevi per la data e l’ora nella cronologia"
+    $description:uk-UA: "Скорочений формат дати й часу в журналі"
+    $description:pl-PL: "Krótki format daty i godziny w historii"
+    $description:nl-NL: "Korte notatie voor datum en tijd in de geschiedenis"
+    $description:tr-TR: "Geçmişte kısa tarih ve saat biçimi"
+    $description:hi-IN: "इतिहास में तारीख और समय के छोटे फ़ॉर्मैट"
+    $description:ar: "تنسيقات التاريخ والوقت المختصرة في السجل"
   - clearInitialInput: false
-    $description:ru-RU: "Пустое поле ввода при открытии окна"
-    $name:ru-RU: "Очищать поле при открытии"
-    $description: "Empty input field when the window opens"
     $name: "Clear Input on Open"
-    $name:vi-VN: Để trống ô nhập khi mới mở
-    $description:vi-VN: Để trống ô nhập (hiển thị dòng gợi ý) khi mới mở thay vì điền sẵn lệnh cũ.
+    $name:ru-RU: "Очищать поле при открытии"
+    $name:vi-VN: "Xóa nội dung ô nhập khi mở"
+    $name:zh-CN: "打开时清空输入框"
+    $name:zh-TW: "開啟時清空輸入欄"
+    $name:ja-JP: "開いたときに入力欄を空にする"
+    $name:ko-KR: "열 때 입력란 비우기"
+    $name:th-TH: "ล้างช่องป้อนข้อมูลเมื่อเปิด"
+    $name:id-ID: "Kosongkan input saat dibuka"
+    $name:ms-MY: "Kosongkan input apabila dibuka"
+    $name:fr-FR: "Vider le champ de saisie à l’ouverture"
+    $name:de-DE: "Eingabefeld beim Öffnen leeren"
+    $name:es-ES: "Vaciar el campo de entrada al abrir"
+    $name:pt-BR: "Limpar o campo de entrada ao abrir"
+    $name:it-IT: "Svuota il campo di immissione all’apertura"
+    $name:uk-UA: "Очищати поле під час відкриття"
+    $name:pl-PL: "Wyczyść pole wprowadzania przy otwarciu"
+    $name:nl-NL: "Invoerveld wissen bij openen"
+    $name:tr-TR: "Açılışta giriş alanını temizle"
+    $name:hi-IN: "खोलने पर इनपुट साफ़ करें"
+    $name:ar: "مسح الإدخال عند الفتح"
+    $description: "Empty input field when the window opens"
+    $description:ru-RU: "Пустое поле ввода при открытии окна"
+    $description:vi-VN: "Để trống ô nhập khi mở cửa sổ"
+    $description:zh-CN: "打开窗口时输入框为空"
+    $description:zh-TW: "開啟視窗時將輸入欄留白"
+    $description:ja-JP: "ウィンドウを開いたときに入力欄を空にします"
+    $description:ko-KR: "창이 열릴 때 빈 입력란을 표시합니다"
+    $description:th-TH: "เว้นช่องป้อนข้อมูลให้ว่างเมื่อเปิดหน้าต่าง"
+    $description:id-ID: "Kolom input kosong saat jendela dibuka"
+    $description:ms-MY: "Medan input kosong apabila tetingkap dibuka"
+    $description:fr-FR: "Le champ de saisie est vide à l’ouverture"
+    $description:de-DE: "Das Eingabefeld ist beim Öffnen leer"
+    $description:es-ES: "El campo de entrada aparece vacío al abrir la ventana"
+    $description:pt-BR: "O campo de entrada fica vazio ao abrir a janela"
+    $description:it-IT: "Il campo di immissione è vuoto all’apertura della finestra"
+    $description:uk-UA: "Порожнє поле введення під час відкриття вікна"
+    $description:pl-PL: "Pole wprowadzania jest puste po otwarciu okna"
+    $description:nl-NL: "Het invoerveld is leeg als het venster wordt geopend"
+    $description:tr-TR: "Pencere açıldığında giriş alanı boş olur"
+    $description:hi-IN: "विंडो खोलने पर इनपुट फ़ील्ड खाली रहता है"
+    $description:ar: "يظهر حقل الإدخال فارغًا عند فتح النافذة"
   - clearStoredHistory: false
-    $description:ru-RU: "После сохранения недавние команды перестают отображаться в истории мода"
-    $name:ru-RU: "Очистка истории"
-    $description: "Recent commands are hidden from the mod history after saving"
     $name: "Clear History"
-    $name:vi-VN: Xóa toàn bộ lịch sử đã lưu
-    $description:vi-VN: Bật và bấm Lưu để xóa lịch sử đã lưu, hoặc bấm trực tiếp trong menu Bánh răng.
+    $name:ru-RU: "Очистка истории"
+    $name:vi-VN: "Xóa lịch sử"
+    $name:zh-CN: "清除历史记录"
+    $name:zh-TW: "清除歷程記錄"
+    $name:ja-JP: "履歴を消去"
+    $name:ko-KR: "기록 지우기"
+    $name:th-TH: "ล้างประวัติ"
+    $name:id-ID: "Hapus riwayat"
+    $name:ms-MY: "Kosongkan sejarah"
+    $name:fr-FR: "Effacer l’historique"
+    $name:de-DE: "Verlauf löschen"
+    $name:es-ES: "Borrar el historial"
+    $name:pt-BR: "Limpar o histórico"
+    $name:it-IT: "Cancella cronologia"
+    $name:uk-UA: "Очистити журнал"
+    $name:pl-PL: "Wyczyść historię"
+    $name:nl-NL: "Geschiedenis wissen"
+    $name:tr-TR: "Geçmişi temizle"
+    $name:hi-IN: "इतिहास साफ़ करें"
+    $name:ar: "مسح السجل"
+    $description: "Recent commands are hidden from the mod history after saving"
+    $description:ru-RU: "После сохранения недавние команды перестают отображаться в истории мода"
+    $description:vi-VN: "Sau khi lưu, các lệnh gần đây sẽ không còn xuất hiện trong lịch sử của mod"
+    $description:zh-CN: "保存后，最近使用的命令将从模组的历史记录中隐藏"
+    $description:zh-TW: "儲存後，近期命令將從模組的歷程記錄中隱藏"
+    $description:ja-JP: "保存すると、最近のコマンドが Mod の履歴に表示されなくなります"
+    $description:ko-KR: "저장하면 최근 명령이 모드 기록에서 숨겨집니다"
+    $description:th-TH: "หลังจากบันทึก คำสั่งล่าสุดจะถูกซ่อนจากประวัติของม็อด"
+    $description:id-ID: "Perintah terakhir disembunyikan dari riwayat mod setelah disimpan"
+    $description:ms-MY: "Arahan terbaru disembunyikan daripada sejarah mod selepas disimpan"
+    $description:fr-FR: "Après l’enregistrement, masque les commandes récentes dans l’historique du mod"
+    $description:de-DE: "Blendet nach dem Speichern zuletzt verwendete Befehle im Verlauf der Mod aus"
+    $description:es-ES: "Oculta los comandos recientes del historial del mod al guardar"
+    $description:pt-BR: "Oculta os comandos recentes no histórico do mod ao salvar"
+    $description:it-IT: "Nasconde i comandi recenti dalla cronologia della mod dopo il salvataggio"
+    $description:uk-UA: "Після збереження останні команди зникають із журналу мода"
+    $description:pl-PL: "Po zapisaniu ukrywa ostatnie polecenia w historii moda"
+    $description:nl-NL: "Verbergt recente opdrachten uit de geschiedenis van de mod na het opslaan"
+    $description:tr-TR: "Kaydettikten sonra son komutlar mod geçmişinde gizlenir"
+    $description:hi-IN: "सहेजने के बाद हाल की कमांड मॉड के इतिहास में नहीं दिखेंगी"
+    $description:ar: "تُخفى الأوامر الأخيرة من سجل التعديل بعد الحفظ"
   - taskbarClickAction: minimize
-    $description:ru-RU: "Действие при клике по значку на панели задач"
-    $name:ru-RU: "Значок на панели задач"
-    $description: "Action when the taskbar icon is clicked"
     $name: "Taskbar Icon"
-    $name:vi-VN: Biểu tượng trên thanh tác vụ
-    $description:vi-VN: Hành động khi bấm vào biểu tượng trên thanh tác vụ
-    $options:vi-VN:
-    - minimize: Ẩn & Mở lại cửa sổ Run
-    - close: Đóng hẳn cửa sổ Run
-    - hidden: Ẩn biểu tượng
+    $name:ru-RU: "Значок на панели задач"
+    $name:vi-VN: "Biểu tượng trên thanh tác vụ"
+    $name:zh-CN: "任务栏图标"
+    $name:zh-TW: "工作列圖示"
+    $name:ja-JP: "タスク バーのアイコン"
+    $name:ko-KR: "작업 표시줄 아이콘"
+    $name:th-TH: "ไอคอนบนแถบงาน"
+    $name:id-ID: "Ikon taskbar"
+    $name:ms-MY: "Ikon bar tugas"
+    $name:fr-FR: "Icône de la barre des tâches"
+    $name:de-DE: "Taskleistensymbol"
+    $name:es-ES: "Icono de la barra de tareas"
+    $name:pt-BR: "Ícone da barra de tarefas"
+    $name:it-IT: "Icona sulla barra delle applicazioni"
+    $name:uk-UA: "Піктограма на панелі завдань"
+    $name:pl-PL: "Ikona na pasku zadań"
+    $name:nl-NL: "Taakbalkpictogram"
+    $name:tr-TR: "Görev çubuğu simgesi"
+    $name:hi-IN: "टास्कबार आइकन"
+    $name:ar: "أيقونة شريط المهام"
+    $description: "Action when the taskbar icon is clicked"
+    $description:ru-RU: "Действие при клике по значку на панели задач"
+    $description:vi-VN: "Thao tác thực hiện khi bấm vào biểu tượng trên thanh tác vụ"
+    $description:zh-CN: "单击任务栏图标时执行的操作"
+    $description:zh-TW: "按一下工作列圖示時執行的動作"
+    $description:ja-JP: "タスク バーのアイコンをクリックしたときの動作"
+    $description:ko-KR: "작업 표시줄 아이콘을 클릭했을 때의 동작"
+    $description:th-TH: "การทำงานเมื่อคลิกไอคอนบนแถบงาน"
+    $description:id-ID: "Tindakan saat ikon taskbar diklik"
+    $description:ms-MY: "Tindakan apabila ikon bar tugas diklik"
+    $description:fr-FR: "Action déclenchée en cliquant sur l’icône de la barre des tâches"
+    $description:de-DE: "Aktion beim Klick auf das Taskleistensymbol"
+    $description:es-ES: "Acción al hacer clic en el icono de la barra de tareas"
+    $description:pt-BR: "Ação ao clicar no ícone da barra de tarefas"
+    $description:it-IT: "Azione eseguita facendo clic sull’icona sulla barra delle applicazioni"
+    $description:uk-UA: "Дія після натискання піктограми на панелі завдань"
+    $description:pl-PL: "Akcja po kliknięciu ikony na pasku zadań"
+    $description:nl-NL: "Actie bij klikken op het taakbalkpictogram"
+    $description:tr-TR: "Görev çubuğu simgesine tıklandığında yapılacak işlem"
+    $description:hi-IN: "टास्कबार आइकन पर क्लिक करने की कार्रवाई"
+    $description:ar: "الإجراء عند النقر على أيقونة شريط المهام"
     $options:
     - minimize: Minimize / Restore
     - close: Close
@@ -1379,196 +3139,327 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
     - minimize: Свернуть / Восстановить
     - close: Закрыть
     - hidden: Отключить значок
+    $options:vi-VN:
+    - minimize: Thu nhỏ / Khôi phục
+    - close: Đóng
+    - hidden: Ẩn biểu tượng
+    $options:zh-CN:
+    - minimize: 最小化或还原
+    - close: 关闭
+    - hidden: 隐藏图标
+    $options:zh-TW:
+    - minimize: 最小化或還原
+    - close: 關閉
+    - hidden: 隱藏圖示
+    $options:ja-JP:
+    - minimize: 最小化 / 復元
+    - close: 閉じる
+    - hidden: アイコンを非表示にする
+    $options:ko-KR:
+    - minimize: 최소화 / 복원
+    - close: 닫기
+    - hidden: 아이콘 숨기기
+    $options:th-TH:
+    - minimize: ย่อ / คืนค่า
+    - close: ปิด
+    - hidden: ซ่อนไอคอน
+    $options:id-ID:
+    - minimize: Minimalkan atau pulihkan
+    - close: Tutup
+    - hidden: Sembunyikan ikon
+    $options:ms-MY:
+    - minimize: Minimumkan atau pulihkan
+    - close: Tutup
+    - hidden: Sembunyikan ikon
+    $options:fr-FR:
+    - minimize: Réduire ou restaurer
+    - close: Fermer
+    - hidden: Masquer l’icône
+    $options:de-DE:
+    - minimize: Minimieren / Wiederherstellen
+    - close: Schließen
+    - hidden: Symbol ausblenden
+    $options:es-ES:
+    - minimize: Minimizar o restaurar
+    - close: Cerrar
+    - hidden: Ocultar el icono
+    $options:pt-BR:
+    - minimize: Minimizar ou restaurar
+    - close: Fechar
+    - hidden: Ocultar o ícone
+    $options:it-IT:
+    - minimize: Riduci a icona o ripristina
+    - close: Chiudi
+    - hidden: Nascondi l’icona
+    $options:uk-UA:
+    - minimize: Згорнути або відновити
+    - close: Закрити
+    - hidden: Приховати піктограму
+    $options:pl-PL:
+    - minimize: Minimalizuj lub przywróć
+    - close: Zamknij
+    - hidden: Ukryj ikonę
+    $options:nl-NL:
+    - minimize: Minimaliseren of herstellen
+    - close: Sluiten
+    - hidden: Pictogram verbergen
+    $options:tr-TR:
+    - minimize: Simge durumuna küçült veya geri yükle
+    - close: Kapat
+    - hidden: Simgeyi gizle
+    $options:hi-IN:
+    - minimize: छोटा करें या पुनर्स्थापित करें
+    - close: बंद करें
+    - hidden: आइकन छिपाएँ
+    $options:ar:
+    - minimize: تصغير أو استعادة
+    - close: إغلاق
+    - hidden: إخفاء الأيقونة
   - closeOnClickOutside: false
-    $description:ru-RU: "Нажатие за пределами окна закрывает его"
-    $name:ru-RU: "Закрывать при нажатии вне окна"
-    $description: "Clicking outside closes the window"
     $name: "Close on Click Outside"
-    $name:vi-VN: Tự động đóng khi bấm ra ngoài cửa sổ
-    $description:vi-VN: Tự động đóng hộp thoại Run khi click chuột ra ngoài cửa sổ.
+    $name:ru-RU: "Закрывать при нажатии вне окна"
+    $name:vi-VN: "Đóng khi bấm ra ngoài"
+    $name:zh-CN: "单击窗口外部时关闭"
+    $name:zh-TW: "按一下視窗外部時關閉"
+    $name:ja-JP: "外側をクリックして閉じる"
+    $name:ko-KR: "창 바깥을 클릭할 때 닫기"
+    $name:th-TH: "ปิดเมื่อคลิกด้านนอก"
+    $name:id-ID: "Tutup saat mengeklik di luar"
+    $name:ms-MY: "Tutup apabila diklik di luar"
+    $name:fr-FR: "Fermer au clic en dehors"
+    $name:de-DE: "Bei Klick außerhalb schließen"
+    $name:es-ES: "Cerrar al hacer clic fuera"
+    $name:pt-BR: "Fechar ao clicar fora"
+    $name:it-IT: "Chiudi con un clic all’esterno"
+    $name:uk-UA: "Закривати після клацання поза вікном"
+    $name:pl-PL: "Zamknij po kliknięciu poza oknem"
+    $name:nl-NL: "Sluiten bij klikken buiten het venster"
+    $name:tr-TR: "Dışarı tıklandığında kapat"
+    $name:hi-IN: "बाहर क्लिक करने पर बंद करें"
+    $name:ar: "الإغلاق عند النقر خارج النافذة"
+    $description: "Clicking outside closes the window"
+    $description:ru-RU: "Нажатие за пределами окна закрывает его"
+    $description:vi-VN: "Bấm ra ngoài để đóng cửa sổ"
+    $description:zh-CN: "单击窗口外部即可关闭窗口"
+    $description:zh-TW: "按一下視窗外的區域即可關閉視窗"
+    $description:ja-JP: "ウィンドウの外側をクリックすると閉じます"
+    $description:ko-KR: "창 바깥을 클릭하면 창이 닫힙니다"
+    $description:th-TH: "คลิกด้านนอกเพื่อปิดหน้าต่าง"
+    $description:id-ID: "Jendela ditutup saat area di luarnya diklik"
+    $description:ms-MY: "Tetingkap ditutup apabila diklik di luar"
+    $description:fr-FR: "Un clic en dehors de la fenêtre la ferme"
+    $description:de-DE: "Ein Klick außerhalb des Fensters schließt es"
+    $description:es-ES: "Al hacer clic fuera de la ventana, se cierra"
+    $description:pt-BR: "A janela fecha ao clicar fora dela"
+    $description:it-IT: "Un clic all’esterno chiude la finestra"
+    $description:uk-UA: "Клацання за межами вікна закриває його"
+    $description:pl-PL: "Kliknięcie poza oknem zamyka je"
+    $description:nl-NL: "Een klik buiten het venster sluit het"
+    $description:tr-TR: "Pencerenin dışına tıklandığında pencere kapanır"
+    $description:hi-IN: "विंडो के बाहर क्लिक करने पर विंडो बंद हो जाती है"
+    $description:ar: "يؤدي النقر خارج النافذة إلى إغلاقها"
   - runAsAdmin: false
     $name: "Elevate by Default"
-    $description: "Run as administrator. Ctrl + Shift + Enter switches privileges for the current command"
     $name:ru-RU: "Повышать права по умолчанию"
+    $name:vi-VN: "Mặc định chạy với quyền quản trị viên"
+    $name:zh-CN: "默认以管理员身份运行"
+    $name:zh-TW: "預設以系統管理員身分執行"
+    $name:ja-JP: "既定で管理者として実行する"
+    $name:ko-KR: "기본적으로 관리자 권한으로 실행"
+    $name:th-TH: "เรียกใช้ในฐานะผู้ดูแลระบบเป็นค่าเริ่มต้น"
+    $name:id-ID: "Jalankan sebagai administrator secara default"
+    $name:ms-MY: "Jalankan sebagai pentadbir secara lalai"
+    $name:fr-FR: "Exécuter en tant qu’administrateur par défaut"
+    $name:de-DE: "Standardmäßig als Administrator ausführen"
+    $name:es-ES: "Ejecutar como administrador de forma predeterminada"
+    $name:pt-BR: "Executar como administrador por padrão"
+    $name:it-IT: "Esegui come amministratore per impostazione predefinita"
+    $name:uk-UA: "Запускати від імені адміністратора за замовчуванням"
+    $name:pl-PL: "Domyślnie uruchamiaj jako administrator"
+    $name:nl-NL: "Standaard uitvoeren als administrator"
+    $name:tr-TR: "Varsayılan olarak yönetici yetkileriyle çalıştır"
+    $name:hi-IN: "डिफ़ॉल्ट रूप से व्यवस्थापक के रूप में चलाएँ"
+    $name:ar: "التشغيل كمسؤول افتراضيًا"
+    $description: "Run as administrator. Ctrl + Shift + Enter switches privileges for the current command"
     $description:ru-RU: "Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды"
-    $name:vi-VN: "Nâng quyền theo mặc định"
-    $description:vi-VN: "Ctrl + Shift + Enter đổi quyền cho lệnh hiện tại"
-    $name:th-TH: "ยกระดับสิทธิ์ตามค่าเริ่มต้น"
-    $description:th-TH: "Ctrl + Shift + Enter สลับสิทธิ์ของคำสั่งปัจจุบัน"
-    $name:id-ID: "Tingkatkan hak akses secara default"
-    $description:id-ID: "Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini"
-    $name:ms-MY: "Tingkatkan keistimewaan secara lalai"
-    $description:ms-MY: "Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa"
-    $name:ja-JP: "既定で管理者権限で実行"
-    $description:ja-JP: "Ctrl + Shift + Enter で現在のコマンドの権限を切り替え"
-    $name:zh-CN: "默认提升权限"
-    $description:zh-CN: "Ctrl + Shift + Enter 切换当前命令的权限"
-    $name:zh-TW: "預設提高權限"
-    $description:zh-TW: "Ctrl + Shift + Enter 切換目前命令的權限"
-    $name:ko-KR: "기본적으로 권한 상승"
-    $description:ko-KR: "Ctrl + Shift + Enter로 현재 명령의 권한을 전환"
-    $name:fr-FR: "Élever les privilèges par défaut"
-    $description:fr-FR: "Ctrl + Maj + Entrée inverse les privilèges de la commande actuelle"
-    $name:de-DE: "Standardmäßig mit erhöhten Rechten"
-    $description:de-DE: "Strg + Umschalt + Eingabe wechselt die Rechte für den aktuellen Befehl"
-    $name:es-ES: "Elevar los permisos de forma predeterminada"
-    $description:es-ES: "Ctrl + Mayús + Entrar cambia los permisos del comando actual"
-    $name:pt-BR: "Elevar privilégios por padrão"
-    $description:pt-BR: "Ctrl + Shift + Enter alterna os privilégios do comando atual"
-    $name:it-IT: "Eleva i privilegi per impostazione predefinita"
-    $description:it-IT: "Ctrl + Maiusc + Invio cambia i privilegi del comando corrente"
-    $name:uk-UA: "Підвищувати права за замовчуванням"
-    $description:uk-UA: "Ctrl + Shift + Enter змінює права для поточної команди"
-    $name:pl-PL: "Domyślnie podnoś uprawnienia"
-    $description:pl-PL: "Ctrl + Shift + Enter przełącza uprawnienia bieżącego polecenia"
-    $name:nl-NL: "Standaard met verhoogde rechten"
-    $description:nl-NL: "Ctrl + Shift + Enter wisselt de rechten voor de huidige opdracht"
-    $name:tr-TR: "Varsayılan olarak yetkileri yükselt"
-    $description:tr-TR: "Ctrl + Shift + Enter geçerli komutun yetkilerini değiştirir"
-    $name:hi-IN: "डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ"
-    $description:hi-IN: "Ctrl + Shift + Enter मौजूदा कमांड के विशेषाधिकार बदलता है"
-    $name:ar: "رفع الامتيازات افتراضيًا"
-    $description:ar: "يبدّل Ctrl + Shift + Enter امتيازات الأمر الحالي"
+    $description:vi-VN: "Chạy với quyền quản trị viên. Dùng Ctrl + Shift + Enter để đổi quyền cho lệnh hiện tại"
+    $description:zh-CN: "以管理员身份运行。按 Ctrl + Shift + Enter 可切换当前命令的权限"
+    $description:zh-TW: "以系統管理員身分執行。按 Ctrl + Shift + Enter 可切換目前命令的權限"
+    $description:ja-JP: "管理者として実行します。Ctrl + Shift + Enter で現在のコマンドの権限を切り替えます"
+    $description:ko-KR: "관리자 권한으로 실행합니다. Ctrl + Shift + Enter로 현재 명령의 권한을 전환합니다"
+    $description:th-TH: "เรียกใช้ในฐานะผู้ดูแลระบบ กด Ctrl + Shift + Enter เพื่อสลับสิทธิ์ของคำสั่งปัจจุบัน"
+    $description:id-ID: "Jalankan sebagai administrator. Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini"
+    $description:ms-MY: "Jalankan sebagai pentadbir. Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa"
+    $description:fr-FR: "Exécute en tant qu’administrateur. Ctrl + Maj + Entrée inverse les droits pour la commande en cours"
+    $description:de-DE: "Führt als Administrator aus. Strg + Umschalt + Eingabe wechselt die Berechtigungsstufe für den aktuellen Befehl"
+    $description:es-ES: "Ejecuta como administrador. Ctrl + Mayús + Entrar cambia los privilegios del comando actual"
+    $description:pt-BR: "Executa como administrador. Ctrl + Shift + Enter alterna os privilégios do comando atual"
+    $description:it-IT: "Esegue come amministratore. Ctrl + Maiusc + Invio alterna i privilegi per il comando corrente"
+    $description:uk-UA: "Запуск від імені адміністратора. Ctrl + Shift + Enter змінює права для поточної команди"
+    $description:pl-PL: "Uruchamia jako administrator. Ctrl + Shift + Enter zmienia poziom uprawnień dla bieżącego polecenia"
+    $description:nl-NL: "Voert uit als administrator. Ctrl + Shift + Enter wisselt het machtigingsniveau voor de huidige opdracht"
+    $description:tr-TR: "Yönetici olarak çalıştırır. Ctrl + Shift + Enter geçerli komutun yetki düzeyini değiştirir"
+    $description:hi-IN: "व्यवस्थापक के रूप में चलाएँ। Ctrl + Shift + Enter से मौजूदा कमांड के विशेषाधिकार बदलते हैं"
+    $description:ar: "تشغيل كمسؤول. يبدّل Ctrl + Shift + Enter صلاحيات الأمر الحالي"
   - adminIndicatorPlacement: panel
-    $description:ru-RU: "Где отображается статус запуска от имени администратора"
-    $description: "Where the administrator launch status appears"
     $name: "Indicator Placement"
-    $options:
-    - panel: "Separate panel"
-    - field: "Inline indicator"
     $name:ru-RU: "Размещение индикатора"
-    $options:ru-RU:
-    - panel: "Отдельная панель"
-    - field: "Индикатор в поле"
     $name:vi-VN: "Vị trí chỉ báo"
-    $options:vi-VN:
-    - panel: "Bảng riêng"
-    - field: "Chỉ báo trong ô nhập"
-    $name:th-TH: "ตำแหน่งตัวบ่งชี้"
-    $options:th-TH:
-    - panel: "แผงแยก"
-    - field: "ตัวบ่งชี้ในช่องป้อนข้อมูล"
-    $name:id-ID: "Posisi indikator"
-    $options:id-ID:
-    - panel: "Panel terpisah"
-    - field: "Indikator di kolom input"
-    $name:ms-MY: "Kedudukan penunjuk"
-    $options:ms-MY:
-    - panel: "Panel berasingan"
-    - field: "Penunjuk dalam medan input"
-    $name:ja-JP: "インジケーターの位置"
-    $options:ja-JP:
-    - panel: "独立したパネル"
-    - field: "入力欄内のインジケーター"
     $name:zh-CN: "指示器位置"
-    $options:zh-CN:
-    - panel: "独立面板"
-    - field: "输入框内指示器"
     $name:zh-TW: "指示器位置"
-    $options:zh-TW:
-    - panel: "獨立面板"
-    - field: "輸入欄內指示器"
+    $name:ja-JP: "インジケーターの位置"
     $name:ko-KR: "표시기 위치"
-    $options:ko-KR:
-    - panel: "별도의 패널"
-    - field: "입력란 안에 표시"
+    $name:th-TH: "ตำแหน่งตัวบ่งชี้"
+    $name:id-ID: "Posisi indikator"
+    $name:ms-MY: "Kedudukan penunjuk"
     $name:fr-FR: "Emplacement de l’indicateur"
-    $options:fr-FR:
-    - panel: "Panneau séparé"
-    - field: "Indicateur dans le champ"
     $name:de-DE: "Position der Anzeige"
-    $options:de-DE:
-    - panel: "Separater Bereich"
-    - field: "Anzeige im Eingabefeld"
-    $name:es-ES: "Ubicación del indicador"
-    $options:es-ES:
-    - panel: "Panel separado"
-    - field: "Indicador en el campo"
+    $name:es-ES: "Posición del indicador"
     $name:pt-BR: "Posição do indicador"
-    $options:pt-BR:
-    - panel: "Painel separado"
-    - field: "Indicador no campo"
     $name:it-IT: "Posizione dell’indicatore"
-    $options:it-IT:
-    - panel: "Pannello separato"
-    - field: "Indicatore nel campo"
     $name:uk-UA: "Розташування індикатора"
-    $options:uk-UA:
-    - panel: "Окрема панель"
-    - field: "Індикатор у полі"
     $name:pl-PL: "Położenie wskaźnika"
-    $options:pl-PL:
-    - panel: "Oddzielny panel"
-    - field: "Wskaźnik w polu"
-    $name:nl-NL: "Positie van indicator"
-    $options:nl-NL:
-    - panel: "Apart paneel"
-    - field: "Indicator in het veld"
+    $name:nl-NL: "Positie van de indicator"
     $name:tr-TR: "Gösterge konumu"
-    $options:tr-TR:
-    - panel: "Ayrı panel"
-    - field: "Giriş alanında gösterge"
     $name:hi-IN: "संकेतक का स्थान"
-    $options:hi-IN:
-    - panel: "अलग पैनल"
-    - field: "इनपुट फ़ील्ड में संकेतक"
     $name:ar: "موضع المؤشر"
+    $description: "Where the administrator launch status appears"
+    $description:ru-RU: "Где отображается статус запуска от имени администратора"
+    $description:vi-VN: "Nơi hiển thị trạng thái chạy với quyền quản trị viên"
+    $description:zh-CN: "显示管理员运行状态的位置"
+    $description:zh-TW: "顯示系統管理員執行狀態的位置"
+    $description:ja-JP: "管理者として実行する状態を表示する場所"
+    $description:ko-KR: "관리자 권한으로 실행하는 상태를 표시할 위치"
+    $description:th-TH: "ตำแหน่งที่แสดงสถานะการเรียกใช้ในฐานะผู้ดูแลระบบ"
+    $description:id-ID: "Lokasi tampilan status jalankan sebagai administrator"
+    $description:ms-MY: "Tempat status jalankan sebagai pentadbir dipaparkan"
+    $description:fr-FR: "Emplacement de l’indicateur d’exécution en tant qu’administrateur"
+    $description:de-DE: "Position der Anzeige für die Ausführung als Administrator"
+    $description:es-ES: "Lugar donde aparece el indicador de ejecución como administrador"
+    $description:pt-BR: "Local do indicador de execução como administrador"
+    $description:it-IT: "Posizione dell’indicatore di esecuzione come amministratore"
+    $description:uk-UA: "Де відображається стан запуску від імені адміністратора"
+    $description:pl-PL: "Miejsce wyświetlania wskaźnika uruchamiania jako administrator"
+    $description:nl-NL: "Locatie van de indicator voor uitvoering als administrator"
+    $description:tr-TR: "Yönetici olarak çalıştırma durumunun göründüğü yer"
+    $description:hi-IN: "व्यवस्थापक के रूप में चलाने की स्थिति दिखाने की जगह"
+    $description:ar: "مكان عرض حالة التشغيل كمسؤول"
+    $options:
+    - panel: Separate panel
+    - field: Inline indicator
+    $options:ru-RU:
+    - panel: Отдельная панель
+    - field: Индикатор в поле
+    $options:vi-VN:
+    - panel: Khung riêng
+    - field: Trong ô nhập
+    $options:zh-CN:
+    - panel: 独立面板
+    - field: 输入框内
+    $options:zh-TW:
+    - panel: 獨立面板
+    - field: 輸入欄內
+    $options:ja-JP:
+    - panel: 別のパネル
+    - field: 入力欄内
+    $options:ko-KR:
+    - panel: 별도 패널
+    - field: 입력란 안
+    $options:th-TH:
+    - panel: แผงแยก
+    - field: ในช่องป้อนข้อมูล
+    $options:id-ID:
+    - panel: Panel terpisah
+    - field: Indikator di kolom input
+    $options:ms-MY:
+    - panel: Panel berasingan
+    - field: Penunjuk dalam medan input
+    $options:fr-FR:
+    - panel: Panneau séparé
+    - field: Dans le champ de saisie
+    $options:de-DE:
+    - panel: Separater Bereich
+    - field: Im Eingabefeld
+    $options:es-ES:
+    - panel: Panel separado
+    - field: En el campo de entrada
+    $options:pt-BR:
+    - panel: Painel separado
+    - field: No campo de entrada
+    $options:it-IT:
+    - panel: Pannello separato
+    - field: Nel campo di immissione
+    $options:uk-UA:
+    - panel: Окрема панель
+    - field: Індикатор у полі введення
+    $options:pl-PL:
+    - panel: Osobny panel
+    - field: W polu wprowadzania
+    $options:nl-NL:
+    - panel: Apart paneel
+    - field: In het invoerveld
+    $options:tr-TR:
+    - panel: Ayrı panel
+    - field: Giriş alanında gösterge
+    $options:hi-IN:
+    - panel: अलग पैनल
+    - field: इनपुट फ़ील्ड में संकेतक
     $options:ar:
-    - panel: "لوحة منفصلة"
-    - field: "مؤشر في حقل الإدخال"
+    - panel: لوحة منفصلة
+    - field: مؤشر داخل حقل الإدخال
   - shiftEnterSwitchesPrivileges: false
     $name: "Switch Privileges with Shift + Enter"
-    $description: "Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
     $name:ru-RU: "Менять права по Shift + Enter"
-    $description:ru-RU: "Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
     $name:vi-VN: "Đổi quyền bằng Shift + Enter"
-    $description:vi-VN: "Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"
-    $name:th-TH: "สลับสิทธิ์ด้วย Shift + Enter"
-    $description:th-TH: "เมื่อปิด Shift + Enter จะเรียกใช้คำสั่งในเทอร์มินัล"
-    $name:id-ID: "Ganti hak akses dengan Shift + Enter"
-    $description:id-ID: "Jika nonaktif, Shift + Enter menjalankan perintah di terminal"
-    $name:ms-MY: "Tukar keistimewaan dengan Shift + Enter"
-    $description:ms-MY: "Apabila dimatikan, Shift + Enter menjalankan arahan dalam terminal"
-    $name:ja-JP: "Shift + Enter で権限を切り替え"
-    $description:ja-JP: "オフの場合、Shift + Enter でターミナル内でコマンドを実行"
     $name:zh-CN: "用 Shift + Enter 切换权限"
-    $description:zh-CN: "关闭后，Shift + Enter 在终端中运行命令"
-    $name:zh-TW: "用 Shift + Enter 切換權限"
-    $description:zh-TW: "關閉時，Shift + Enter 會在終端機中執行命令"
+    $name:zh-TW: "使用 Shift + Enter 切換權限"
+    $name:ja-JP: "Shift + Enter で権限を切り替える"
     $name:ko-KR: "Shift + Enter로 권한 전환"
-    $description:ko-KR: "끄면 Shift + Enter로 터미널에서 명령을 실행"
-    $name:fr-FR: "Changer les privilèges avec Maj + Entrée"
-    $description:fr-FR: "Si désactivé, Maj + Entrée lance la commande dans un terminal"
-    $name:de-DE: "Rechte mit Umschalt + Eingabe wechseln"
-    $description:de-DE: "Wenn deaktiviert, führt Umschalt + Eingabe den Befehl in einem Terminal aus"
-    $name:es-ES: "Cambiar permisos con Mayús + Entrar"
-    $description:es-ES: "Si se desactiva, Mayús + Entrar ejecuta el comando en un terminal"
+    $name:th-TH: "สลับสิทธิ์ด้วย Shift + Enter"
+    $name:id-ID: "Ganti hak akses dengan Shift + Enter"
+    $name:ms-MY: "Tukar keistimewaan dengan Shift + Enter"
+    $name:fr-FR: "Changer de droits avec Maj + Entrée"
+    $name:de-DE: "Berechtigungsstufe mit Umschalt + Eingabe wechseln"
+    $name:es-ES: "Cambiar los privilegios con Mayús + Entrar"
     $name:pt-BR: "Alternar privilégios com Shift + Enter"
-    $description:pt-BR: "Desativado, Shift + Enter executa o comando em um terminal"
-    $name:it-IT: "Cambia privilegi con Maiusc + Invio"
-    $description:it-IT: "Se disattivato, Maiusc + Invio esegue il comando in un terminale"
-    $name:uk-UA: "Змінювати права через Shift + Enter"
-    $description:uk-UA: "Якщо вимкнено, Shift + Enter запускає команду в терміналі"
-    $name:pl-PL: "Przełączaj uprawnienia klawiszami Shift + Enter"
-    $description:pl-PL: "Po wyłączeniu Shift + Enter uruchamia polecenie w terminalu"
-    $name:nl-NL: "Rechten wisselen met Shift + Enter"
-    $description:nl-NL: "Uitgeschakeld voert Shift + Enter de opdracht uit in een terminal"
-    $name:tr-TR: "Shift + Enter ile yetkileri değiştir"
-    $description:tr-TR: "Kapalıyken Shift + Enter komutu terminalde çalıştırır"
+    $name:it-IT: "Alterna i privilegi con Maiusc + Invio"
+    $name:uk-UA: "Змінювати права клавішами Shift + Enter"
+    $name:pl-PL: "Zmieniaj poziom uprawnień skrótem Shift + Enter"
+    $name:nl-NL: "Machtigingsniveau wisselen met Shift + Enter"
+    $name:tr-TR: "Shift + Enter ile yetki düzeyini değiştir"
     $name:hi-IN: "Shift + Enter से विशेषाधिकार बदलें"
-    $description:hi-IN: "बंद होने पर Shift + Enter कमांड को टर्मिनल में चलाता है"
-    $name:ar: "تبديل الامتيازات باستخدام Shift + Enter"
-    $description:ar: "عند إيقاف الخيار، يشغّل Shift + Enter الأمر في الطرفية"
+    $name:ar: "تبديل الصلاحيات باستخدام Shift + Enter"
+    $description: "Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
+    $description:ru-RU: "Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
+    $description:vi-VN: "Nhấn Shift + Enter thay cho Ctrl + Shift + Enter để chạy với quyền quản trị viên"
+    $description:zh-CN: "使用 Shift + Enter 代替 Ctrl + Shift + Enter 以管理员身份运行"
+    $description:zh-TW: "按 Shift + Enter 取代 Ctrl + Shift + Enter，以系統管理員身分執行"
+    $description:ja-JP: "Ctrl + Shift + Enter の代わりに Shift + Enter を押すと、管理者として実行できます"
+    $description:ko-KR: "Ctrl + Shift + Enter 대신 Shift + Enter를 눌러 관리자 권한으로 실행합니다"
+    $description:th-TH: "กด Shift + Enter แทน Ctrl + Shift + Enter เพื่อเรียกใช้ในฐานะผู้ดูแลระบบ"
+    $description:id-ID: "Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai administrator"
+    $description:ms-MY: "Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai pentadbir"
+    $description:fr-FR: "Exécute en tant qu’administrateur avec Maj + Entrée au lieu de Ctrl + Maj + Entrée"
+    $description:de-DE: "Mit Umschalt + Eingabe statt Strg + Umschalt + Eingabe als Administrator ausführen"
+    $description:es-ES: "Ejecuta como administrador con Mayús + Entrar en lugar de Ctrl + Mayús + Entrar"
+    $description:pt-BR: "Executa como administrador com Shift + Enter em vez de Ctrl + Shift + Enter"
+    $description:it-IT: "Esegue come amministratore con Maiusc + Invio anziché Ctrl + Maiusc + Invio"
+    $description:uk-UA: "Для запуску від імені адміністратора достатньо натиснути Shift + Enter замість Ctrl + Shift + Enter"
+    $description:pl-PL: "Uruchamia jako administrator skrótem Shift + Enter zamiast Ctrl + Shift + Enter"
+    $description:nl-NL: "Voert uit als administrator met Shift + Enter in plaats van Ctrl + Shift + Enter"
+    $description:tr-TR: "Yönetici olarak çalıştırmak için Ctrl + Shift + Enter yerine Shift + Enter kullanılır"
+    $description:hi-IN: "व्यवस्थापक के रूप में चलाने के लिए Ctrl + Shift + Enter की जगह Shift + Enter दबाएँ"
+    $description:ar: "للتشغيل كمسؤول، يُستخدم Shift + Enter بدلًا من Ctrl + Shift + Enter"
   $name: "Behavior"
   $name:ru-RU: "Поведение"
-  $name:vi-VN: "Hành vi"
+  $name:vi-VN: "Cách hoạt động"
+  $name:zh-CN: "行为"
+  $name:zh-TW: "行為"
+  $name:ja-JP: "動作"
+  $name:ko-KR: "동작"
   $name:th-TH: "ลักษณะการทำงาน"
   $name:id-ID: "Perilaku"
   $name:ms-MY: "Tingkah laku"
-  $name:ja-JP: "動作"
-  $name:zh-CN: "行为"
-  $name:zh-TW: "行為"
-  $name:ko-KR: "동작"
   $name:fr-FR: "Comportement"
   $name:de-DE: "Verhalten"
   $name:es-ES: "Comportamiento"
@@ -1583,29 +3474,176 @@ Thay thế hộp thoại **Run (`Win + R`)** và **Tạo tác vụ mới trong T
 
 - customAliases:
   - - alias: "hosts"
-      $name: Short Name
-      $name:ru-RU: Короткое имя
-      $description: Short name for launching a command
-      $description:ru-RU: Короткое имя для запуска команды
-      $name:vi-VN: Lệnh tắt (Alias)
+      $name: "Short Name"
+      $name:ru-RU: "Короткое имя"
+      $name:vi-VN: "Tên tắt"
+      $name:zh-CN: "简称"
+      $name:zh-TW: "簡稱"
+      $name:ja-JP: "短縮名"
+      $name:ko-KR: "짧은 이름"
+      $name:th-TH: "ชื่อย่อ"
+      $name:id-ID: "Nama pendek"
+      $name:ms-MY: "Nama ringkas"
+      $name:fr-FR: "Nom court"
+      $name:de-DE: "Kurzname"
+      $name:es-ES: "Nombre corto"
+      $name:pt-BR: "Nome curto"
+      $name:it-IT: "Nome breve"
+      $name:uk-UA: "Коротке ім’я"
+      $name:pl-PL: "Krótka nazwa"
+      $name:nl-NL: "Korte naam"
+      $name:tr-TR: "Kısa ad"
+      $name:hi-IN: "छोटा नाम"
+      $name:ar: "الاسم المختصر"
+      $description: "Short name for launching a command"
+      $description:ru-RU: "Короткое имя для запуска команды"
+      $description:vi-VN: "Tên tắt dùng để chạy lệnh"
+      $description:zh-CN: "用于运行命令的简称"
+      $description:zh-TW: "用來執行命令的簡稱"
+      $description:ja-JP: "コマンドを実行するための短縮名"
+      $description:ko-KR: "명령을 실행할 때 사용할 짧은 이름"
+      $description:th-TH: "ชื่อย่อที่ใช้เรียกใช้คำสั่ง"
+      $description:id-ID: "Nama pendek untuk menjalankan perintah"
+      $description:ms-MY: "Nama ringkas untuk menjalankan arahan"
+      $description:fr-FR: "Nom court utilisé pour lancer une commande"
+      $description:de-DE: "Kurzname zum Starten eines Befehls"
+      $description:es-ES: "Nombre corto para ejecutar un comando"
+      $description:pt-BR: "Nome curto para executar um comando"
+      $description:it-IT: "Nome breve per eseguire un comando"
+      $description:uk-UA: "Коротке ім’я для запуску команди"
+      $description:pl-PL: "Krótka nazwa uruchamiająca polecenie"
+      $description:nl-NL: "Korte naam om een opdracht uit te voeren"
+      $description:tr-TR: "Komutu çalıştırmak için kullanılan kısa ad"
+      $description:hi-IN: "कमांड चलाने के लिए छोटा नाम"
+      $description:ar: "اسم مختصر لتشغيل الأمر"
     - command: 'notepad C:\Windows\System32\drivers\etc\hosts'
-      $name: Command or Path
-      $name:ru-RU: Команда или путь
-      $description: The command or path launched by the short name
-      $description:ru-RU: Команда или путь, которые запускаются по короткому имени
-      $name:vi-VN: Lệnh hoặc đường dẫn đích
+      $name: "Command or Path"
+      $name:ru-RU: "Команда или путь"
+      $name:vi-VN: "Lệnh hoặc đường dẫn"
+      $name:zh-CN: "命令或路径"
+      $name:zh-TW: "命令或路徑"
+      $name:ja-JP: "コマンドまたはパス"
+      $name:ko-KR: "명령 또는 경로"
+      $name:th-TH: "คำสั่งหรือเส้นทาง"
+      $name:id-ID: "Perintah atau jalur"
+      $name:ms-MY: "Arahan atau laluan"
+      $name:fr-FR: "Commande ou chemin d’accès"
+      $name:de-DE: "Befehl oder Pfad"
+      $name:es-ES: "Comando o ruta de acceso"
+      $name:pt-BR: "Comando ou caminho"
+      $name:it-IT: "Comando o percorso"
+      $name:uk-UA: "Команда або шлях"
+      $name:pl-PL: "Polecenie lub ścieżka"
+      $name:nl-NL: "Opdracht of pad"
+      $name:tr-TR: "Komut veya yol"
+      $name:hi-IN: "कमांड या पाथ"
+      $name:ar: "الأمر أو المسار"
+      $description: "The command or path launched by the short name"
+      $description:ru-RU: "Команда или путь, которые запускаются по короткому имени"
+      $description:vi-VN: "Lệnh sẽ chạy hoặc đường dẫn sẽ mở khi nhập tên tắt"
+      $description:zh-CN: "输入简称后运行的命令或打开的路径"
+      $description:zh-TW: "輸入簡稱後執行的命令或開啟的路徑"
+      $description:ja-JP: "短縮名の入力で実行するコマンド、または開くパス"
+      $description:ko-KR: "짧은 이름으로 실행할 명령 또는 열 경로"
+      $description:th-TH: "คำสั่งที่จะเรียกใช้หรือเส้นทางที่จะเปิดด้วยชื่อย่อ"
+      $description:id-ID: "Perintah yang dijalankan atau jalur yang dibuka dengan nama pendek"
+      $description:ms-MY: "Arahan yang dijalankan atau laluan yang dibuka dengan nama ringkas"
+      $description:fr-FR: "Commande à exécuter ou chemin d’accès à ouvrir avec ce nom court"
+      $description:de-DE: "Befehl oder Pfad, der mit dem Kurznamen aufgerufen wird"
+      $description:es-ES: "Comando que se ejecuta o ruta de acceso que se abre con el nombre corto"
+      $description:pt-BR: "Comando executado ou caminho aberto pelo nome curto"
+      $description:it-IT: "Comando da eseguire o percorso da aprire con il nome breve"
+      $description:uk-UA: "Команда для виконання або шлях для відкриття за коротким ім’ям"
+      $description:pl-PL: "Polecenie uruchamiane lub ścieżka otwierana za pomocą krótkiej nazwy"
+      $description:nl-NL: "Opdracht die wordt uitgevoerd of pad dat wordt geopend met de korte naam"
+      $description:tr-TR: "Kısa adla çalıştırılan komut veya açılan yol"
+      $description:hi-IN: "छोटे नाम से चलाई जाने वाली कमांड या खोला जाने वाला पाथ"
+      $description:ar: "الأمر الذي يُشغَّل أو المسار الذي يُفتح بالاسم المختصر"
     - runAsAdmin: true
-      $name: Run as Administrator
-      $name:ru-RU: Запуск от имени администратора
-      $description: Elevated privileges for this command
-      $description:ru-RU: Права для этой команды
-      $name:vi-VN: Chạy với quyền Quản trị
-  $name: Commands
-  $name:ru-RU: Команды
-  $name:vi-VN: Bí danh lệnh tùy chỉnh
-  $description: Set up custom commands to launch programs and files by short name
-  $description:ru-RU: Собственные команды для запуска программ и файлов по коротким именам
-  $description:vi-VN: Khai báo các lệnh gõ tắt (ví dụ hosts, env, ws) để mở nhanh file, thư mục hoặc chạy lệnh với quyền Quản trị.
+      $name: "Run as Administrator"
+      $name:ru-RU: "Запуск от имени администратора"
+      $name:vi-VN: "Chạy với quyền quản trị viên"
+      $name:zh-CN: "以管理员身份运行"
+      $name:zh-TW: "以系統管理員身分執行"
+      $name:ja-JP: "管理者として実行"
+      $name:ko-KR: "관리자 권한으로 실행"
+      $name:th-TH: "เรียกใช้ในฐานะผู้ดูแลระบบ"
+      $name:id-ID: "Jalankan sebagai administrator"
+      $name:ms-MY: "Jalankan sebagai pentadbir"
+      $name:fr-FR: "Exécuter en tant qu’administrateur"
+      $name:de-DE: "Als Administrator ausführen"
+      $name:es-ES: "Ejecutar como administrador"
+      $name:pt-BR: "Executar como administrador"
+      $name:it-IT: "Esegui come amministratore"
+      $name:uk-UA: "Запуск від імені адміністратора"
+      $name:pl-PL: "Uruchom jako administrator"
+      $name:nl-NL: "Als administrator uitvoeren"
+      $name:tr-TR: "Yönetici olarak çalıştır"
+      $name:hi-IN: "व्यवस्थापक के रूप में चलाएँ"
+      $name:ar: "تشغيل كمسؤول"
+      $description: "Elevated privileges for this command"
+      $description:ru-RU: "Права для этой команды"
+      $description:vi-VN: "Dùng quyền quản trị viên cho lệnh này"
+      $description:zh-CN: "以提升的权限运行此命令"
+      $description:zh-TW: "以提高的權限執行此命令"
+      $description:ja-JP: "このコマンドを管理者権限で実行します"
+      $description:ko-KR: "이 명령을 관리자 권한으로 실행합니다"
+      $description:th-TH: "ใช้สิทธิ์ผู้ดูแลระบบสำหรับคำสั่งนี้"
+      $description:id-ID: "Hak akses lebih tinggi untuk perintah ini"
+      $description:ms-MY: "Keistimewaan lebih tinggi untuk arahan ini"
+      $description:fr-FR: "Privilèges élevés pour cette commande"
+      $description:de-DE: "Erhöhte Berechtigungen für diesen Befehl"
+      $description:es-ES: "Privilegios elevados para este comando"
+      $description:pt-BR: "Privilégios elevados para este comando"
+      $description:it-IT: "Privilegi elevati per questo comando"
+      $description:uk-UA: "Підвищені права для цієї команди"
+      $description:pl-PL: "Podwyższone uprawnienia dla tego polecenia"
+      $description:nl-NL: "Verhoogde rechten voor deze opdracht"
+      $description:tr-TR: "Bu komut için yükseltilmiş yetkiler"
+      $description:hi-IN: "इस कमांड के लिए अतिरिक्त विशेषाधिकार"
+      $description:ar: "صلاحيات مرتفعة لهذا الأمر"
+  $name: "Commands"
+  $name:ru-RU: "Команды"
+  $name:vi-VN: "Lệnh"
+  $name:zh-CN: "命令"
+  $name:zh-TW: "命令"
+  $name:ja-JP: "コマンド"
+  $name:ko-KR: "명령"
+  $name:th-TH: "คำสั่ง"
+  $name:id-ID: "Perintah"
+  $name:ms-MY: "Arahan"
+  $name:fr-FR: "Commandes"
+  $name:de-DE: "Befehle"
+  $name:es-ES: "Comandos"
+  $name:pt-BR: "Comandos"
+  $name:it-IT: "Comandi"
+  $name:uk-UA: "Команди"
+  $name:pl-PL: "Polecenia"
+  $name:nl-NL: "Opdrachten"
+  $name:tr-TR: "Komutlar"
+  $name:hi-IN: "कमांड"
+  $name:ar: "الأوامر"
+  $description: "Set up custom commands to launch programs and files by short name"
+  $description:ru-RU: "Собственные команды для запуска программ и файлов по коротким именам"
+  $description:vi-VN: "Thiết lập lệnh tùy chỉnh để mở chương trình và tệp bằng tên tắt"
+  $description:zh-CN: "设置自定义命令，以便使用简称打开程序和文件"
+  $description:zh-TW: "設定自訂命令，使用簡稱來開啟程式與檔案"
+  $description:ja-JP: "短縮名でプログラムやファイルを開くカスタム コマンドを設定します"
+  $description:ko-KR: "짧은 이름으로 프로그램이나 파일을 열 수 있도록 사용자 지정 명령을 설정합니다"
+  $description:th-TH: "ตั้งค่าคำสั่งแบบกำหนดเองเพื่อเปิดโปรแกรมและไฟล์ด้วยชื่อย่อ"
+  $description:id-ID: "Atur perintah khusus untuk menjalankan program dan membuka file dengan nama pendek"
+  $description:ms-MY: "Sediakan arahan tersuai untuk menjalankan program dan membuka fail dengan nama ringkas"
+  $description:fr-FR: "Configurer des commandes personnalisées pour lancer des programmes et ouvrir des fichiers par nom court"
+  $description:de-DE: "Benutzerdefinierte Befehle einrichten, um Programme und Dateien per Kurzname zu öffnen"
+  $description:es-ES: "Configura comandos personalizados para abrir programas y archivos con un nombre corto"
+  $description:pt-BR: "Configure comandos personalizados para abrir programas e arquivos por nome curto"
+  $description:it-IT: "Configura comandi personalizzati per aprire programmi e file con un nome breve"
+  $description:uk-UA: "Налаштування власних команд для запуску програм і відкриття файлів за коротким ім’ям"
+  $description:pl-PL: "Skonfiguruj własne polecenia, aby otwierać programy i pliki za pomocą krótkich nazw"
+  $description:nl-NL: "Stel aangepaste opdrachten in om programma’s en bestanden met een korte naam te openen"
+  $description:tr-TR: "Programları ve dosyaları kısa adlarla açmak için özel komutlar oluşturun"
+  $description:hi-IN: "प्रोग्राम और फ़ाइलें छोटे नाम से खोलने के लिए अपनी कमांड सेट करें"
+  $description:ar: "إعداد أوامر مخصصة لتشغيل البرامج وفتح الملفات بأسماء مختصرة"
 */
 // ==/WindhawkModSettings==
 
@@ -3330,9 +5368,14 @@ std::wstring ResolveEffectiveLanguageCode(std::wstring lang) {
             default:              return L"en";
         }
     }
+    if (lang == L"zh-cn") return L"zh_cn";
+    if (lang == L"zh-tw") return L"zh_tw";
     return lang;
 }
 
+bool IsRtlUiLanguage(const std::wstring& language) {
+    return ResolveEffectiveLanguageCode(language) == L"ar";
+}
 
 struct RunSupplementalStrings {
     const wchar_t* compactPlaceholder;
@@ -3351,213 +5394,213 @@ const RunSupplementalStrings& GetRunSupplementalStrings(std::wstring lang) {
         RunSupplementalStrings strings;
     };
     static constexpr Translation translations[] = {
-        {L"vi", {
-            L"Nhập tên lệnh",
-            L"Ghim cố định lên đầu",
-            L"Bỏ ghim khỏi đầu danh sách",
-            L"Mở thư mục chứa file",
-            L"Xóa mục này khỏi lịch sử",
-            L"Gõ từ khóa để tìm kiếm trên Google (Trình duyệt mặc định)",
-            L"Tìm trên Google: \"",
-            L"Đã vượt quá giới hạn độ dài của lệnh.",
-        }},
-        {L"zh_tw", {
-            L"輸入指令",
-            L"釘選到頂部",
-            L"從頂部取消釘選",
-            L"開啟檔案位置",
-            L"從歷史記錄中刪除此項",
-            L"輸入關鍵字使用 Chrome 進行 Google 搜尋",
-            L"Google 搜尋 (Chrome): \"",
-            L"指令長度已超過上限。",
-        }},
-        {L"zh_cn", {
-            L"输入命令",
-            L"置顶固定",
-            L"取消置顶固定",
-            L"打开文件所在位置",
-            L"从历史记录中删除此项",
-            L"输入关键词使用 Chrome 进行 Google 搜索",
-            L"Google 搜索 (Chrome): \"",
-            L"命令长度已超出限制。",
-        }},
-        {L"ja", {
-            L"コマンドを入力",
-            L"先頭にピン留め",
-            L"ピン留めを解除",
-            L"ファイルの場所を開く",
-            L"履歴からこの項目を削除",
-            L"キーワードを入力して Chrome で Google 検索",
-            L"Google 検索 (Chrome): \"",
-            L"コマンドの長さが上限を超えています。",
-        }},
-        {L"ko", {
-            L"명령어 입력",
-            L"상단에 고정",
-            L"상단 고정 해제",
-            L"파일 위치 열기",
-            L"기록에서 이 항목 삭제",
-            L"Chrome에서 Google 검색할 키워드 입력",
-            L"Google 검색 (Chrome): \"",
-            L"명령 길이가 제한을 초과했습니다.",
-        }},
-        {L"th", {
-            L"พิมพ์คำสั่ง",
-            L"ปักหมุดไว้ด้านบน",
-            L"เลิกปักหมุดจากด้านบน",
-            L"เปิดตำแหน่งไฟล์",
-            L"ลบรายการนี้ออกจากประวัติ",
-            L"พิมพ์คำค้นหาเพื่อค้นหา Google ใน Chrome",
-            L"ค้นหา Google (Chrome): \"",
-            L"คำสั่งยาวเกินขีดจำกัด",
-        }},
-        {L"id", {
-            L"Ketik perintah",
-            L"Sematkan ke atas",
-            L"Lepas sematan dari atas",
-            L"Buka lokasi file",
-            L"Hapus item ini dari riwayat",
-            L"Ketik kata kunci untuk mencari di Google (Chrome)",
-            L"Cari di Google (Chrome): \"",
-            L"Panjang perintah melebihi batas.",
-        }},
-        {L"ms", {
-            L"Taip arahan",
-            L"Sematkan ke atas",
-            L"Nyahsemat dari atas",
-            L"Buka lokasi fail",
-            L"Padam item ini daripada sejarah",
-            L"Taip kata kunci untuk mencari di Google (Chrome)",
-            L"Cari di Google (Chrome): \"",
-            L"Panjang arahan melebihi had.",
-        }},
-        {L"fr", {
-            L"Commande...",
-            L"Épingler en haut",
-            L"Détacher du haut",
-            L"Ouvrir l'emplacement du fichier",
-            L"Supprimer cet élément de l'historique",
-            L"Tapez un mot-clé pour rechercher sur Google (Chrome)",
-            L"Recherche Google (Chrome) : \"",
-            L"La commande dépasse la longueur maximale autorisée.",
-        }},
-        {L"de", {
-            L"Befehl eingeben",
-            L"Oben anheften",
-            L"Von oben lösen",
-            L"Dateispeicherort öffnen",
-            L"Eintrag aus Verlauf löschen",
-            L"Suchbegriff für Google-Suche in Chrome eingeben",
-            L"Google-Suche (Chrome): \"",
-            L"Die maximale Befehlslänge wurde überschritten.",
-        }},
-        {L"es", {
-            L"Escribir comando",
-            L"Fijar arriba",
-            L"Desfijar de arriba",
-            L"Abrir ubicación del archivo",
-            L"Eliminar este elemento del historial",
-            L"Escriba una palabra clave para buscar en Google (Chrome)",
-            L"Buscar en Google (Chrome): \"",
-            L"La longitud del comando supera el límite.",
-        }},
-        {L"pt", {
-            L"Digite comando",
-            L"Fixar no topo",
-            L"Desafixar do topo",
-            L"Abrir local do arquivo",
-            L"Remover este item do histórico",
-            L"Digite uma palavra-chave para pesquisar no Google (Chrome)",
-            L"Pesquisar no Google (Chrome): \"",
-            L"O comando excede o limite de comprimento.",
-        }},
-        {L"it", {
-            L"Digita comando",
-            L"Fissa in alto",
-            L"Rimuovi da in alto",
-            L"Apri percorso file",
-            L"Elimina questo elemento dalla cronologia",
-            L"Digita una parola chiave per cercare su Google (Chrome)",
-            L"Cerca su Google (Chrome): \"",
-            L"Il comando supera la lunghezza massima consentita.",
-        }},
         {L"ru", {
-            L"Введите команду",
+            L"Введите имя команды или путь",
             L"Закрепить сверху",
             L"Открепить",
             L"Открыть расположение файла",
             L"Удалить из истории",
-            L"Введите запрос для поиска в Google через Chrome",
-            L"Поиск Google (Chrome): \"",
+            L"Введите запрос для поиска в Google через браузер по умолчанию",
+            L"Поиск в Google: \"",
             L"Превышен лимит длины команды.",
         }},
+        {L"vi", {
+            L"Nhập lệnh hoặc đường dẫn",
+            L"Ghim lên đầu",
+            L"Bỏ ghim",
+            L"Mở vị trí tệp",
+            L"Xóa khỏi lịch sử",
+            L"Nhập từ khóa để tìm trên Google bằng trình duyệt mặc định",
+            L"Tìm trên Google: \"",
+            L"Lệnh vượt quá độ dài cho phép.",
+        }},
+        {L"zh_cn", {
+            L"输入命令或路径",
+            L"固定到顶部",
+            L"取消固定",
+            L"打开文件位置",
+            L"从历史记录中移除",
+            L"输入关键词，即可在默认浏览器中使用 Google 搜索",
+            L"Google 搜索： \"",
+            L"命令超过长度限制。",
+        }},
+        {L"zh_tw", {
+            L"輸入命令或路徑",
+            L"釘選到頂端",
+            L"取消釘選",
+            L"開啟檔案位置",
+            L"從歷程記錄中移除",
+            L"輸入關鍵字，即可在預設瀏覽器中使用 Google 搜尋",
+            L"Google 搜尋： \"",
+            L"命令超過長度限制。",
+        }},
+        {L"ja", {
+            L"コマンドまたはパスを入力",
+            L"先頭にピン留めする",
+            L"ピン留めを外す",
+            L"ファイルの場所を開く",
+            L"履歴から削除",
+            L"キーワードを入力すると、既定のブラウザーで Google 検索を開きます",
+            L"Google 検索: \"",
+            L"コマンドが長さの上限を超えています。",
+        }},
+        {L"ko", {
+            L"명령 또는 경로 입력",
+            L"맨 위에 고정",
+            L"고정 해제",
+            L"파일 위치 열기",
+            L"기록에서 제거",
+            L"키워드를 입력하면 기본 브라우저에서 Google로 검색합니다",
+            L"Google 검색: \"",
+            L"명령이 길이 제한을 초과했습니다.",
+        }},
+        {L"th", {
+            L"ป้อนคำสั่งหรือเส้นทาง",
+            L"ปักหมุดไว้ด้านบน",
+            L"ถอนหมุด",
+            L"เปิดตำแหน่งที่ตั้งไฟล์",
+            L"เอาออกจากประวัติ",
+            L"ป้อนคำค้นหาเพื่อค้นหาด้วย Google ในเบราว์เซอร์เริ่มต้น",
+            L"ค้นหาด้วย Google: \"",
+            L"คำสั่งยาวเกินขีดจำกัด",
+        }},
+        {L"id", {
+            L"Masukkan perintah atau jalur",
+            L"Sematkan ke bagian atas",
+            L"Lepas sematan",
+            L"Buka lokasi file",
+            L"Hapus dari riwayat",
+            L"Masukkan kata kunci untuk menelusuri Google di browser default",
+            L"Telusuri Google: \"",
+            L"Perintah melebihi batas panjang.",
+        }},
+        {L"ms", {
+            L"Masukkan arahan atau laluan",
+            L"Semat di bahagian atas",
+            L"Nyahsemat",
+            L"Buka lokasi fail",
+            L"Alih keluar daripada sejarah",
+            L"Masukkan kata kunci untuk mencari di Google melalui pelayar lalai",
+            L"Cari di Google: \"",
+            L"Arahan melebihi had panjang.",
+        }},
+        {L"fr", {
+            L"Saisir une commande ou un chemin d’accès",
+            L"Épingler en haut",
+            L"Désépingler",
+            L"Ouvrir l’emplacement du fichier",
+            L"Supprimer de l’historique",
+            L"Saisir un mot-clé pour lancer une recherche Google dans le navigateur par défaut",
+            L"Rechercher sur Google : \"",
+            L"La commande dépasse la longueur maximale.",
+        }},
+        {L"de", {
+            L"Befehl oder Pfad eingeben",
+            L"Oben anheften",
+            L"Lösen",
+            L"Dateispeicherort öffnen",
+            L"Aus dem Verlauf entfernen",
+            L"Suchbegriff eingeben, um mit Google im Standardbrowser zu suchen",
+            L"Mit Google suchen: \"",
+            L"Der Befehl ist länger als zulässig.",
+        }},
+        {L"es", {
+            L"Escribe un comando o una ruta de acceso",
+            L"Anclar arriba",
+            L"Desanclar",
+            L"Abrir ubicación del archivo",
+            L"Quitar del historial",
+            L"Escribe una palabra clave para buscar en Google en el navegador predeterminado",
+            L"Buscar en Google: \"",
+            L"El comando supera la longitud máxima.",
+        }},
+        {L"pt", {
+            L"Digite um comando ou caminho",
+            L"Fixar no topo",
+            L"Desafixar",
+            L"Abrir local do arquivo",
+            L"Remover do histórico",
+            L"Digite uma palavra-chave para pesquisar no Google pelo navegador padrão",
+            L"Pesquisar no Google: \"",
+            L"O comando excede o limite de caracteres.",
+        }},
+        {L"it", {
+            L"Immetti un comando o un percorso",
+            L"Fissa in alto",
+            L"Rimuovi da quelli fissati",
+            L"Apri percorso file",
+            L"Rimuovi dalla cronologia",
+            L"Immetti una parola chiave per cercare su Google nel browser predefinito",
+            L"Cerca su Google: \"",
+            L"Il comando supera la lunghezza massima.",
+        }},
         {L"uk", {
-            L"Введіть команду",
-            L"Закріпити зверху",
-            L"Відкріпити зверху",
+            L"Введіть команду або шлях",
+            L"Закріпити вгорі",
+            L"Відкріпити",
             L"Відкрити розташування файлу",
-            L"Видалити цей елемент з історії",
-            L"Введіть запит для пошуку в Google через Chrome",
-            L"Пошук Google (Chrome): \"",
-            L"Перевищено обмеження довжини команди.",
+            L"Видалити з журналу",
+            L"Введіть запит для пошуку в Google у стандартному браузері",
+            L"Пошук у Google: \"",
+            L"Команда перевищує допустиму довжину.",
         }},
         {L"pl", {
-            L"Wpisz polecenie",
+            L"Wpisz polecenie lub ścieżkę",
             L"Przypnij na górze",
-            L"Odepnij z góry",
+            L"Odepnij",
             L"Otwórz lokalizację pliku",
-            L"Usuń ten element z historii",
-            L"Wpisz słowo kluczowe, aby wyszukać w Google (Chrome)",
-            L"Szukaj w Google (Chrome): \"",
-            L"Przekroczono limit długości polecenia.",
+            L"Usuń z historii",
+            L"Wpisz szukaną frazę, aby wyszukać ją w Google w domyślnej przeglądarce",
+            L"Szukaj w Google: \"",
+            L"Polecenie przekracza maksymalną długość.",
         }},
         {L"nl", {
-            L"Typ opdracht",
+            L"Voer een opdracht of pad in",
             L"Bovenaan vastmaken",
-            L"Losmaken van boven",
+            L"Losmaken",
             L"Bestandslocatie openen",
-            L"Verwijder dit item uit de geschiedenis",
-            L"Typ een trefwoord om met Google in Chrome te zoeken",
-            L"Zoeken op Google (Chrome): \"",
-            L"De maximale lengte van de opdracht is overschreden.",
+            L"Uit geschiedenis verwijderen",
+            L"Voer een zoekterm in om met Google te zoeken in de standaardbrowser",
+            L"Zoeken met Google: \"",
+            L"De opdracht is langer dan toegestaan.",
         }},
         {L"tr", {
-            L"Komut yazın",
-            L"Üste sabitle",
-            L"Üstten sabitlemeyi kaldır",
+            L"Bir komut veya yol girin",
+            L"En üste sabitle",
+            L"Sabitlemeyi kaldır",
             L"Dosya konumunu aç",
-            L"Bu öğeyi geçmişten sil",
-            L"Chrome ile Google'da aramak için anahtar kelime yazın",
-            L"Google'da Ara (Chrome): \"",
-            L"Komut uzunluğu sınırı aşıldı.",
+            L"Geçmişтен kaldır",
+            L"Varsayılan tarayıcıda Google’da aramak için bir sözcük yazın",
+            L"Google’da ara: \"",
+            L"Komut uzunluk sınırını aşıyor.",
         }},
         {L"hi", {
-            L"कमांड लिखें",
-            L"शीर्ष पर पिन करें",
-            L"शीर्ष से अनपिन करें",
-            L"फ़ाइल स्थान खोलें",
-            L"इतिहास से इसे हटाएं",
-            L"Chrome में Google खोजने के लिए कीवर्ड टाइप करें",
-            L"Google खोज (Chrome): \"",
-            L"कमांड की लंबाई निर्धारित सीमा से अधिक है।",
+            L"कमांड या पाथ दर्ज करें",
+            L"सबसे ऊपर पिन करें",
+            L"पिन हटाएँ",
+            L"फ़ाइल का स्थान खोलें",
+            L"इतिहास से हटाएँ",
+            L"डिफ़ॉल्ट ब्राउज़र में Google पर खोजने के लिए शब्द दर्ज करें",
+            L"Google पर खोजें: \"",
+            L"कमांड तय सीमा से लंबी है।",
         }},
         {L"ar", {
-            L"اكتب أمراً",
+            L"أدخل أمرًا أو مسارًا",
             L"تثبيت في الأعلى",
-            L"إلغاء التثبيت من الأعلى",
+            L"إلغاء التثبيت",
             L"فتح موقع الملف",
-            L"حذف هذا العنصر من السجل",
-            L"اكتب كلمة مفتاحية للبحث في Google عبر Chrome",
-            L"بحث Google (Chrome): \"",
-            L"تجاوز الأمر الحد الأقصى للطول.",
+            L"إزالة من السجل",
+            L"أدخل كلمة للبحث في Google عبر متصفحك الافتراضي",
+            L"البحث في Google: \"",
+            L"يتجاوز الأمر الحد الأقصى للطول.",
         }},
         {L"en", {
-            L"Type command",
+            L"Enter a command or path",
             L"Pin to top",
-            L"Unpin from top",
+            L"Unpin",
             L"Open file location",
-            L"Delete from history",
-            L"Type a keyword to search on Google (Default Browser)",
+            L"Remove from history",
+            L"Enter a keyword to search Google in your default browser",
             L"Search Google: \"",
             L"The command exceeds the length limit.",
         }},
@@ -3575,10 +5618,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
 
     if (lang == L"vi") {
         return {
-            L"Nhập tên lệnh hoặc chương trình để chạy",
+            L"Nhập lệnh hoặc đường dẫn",
             L"Duyệt",
             L"Chạy",
-            L"Thoát",
+            L"Đóng",
             L"Hôm nay",
             L"Chọn chương trình (.exe) để đưa vào ô nhập",
             L"Chương trình (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Tất cả tệp (*.*)\0*.*\0\0",
@@ -3587,10 +5630,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"th") {
         return {
-            L"พิมพ์ชื่อคำสั่งหรือโปรแกรมเพื่อเรียกใช้งาน",
+            L"ป้อนคำสั่งหรือเส้นทาง",
             L"เรียกดู",
             L"เรียกใช้",
-            L"ออก",
+            L"ปิด",
             L"วันนี้",
             L"เลือกโปรแกรมที่ต้องการเรียกใช้งาน",
             L"โปรแกรม (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0ไฟล์ทั้งหมด (*.*)\0*.*\0\0",
@@ -3599,10 +5642,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"id") {
         return {
-            L"Ketik nama perintah atau program untuk dijalankan",
+            L"Masukkan perintah atau jalur",
             L"Telusuri",
             L"Jalankan",
-            L"Keluar",
+            L"Tutup",
             L"Hari ini",
             L"Pilih program yang akan dijalankan",
             L"Program (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Semua File (*.*)\0*.*\0\0",
@@ -3611,10 +5654,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"ms") {
         return {
-            L"Taip nama arahan atau program untuk dijalankan",
-            L"Semak",
+            L"Masukkan arahan atau laluan",
+            L"Semak imbas",
             L"Jalankan",
-            L"Keluar",
+            L"Tutup",
             L"Hari ini",
             L"Pilih program untuk dijalankan",
             L"Program (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Semua Fail (*.*)\0*.*\0\0",
@@ -3623,7 +5666,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"ja") {
         return {
-            L"実行するコマンドの名前を入力してください",
+            L"コマンドまたはパスを入力",
             L"参照",
             L"実行",
             L"閉じる",
@@ -3635,10 +5678,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"zh_cn") {
         return {
-            L"输入要运行的命令名称",
+            L"输入命令或路径",
             L"浏览",
             L"运行",
-            L"退出",
+            L"关闭",
             L"今天",
             L"选择要运行的程序",
             L"程序 (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0所有文件 (*.*)\0*.*\0\0",
@@ -3647,10 +5690,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"zh_tw") {
         return {
-            L"輸入要執行的命令名稱",
+            L"輸入命令或路徑",
             L"瀏覽",
             L"執行",
-            L"退出",
+            L"關閉",
             L"今天",
             L"選擇要執行的程式",
             L"程式 (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0所有檔案 (*.*)\0*.*\0\0",
@@ -3659,7 +5702,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"ko") {
         return {
-            L"실행할 명령의 이름을 입력하세요",
+            L"명령 또는 경로 입력",
             L"찾아보기",
             L"실행",
             L"닫기",
@@ -3671,10 +5714,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"fr") {
         return {
-            L"Entrez le nom d'une commande",
+            L"Saisir une commande ou un chemin d’accès",
             L"Parcourir",
             L"Exécuter",
-            L"Quitter",
+            L"Fermer",
             L"Aujourd'hui",
             L"Sélectionner un programme",
             L"Programmes (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Tous les fichiers (*.*)\0*.*\0\0",
@@ -3683,7 +5726,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"de") {
         return {
-            L"Geben Sie den Namen eines Befehls ein",
+            L"Befehl oder Pfad eingeben",
             L"Durchsuchen",
             L"Ausführen",
             L"Schließen",
@@ -3695,10 +5738,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"es") {
         return {
-            L"Escriba el nombre de un comando para ejecutar",
+            L"Escribe un comando o una ruta de acceso",
             L"Examinar",
             L"Ejecutar",
-            L"Salir",
+            L"Cerrar",
             L"Hoy",
             L"Seleccionar un programa",
             L"Programas (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Todos los archivos (*.*)\0*.*\0\0",
@@ -3707,10 +5750,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"pt") {
         return {
-            L"Digite o nome de um comando ou programa para executar",
+            L"Digite um comando ou caminho",
             L"Procurar",
             L"Executar",
-            L"Sair",
+            L"Fechar",
             L"Hoje",
             L"Selecionar um programa executável",
             L"Programas (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Todos os arquivos (*.*)\0*.*\0\0",
@@ -3719,10 +5762,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"it") {
         return {
-            L"Digitare il nome del programma da eseguire",
+            L"Immetti un comando o un percorso",
             L"Sfoglia",
             L"Esegui",
-            L"Esci",
+            L"Chiudi",
             L"Oggi",
             L"Seleziona un programma da eseguire",
             L"Programmi (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Tutti i file (*.*)\0*.*\0\0",
@@ -3734,7 +5777,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
             L"Введите имя команды или путь",
             L"Обзор",
             L"Выполнить",
-            L"Выход",
+            L"Закрыть",
             L"Сегодня",
             L"Выберите программу",
             L"Программы (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Все файлы (*.*)\0*.*\0\0",
@@ -3743,10 +5786,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"uk") {
         return {
-            L"Введіть ім'я команди або програми для виконання",
+            L"Введіть команду або шлях",
             L"Огляд",
             L"Виконати",
-            L"Вихід",
+            L"Закрити",
             L"Сьогодні",
             L"Виберіть програму для виконання",
             L"Програми (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Усі файли (*.*)\0*.*\0\0",
@@ -3755,10 +5798,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"pl") {
         return {
-            L"Wpisz nazwę polecenia lub programu do uruchomienia",
+            L"Wpisz polecenie lub ścieżkę",
             L"Przeglądaj",
             L"Uruchom",
-            L"Wyjdź",
+            L"Zamknij",
             L"Dzisiaj",
             L"Wybierz program do uruchomienia",
             L"Programy (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Wszystkie pliki (*.*)\0*.*\0\0",
@@ -3767,7 +5810,7 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"nl") {
         return {
-            L"Typ de naam van een opdracht of programma",
+            L"Voer een opdracht of pad in",
             L"Bladeren",
             L"Uitvoeren",
             L"Sluiten",
@@ -3779,10 +5822,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"tr") {
         return {
-            L"Çalıştırmak istediğiniz komutun adını yazın",
+            L"Bir komut veya yol girin",
             L"Gözat",
             L"Çalıştır",
-            L"Çıkış",
+            L"Kapat",
             L"Bugün",
             L"Çalıştırılacak bir program seçin",
             L"Programlar (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0Tüm Dosyalar (*.*)\0*.*\0\0",
@@ -3791,8 +5834,8 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"hi") {
         return {
-            L"चलाने के लिए किसी कमांड या प्रोग्राम का नाम टाइप करें",
-            L"ब्राउज़",
+            L"कमांड या पाथ दर्ज करें",
+            L"ब्राउज़ करें",
             L"चलाएँ",
             L"बंद करें",
             L"आज",
@@ -3803,10 +5846,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
     if (lang == L"ar") {
         return {
-            L"اكتب اسم أمر أو برنامج لتشغيله",
+            L"أدخل أمرًا أو مسارًا",
             L"استعراض",
             L"تشغيل",
-            L"خروج",
+            L"إغلاق",
             L"اليوم",
             L"اختر برنامجاً لتشغيله",
             L"البرامج (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0كل الملفات (*.*)\0*.*\0\0",
@@ -3815,10 +5858,10 @@ LocalizedStrings GetLocalizedStringsForLanguage(std::wstring lang) {
     }
 
     return {
-        L"Enter a command name or path",
+        L"Enter a command or path",
         L"Browse",
         L"Run",
-        L"Exit",
+        L"Close",
         L"Today",
         L"Select an executable program",
         L"Programs (*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl)\0*.exe;*.bat;*.cmd;*.com;*.msc;*.cpl\0All Files (*.*)\0*.*\0\0",
@@ -11065,8 +13108,9 @@ struct LayoutLocalizedStrings {
 struct ActionButtonStrings {
     const wchar_t* groupTitle;
     const wchar_t* groupDescription;
-    const wchar_t* hidePattern;
+    const wchar_t* hideLabels[kRunActionCount];
     const wchar_t* labels[kRunActionCount];
+    const wchar_t* shortcuts[kRunActionCount];
 };
 
 struct ContextMenuStyleStrings {
@@ -11079,64 +13123,57 @@ constexpr wchar_t kWindowsFluentMenuLabel[] = L"Windows (Fluent)";
 constexpr int kIconSetControl = 2101;
 
 struct IconSetStrings {
-    const wchar_t* language;
     const wchar_t* title;
     const wchar_t* modLabel;
 };
 
-const IconSetStrings& GetIconSetStrings(const std::wstring& language) {
-    static constexpr IconSetStrings strings[] = {
-        {L"en", L"Icons", L"Default"},
-        {L"vi", L"Biểu tượng", L"Biểu tượng của mod"},
-        {L"th", L"ไอคอน", L"ไอคอนของม็อด"},
-        {L"id", L"Ikon", L"Ikon mod"},
-        {L"ms", L"Ikon", L"Ikon mod"},
-        {L"ja", L"アイコン", L"Mod のアイコン"},
-        {L"zh_cn", L"图标", L"模组图标"},
-        {L"zh_tw", L"圖示", L"模組圖示"},
-        {L"ko", L"아이콘", L"모드 아이콘"},
-        {L"fr", L"Icônes", L"Icônes du mod"},
-        {L"de", L"Symbole", L"Symbole des Mods"},
-        {L"es", L"Iconos", L"Iconos del mod"},
-        {L"pt", L"Ícones", L"Ícones do mod"},
-        {L"it", L"Icone", L"Icone della mod"},
-        {L"ru", L"Иконки", L"По умолчанию"},
-        {L"uk", L"Піктограми", L"Піктограми мода"},
-        {L"pl", L"Ikony", L"Ikony moda"},
-        {L"nl", L"Pictogrammen", L"Pictogrammen van de mod"},
-        {L"tr", L"Simgeler", L"Mod simgeleri"},
-        {L"hi", L"आइकन", L"मॉड के आइकन"},
-        {L"ar", L"الأيقونات", L"أيقونات التعديل"},
-    };
+IconSetStrings GetIconSetStrings(const std::wstring& language) {
     const auto code = ResolveEffectiveLanguageCode(language);
-    for (const auto& value : strings) {
-        if (code == value.language) return value;
-    }
-    return strings[0];
+    if (code == L"ru") return { L"Иконки", L"По умолчанию" };
+    if (code == L"vi") return { L"Biểu tượng", L"Mặc định" };
+    if (code == L"zh_cn") return { L"图标", L"默认" };
+    if (code == L"zh_tw") return { L"圖示", L"預設" };
+    if (code == L"ja") return { L"アイコン", L"既定" };
+    if (code == L"ko") return { L"아이콘", L"기본값" };
+    if (code == L"th") return { L"ไอคอน", L"ค่าเริ่มต้น" };
+    if (code == L"id") return { L"Ikon", L"Default" };
+    if (code == L"ms") return { L"Ikon", L"Lalai" };
+    if (code == L"fr") return { L"Icônes", L"Par défaut" };
+    if (code == L"de") return { L"Symbole", L"Standard" };
+    if (code == L"es") return { L"Iconos", L"Predeterminado" };
+    if (code == L"pt") return { L"Ícones", L"Padrão" };
+    if (code == L"it") return { L"Icone", L"Predefinito" };
+    if (code == L"uk") return { L"Піктограми", L"За замовчуванням" };
+    if (code == L"pl") return { L"Ikony", L"Domyślne" };
+    if (code == L"nl") return { L"Pictogrammen", L"Standaard" };
+    if (code == L"tr") return { L"Simgeler", L"Varsayılan" };
+    if (code == L"hi") return { L"आइकन", L"डिफ़ॉल्ट" };
+    if (code == L"ar") return { L"الأيقونات", L"افتراضي" };
+    return { L"Icons", L"Default" };
 }
 
 ContextMenuStyleStrings GetContextMenuStyleStrings(const std::wstring& rawLang) {
-    const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Kiểu menu ngữ cảnh", L"Đổi giao diện menu khi nhấp chuột phải", L"Kiểu của mod" };
-    if (lang == L"th") return { L"รูปแบบเมนูบริบท", L"เปลี่ยนรูปแบบเมนูเมื่อคลิกขวา", L"รูปแบบของม็อด" };
-    if (lang == L"id") return { L"Gaya Menu Konteks", L"Mengubah tampilan menu saat klik kanan", L"Gaya Mod" };
-    if (lang == L"ms") return { L"Gaya Menu Konteks", L"Mengubah rupa menu apabila klik kanan", L"Gaya Mod" };
-    if (lang == L"ja") return { L"コンテキスト メニューのスタイル", L"右クリック メニューの外観を変更します", L"Mod のスタイル" };
-    if (lang == L"zh_cn") return { L"右键菜单样式", L"更改右键单击时显示的菜单外观", L"模组样式" };
-    if (lang == L"zh_tw") return { L"快顯選單樣式", L"變更按下滑鼠右鍵時顯示的選單外觀", L"模組樣式" };
-    if (lang == L"ko") return { L"상황에 맞는 메뉴 스타일", L"마우스 오른쪽 클릭 메뉴의 모양을 변경합니다", L"모드 스타일" };
-    if (lang == L"fr") return { L"Style du menu contextuel", L"Modifie l’apparence du menu du clic droit", L"Style du mod" };
-    if (lang == L"de") return { L"Kontextmenüstil", L"Ändert das Aussehen des Menüs beim Rechtsklick", L"Mod-Stil" };
-    if (lang == L"es") return { L"Estilo del menú contextual", L"Cambia el aspecto del menú al hacer clic con el botón derecho", L"Estilo del mod" };
-    if (lang == L"pt") return { L"Estilo do menu de contexto", L"Altera a aparência do menu do botão direito", L"Estilo do mod" };
-    if (lang == L"it") return { L"Stile del menu contestuale", L"Modifica l’aspetto del menu del tasto destro", L"Stile della mod" };
-    if (lang == L"ru") return { L"Стиль контекстного меню", L"Оформление меню при нажатии правой кнопки мыши", L"Обычный" };
-    if (lang == L"uk") return { L"Стиль контекстного меню", L"Змінює вигляд меню при натисканні правою кнопкою миші", L"Стиль мода" };
-    if (lang == L"pl") return { L"Styl menu kontekstowego", L"Zmienia wygląd menu wyświetlanego po kliknięciu prawym przyciskiem", L"Styl moda" };
-    if (lang == L"nl") return { L"Stijl van het snelmenu", L"Wijzigt het uiterlijk van het menu bij rechtsklikken", L"Stijl van de mod" };
-    if (lang == L"tr") return { L"Bağlam menüsü stili", L"Sağ tıklama menüsünün görünümünü değiştirir", L"Mod stili" };
-    if (lang == L"hi") return { L"संदर्भ मेनू की शैली", L"राइट-क्लिक मेनू का रूप बदलता है", L"मॉड की शैली" };
-    if (lang == L"ar") return { L"نمط قائمة السياق", L"يغير مظهر القائمة عند النقر بزر الماوس الأيمن", L"نمط التعديل" };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return { L"Стиль контекстного меню", L"Оформление меню при нажатии правой кнопки мыши", L"Обычный" };
+    if (code == L"vi") return { L"Kiểu menu ngữ cảnh", L"Giao diện của menu khi bấm chuột phải", L"Tiêu chuẩn" };
+    if (code == L"zh_cn") return { L"上下文菜单样式", L"右键菜单的外观", L"标准" };
+    if (code == L"zh_tw") return { L"快顯功能表樣式", L"按右鍵時顯示的功能表外觀", L"標準" };
+    if (code == L"ja") return { L"コンテキスト メニューのスタイル", L"右クリック メニューの外観", L"標準" };
+    if (code == L"ko") return { L"상황에 맞는 메뉴 스타일", L"마우스 오른쪽 단추 메뉴의 모양", L"표준" };
+    if (code == L"th") return { L"รูปแบบเมนูบริบท", L"ลักษณะของเมนูที่เปิดด้วยการคลิกขวา", L"มาตรฐาน" };
+    if (code == L"id") return { L"Gaya menu konteks", L"Tampilan menu klik kanan", L"Standar" };
+    if (code == L"ms") return { L"Gaya menu konteks", L"Rupa menu klik kanan", L"Standard" };
+    if (code == L"fr") return { L"Style du menu contextuel", L"Apparence du menu qui s’ouvre avec le clic droit", L"Standard" };
+    if (code == L"de") return { L"Kontextmenüstil", L"Darstellung des Menüs beim Rechtsklick", L"Standard" };
+    if (code == L"es") return { L"Estilo del menú contextual", L"Apariencia del menú que se abre con el botón derecho", L"Estándar" };
+    if (code == L"pt") return { L"Estilo do menu de contexto", L"Aparência do menu que abre com o botão direito", L"Padrão" };
+    if (code == L"it") return { L"Stile del menu di scelta rapida", L"Aspetto del menu che si apre con il pulsante destro", L"Standard" };
+    if (code == L"uk") return { L"Стиль контекстного меню", L"Вигляд меню, що відкривається правою кнопкою миші", L"Стандартний" };
+    if (code == L"pl") return { L"Styl menu kontekstowego", L"Wygląd menu otwieranego prawym przyciskiem myszy", L"Standardowy" };
+    if (code == L"nl") return { L"Stijl van het snelmenu", L"Uiterlijk van het snelmenu bij rechtsklikken", L"Standaard" };
+    if (code == L"tr") return { L"Bağlam menüsü stili", L"Sağ tıklama menüsünün görünümü", L"Standart" };
+    if (code == L"hi") return { L"संदर्भ मेनू की शैली", L"राइट-क्लिक मेनू का रूप", L"मानक" };
+    if (code == L"ar") return { L"نمط قائمة السياق", L"مظهر قائمة النقر بزر الماوس الأيمن", L"قياسي" };
     return { L"Context Menu Style", L"Appearance of the right-click menu", L"Standard" };
 }
 
@@ -11147,29 +13184,28 @@ struct ContextMenuBorderStrings {
 };
 
 ContextMenuBorderStrings GetContextMenuBorderStrings(const std::wstring& rawLang) {
-    const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Viền menu ngữ cảnh", L"Viền ngoài của menu kiểu mod", { L"Viền riêng", L"Theo cài đặt cửa sổ", L"Theo Windows", L"Tắt" } };
-    if (lang == L"th") return { L"ขอบเมนูบริบท", L"ขอบด้านนอกของเมนูแบบม็อด", { L"ขอบของเมนู", L"ตามการตั้งค่าหน้าต่าง", L"ตาม Windows", L"ปิด" } };
-    if (lang == L"id") return { L"Bingkai Menu Konteks", L"Garis luar menu bergaya mod", { L"Bingkai menu", L"Sesuai pengaturan jendela", L"Sesuai Windows", L"Nonaktif" } };
-    if (lang == L"ms") return { L"Sempadan Menu Konteks", L"Sempadan luar menu gaya mod", { L"Sempadan menu", L"Mengikut tetapan tetingkap", L"Mengikut Windows", L"Dimatikan" } };
-    if (lang == L"ja") return { L"コンテキスト メニューの境界線", L"Mod スタイルのメニューの外枠", { L"メニュー独自の境界線", L"ウィンドウの設定に従う", L"Windows に従う", L"表示しない" } };
-    if (lang == L"zh_cn") return { L"右键菜单边框", L"模组样式菜单的外边框", { L"菜单自带边框", L"由窗口设置决定", L"由 Windows 决定", L"关闭" } };
-    if (lang == L"zh_tw") return { L"快顯選單邊框", L"模組樣式選單的外邊框", { L"選單自帶邊框", L"由視窗設定決定", L"由 Windows 決定", L"關閉" } };
-    if (lang == L"ko") return { L"상황에 맞는 메뉴 테두리", L"모드 스타일 메뉴의 바깥 테두리", { L"메뉴 고유 테두리", L"창 설정에 따름", L"Windows 설정", L"끔" } };
-    if (lang == L"fr") return { L"Bordures du menu contextuel", L"Contour du menu dans le style du mod", { L"Bordure propre au menu", L"Selon les paramètres de fenêtre", L"Selon Windows", L"Désactivées" } };
-    if (lang == L"de") return { L"Kontextmenürahmen", L"Außenrahmen des Menüs im Mod-Stil", { L"Eigener Rahmen", L"Nach Fenstereinstellungen", L"Von Windows festgelegt", L"Aus" } };
-    if (lang == L"es") return { L"Bordes del menú contextual", L"Contorno del menú con estilo del mod", { L"Borde propio del menú", L"Según los ajustes de ventana", L"Según Windows", L"Desactivados" } };
-    if (lang == L"pt") return { L"Bordas do menu de contexto", L"Contorno externo do menu no estilo do mod", { L"Borda própria do menu", L"Conforme as configurações das janelas", L"Definido pelo Windows", L"Desativadas" } };
-    if (lang == L"it") return { L"Bordi del menu contestuale", L"Contorno esterno del menu in stile mod", { L"Bordo proprio del menu", L"Secondo le impostazioni delle finestre", L"Secondo Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки меню", L"Цвет и видимость рамки контекстного меню", { L"По умолчанию", L"Как у окна", L"Определено Windows", L"Отключены" } };
-    if (lang == L"uk") return { L"Рамки меню", L"Зовнішній контур меню в стилі мода", { L"Власна рамка", L"Визначено параметрами вікон", L"Визначено Windows", L"Вимкнено" } };
-    if (lang == L"pl") return { L"Obramowanie menu kontekstowego", L"Zewnętrzna ramka menu w stylu moda", { L"Własne obramowanie", L"Według ustawień okien", L"Według systemu Windows", L"Wyłączone" } };
-    if (lang == L"nl") return { L"Randen van het snelmenu", L"Buitenrand van het menu in de modstijl", { L"Eigen rand", L"Volgens de vensterinstellingen", L"Volgens Windows", L"Uit" } };
-    if (lang == L"tr") return { L"Bağlam Menüsü Kenarlıkları", L"Mod stilindeki menünün dış kenarlığı", { L"Menüye özel kenarlık", L"Pencere ayarlarına göre", L"Windows’a göre", L"Kapalı" } };
-    if (lang == L"hi") return { L"संदर्भ मेनू की सीमाएँ", L"मॉड शैली के मेनू की बाहरी सीमा", { L"मेनू की अपनी सीमा", L"विंडो सेटिंग के अनुसार", L"Windows के अनुसार", L"बंद" } };
-    if (lang == L"ar") return { L"حدود قائمة السياق", L"الحد الخارجي للقائمة بنمط التعديل", { L"حد خاص بالقائمة", L"حسب إعدادات النوافذ", L"حسب Windows", L"معطلة" } };
-    return { L"Menu Borders", L"Color and visibility of the context menu border",
-             { L"Default", L"Same as window", L"Windows-defined", L"Off" } };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return { L"Рамки меню", L"Цвет и видимость рамки контекстного меню", { L"По умолчанию", L"Как у окна", L"Определено Windows", L"Отключены" } };
+    if (code == L"vi") return { L"Viền menu", L"Màu và chế độ hiển thị viền menu ngữ cảnh", { L"Mặc định", L"Theo cửa sổ", L"Theo Windows", L"Tắt" } };
+    if (code == L"zh_cn") return { L"菜单边框", L"上下文菜单边框的颜色和显示方式", { L"默认", L"与窗口相同", L"由 Windows 决定", L"关闭" } };
+    if (code == L"zh_tw") return { L"功能表邊框", L"快顯功能表邊框的色彩與顯示方式", { L"預設", L"與視窗相同", L"依 Windows 設定", L"關閉" } };
+    if (code == L"ja") return { L"メニューの枠線", L"コンテキスト メニューの枠線の色と表示設定", { L"既定", L"ウィンドウと同じ", L"Windows に従う", L"オフ" } };
+    if (code == L"ko") return { L"메뉴 테두리", L"상황에 맞는 메뉴의 테두리 색 및 표시 여부", { L"기본값", L"창과 동일", L"Windows 설정 따르기", L"끔" } };
+    if (code == L"th") return { L"เส้นขอบเมนู", L"สีและการแสดงเส้นขอบของเมนูบริบท", { L"ค่าเริ่มต้น", L"เหมือนหน้าต่าง", L"ตาม Windows", L"ปิด" } };
+    if (code == L"id") return { L"Bingkai menu", L"Warna dan visibilitas bingkai menu konteks", { L"Default", L"Sama seperti jendela", L"Mengikuti Windows", L"Nonaktif" } };
+    if (code == L"ms") return { L"Sempadan menu", L"Warna dan keterlihatan sempadan menu konteks", { L"Lalai", L"Sama seperti tetingkap", L"Mengikut Windows", L"Mati" } };
+    if (code == L"fr") return { L"Bordures du menu", L"Couleur et visibilité de la bordure du menu contextuel", { L"Par défaut", L"Comme la fenêtre", L"Définies par Windows", L"Désactivées" } };
+    if (code == L"de") return { L"Menürahmen", L"Farbe und Sichtbarkeit des Kontextmenürahmens", { L"Standard", L"Wie beim Fenster", L"Von Windows festgelegt", L"Aus" } };
+    if (code == L"es") return { L"Bordes del menú", L"Color y visibilidad del borde del menú contextual", { L"Predeterminado", L"Igual que la ventana", L"Según Windows", L"Desactivados" } };
+    if (code == L"pt") return { L"Bordas do menu", L"Cor e visibilidade da borda do menu de contexto", { L"Padrão", L"Igual à janela", L"Definidas pelo Windows", L"Desativadas" } };
+    if (code == L"it") return { L"Bordi del menu", L"Colore e visibilità del bordo del menu di scelta rapida", { L"Predefinito", L"Come per la finestra", L"Definiti da Windows", L"Disattivati" } };
+    if (code == L"uk") return { L"Рамка меню", L"Колір і видимість рамки контекстного меню", { L"За замовчуванням", L"Як у вікна", L"За параметрами Windows", L"Вимкнено" } };
+    if (code == L"pl") return { L"Obramowanie menu", L"Kolor i widoczność obramowania menu kontekstowego", { L"Domyślne", L"Tak jak w oknie", L"Według ustawień systemu Windows", L"Wyłączone" } };
+    if (code == L"nl") return { L"Menuranden", L"Kleur en zichtbaarheid van de rand van het snelmenu", { L"Standaard", L"Zoals bij het venster", L"Volgens Windows", L"Uit" } };
+    if (code == L"tr") return { L"Menü kenarlığı", L"Bağlam menüsü kenarlığının rengi ve görünürlüğü", { L"Varsayılan", L"Pencereyle aynı", L"Windows’a göre", L"Kapalı" } };
+    if (code == L"hi") return { L"मेनू का बॉर्डर", L"संदर्भ मेनू के बॉर्डर का रंग और दृश्यता", { L"डिफ़ॉल्ट", L"विंडो जैसा", L"Windows के अनुसार", L"बंद" } };
+    if (code == L"ar") return { L"إطار القائمة", L"لون إطار قائمة السياق وظهوره", { L"افتراضي", L"مثل النافذة", L"حسب Windows", L"إيقاف" } };
+    return { L"Menu Borders", L"Color and visibility of the context menu border", { L"Default", L"Same as window", L"Windows-defined", L"Off" } };
 }
 
 struct WindowBorderStrings {
@@ -11180,29 +13216,28 @@ struct WindowBorderStrings {
 };
 
 WindowBorderStrings GetWindowBorderStrings(const std::wstring& rawLang) {
-    const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Viền cửa sổ", L"Chế độ viền", L"Màu sắc và hiển thị viền các bảng", { L"Theo mod", L"Theo Windows", L"Tắt" } };
-    if (lang == L"th") return { L"ขอบหน้าต่าง", L"โหมดขอบ", L"สีและการแสดงขอบแผง", { L"ตามม็อด", L"ตาม Windows", L"ปิด" } };
-    if (lang == L"id") return { L"Bingkai Jendela", L"Mode Bingkai", L"Warna dan visibilitas garis luar panel", { L"Sesuai mod", L"Sesuai Windows", L"Nonaktif" } };
-    if (lang == L"ms") return { L"Sempadan Tetingkap", L"Mod Sempadan", L"Warna dan keterlihatan sempadan panel", { L"Mengikut mod", L"Mengikut Windows", L"Dimatikan" } };
-    if (lang == L"ja") return { L"ウィンドウの境界線", L"境界線モード", L"パネルの境界線の色と表示", { L"Mod に従う", L"Windows に従う", L"表示しない" } };
-    if (lang == L"zh_cn") return { L"窗口边框", L"边框模式", L"面板边框的颜色和可见性", { L"由模组决定", L"由 Windows 决定", L"关闭" } };
-    if (lang == L"zh_tw") return { L"視窗邊框", L"邊框模式", L"面板邊框的色彩和顯示", { L"由模組決定", L"由 Windows 決定", L"關閉" } };
-    if (lang == L"ko") return { L"창 테두리", L"테두리 모드", L"패널 테두리의 색상과 표시 여부", { L"모드 설정", L"Windows 설정", L"끔" } };
-    if (lang == L"fr") return { L"Bordures des fenêtres", L"Mode des bordures", L"Couleur et visibilité du contour des panneaux", { L"Selon le mod", L"Selon Windows", L"Désactivées" } };
-    if (lang == L"de") return { L"Fensterrahmen", L"Rahmenmodus", L"Farbe und Sichtbarkeit der Panelrahmen", { L"Vom Mod festgelegt", L"Von Windows festgelegt", L"Aus" } };
-    if (lang == L"es") return { L"Bordes de las ventanas", L"Modo de borde", L"Color y visibilidad del contorno de los paneles", { L"Según el mod", L"Según Windows", L"Desactivados" } };
-    if (lang == L"pt") return { L"Bordas das janelas", L"Modo das bordas", L"Cor e visibilidade do contorno dos painéis", { L"Definido pelo mod", L"Definido pelo Windows", L"Desativadas" } };
-    if (lang == L"it") return { L"Bordi delle finestre", L"Modalità dei bordi", L"Colore e visibilità del contorno dei riquadri", { L"Secondo la mod", L"Secondo Windows", L"Disattivati" } };
-    if (lang == L"ru") return { L"Рамки", L"Рамки окон", L"Цвет внешних контуров основных панелей", { L"По умолчанию", L"Определено Windows", L"Отключены" } };
-    if (lang == L"uk") return { L"Рамки вікон", L"Режим рамок", L"Колір і видимість зовнішніх контурів панелей", { L"Визначено модом", L"Визначено Windows", L"Вимкнено" } };
-    if (lang == L"pl") return { L"Obramowania okien", L"Tryb obramowania", L"Kolor i widoczność obramowań paneli", { L"Według moda", L"Według systemu Windows", L"Wyłączone" } };
-    if (lang == L"nl") return { L"Vensterranden", L"Randmodus", L"Kleur en zichtbaarheid van paneelranden", { L"Volgens de mod", L"Volgens Windows", L"Uit" } };
-    if (lang == L"tr") return { L"Pencere Kenarlıkları", L"Kenarlık Modu", L"Panel kenarlıklarının rengi ve görünürlüğü", { L"Moda göre", L"Windows’a göre", L"Kapalı" } };
-    if (lang == L"hi") return { L"विंडो की सीमाएँ", L"सीमा मोड", L"पैनल की बाहरी सीमाओं का रंग और दृश्यता", { L"मॉड के अनुसार", L"Windows के अनुसार", L"बंद" } };
-    if (lang == L"ar") return { L"حدود النوافذ", L"وضع الحدود", L"لون وحدود ظهور الحواف الخارجية للوحات", { L"حسب التعديل", L"حسب Windows", L"معطلة" } };
-    return { L"Borders", L"Window Borders", L"Color of the outer outlines of the main panels",
-             { L"Default", L"Windows-defined", L"Off" } };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return { L"Рамки", L"Рамки окон", L"Цвет внешних контуров основных панелей", { L"По умолчанию", L"Определено Windows", L"Отключены" } };
+    if (code == L"vi") return { L"Viền", L"Viền cửa sổ", L"Màu viền ngoài của các khung chính", { L"Mặc định", L"Theo Windows", L"Tắt" } };
+    if (code == L"zh_cn") return { L"边框", L"窗口边框", L"主要面板外边框的颜色", { L"默认", L"由 Windows 决定", L"关闭" } };
+    if (code == L"zh_tw") return { L"邊框", L"視窗邊框", L"主要面板外框的色彩", { L"預設", L"依 Windows 設定", L"關閉" } };
+    if (code == L"ja") return { L"枠線", L"ウィンドウの枠線", L"メイン パネルの外枠の色", { L"既定", L"Windows に従う", L"オフ" } };
+    if (code == L"ko") return { L"테두리", L"창 테두리", L"기본 패널의 바깥쪽 테두리 색", { L"기본값", L"Windows 설정 따르기", L"끔" } };
+    if (code == L"th") return { L"เส้นขอบ", L"เส้นขอบหน้าต่าง", L"สีเส้นขอบด้านนอกของแผงหลัก", { L"ค่าเริ่มต้น", L"ตาม Windows", L"ปิด" } };
+    if (code == L"id") return { L"Bingkai", L"Bingkai jendela", L"Warna garis luar panel utama", { L"Default", L"Mengikuti Windows", L"Nonaktif" } };
+    if (code == L"ms") return { L"Sempadan", L"Sempadan tetingkap", L"Warna sempadan luar panel utama", { L"Lalai", L"Mengikut Windows", L"Mati" } };
+    if (code == L"fr") return { L"Bordures", L"Bordures de la fenêtre", L"Couleur du contour des panneaux principaux", { L"Par défaut", L"Définies par Windows", L"Désactivées" } };
+    if (code == L"de") return { L"Rahmen", L"Fensterrahmen", L"Farbe der Außenrahmen der Hauptbereiche", { L"Standard", L"Von Windows festgelegt", L"Aus" } };
+    if (code == L"es") return { L"Bordes", L"Bordes de la ventana", L"Color del contorno exterior de los paneles principales", { L"Predeterminado", L"Según Windows", L"Desactivados" } };
+    if (code == L"pt") return { L"Bordas", L"Bordas da janela", L"Cor do contorno externo dos painéis principais", { L"Padrão", L"Definidas pelo Windows", L"Desativadas" } };
+    if (code == L"it") return { L"Bordi", L"Bordi della finestra", L"Colore del contorno esterno dei pannelli principali", { L"Predefinito", L"Definiti da Windows", L"Disattivati" } };
+    if (code == L"uk") return { L"Рамки", L"Рамки вікна", L"Колір зовнішніх рамок основних панелей", { L"За замовчуванням", L"За параметрами Windows", L"Вимкнено" } };
+    if (code == L"pl") return { L"Obramowanie", L"Obramowanie okna", L"Kolor zewnętrznych obramowań głównych paneli", { L"Domyślne", L"Według ustawień systemu Windows", L"Wyłączone" } };
+    if (code == L"nl") return { L"Randen", L"Vensterranden", L"Kleur van de buitenrand van de hoofdpanelen", { L"Standaard", L"Volgens Windows", L"Uit" } };
+    if (code == L"tr") return { L"Kenarlıklar", L"Pencere kenarlıkları", L"Ana panellerin dış kenarlık rengi", { L"Varsayılan", L"Windows’a göre", L"Kapalı" } };
+    if (code == L"hi") return { L"बॉर्डर", L"विंडो के बॉर्डर", L"मुख्य पैनल के बाहरी बॉर्डर का रंग", { L"डिफ़ॉल्ट", L"Windows के अनुसार", L"बंद" } };
+    if (code == L"ar") return { L"الإطارات", L"إطارات النافذة", L"لون الإطارات الخارجية للوحات الرئيسية", { L"افتراضي", L"حسب Windows", L"إيقاف" } };
+    return { L"Borders", L"Window Borders", L"Color of the outer outlines of the main panels", { L"Default", L"Windows-defined", L"Off" } };
 }
 
 struct TaskbarIconStrings {
@@ -11213,16 +13248,27 @@ struct TaskbarIconStrings {
 
 TaskbarIconStrings GetTaskbarIconStrings(const std::wstring& language) {
     const auto code = ResolveEffectiveLanguageCode(language);
-    if (code == L"ru") {
-        return { L"Значок на панели задач", L"Действие при клике по значку на панели задач",
-                 { L"Свернуть / Восстановить", L"Закрыть", L"Отключить значок" } };
-    }
-    if (code == L"vi") {
-        return { L"Biểu tượng trên thanh tác vụ", L"Hành động khi bấm vào biểu tượng trên thanh tác vụ",
-                 { L"Ẩn & Mở lại cửa sổ Run", L"Đóng hẳn cửa sổ Run", L"Ẩn biểu tượng" } };
-    }
-    return { L"Taskbar Icon", L"Action when the taskbar icon is clicked",
-             { L"Minimize / Restore", L"Close", L"Hide icon" } };
+    if (code == L"ru") return { L"Значок на панели задач", L"Действие при клике по значку на панели задач", { L"Свернуть / Восстановить", L"Закрыть", L"Отключить значок" } };
+    if (code == L"vi") return { L"Biểu tượng trên thanh tác vụ", L"Thao tác thực hiện khi bấm vào biểu tượng trên thanh tác vụ", { L"Thu nhỏ / Khôi phục", L"Đóng", L"Ẩn biểu tượng" } };
+    if (code == L"zh_cn") return { L"任务栏图标", L"单击任务栏图标时执行的操作", { L"最小化或还原", L"关闭", L"隐藏图标" } };
+    if (code == L"zh_tw") return { L"工作列圖示", L"按一下工作列圖示時執行的動作", { L"最小化或還原", L"關閉", L"隱藏圖示" } };
+    if (code == L"ja") return { L"タスク バーのアイコン", L"タスク バーのアイコンをクリックしたときの動作", { L"最小化 / 復元", L"閉じる", L"アイコンを非表示にする" } };
+    if (code == L"ko") return { L"작업 표시줄 아이콘", L"작업 표시줄 아이콘을 클릭했을 때의 동작", { L"최소화 / 복원", L"닫기", L"아이콘 숨기기" } };
+    if (code == L"th") return { L"ไอคอนบนแถบงาน", L"การทำงานเมื่อคลิกไอคอนบนแถบงาน", { L"ย่อ / คืนค่า", L"ปิด", L"ซ่อนไอคอน" } };
+    if (code == L"id") return { L"Ikon taskbar", L"Tindakan saat ikon taskbar diklik", { L"Minimalkan atau pulihkan", L"Tutup", L"Sembunyikan ikon" } };
+    if (code == L"ms") return { L"Ikon bar tugas", L"Tindakan apabila ikon bar tugas diklik", { L"Minimumkan atau pulihkan", L"Tutup", L"Sembunyikan ikon" } };
+    if (code == L"fr") return { L"Icône de la barre des tâches", L"Action déclenchée en cliquant sur l’icône de la barre des tâches", { L"Réduire ou restaurer", L"Fermer", L"Masquer l’icône" } };
+    if (code == L"de") return { L"Taskleistensymbol", L"Aktion beim Klick auf das Taskleistensymbol", { L"Minimieren / Wiederherstellen", L"Schließen", L"Symbol ausblenden" } };
+    if (code == L"es") return { L"Icono de la barra de tareas", L"Acción al hacer clic en el icono de la barra de tareas", { L"Minimizar o restaurar", L"Cerrar", L"Ocultar el icono" } };
+    if (code == L"pt") return { L"Ícone da barra de tarefas", L"Ação ao clicar no ícone da barra de tarefas", { L"Minimizar ou restaurar", L"Fechar", L"Ocultar o ícone" } };
+    if (code == L"it") return { L"Icona sulla barra delle applicazioni", L"Azione eseguita facendo clic sull’icona sulla barra delle applicazioni", { L"Riduci a icona o ripristina", L"Chiudi", L"Nascondi l’icona" } };
+    if (code == L"uk") return { L"Піктограма на панелі завдань", L"Дія після натискання піктограми на панелі завдань", { L"Згорнути або відновити", L"Закрити", L"Приховати піктограму" } };
+    if (code == L"pl") return { L"Ikona na pasku zadań", L"Akcja po kliknięciu ikony na pasku zadań", { L"Minimalizuj lub przywróć", L"Zamknij", L"Ukryj ikonę" } };
+    if (code == L"nl") return { L"Taakbalkpictogram", L"Actie bij klikken op het taakbalkpictogram", { L"Minimaliseren of herstellen", L"Sluiten", L"Pictogram verbergen" } };
+    if (code == L"tr") return { L"Görev çubuğu simgesi", L"Görev çubuğu simgesine tıklandığında yapılacak işlem", { L"Simge durumuna küçült veya geri yükle", L"Kapat", L"Simgeyi gizle" } };
+    if (code == L"hi") return { L"टास्कबार आइकन", L"टास्कबार आइकन पर क्लिक करने की कार्रवाई", { L"छोटा करें या पुनर्स्थापित करें", L"बंद करें", L"आइकन छिपाएँ" } };
+    if (code == L"ar") return { L"أيقونة شريط المهام", L"الإجراء عند النقر على أيقونة شريط المهام", { L"تصغير أو استعادة", L"إغلاق", L"إخفاء الأيقونة" } };
+    return { L"Taskbar Icon", L"Action when the taskbar icon is clicked", { L"Minimize / Restore", L"Close", L"Hide icon" } };
 }
 
 struct CornerRadiusStrings {
@@ -11232,28 +13278,28 @@ struct CornerRadiusStrings {
 };
 
 CornerRadiusStrings GetCornerRadiusStrings(const std::wstring& rawLang) {
-    const auto lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Bán kính góc ngoài", L"Bán kính góc trong", L"Bo góc vùng tô sáng trong lịch sử, gợi ý và menu của mod" };
-    if (lang == L"th") return { L"รัศมีมุมด้านนอก", L"รัศมีมุมด้านใน", L"ปรับความโค้งของแถบไฮไลต์ในประวัติ คำแนะนำ และเมนูของม็อด" };
-    if (lang == L"id") return { L"Radius Sudut Luar", L"Radius Sudut Dalam", L"Atur sudut sorotan di riwayat, saran, dan menu mod" };
-    if (lang == L"ms") return { L"Jejari Sudut Luar", L"Jejari Sudut Dalam", L"Laras sudut serlahan dalam sejarah, cadangan dan menu mod" };
-    if (lang == L"ja") return { L"外側の角の半径", L"内側の角の半径", L"履歴、候補、Mod のメニューで強調表示する行の角を丸めます" };
-    if (lang == L"zh_cn") return { L"外部圆角半径", L"内部圆角半径", L"调整历史记录、建议和模组菜单中高亮行的圆角" };
-    if (lang == L"zh_tw") return { L"外部圓角半徑", L"內部圓角半徑", L"調整歷程記錄、建議和模組選單中醒目提示列的圓角" };
-    if (lang == L"ko") return { L"바깥쪽 모서리 반경", L"안쪽 모서리 반경", L"기록, 제안 및 모드 메뉴에서 강조 표시의 모서리를 조정합니다" };
-    if (lang == L"fr") return { L"Rayon des coins extérieurs", L"Rayon des coins intérieurs", L"Arrondi des éléments surlignés dans l’historique, les suggestions et le menu du mod" };
-    if (lang == L"de") return { L"Äußerer Eckenradius", L"Innerer Eckenradius", L"Rundung der Hervorhebung in Verlauf, Vorschlägen und Mod-Menü" };
-    if (lang == L"es") return { L"Radio de las esquinas exteriores", L"Radio de las esquinas interiores", L"Redondeo del resaltado en el historial, las sugerencias y el menú del mod" };
-    if (lang == L"pt") return { L"Raio dos cantos externos", L"Raio dos cantos internos", L"Arredondamento do realce no histórico, nas sugestões e no menu do mod" };
-    if (lang == L"it") return { L"Raggio degli angoli esterni", L"Raggio degli angoli interni", L"Arrotondamento degli elementi evidenziati in cronologia, suggerimenti e menu della mod" };
-    if (lang == L"ru") return { L"Радиус внешних углов", L"Радиус внутренних углов", L"Углы выделения строк в истории, подсказках и контекстном меню; от -1 до 28\u00A0px" };
-    if (lang == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділення в історії, підказках і меню мода" };
-    if (lang == L"pl") return { L"Promień narożników zewnętrznych", L"Promień narożników wewnętrznych", L"Zaokrąglenie podświetlenia w historii, sugestiach i menu moda" };
-    if (lang == L"nl") return { L"Buitenste hoekradius", L"Binnenste hoekradius", L"Afronding van markeringen in geschiedenis, suggesties en het modmenu" };
-    if (lang == L"tr") return { L"Dış Köşe Yarıçapı", L"İç Köşe Yarıçapı", L"Geçmişte, önerilerde ve mod menüsünde vurgulanan satırların yuvarlaklığı" };
-    if (lang == L"hi") return { L"बाहरी कोनों की त्रिज्या", L"भीतरी कोनों की त्रिज्या", L"इतिहास, सुझाव और मॉड मेनू में हाइलाइट का गोलाई स्तर" };
-    if (lang == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"استدارة التمييز في المحفوظات والاقتراحات وقائمة التعديل" };
-    return { L"Outer Corner Radius", L"Inner Corner Radius", L"Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28\u00A0px" };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return { L"Радиус внешних углов", L"Радиус внутренних углов", L"Углы выделения строк в истории, подсказках и контекстном меню; от -1 до 28 px" };
+    if (code == L"vi") return { L"Bán kính bo góc ngoài", L"Bán kính bo góc trong", L"Độ bo góc của các dòng được tô sáng trong lịch sử, danh sách gợi ý và menu ngữ cảnh. Từ -1 đến 28 px" };
+    if (code == L"zh_cn") return { L"外侧圆角半径", L"内侧圆角半径", L"历史记录、建议列表和上下文菜单中高亮行的圆角。范围为 -1 至 28 px" };
+    if (code == L"zh_tw") return { L"外側圓角半徑", L"內側圓角半徑", L"歷程記錄、建議清單與快顯功能表中醒目提示列的圓角。範圍為 -1 至 28 px" };
+    if (code == L"ja") return { L"外側の角の半径", L"内側の角の半径", L"履歴、候補一覧、コンテキスト メニューの強調表示行の角の丸み。範囲は -1 ～ 28 px" };
+    if (code == L"ko") return { L"바깥쪽 모서리 반경", L"안쪽 모서리 반경", L"기록, 추천 목록 및 상황에 맞는 메뉴에서 강조 표시되는 행의 모서리입니다. 범위는 -1~28 px입니다" };
+    if (code == L"th") return { L"รัศมีมุมด้านนอก", L"รัศมีมุมด้านใน", L"ความโค้งของมุมแถวที่ไฮไลต์ในประวัติ รายการแนะนำ และเมนูบริบท ตั้งได้ตั้งแต่ -1 ถึง 28 px" };
+    if (code == L"id") return { L"Radius sudut luar", L"Radius sudut dalam", L"Sudut baris yang disorot pada riwayat, saran, dan menu konteks. Antara -1 dan 28 piksel" };
+    if (code == L"ms") return { L"Jejari sudut luar", L"Jejari sudut dalam", L"Sudut baris yang diserlahkan dalam sejarah, cadangan dan menu konteks. Antara -1 hingga 28 piksel" };
+    if (code == L"fr") return { L"Rayon des angles extérieurs", L"Rayon des angles intérieurs", L"Angles des lignes mises en évidence dans l’historique, les suggestions et le menu contextuel. De -1 à 28 px" };
+    if (code == L"de") return { L"Äußerer Eckenradius", L"Innerer Eckenradius", L"Ecken der hervorgehobenen Zeilen im Verlauf, in Vorschlägen und im Kontextmenü. Von -1 bis 28 px" };
+    if (code == L"es") return { L"Radio de las esquinas exteriores", L"Radio de las esquinas interiores", L"Esquinas de las filas resaltadas en el historial, las sugerencias y el menú contextual. De -1 a 28 px" };
+    if (code == L"pt") return { L"Raio dos cantos externos", L"Raio dos cantos internos", L"Cantos das linhas realçadas no histórico, nas sugestões e no menu de contexto. De -1 a 28 px" };
+    if (code == L"it") return { L"Raggio degli angoli esterni", L"Raggio degli angoli interni", L"Angoli delle righe evidenziate nella cronologia, nei suggerimenti e nel menu di scelta rapida. Da -1 a 28 px" };
+    if (code == L"uk") return { L"Радіус зовнішніх кутів", L"Радіус внутрішніх кутів", L"Заокруглення виділених рядків у журналі, підказках і контекстному меню. Від -1 до 28 пкс" };
+    if (code == L"pl") return { L"Promień narożników zewnętrznych", L"Promień narożników wewnętrznych", L"Narożniki wyróżnionych wierszy w historii, sugestiach i menu kontekstowym. Od -1 do 28 px" };
+    if (code == L"nl") return { L"Radius van buitenhoeken", L"Radius van binnenhoeken", L"Hoeken van gemarkeerde rijen in de geschiedenis, suggesties en het snelmenu. Van -1 tot 28 px" };
+    if (code == L"tr") return { L"Dış köşe yarıçapı", L"İç köşe yarıçapı", L"Geçmişte, önerilerde ve bağlam menüsünde vurgulanan satırların köşeleri. -1 ile 28 piksel arası" };
+    if (code == L"hi") return { L"बाहरी कोनों की गोलाई", L"भीतरी कोनों की गोलाई", L"इतिहास, सुझावों और संदर्भ मेनू में हाइलाइट की गई पंक्तियों के कोने। -1 से 28 पिक्सेल" };
+    if (code == L"ar") return { L"نصف قطر الزوايا الخارجية", L"نصف قطر الزوايا الداخلية", L"زوايا الصفوف المميزة في السجل والاقتراحات وقائمة السياق. من ‎-1‎ إلى 28 بكسل" };
+    return { L"Outer Corner Radius", L"Inner Corner Radius", L"Corners of highlighted rows in history, suggestions, and the context menu. From -1 to 28 px" };
 }
 
 constexpr int kHideActionRowBase = 2420;
@@ -11261,62 +13307,121 @@ constexpr UINT kHiddenActionMenuBase = 810;
 constexpr std::array<FluentMenuIcon, kRunActionCount> kActionMenuIcons{
     FluentMenuIcon::FolderPick, FluentMenuIcon::RunArrow, FluentMenuIcon::Close, FluentMenuIcon::Settings
 };
-constexpr std::array<const wchar_t*, kRunActionCount> kActionShortcuts{
-    L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ,"
-};
 
 ActionButtonStrings GetActionButtonStrings(const std::wstring& rawLang) {
-    const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Nút thao tác", L"Các thao tác đã ẩn có trong menu chuột phải", L"Ẩn nút %s", { L"Duyệt", L"Chạy", L"Đóng", L"Cài đặt" } };
-    if (lang == L"th") return { L"ปุ่มคำสั่ง", L"คำสั่งที่ซ่อนจะอยู่ในเมนูคลิกขวา", L"ซ่อนปุ่ม %s", { L"เรียกดู", L"เรียกใช้", L"ปิด", L"การตั้งค่า" } };
-    if (lang == L"id") return { L"Tombol Tindakan", L"Tindakan tersembunyi tersedia di menu klik kanan", L"Sembunyikan tombol %s", { L"Telusuri", L"Jalankan", L"Tutup", L"Pengaturan" } };
-    if (lang == L"ms") return { L"Butang Tindakan", L"Tindakan tersembunyi tersedia dalam menu klik kanan", L"Sembunyikan butang %s", { L"Semak imbas", L"Jalankan", L"Tutup", L"Tetapan" } };
-    if (lang == L"ja") return { L"操作ボタン", L"非表示にした操作は右クリックメニューに表示されます", L"「%s」ボタンを非表示にする", { L"参照", L"実行", L"閉じる", L"設定" } };
-    if (lang == L"zh_cn") return { L"操作按钮", L"隐藏按钮的操作可通过右键菜单使用", L"隐藏“%s”按钮", { L"浏览", L"运行", L"关闭", L"设置" } };
-    if (lang == L"zh_tw") return { L"操作按鈕", L"隱藏按鈕的動作仍可從右鍵選單使用", L"隱藏「%s」按鈕", { L"瀏覽", L"執行", L"關閉", L"設定" } };
-    if (lang == L"ko") return { L"동작 버튼", L"숨긴 동작은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다", L"%s 버튼 숨기기", { L"찾아보기", L"실행", L"닫기", L"설정" } };
-    if (lang == L"fr") return { L"Boutons d’action", L"Les actions masquées restent accessibles via le menu contextuel", L"Masquer le bouton %s", { L"Parcourir", L"Exécuter", L"Fermer", L"Paramètres" } };
-    if (lang == L"de") return { L"Aktionsschaltflächen", L"Ausgeblendete Aktionen stehen im Kontextmenü zur Verfügung", L"Schaltfläche „%s“ ausblenden", { L"Durchsuchen", L"Ausführen", L"Schließen", L"Einstellungen" } };
-    if (lang == L"es") return { L"Botones de acción", L"Las acciones ocultas están disponibles en el menú contextual", L"Ocultar el botón %s", { L"Examinar", L"Ejecutar", L"Cerrar", L"Configuración" } };
-    if (lang == L"pt") return { L"Botões de ação", L"As ações ocultas ficam disponíveis no menu de contexto", L"Ocultar o botão %s", { L"Procurar", L"Executar", L"Fechar", L"Configurações" } };
-    if (lang == L"it") return { L"Pulsanti di azione", L"Le azioni nascoste restano disponibili nel menu di scelta rapida", L"Nascondi il pulsante %s", { L"Sfoglia", L"Esegui", L"Chiudi", L"Impostazioni" } };
-    if (lang == L"ru") return { L"Кнопки действий", L"Скрытые действия доступны в контекстном меню и с клавиатуры", L"Скрывать кнопку «%s»", { L"Обзор", L"Выполнить", L"Закрыть", L"Настройки" } };
-    if (lang == L"uk") return { L"Кнопки дій", L"Дії прихованих кнопок доступні в контекстному меню", L"Приховати кнопку «%s»", { L"Огляд", L"Виконати", L"Закрити", L"Налаштування" } };
-    if (lang == L"pl") return { L"Przyciski akcji", L"Ukryte akcje są dostępne w menu kontekstowym", L"Ukryj przycisk „%s”", { L"Przeglądaj", L"Uruchom", L"Zamknij", L"Ustawienia" } };
-    if (lang == L"nl") return { L"Actieknoppen", L"Verborgen acties staan in het snelmenu", L"Knop %s verbergen", { L"Bladeren", L"Uitvoeren", L"Sluiten", L"Instellingen" } };
-    if (lang == L"tr") return { L"Eylem düğmeleri", L"Gizlenen eylemler sağ tıklama menüsünde bulunur", L"%s düğmesini gizle", { L"Gözat", L"Çalıştır", L"Kapat", L"Ayarlar" } };
-    if (lang == L"hi") return { L"कार्रवाई बटन", L"छिपी कार्रवाइयाँ राइट-क्लिक मेनू में उपलब्ध हैं", L"%s बटन छिपाएँ", { L"ब्राउज़ करें", L"चलाएँ", L"बंद करें", L"सेटिंग्स" } };
-    if (lang == L"ar") return { L"أزرار الإجراءات", L"تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن", L"إخفاء زر %s", { L"استعراض", L"تشغيل", L"إغلاق", L"الإعدادات" } };
-    return { L"Action Buttons", L"Hidden actions are available in the right-click menu", L"Hide the %s button", { L"Browse", L"Run", L"Close", L"Settings" } };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return {
+        L"Кнопки действий", L"Действия скрытых кнопок доступны в контекстном меню", { L"Скрывать кнопку «Обзор»", L"Скрывать кнопку «Выполнить»", L"Скрывать кнопку «Закрыть»", L"Скрывать кнопку «Настройки»" }, { L"Обзор", L"Выполнить", L"Закрыть", L"Настройки" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"vi") return {
+        L"Các nút thao tác", L"Các thao tác đã ẩn vẫn có trong menu chuột phải", { L"Ẩn nút Duyệt", L"Ẩn nút Chạy", L"Ẩn nút Đóng", L"Ẩn nút Cài đặt" }, { L"Duyệt", L"Chạy", L"Đóng", L"Cài đặt" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"zh_cn") return {
+        L"操作按钮", L"仍可从右键菜单执行已隐藏的操作", { L"隐藏“浏览”按钮", L"隐藏“运行”按钮", L"隐藏“关闭”按钮", L"隐藏“设置”按钮" }, { L"浏览", L"运行", L"关闭", L"设置" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"zh_tw") return {
+        L"動作按鈕", L"仍可從右鍵功能表執行已隱藏的動作", { L"隱藏「瀏覽」按鈕", L"隱藏「執行」按鈕", L"隱藏「關閉」按鈕", L"隱藏「設定」按鈕" }, { L"瀏覽", L"執行", L"關閉", L"設定" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"ja") return {
+        L"操作ボタン", L"ボタンを非表示にしても、右クリック メニューから操作できます", { L"[参照] ボタンを非表示にする", L"[実行] ボタンを非表示にする", L"[閉じる] ボタンを非表示にする", L"[設定] ボタンを非表示にする" }, { L"参照", L"実行", L"閉じる", L"設定" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"ko") return {
+        L"작업 단추", L"숨긴 작업은 마우스 오른쪽 단추 메뉴에서 사용할 수 있습니다", { L"찾아보기 단추 숨기기", L"실행 단추 숨기기", L"닫기 단추 숨기기", L"설정 단추 숨기기" }, { L"찾아보기", L"실행", L"닫기", L"설정" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"th") return {
+        L"ปุ่มคำสั่ง", L"คำสั่งที่ซ่อนไว้ยังใช้ได้จากเมนูคลิกขวา", { L"ซ่อนปุ่มเรียกดู", L"ซ่อนปุ่มเรียกใช้", L"ซ่อนปุ่มปิด", L"ซ่อนปุ่มการตั้งค่า" }, { L"เรียกดู", L"เรียกใช้", L"ปิด", L"การตั้งค่า" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"id") return {
+        L"Tombol tindakan", L"Tindakan tersembunyi tersedia di menu klik kanan", { L"Sembunyikan tombol Telusuri", L"Sembunyikan tombol Jalankan", L"Sembunyikan tombol Tutup", L"Sembunyikan tombol Pengaturan" }, { L"Telusuri", L"Jalankan", L"Tutup", L"Pengaturan" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"ms") return {
+        L"Butang tindakan", L"Tindakan tersembunyi tersedia dalam menu klik kanan", { L"Sembunyikan butang Semak imbas", L"Sembunyikan butang Jalankan", L"Sembunyikan butang Tutup", L"Sembunyikan butang Tetapan" }, { L"Semak imbas", L"Jalankan", L"Tutup", L"Tetapan" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"fr") return {
+        L"Boutons d’action", L"Les actions masquées restent accessibles dans le menu contextuel", { L"Masquer le bouton Parcourir", L"Masquer le bouton Exécuter", L"Masquer le bouton Fermer", L"Masquer le bouton Paramètres" }, { L"Parcourir", L"Exécuter", L"Fermer", L"Paramètres" },
+        { L"Ctrl + O", L"Entrée", L"Échap", L"Ctrl + ," }
+    };
+    if (code == L"de") return {
+        L"Aktionsschaltflächen", L"Ausgeblendete Aktionen bleiben im Kontextmenü verfügbar", { L"Schaltfläche „Durchsuchen“ ausblenden", L"Schaltfläche „Ausführen“ ausblenden", L"Schaltfläche „Schließen“ ausblenden", L"Schaltfläche „Einstellungen“ ausblenden" }, { L"Durchsuchen", L"Ausführen", L"Schließen", L"Einstellungen" },
+        { L"Strg + O", L"Eingabe", L"Esc", L"Strg + ," }
+    };
+    if (code == L"es") return {
+        L"Botones de acción", L"Las acciones ocultas siguen disponibles en el menú contextual", { L"Ocultar el botón Examinar", L"Ocultar el botón Ejecutar", L"Ocultar el botón Cerrar", L"Ocultar el botón Configuración" }, { L"Examinar", L"Ejecutar", L"Cerrar", L"Configuración" },
+        { L"Ctrl + O", L"Entrar", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"pt") return {
+        L"Botões de ação", L"As ações ocultas continuam disponíveis no menu de contexto", { L"Ocultar o botão Procurar", L"Ocultar o botão Executar", L"Ocultar o botão Fechar", L"Ocultar o botão Configurações" }, { L"Procurar", L"Executar", L"Fechar", L"Configurações" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"it") return {
+        L"Pulsanti di azione", L"Le azioni nascoste restano disponibili nel menu di scelta rapida", { L"Nascondi il pulsante Sfoglia", L"Nascondi il pulsante Esegui", L"Nascondi il pulsante Chiudi", L"Nascondi il pulsante Impostazioni" }, { L"Sfoglia", L"Esegui", L"Chiudi", L"Impostazioni" },
+        { L"Ctrl + O", L"Invio", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"uk") return {
+        L"Кнопки дій", L"Приховані дії доступні в контекстному меню", { L"Приховати кнопку «Огляд»", L"Приховати кнопку «Виконати»", L"Приховати кнопку «Закрити»", L"Приховати кнопку «Параметри»" }, { L"Огляд", L"Виконати", L"Закрити", L"Параметри" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"pl") return {
+        L"Przyciski akcji", L"Ukryte akcje pozostają dostępne w menu kontekstowym", { L"Ukryj przycisk „Przeglądaj”", L"Ukryj przycisk „Uruchom”", L"Ukryj przycisk „Zamknij”", L"Ukryj przycisk „Ustawienia”" }, { L"Przeglądaj", L"Uruchom", L"Zamknij", L"Ustawienia" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"nl") return {
+        L"Actieknoppen", L"Verborgen acties blijven beschikbaar in het snelmenu", { L"Knop Bladeren verbergen", L"Knop Uitvoeren verbergen", L"Knop Sluiten verbergen", L"Knop Instellingen verbergen" }, { L"Bladeren", L"Uitvoeren", L"Sluiten", L"Instellingen" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"tr") return {
+        L"Eylem düğmeleri", L"Gizlenen eylemler sağ tıklama menüsünde kullanılabilir", { L"Gözat düğmesini gizle", L"Çalıştır düğmesini gizle", L"Kapat düğmesini gizle", L"Ayarlar düğmesini gizle" }, { L"Gözat", L"Çalıştır", L"Kapat", L"Ayarlar" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"hi") return {
+        L"कार्रवाई बटन", L"छिपी कार्रवाइयाँ राइट-क्लिक मेनू में मिलेंगी", { L"ब्राउज़ करें बटन छिपाएँ", L"चलाएँ बटन छिपाएँ", L"बंद करें बटन छिपाएँ", L"सेटिंग्स बटन छिपाएँ" }, { L"ब्राउज़ करें", L"चलाएँ", L"बंद करें", L"सेटिंग्स" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    if (code == L"ar") return {
+        L"أزرار الإجراءات", L"تتوفر الإجراءات المخفية في قائمة النقر بزر الماوس الأيمن", { L"إخفاء زر «استعراض»", L"إخفاء زر «تشغيل»", L"إخفاء زر «إغلاق»", L"إخفاء زر «الإعدادات»" }, { L"استعراض", L"تشغيل", L"إغلاق", L"الإعدادات" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
+    return {
+        L"Action Buttons", L"Hidden actions are available in the right-click menu", { L"Hide the Browse button", L"Hide the Run button", L"Hide the Close button", L"Hide the Settings button" }, { L"Browse", L"Run", L"Close", L"Settings" },
+        { L"Ctrl + O", L"Enter", L"Esc", L"Ctrl + ," }
+    };
 }
 
 static LayoutLocalizedStrings GetLayoutLocalizedStrings(const std::wstring& rawLang) {
-    const std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") return { L"Bố cục hộp thoại", L"Bố cục cửa sổ cơ bản sử dụng các thiết lập cá nhân hóa", { L"Cổ điển", L"Thu gọn (Pill)", L"Fluent" } };
-    if (lang == L"th") return { L"รูปแบบกล่องโต้ตอบ", L"รูปแบบหน้าต่างพื้นฐานที่ใช้การตั้งค่าส่วนบุคคล", { L"คลาสสิก", L"กะทัดรัด (Pill)", L"Fluent" } };
-    if (lang == L"id") return { L"Tata Letak Dialog", L"Tata letak dasar jendela yang menggunakan pengaturan personalisasi", { L"Klasik", L"Ringkas (Pill)", L"Fluent" } };
-    if (lang == L"ms") return { L"Susun Atur Dialog", L"Susun atur asas tetingkap yang menggunakan tetapan pemperibadian", { L"Klasik", L"Padat (Pill)", L"Fluent" } };
-    if (lang == L"ja") return { L"ダイアログのレイアウト", L"個人用設定を使用する基本的なウィンドウレイアウト", { L"クラシック", L"コンパクト (Pill)", L"Fluent" } };
-    if (lang == L"zh_cn") return { L"对话框布局", L"使用个性化设置的基本窗口布局", { L"经典", L"紧凑（胶囊形）", L"Fluent" } };
-    if (lang == L"zh_tw") return { L"對話方塊版面配置", L"使用個人化設定的基本視窗版面配置", { L"傳統", L"精簡（膠囊形）", L"Fluent" } };
-    if (lang == L"ko") return { L"대화 상자 레이아웃", L"개인 설정을 사용하는 기본 창 레이아웃", { L"클래식", L"간단히 (Pill)", L"Fluent" } };
-    if (lang == L"fr") return { L"Disposition de la fenêtre", L"Disposition de base de la fenêtre qui utilise les paramètres de personnalisation", { L"Classique", L"Compact (Pill)", L"Fluent" } };
-    if (lang == L"de") return { L"Dialoglayout", L"Grundlayout des Fensters unter Verwendung der Personalisierungseinstellungen", { L"Klassisch", L"Kompakt (Pill)", L"Fluent" } };
-    if (lang == L"es") return { L"Diseño del cuadro de diálogo", L"Diseño básico de la ventana que usa la configuración de personalización", { L"Clásico", L"Compacto (Pill)", L"Fluent" } };
-    if (lang == L"pt") return { L"Layout da janela", L"Layout básico da janela que usa as configurações de personalização", { L"Clássico", L"Compacto (Pill)", L"Fluent" } };
-    if (lang == L"it") return { L"Layout della finestra", L"Layout di base della finestra che usa le impostazioni di personalizzazione", { L"Classico", L"Compatto (Pill)", L"Fluent" } };
-    if (lang == L"ru") return { L"Макет окна", L"Расположение поля ввода, списков и кнопок, с учетом настроек персонализации", { L"Классический", L"Компактный (Pill)", L"Современный (Fluent)" } };
-    if (lang == L"uk") return { L"Макет вікна", L"Базове компонування вікна з урахуванням параметрів персоналізації", { L"Класичний", L"Компактний (Pill)", L"Fluent" } };
-    if (lang == L"pl") return { L"Układ okna", L"Podstawowy układ okna, który korzysta z ustawień personalizacji", { L"Klasyczny", L"Kompaktowy (Pill)", L"Fluent" } };
-    if (lang == L"nl") return { L"Vensterindeling", L"Basisindeling van het venster met de instellingen voor persoonlijke voorkeur", { L"Klassiek", L"Compact (Pill)", L"Fluent" } };
-    if (lang == L"tr") return { L"İletişim Kutusu Düzeni", L"Kişiselleştirme ayarlarını kullanan temel pencere düzeni", { L"Klasik", L"Kompakt (Pill)", L"Fluent" } };
-    if (lang == L"hi") return { L"डायलॉग का लेआउट", L"वैयक्तिकरण सेटिंग का उपयोग करने वाला मूल विंडो लेआउट", { L"क्लासिक", L"कॉम्पैक्ट (Pill)", L"Fluent" } };
-    if (lang == L"ar") return { L"تخطيط النافذة", L"التخطيط الأساسي للنافذة الذي يستخدم إعدادات التخصيص", { L"كلاسيكي", L"مدمج (Pill)", L"Fluent" } };
-    return { L"Dialog Layout", L"Base window layout that uses personalization settings", { L"Classic", L"Compact Mini-Pill", L"Fluent" } };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return { L"Макет окна", L"Расположение поля ввода, списков и кнопок, с учетом настроек персонализации", { L"Классический", L"Компактный (Pill)", L"Современный (Fluent)" } };
+    if (code == L"vi") return { L"Bố cục cửa sổ", L"Bố trí ô nhập, danh sách và các nút theo tùy chọn cá nhân hóa", { L"Cổ điển", L"Thu gọn (dạng viên nang)", L"Fluent" } };
+    if (code == L"zh_cn") return { L"窗口布局", L"输入框、列表和按钮的排列方式，应用个性化设置", { L"经典", L"紧凑（胶囊形）", L"Fluent" } };
+    if (code == L"zh_tw") return { L"視窗版面配置", L"輸入欄、清單和按鈕的排列方式，套用個人化設定", { L"傳統", L"精簡（膠囊形）", L"Fluent" } };
+    if (code == L"ja") return { L"ウィンドウのレイアウト", L"個人用設定を反映した入力欄、一覧、ボタンの配置", { L"クラシック", L"コンパクト (カプセル型)", L"Fluent" } };
+    if (code == L"ko") return { L"창 레이아웃", L"개인 설정을 적용한 입력란, 목록 및 단추의 배치", { L"클래식", L"간결한 캡슐형", L"Fluent" } };
+    if (code == L"th") return { L"เค้าโครงหน้าต่าง", L"การจัดวางช่องป้อนข้อมูล รายการ และปุ่มตามการตั้งค่าส่วนบุคคล", { L"คลาสสิก", L"กะทัดรัด (ทรงแคปซูล)", L"Fluent" } };
+    if (code == L"id") return { L"Tata letak jendela", L"Penataan kolom input, daftar, dan tombol dengan pengaturan personalisasi", { L"Klasik", L"Ringkas (kapsul)", L"Fluent" } };
+    if (code == L"ms") return { L"Susun atur tetingkap", L"Susunan medan input, senarai dan butang mengikut tetapan pemperibadian", { L"Klasik", L"Padat (kapsul)", L"Fluent" } };
+    if (code == L"fr") return { L"Disposition de la fenêtre", L"Disposition du champ de saisie, des listes et des boutons, selon les paramètres de personnalisation", { L"Classique", L"Capsule compacte", L"Fluent" } };
+    if (code == L"de") return { L"Fensterlayout", L"Anordnung von Eingabefeld, Listen und Schaltflächen mit den Personalisierungseinstellungen", { L"Klassisch", L"Kompakte Kapselform", L"Fluent" } };
+    if (code == L"es") return { L"Distribución de la ventana", L"Distribución del campo de entrada, las listas y los botones con la personalización aplicada", { L"Clásica", L"Cápsula compacta", L"Fluent" } };
+    if (code == L"pt") return { L"Layout da janela", L"Disposição do campo de entrada, das listas e dos botões com as configurações de personalização", { L"Clássico", L"Cápsula compacta", L"Fluent" } };
+    if (code == L"it") return { L"Layout della finestra", L"Disposizione del campo di immissione, degli elenchi e dei pulsanti con le impostazioni di personalizzazione", { L"Classico", L"Capsula compatta", L"Fluent" } };
+    if (code == L"uk") return { L"Макет вікна", L"Розташування поля введення, списків і кнопок з урахуванням персоналізації", { L"Класичний", L"Компактний (капсула)", L"Fluent" } };
+    if (code == L"pl") return { L"Układ okna", L"Rozmieszczenie pola wprowadzania, list i przycisków z uwzględnieniem personalizacji", { L"Klasyczny", L"Kompaktowa kapsuła", L"Fluent" } };
+    if (code == L"nl") return { L"Vensterindeling", L"Indeling van het invoerveld, de lijsten en de knoppen met de persoonlijke instellingen", { L"Klassiek", L"Compacte capsule", L"Fluent" } };
+    if (code == L"tr") return { L"Pencere düzeni", L"Giriş alanının, listelerin ve düğmelerin kişiselleştirme ayarlarına göre yerleşimi", { L"Klasik", L"Kompakt (kapsül)", L"Fluent" } };
+    if (code == L"hi") return { L"विंडो का लेआउट", L"इनपुट फ़ील्ड, सूचियों और बटनों की व्यवस्था, वैयक्तिकरण की सेटिंग के साथ", { L"क्लासिक", L"कॉम्पैक्ट (कैप्सूल)", L"Fluent" } };
+    if (code == L"ar") return { L"تخطيط النافذة", L"ترتيب حقل الإدخال والقوائم والأزرار وفق إعدادات التخصيص", { L"كلاسيكي", L"مدمج (كبسولة)", L"Fluent" } };
+    return { L"Window Layout", L"Arrangement of the input field, lists, and buttons with personalization applied", { L"Classic", L"Compact Mini-Pill", L"Fluent" } };
 }
 
 struct RunDisplaySettingStrings {
-    const wchar_t* language;
     const wchar_t* widthTitle;
     const wchar_t* widthDescription;
     const wchar_t* widthOptions0;
@@ -11327,51 +13432,150 @@ struct RunDisplaySettingStrings {
     const wchar_t* adminDefault;
     const wchar_t* adminDefaultDescription;
     const wchar_t* indicatorTitle;
+    const wchar_t* indicatorDescription;
     const wchar_t* panel;
     const wchar_t* field;
     const wchar_t* shiftTitle;
     const wchar_t* shiftDescription;
 };
 
-const RunDisplaySettingStrings& GetRunDisplaySettingStrings(const std::wstring& language) {
-    static constexpr RunDisplaySettingStrings strings[] = {
-        {L"en", L"Window width", L"The default width follows the window layout", L"Default", L"Narrow", L"Wide", L"Behavior", L"Run as administrator", L"Elevate by default", L"Run as administrator. Ctrl + Shift + Enter switches privileges for the current command", L"Indicator placement", L"Separate panel", L"Inline indicator", L"Switch privileges with Shift + Enter", L"Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"},
-        {L"ru", L"Ширина окна", L"Ширина по умолчанию зависит от макета окна", L"По умолчанию", L"Узкая", L"Широкая", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию", L"Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды", L"Размещение индикатора", L"Отдельная панель", L"Индикатор в поле", L"Менять права по Shift + Enter", L"Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"},
-        {L"vi", L"Chiều rộng cửa sổ", L"Đặt chiều rộng của cửa sổ Run", L"Theo bố cục", L"Hẹp hơn", L"Rộng hơn", L"Hành vi", L"Chạy với tư cách quản trị viên", L"Nâng quyền theo mặc định", L"Ctrl + Shift + Enter đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Bảng riêng", L"Chỉ báo trong ô nhập", L"Đổi quyền bằng Shift + Enter", L"Khi tắt, Shift + Enter chạy lệnh trong cửa sổ dòng lệnh"},
-        {L"th", L"ความกว้างหน้าต่าง", L"กำหนดความกว้างของหน้าต่าง Run", L"ตามเค้าโครง", L"แคบลง", L"กว้างขึ้น", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์ตามค่าเริ่มต้น", L"Ctrl + Shift + Enter สลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"แผงแยก", L"ตัวบ่งชี้ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift + Enter", L"เมื่อปิด Shift + Enter จะเรียกใช้คำสั่งในเทอร์มินัล"},
-        {L"id", L"Lebar jendela", L"Atur lebar jendela Run", L"Sesuai tata letak", L"Lebih sempit", L"Lebih lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Tingkatkan hak akses secara default", L"Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Panel terpisah", L"Indikator di kolom input", L"Ganti hak akses dengan Shift + Enter", L"Jika nonaktif, Shift + Enter menjalankan perintah di terminal"},
-        {L"ms", L"Lebar tetingkap", L"Tetapkan lebar tetingkap Run", L"Mengikut susun atur", L"Lebih sempit", L"Lebih lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Tingkatkan keistimewaan secara lalai", L"Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Panel berasingan", L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift + Enter", L"Apabila dimatikan, Shift + Enter menjalankan arahan dalam terminal"},
-        {L"ja", L"ウィンドウの幅", L"「ファイル名を指定して実行」のウィンドウ幅を設定", L"レイアウトに従う", L"より狭く", L"より広く", L"動作", L"管理者として実行", L"既定で管理者権限で実行", L"Ctrl + Shift + Enter で現在のコマンドの権限を切り替え", L"インジケーターの位置", L"独立したパネル", L"入力欄内のインジケーター", L"Shift + Enter で権限を切り替え", L"オフの場合、Shift + Enter でターミナル内でコマンドを実行"},
-        {L"zh_cn", L"窗口宽度", L"设置“运行”窗口的宽度", L"由布局决定", L"更窄", L"更宽", L"行为", L"以管理员身份运行", L"默认提升权限", L"Ctrl + Shift + Enter 切换当前命令的权限", L"指示器位置", L"独立面板", L"输入框内指示器", L"用 Shift + Enter 切换权限", L"关闭后，Shift + Enter 在终端中运行命令"},
-        {L"zh_tw", L"視窗寬度", L"設定「執行」視窗的寬度", L"依版面配置", L"較窄", L"較寬", L"行為", L"以系統管理員身分執行", L"預設提高權限", L"Ctrl + Shift + Enter 切換目前命令的權限", L"指示器位置", L"獨立面板", L"輸入欄內指示器", L"用 Shift + Enter 切換權限", L"關閉時，Shift + Enter 會在終端機中執行命令"},
-        {L"ko", L"창 너비", L"실행 창의 너비를 설정", L"레이아웃 기본값", L"더 좁게", L"더 넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 권한 상승", L"Ctrl + Shift + Enter로 현재 명령의 권한을 전환", L"표시기 위치", L"별도의 패널", L"입력란 안에 표시", L"Shift + Enter로 권한 전환", L"끄면 Shift + Enter로 터미널에서 명령을 실행"},
-        {L"fr", L"Largeur de la fenêtre", L"Définit la largeur de la fenêtre Exécuter", L"Selon la disposition", L"Plus étroite", L"Plus large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Élever les privilèges par défaut", L"Ctrl + Maj + Entrée inverse les privilèges de la commande actuelle", L"Emplacement de l’indicateur", L"Panneau séparé", L"Indicateur dans le champ", L"Changer les privilèges avec Maj + Entrée", L"Si désactivé, Maj + Entrée lance la commande dans un terminal"},
-        {L"de", L"Fensterbreite", L"Legt die Breite des Fensters „Ausführen“ fest", L"Nach Layout", L"Schmaler", L"Breiter", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig mit erhöhten Rechten", L"Strg + Umschalt + Eingabe wechselt die Rechte für den aktuellen Befehl", L"Position der Anzeige", L"Separater Bereich", L"Anzeige im Eingabefeld", L"Rechte mit Umschalt + Eingabe wechseln", L"Wenn deaktiviert, führt Umschalt + Eingabe den Befehl in einem Terminal aus"},
-        {L"es", L"Ancho de ventana", L"Ajusta el ancho de la ventana Ejecutar", L"Según el diseño", L"Más estrecha", L"Más ancha", L"Comportamiento", L"Ejecutar como administrador", L"Elevar los permisos de forma predeterminada", L"Ctrl + Mayús + Entrar cambia los permisos del comando actual", L"Ubicación del indicador", L"Panel separado", L"Indicador en el campo", L"Cambiar permisos con Mayús + Entrar", L"Si se desactiva, Mayús + Entrar ejecuta el comando en un terminal"},
-        {L"pt", L"Largura da janela", L"Define a largura da janela Executar", L"Conforme o layout", L"Mais estreita", L"Mais larga", L"Comportamento", L"Executar como administrador", L"Elevar privilégios por padrão", L"Ctrl + Shift + Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Painel separado", L"Indicador no campo", L"Alternar privilégios com Shift + Enter", L"Desativado, Shift + Enter executa o comando em um terminal"},
-        {L"it", L"Larghezza della finestra", L"Imposta la larghezza della finestra Esegui", L"Secondo il layout", L"Più stretta", L"Più larga", L"Comportamento", L"Esegui come amministratore", L"Eleva i privilegi per impostazione predefinita", L"Ctrl + Maiusc + Invio cambia i privilegi del comando corrente", L"Posizione dell’indicatore", L"Pannello separato", L"Indicatore nel campo", L"Cambia privilegi con Maiusc + Invio", L"Se disattivato, Maiusc + Invio esegue il comando in un terminale"},
-        {L"uk", L"Ширина вікна", L"Задає ширину вікна «Виконати»", L"За макетом", L"Вужче", L"Ширше", L"Поведінка", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням", L"Ctrl + Shift + Enter змінює права для поточної команди", L"Розташування індикатора", L"Окрема панель", L"Індикатор у полі", L"Змінювати права через Shift + Enter", L"Якщо вимкнено, Shift + Enter запускає команду в терміналі"},
-        {L"pl", L"Szerokość okna", L"Ustawia szerokość okna Uruchamianie", L"Zgodnie z układem", L"Węższe", L"Szersze", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie podnoś uprawnienia", L"Ctrl + Shift + Enter przełącza uprawnienia bieżącego polecenia", L"Położenie wskaźnika", L"Oddzielny panel", L"Wskaźnik w polu", L"Przełączaj uprawnienia klawiszami Shift + Enter", L"Po wyłączeniu Shift + Enter uruchamia polecenie w terminalu"},
-        {L"nl", L"Vensterbreedte", L"Stelt de breedte van het venster Uitvoeren in", L"Volgens indeling", L"Smaller", L"Breder", L"Gedrag", L"Als administrator uitvoeren", L"Standaard met verhoogde rechten", L"Ctrl + Shift + Enter wisselt de rechten voor de huidige opdracht", L"Positie van indicator", L"Apart paneel", L"Indicator in het veld", L"Rechten wisselen met Shift + Enter", L"Uitgeschakeld voert Shift + Enter de opdracht uit in een terminal"},
-        {L"tr", L"Pencere genişliği", L"Çalıştır penceresinin genişliğini ayarlar", L"Düzene göre", L"Daha dar", L"Daha geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yetkileri yükselt", L"Ctrl + Shift + Enter geçerli komutun yetkilerini değiştirir", L"Gösterge konumu", L"Ayrı panel", L"Giriş alanında gösterge", L"Shift + Enter ile yetkileri değiştir", L"Kapalıyken Shift + Enter komutu terminalde çalıştırır"},
-        {L"hi", L"विंडो की चौड़ाई", L"रन विंडो की चौड़ाई सेट करें", L"लेआउट के अनुसार", L"और संकरा", L"और चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से विशेषाधिकार बढ़ाएँ", L"Ctrl + Shift + Enter मौजूदा कमांड के विशेषाधिकार बदलता है", L"संकेतक का स्थान", L"अलग पैनल", L"इनपुट फ़ील्ड में संकेतक", L"Shift + Enter से विशेषाधिकार बदलें", L"बंद होने पर Shift + Enter कमांड को टर्मिनल में चलाता है"},
-        {L"ar", L"عرض النافذة", L"يضبط عرض نافذة تشغيل", L"حسب التخطيط", L"أضيق", L"أعرض", L"السلوك", L"تشغيل كمسؤول", L"رفع الامتيازات افتراضيًا", L"يبدّل Ctrl + Shift + Enter امتيازات الأمر الحالي", L"موضع المؤشر", L"لوحة منفصلة", L"مؤشر في حقل الإدخال", L"تبديل الامتيازات باستخدام Shift + Enter", L"عند إيقاف الخيار، يشغّل Shift + Enter الأمر في الطرفية"},
-    };
+RunDisplaySettingStrings GetRunDisplaySettingStrings(const std::wstring& language) {
     const auto code = ResolveEffectiveLanguageCode(language);
-    for (const auto& value : strings) {
-        if (code == value.language) return value;
-    }
-    return strings[0];
+    if (code == L"ru") return {
+        L"Ширина окна", L"Ширина по умолчанию зависит от макета окна", L"По умолчанию", L"Узкая",
+        L"Широкая", L"Поведение", L"Запуск от имени администратора", L"Повышать права по умолчанию",
+        L"Запуск с правами администратора, Ctrl + Shift + Enter меняет права текущей команды", L"Размещение индикатора", L"Где отображается статус запуска от имени администратора", L"Отдельная панель",
+        L"Индикатор в поле", L"Менять права по Shift + Enter", L"Запуск от имени администратора нажатием Shift + Enter вместо Ctrl + Shift + Enter"
+    };
+    if (code == L"vi") return {
+        L"Chiều rộng cửa sổ", L"Chiều rộng mặc định phụ thuộc vào bố cục cửa sổ", L"Mặc định", L"Hẹp",
+        L"Rộng", L"Cách hoạt động", L"Chạy với quyền quản trị viên", L"Mặc định chạy với quyền quản trị viên",
+        L"Chạy với quyền quản trị viên. Dùng Ctrl + Shift + Enter để đổi quyền cho lệnh hiện tại", L"Vị trí chỉ báo", L"Nơi hiển thị trạng thái chạy với quyền quản trị viên", L"Khung riêng",
+        L"Trong ô nhập", L"Đổi quyền bằng Shift + Enter", L"Nhấn Shift + Enter thay cho Ctrl + Shift + Enter để chạy với quyền quản trị viên"
+    };
+    if (code == L"zh_cn") return {
+        L"窗口宽度", L"默认宽度由窗口布局决定", L"默认", L"较窄",
+        L"较宽", L"行为", L"以管理员身份运行", L"默认以管理员身份运行",
+        L"以管理员身份运行。按 Ctrl + Shift + Enter 可切换当前命令的权限", L"指示器位置", L"显示管理员运行状态的位置", L"独立面板",
+        L"输入框内", L"用 Shift + Enter 切换权限", L"使用 Shift + Enter 代替 Ctrl + Shift + Enter 以管理员身份运行"
+    };
+    if (code == L"zh_tw") return {
+        L"視窗寬度", L"預設寬度由視窗版面配置決定", L"預設", L"窄",
+        L"寬", L"行為", L"以系統管理員身分執行", L"預設以系統管理員身分執行",
+        L"以系統管理員身分執行。按 Ctrl + Shift + Enter 可切換目前命令的權限", L"指示器位置", L"顯示系統管理員執行狀態的位置", L"獨立面板",
+        L"輸入欄內", L"使用 Shift + Enter 切換權限", L"按 Shift + Enter 取代 Ctrl + Shift + Enter，以系統管理員身分執行"
+    };
+    if (code == L"ja") return {
+        L"ウィンドウの幅", L"既定の幅はウィンドウのレイアウトに応じて決まります", L"既定", L"狭い",
+        L"広い", L"動作", L"管理者として実行", L"既定で管理者として実行する",
+        L"管理者として実行します。Ctrl + Shift + Enter で現在のコマンドの権限を切り替えます", L"インジケーターの位置", L"管理者として実行する状態を表示する場所", L"別のパネル",
+        L"入力欄内", L"Shift + Enter で権限を切り替える", L"Ctrl + Shift + Enter の代わりに Shift + Enter を押すと、管理者として実行できます"
+    };
+    if (code == L"ko") return {
+        L"창 너비", L"기본 너비는 창 레이아웃에 따라 결정됩니다", L"기본값", L"좁게",
+        L"넓게", L"동작", L"관리자 권한으로 실행", L"기본적으로 관리자 권한으로 실행",
+        L"관리자 권한으로 실행합니다. Ctrl + Shift + Enter로 현재 명령의 권한을 전환합니다", L"표시기 위치", L"관리자 권한으로 실행하는 상태를 표시할 위치", L"별도 패널",
+        L"입력란 안", L"Shift + Enter로 권한 전환", L"Ctrl + Shift + Enter 대신 Shift + Enter를 눌러 관리자 권한으로 실행합니다"
+    };
+    if (code == L"th") return {
+        L"ความกว้างหน้าต่าง", L"ความกว้างเริ่มต้นขึ้นอยู่กับเค้าโครงหน้าต่าง", L"ค่าเริ่มต้น", L"แคบ",
+        L"กว้าง", L"ลักษณะการทำงาน", L"เรียกใช้ในฐานะผู้ดูแลระบบ", L"เรียกใช้ในฐานะผู้ดูแลระบบเป็นค่าเริ่มต้น",
+        L"เรียกใช้ในฐานะผู้ดูแลระบบ กด Ctrl + Shift + Enter เพื่อสลับสิทธิ์ของคำสั่งปัจจุบัน", L"ตำแหน่งตัวบ่งชี้", L"ตำแหน่งที่แสดงสถานะการเรียกใช้ในฐานะผู้ดูแลระบบ", L"แผงแยก",
+        L"ในช่องป้อนข้อมูล", L"สลับสิทธิ์ด้วย Shift + Enter", L"กด Shift + Enter แทน Ctrl + Shift + Enter เพื่อเรียกใช้ในฐานะผู้ดูแลระบบ"
+    };
+    if (code == L"id") return {
+        L"Lebar jendela", L"Lebar default mengikuti tata letak jendela", L"Default", L"Sempit",
+        L"Lebar", L"Perilaku", L"Jalankan sebagai administrator", L"Jalankan sebagai administrator secara default",
+        L"Jalankan sebagai administrator. Ctrl + Shift + Enter mengganti hak akses untuk perintah saat ini", L"Posisi indikator", L"Lokasi tampilan status jalankan sebagai administrator", L"Panel terpisah",
+        L"Indikator di kolom input", L"Ganti hak akses dengan Shift + Enter", L"Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai administrator"
+    };
+    if (code == L"ms") return {
+        L"Lebar tetingkap", L"Lebar lalai mengikut susun atur tetingkap", L"Lalai", L"Sempit",
+        L"Lebar", L"Tingkah laku", L"Jalankan sebagai pentadbir", L"Jalankan sebagai pentadbir secara lalai",
+        L"Jalankan sebagai pentadbir. Ctrl + Shift + Enter menukar keistimewaan untuk arahan semasa", L"Kedudukan penunjuk", L"Tempat status jalankan sebagai pentadbir dipaparkan", L"Panel berasingan",
+        L"Penunjuk dalam medan input", L"Tukar keistimewaan dengan Shift + Enter", L"Tekan Shift + Enter sebagai ganti Ctrl + Shift + Enter untuk menjalankan sebagai pentadbir"
+    };
+    if (code == L"fr") return {
+        L"Largeur de la fenêtre", L"La largeur par défaut dépend de la disposition de la fenêtre", L"Par défaut", L"Étroite",
+        L"Large", L"Comportement", L"Exécuter en tant qu’administrateur", L"Exécuter en tant qu’administrateur par défaut",
+        L"Exécute en tant qu’administrateur. Ctrl + Maj + Entrée inverse les droits pour la commande en cours", L"Emplacement de l’indicateur", L"Emplacement de l’indicateur d’exécution en tant qu’administrateur", L"Panneau séparé",
+        L"Dans le champ de saisie", L"Changer de droits avec Maj + Entrée", L"Exécute en tant qu’administrateur avec Maj + Entrée au lieu de Ctrl + Maj + Entrée"
+    };
+    if (code == L"de") return {
+        L"Fensterbreite", L"Die Standardbreite richtet sich nach dem Fensterlayout", L"Standard", L"Schmal",
+        L"Breit", L"Verhalten", L"Als Administrator ausführen", L"Standardmäßig als Administrator ausführen",
+        L"Führt als Administrator aus. Strg + Umschalt + Eingabe wechselt die Berechtigungsstufe für den aktuellen Befehl", L"Position der Anzeige", L"Position der Anzeige für die Ausführung als Administrator", L"Separater Bereich",
+        L"Im Eingabefeld", L"Berechtigungsstufe mit Umschalt + Eingabe wechseln", L"Mit Umschalt + Eingabe statt Strg + Umschalt + Eingabe als Administrator ausführen"
+    };
+    if (code == L"es") return {
+        L"Ancho de la ventana", L"El ancho predeterminado depende de la distribución de la ventana", L"Predeterminado", L"Estrecho",
+        L"Ancho", L"Comportamiento", L"Ejecutar como administrador", L"Ejecutar como administrador de forma predeterminada",
+        L"Ejecuta como administrador. Ctrl + Mayús + Entrar cambia los privilegios del comando actual", L"Posición del indicador", L"Lugar donde aparece el indicador de ejecución como administrador", L"Panel separado",
+        L"En el campo de entrada", L"Cambiar los privilegios con Mayús + Entrar", L"Ejecuta como administrador con Mayús + Entrar en lugar de Ctrl + Mayús + Entrar"
+    };
+    if (code == L"pt") return {
+        L"Largura da janela", L"A largura padrão segue o layout da janela", L"Padrão", L"Estreita",
+        L"Larga", L"Comportamento", L"Executar como administrador", L"Executar como administrador por padrão",
+        L"Executa como administrador. Ctrl + Shift + Enter alterna os privilégios do comando atual", L"Posição do indicador", L"Local do indicador de execução como administrador", L"Painel separado",
+        L"No campo de entrada", L"Alternar privilégios com Shift + Enter", L"Executa como administrador com Shift + Enter em vez de Ctrl + Shift + Enter"
+    };
+    if (code == L"it") return {
+        L"Larghezza della finestra", L"La larghezza predefinita dipende dal layout della finestra", L"Predefinito", L"Stretta",
+        L"Larga", L"Comportamento", L"Esegui come amministratore", L"Esegui come amministratore per impostazione predefinita",
+        L"Esegue come amministratore. Ctrl + Maiusc + Invio alterna i privilegi per il comando corrente", L"Posizione dell’indicatore", L"Posizione dell’indicatore di esecuzione come amministratore", L"Pannello separato",
+        L"Nel campo di immissione", L"Alterna i privilegi con Maiusc + Invio", L"Esegue come amministratore con Maiusc + Invio anziché Ctrl + Maiusc + Invio"
+    };
+    if (code == L"uk") return {
+        L"Ширина вікна", L"Типова ширина залежить від макета вікна", L"За замовчуванням", L"Вузьке",
+        L"Широке", L"Поведінка", L"Запуск від імені адміністратора", L"Запускати від імені адміністратора за замовчуванням",
+        L"Запуск від імені адміністратора. Ctrl + Shift + Enter змінює права для поточної команди", L"Розташування індикатора", L"Де відображається стан запуску від імені адміністратора", L"Окрема панель",
+        L"Індикатор у полі введення", L"Змінювати права клавішами Shift + Enter", L"Для запуску від імені адміністратора достатньо натиснути Shift + Enter замість Ctrl + Shift + Enter"
+    };
+    if (code == L"pl") return {
+        L"Szerokość okna", L"Domyślna szerokość zależy od układu okna", L"Domyślne", L"Wąskie",
+        L"Szerokie", L"Zachowanie", L"Uruchom jako administrator", L"Domyślnie uruchamiaj jako administrator",
+        L"Uruchamia jako administrator. Ctrl + Shift + Enter zmienia poziom uprawnień dla bieżącego polecenia", L"Położenie wskaźnika", L"Miejsce wyświetlania wskaźnika uruchamiania jako administrator", L"Osobny panel",
+        L"W polu wprowadzania", L"Zmieniaj poziom uprawnień skrótem Shift + Enter", L"Uruchamia jako administrator skrótem Shift + Enter zamiast Ctrl + Shift + Enter"
+    };
+    if (code == L"nl") return {
+        L"Vensterbreedte", L"De standaardbreedte hangt af van de vensterindeling", L"Standaard", L"Smal",
+        L"Breed", L"Gedrag", L"Als administrator uitvoeren", L"Standaard uitvoeren als administrator",
+        L"Voert uit als administrator. Ctrl + Shift + Enter wisselt het machtigingsniveau voor de huidige opdracht", L"Positie van de indicator", L"Locatie van de indicator voor uitvoering als administrator", L"Apart paneel",
+        L"In het invoerveld", L"Machtigingsniveau wisselen met Shift + Enter", L"Voert uit als administrator met Shift + Enter in plaats van Ctrl + Shift + Enter"
+    };
+    if (code == L"tr") return {
+        L"Pencere genişliği", L"Varsayılan genişlik pencere düzenine göre belirlenir", L"Varsayılan", L"Dar",
+        L"Geniş", L"Davranış", L"Yönetici olarak çalıştır", L"Varsayılan olarak yönetici yetkileriyle çalıştır",
+        L"Yönetici olarak çalıştırır. Ctrl + Shift + Enter geçerli komutun yetki düzeyini değiştirir", L"Gösterge konumu", L"Yönetici olarak çalıştırma durumunun göründüğü yer", L"Ayrı panel",
+        L"Giriş alanında gösterge", L"Shift + Enter ile yetki düzeyini değiştir", L"Yönetici olarak çalıştırmak için Ctrl + Shift + Enter yerine Shift + Enter kullanılır"
+    };
+    if (code == L"hi") return {
+        L"विंडो की चौड़ाई", L"डिफ़ॉल्ट चौड़ाई विंडो के लेआउट पर निर्भर करती है", L"डिफ़ॉल्ट", L"संकरा",
+        L"चौड़ा", L"व्यवहार", L"व्यवस्थापक के रूप में चलाएँ", L"डिफ़ॉल्ट रूप से व्यवस्थापक के रूप में चलाएँ",
+        L"व्यवस्थापक के रूप में चलाएँ। Ctrl + Shift + Enter से मौजूदा कमांड के विशेषाधिकार बदलते हैं", L"संकेतक का स्थान", L"व्यवस्थापक के रूप में चलाने की स्थिति दिखाने की जगह", L"अलग पैनल",
+        L"इनपुट फ़ील्ड में संकेतक", L"Shift + Enter से विशेषाधिकार बदलें", L"व्यवस्थापक के रूप में चलाने के लिए Ctrl + Shift + Enter की जगह Shift + Enter दबाएँ"
+    };
+    if (code == L"ar") return {
+        L"عرض النافذة", L"يحدد تخطيط النافذة العرض الافتراضي", L"افتراضي", L"ضيّق",
+        L"عريض", L"السلوك", L"تشغيل كمسؤول", L"التشغيل كمسؤول افتراضيًا",
+        L"تشغيل كمسؤول. يبدّل Ctrl + Shift + Enter صلاحيات الأمر الحالي", L"موضع المؤشر", L"مكان عرض حالة التشغيل كمسؤول", L"لوحة منفصلة",
+        L"مؤشر داخل حقل الإدخال", L"تبديل الصلاحيات باستخدام Shift + Enter", L"للتشغيل كمسؤول، يُستخدم Shift + Enter بدلًا من Ctrl + Shift + Enter"
+    };
+    return {
+        L"Window Width", L"The default width follows the window layout", L"Default", L"Narrow",
+        L"Wide", L"Behavior", L"Run as administrator", L"Elevate by Default",
+        L"Run as administrator. Ctrl + Shift + Enter switches privileges for the current command", L"Indicator Placement", L"Where the administrator launch status appears", L"Separate panel",
+        L"Inline indicator", L"Switch Privileges with Shift + Enter", L"Run as administrator by pressing Shift + Enter instead of Ctrl + Shift + Enter"
+    };
 }
 
-constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 56)";
+constexpr wchar_t kSettingsVersion[] = WH_MOD_VERSION L" (build 59)";
 constexpr wchar_t kColorModeSettingsGlyph[] = L"\u25D0";
 
 struct SettingsLocalizedStrings {
     const wchar_t* winTitle;
     const wchar_t* nav0;
     const wchar_t* nav1;
-    const wchar_t* nav2;
     const wchar_t* nav3;
     const wchar_t* on;
     const wchar_t* off;
@@ -11405,7 +13609,6 @@ struct SettingsLocalizedStrings {
     const wchar_t* bgColSub;
     const wchar_t* bdColTitle;
     const wchar_t* bdColSub;
-    const wchar_t* radiusTitle;
     const wchar_t* radiusSub;
     const wchar_t* bgImgTitle;
     const wchar_t* bgImgNone;
@@ -11426,12 +13629,9 @@ struct SettingsLocalizedStrings {
     const wchar_t* showHistSub;
     const wchar_t* clearInitTitle;
     const wchar_t* clearInitSub;
-    const wchar_t* adminTitle;
-    const wchar_t* adminSub;
     const wchar_t* clearHistTitle;
     const wchar_t* clearHistSub;
     const wchar_t* gLangTitle;
-    const wchar_t* gLangSub;
     const wchar_t* cpTitle;
     const wchar_t* cpSwatches;
     const wchar_t* cpApply;
@@ -11439,71 +13639,586 @@ struct SettingsLocalizedStrings {
     const wchar_t* ofnTitle;
     const wchar_t* adminMsg;
     const wchar_t* adminWarnTitle;
+    const wchar_t* iconSetSub;
+    const wchar_t* themeDefault;
+    const wchar_t* timestampTitle;
+    const wchar_t* timestampSub;
+    const wchar_t* closeOutsideTitle;
+    const wchar_t* closeOutsideSub;
+    const wchar_t* automaticLanguage;
+    const wchar_t* backgroundFiles;
+    const wchar_t* allFiles;
 };
 
 static SettingsLocalizedStrings GetSettingsLocalizedStrings(const std::wstring& rawLang) {
-    std::wstring lang = ResolveEffectiveLanguageCode(rawLang);
-    if (lang == L"vi") {
-        return { L"Cài đặt Modern Run", L"Cá nhân hoá", L"Bố cục & Vị trí", L"Lịch sử & Hành vi", L"Ngôn ngữ (21)", L"Bật", L"Tắt", L"Mặc định", L"Tự động", L"Chọn màu...", L"Chọn ảnh...", L"Xóa", L"Xóa ngay", L"Tự tùy chỉnh", L"Windows 11 Blur (Mặc định)", L"Tự động theo Windows", L"Tối (Dark)", L"Sáng (Light)", L"Dưới – Trái", L"Dưới – Giữa", L"Dưới – Phải", L"Trên – Trái", L"Trên – Giữa", L"Trên – Phải", L"Giữa màn hình", L"Chủ đề & Giao diện bề mặt", L"Chọn chủ đề mặc định (Windows 11 Blur và Liquid Glass đã tinh chỉnh sẵn)", L"Chủ đề mặc định (Theme Preset)", L"Chọn nhanh 13 bộ giao diện có sẵn (mặc định Windows 11 Blur)", L"Chế độ Sáng / Tối", L"Tự động theo Windows hoặc chọn cố định", L"Màu sắc, Hình nền & Bo góc tùy chỉnh", L"Cá nhân hóa màu nền, màu viền, ảnh/GIF động và độ bo góc", L"Màu nền hộp thoại", L"Để Mặc định nếu dùng theo Theme Preset", L"Màu viền hộp thoại", L"Đổi màu viền quanh thanh nhập & thẻ lịch sử", L"Bán kính bo góc (Border Radius)", L"0 px = vuông, 14 px = Win11, 27 px = viên thuốc", L"Hình nền / Ảnh động (PNG, JPG, GIF)", L"Chưa chọn tệp — hỗ trợ ảnh tĩnh & GIF động (tối đa 25 MB)", L"Đang dùng: ", L"Độ đậm nền hộp thoại & hình nền", L"Chỉnh độ mờ đục của nền hộp thoại hoặc ảnh/GIF (mặc định 85%)", L"Vị trí & Chế độ hiển thị", L"Điều chỉnh vị trí mở Win + R và kiểu bố cục quen thuộc", L"Vị trí hiển thị hộp thoại", L"Chọn cố định góc màn hình hoặc để Tự động", L"Ghi nhớ vị trí cửa sổ lần cuối", L"Mở lại đúng tọa độ kéo thả cuối (nhấn Ctrl + 0 để đặt lại)", L"Tỷ lệ kích thước (UI Scale)", L"Phóng to hoặc thu nhỏ toàn bộ hộp thoại", L"Lịch sử & Quyền thực thi", L"Quản lý lịch sử lệnh, điền sẵn lệnh cũ và quyền Quản trị viên", L"Hiển thị danh sách lịch sử lệnh", L"Hiện các lệnh chạy gần đây cùng danh sách ghim", L"Để trống ô nhập khi mới mở", L"Tắt để giữ sẵn lệnh vừa chạy (Win + R → Enter)", L"Cho phép chạy với quyền quản trị (Admin)", L"Mặc định nâng quyền Admin (luôn hỗ trợ Ctrl + Shift + Enter)", L"Xóa toàn bộ lịch sử đã lưu", L"Xóa danh sách lệnh trong Windows RunMRU", L"Ngôn ngữ hiển thị (21 ngôn ngữ)", L"Áp dụng ngay cho cả hộp thoại Run và cửa sổ Cài đặt", L"Chọn màu (WinUI 3)", L"Bảng màu nhanh Fluent", L"Áp dụng", L"Hủy", L"Chọn hình nền hoặc ảnh động GIF", L"Khi bật tùy chọn này, các lệnh thực thi sẽ chạy với quyền Quản trị viên (Administrator). Bạn có cho phép bật không?", L"Cảnh báo quyền quản trị" };
-    }
-    else if (lang == L"zh-cn") {
-        return { L"Modern Run 设置", L"个性化", L"布局与位置", L"历史与行为", L"语言 (21)", L"开", L"关", L"默认", L"自动", L"选择颜色...", L"浏览...", L"清除", L"立即清除", L"自定义", L"Windows 11 Blur (默认)", L"跟随系统", L"深色", L"浅色", L"左下角", L"底部居中", L"右下角", L"左上角", L"顶部居中", L"右上角", L"屏幕居中", L"主题与表面效果", L"选择内置视觉主题（Windows 11 模糊与液态玻璃已优化）", L"主题预设", L"在 13 套内置主题间切换（默认 Windows 11 Blur）", L"颜色模式", L"跟随 Windows 或固定深色 / 浅色", L"自定义颜色、背景与圆角", L"自定义背景色、边框色、静态/GIF 动态背景和圆角", L"对话框背景色", L"保持默认以跟随主题预设", L"对话框边框色", L"覆盖输入框与历史卡片边框颜色", L"圆角半径", L"0 px = 直角，14 px = Win11，27 px = 胶囊", L"背景图片 / 动态 GIF", L"未选择 — 支持 PNG、JPG、WebP、动态 GIF（最大 25 MB）", L"当前：", L"背景不透明度", L"调整图片/GIF 显示清晰度（默认 85%）", L"位置与显示模式", L"配置 Win + R 弹出位置和布局风格", L"对话框位置", L"固定到屏幕边缘/居中或设为自动", L"记住上次窗口位置", L"在最后拖动的位置重新打开（按 Ctrl + 0 重置）", L"界面缩放比例", L"缩放运行对话框整体尺寸", L"历史记录与执行行为", L"管理命令历史、初始输入和管理员权限", L"显示命令历史列表", L"显示最近运行的命令和置顶项", L"打开时清空输入框", L"关闭以保留上次命令（Win + R → 回车）", L"以管理员身份运行命令", L"默认提权运行（始终支持 Ctrl + Shift + Enter）", L"清除所有已保存历史", L"清空 Windows RunMRU 中的最近记录", L"显示语言（21 种语言）", L"立即应用于运行对话框和设置窗口", L"选择颜色", L"快捷 Fluent 色板", L"应用", L"取消", L"选择背景图片或动态 GIF", L"启用后，命令将以管理员权限运行。是否允许？", L"管理员权限警告" };
-    }
-    else if (lang == L"zh-tw") {
-        return { L"Modern Run 設定", L"個人化", L"版面與位置", L"歷史與行為", L"語言 (21)", L"開", L"關", L"預設", L"自動", L"選擇顏色...", L"瀏覽...", L"清除", L"立即清除", L"自訂", L"Windows 11 Blur (預設)", L"跟隨系統", L"深色", L"淺色", L"左下角", L"底部置中", L"右下角", L"左上角", L"頂部置中", L"右上角", L"螢幕置中", L"主題與表面效果", L"選擇內建視覺主題（Windows 11 模糊與液態玻璃已最佳化）", L"主題預設", L"在 13 套內建主題間切換（預設 Windows 11 Blur）", L"色彩模式", L"跟隨 Windows 或固定深色 / 淺色", L"自訂色彩、背景與圓角", L"自訂背景色、邊框色、靜態/GIF 動態背景與圓角", L"對話方塊背景色", L"保持預設以跟隨主題", L"對話方塊邊框色", L"自訂輸入列與歷史卡片邊框顏色", L"圓角半徑", L"0 px = 直角，14 px = Win11，27 px = 膠囊", L"背景圖片 / 動態 GIF", L"未選擇 — 支援 PNG、JPG、WebP、動態 GIF（上限 25 MB）", L"使用中：", L"背景不透明度", L"調整圖片/GIF 顯示清晰度（預設 85%）", L"位置與顯示模式", L"設定 Win + R 彈出位置與版面風格", L"對話方塊位置", L"固定於螢幕角落/置中或設為自動", L"記住上次視窗位置", L"在最後拖曳位置重新開啟（按 Ctrl + 0 重設）", L"介面縮放比例", L"縮放執行對話方塊整體大小", L"歷史紀錄與執行行為", L"管理指令歷史、初始輸入與系統管理員權限", L"顯示指令歷史清單", L"顯示最近執行的指令與釘選項目", L"開啟時清空輸入欄", L"關閉以保留上次指令（Win + R → Enter）", L"以系統管理員身分執行", L"預設以管理員權限執行（始終支援 Ctrl + Shift + Enter）", L"清除所有已儲存歷史", L"清除 Windows RunMRU 中的最近紀錄", L"顯示語言（21 種語言）", L"立即套用於執行對話方塊與設定視窗", L"選擇顏色", L"快速 Fluent 色票", L"套用", L"取消", L"選擇背景圖片或動態 GIF", L"啟用後，指令將以系統管理員權限執行。是否允許？", L"系統管理員權限警告" };
-    }
-    else if (lang == L"ja") {
-        return { L"Modern Run 設定", L"個人用設定", L"レイアウトと位置", L"履歴と動作", L"言語 (21)", L"オン", L"オフ", L"既定", L"自動", L"色を選択...", L"参照...", L"クリア", L"今すぐ削除", L"カスタム", L"Windows 11 Blur (既定)", L"自動 (Windows に合わせる)", L"ダーク", L"ライト", L"左下", L"下中央", L"右下", L"左上", L"上中央", L"右上", L"画面中央", L"テーマとサーフェス", L"組み込みテーマを選択（Windows 11 Blur と Liquid Glass は最適化済み）", L"テーマプリセット", L"13 種類のテーマから選択（既定は Windows 11 Blur）", L"カラーモード", L"Windows に合わせるか、ダーク / ライトを固定", L"カスタムカラー・背景・角丸", L"背景色、枠線色、静止画/GIF 背景、角丸半径をカスタマイズ", L"背景色", L"既定のままにするとテーマに従います", L"枠線の色", L"入力バーと履歴カードの枠線色を変更", L"角丸半径", L"0 px = 角張る、14 px = Win11、27 px = ピル", L"背景画像 / アニメーション GIF", L"未選択 — PNG、JPG、WebP、GIF 対応（最大 25 MB）", L"適用中: ", L"背景の不透明度", L"画像/GIF の透明度を調整（既定 85%）", L"位置と表示モード", L"Win + R の表示位置とレイアウトを設定", L"ダイアログの位置", L"画面の端・中央に固定するか自動を選択", L"前回のウィンドウ位置を記憶", L"最後にドラッグした位置で開く（Ctrl + 0 でリセット）", L"UI スケール", L"ダイアログ全体の表示サイズを変更", L"履歴と実行動作", L"コマンド履歴、初期入力、管理者権限を管理", L"コマンド履歴を表示", L"最近実行したコマンドとピン留めを表示", L"起動時に入力欄をクリア", L"オフにすると前回のコマンドを保持します", L"管理者として実行", L"既定で管理者権限で実行（Ctrl + Shift + Enter は常に有効）", L"保存済み履歴をすべて削除", L"Windows RunMRU の履歴を消去します", L"表示言語（21 言語）", L"実行ダイアログと設定ウィンドウに即時反映されます", L"色を選択", L"クイック Fluent スウォッチ", L"適用", L"キャンセル", L"背景画像またはアニメーション GIF を選択", L"有効にするとコマンドは管理者権限で実行されます。許可しますか？", L"管理者権限の警告" };
-    }
-    else if (lang == L"ko") {
-        return { L"Modern Run 설정", L"개인 설정", L"레이아웃 및 위치", L"기록 및 동작", L"언어 (21)", L"켬", L"끔", L"기본값", L"자동", L"색상 선택...", L"찾아보기...", L"지우기", L"지금 지우기", L"사용자 지정", L"Windows 11 Blur (기본값)", L"자동 (Windows 따름)", L"다크", L"라이트", L"왼쪽 아래", L"아래 가운데", L"오른쪽 아래", L"왼쪽 위", L"위 가운데", L"오른쪽 위", L"화면 중앙", L"테마 및 표면", L"기본 제공 테마 선택 (Windows 11 Blur 및 Liquid Glass 최적화)", L"테마 프리셋", L"13가지 기본 테마 중 선택 (기본값: Windows 11 Blur)", L"색상 모드", L"Windows 테마 따르기 또는 다크/라이트 고정", L"사용자 지정 색상, 배경 및 모서리", L"배경색, 테두리색, 이미지/움직이는 GIF 배경 및 둥글기 설정", L"배경 색상", L"기본값으로 두면 테마 색상을 따릅니다", L"테두리 색상", L"입력창 및 기록 카드 테두리 색상 지정", L"모서리 반경", L"0 px = 직각, 14 px = Win11, 27 px = 알약형", L"배경 이미지 / 움직이는 GIF", L"선택 안 됨 — PNG, JPG, WebP, GIF 지원 (최대 25 MB)", L"적용됨: ", L"배경 불투명도", L"이미지/GIF 선명도 조절 (기본 85%)", L"위치 및 표시 모드", L"Win + R 표시 위치와 레이아웃 스타일 설정", L"대화 상자 위치", L"화면 모서리/중앙 고정 또는 자동", L"마지막 창 위치 기억", L"마지막으로 드래그한 위치에서 열기 (Ctrl + 0 초기화)", L"UI 크기 배율", L"실행 대화 상자 전체 크기 조절", L"기록 및 실행 동작", L"명령 기록, 초기 입력 및 관리자 권한 관리", L"명령 기록 표시", L"최근 실행 명령 및 고정 항목 표시", L"열 때 입력창 비우기", L"끄면 마지막 명령이 유지됩니다", L"관리자 권한으로 실행", L"기본적으로 관리자 권한 실행 (Ctrl + Shift + Enter 항상 지원)", L"저장된 기록 모두 지우기", L"Windows RunMRU의 최근 기록 삭제", L"표시 언어 (21개 언어)", L"실행 창과 설정 창에 즉시 적용됩니다", L"색상 선택", L"빠른 Fluent 색상", L"적용", L"취소", L"배경 이미지 또는 GIF 선택", L"활성화하면 명령이 관리자 권한으로 실행됩니다. 허용하시겠습니까?", L"관리자 권한 경고" };
-    }
-    else if (lang == L"th") {
-        return { L"การตั้งค่า Modern Run", L"การปรับแต่ง", L"เค้าโครงและตำแหน่ง", L"ประวัติและพฤติกรรม", L"ภาษา (21)", L"เปิด", L"ปิด", L"ค่าเริ่มต้น", L"อัตโนมัติ", L"เลือกสี...", L"เลือกไฟล์...", L"ล้าง", L"ล้างตอนนี้", L"กำหนดเอง", L"Windows 11 Blur (ค่าเริ่มต้น)", L"อัตโนมัติตาม Windows", L"มืด", L"สว่าง", L"ล่างซ้าย", L"ล่างกลาง", L"ล่างขวา", L"บนซ้าย", L"บนกลาง", L"บนขวา", L"กลางหน้าจอ", L"ธีมและพื้นผิว", L"เลือกธีมในตัว (Windows 11 Blur และ Liquid Glass ปรับแต่งมาให้แล้ว)", L"ชุดธีมเริ่มต้น", L"เลือกจาก 13 ธีมในตัว (ค่าเริ่มต้น Windows 11 Blur)", L"โหมดสี", L"ตามระบบ Windows หรือเลือกมืด / สว่าง", L"สี พื้นหลัง และความโค้งมน", L"ปรับแต่งสีพื้นหลัง สีขอบ รูปภาพ/GIF และความโค้งมุม", L"สีพื้นหลัง", L"เว้นเป็นค่าเริ่มต้นเพื่อใช้ตามธีม", L"สีขอบ", L"เปลี่ยนสีขอบรอบกล่องป้อนคำสั่งและการ์ดประวัติ", L"รัศมีมุมโค้ง", L"0 px = เหลี่ยม, 14 px = Win11, 27 px = แคปซูล", L"รูปพื้นหลัง / GIF เคลื่อนไหว", L"ยังไม่ได้เลือก — รองรับ PNG, JPG, WebP, GIF (สูงสุด 25 MB)", L"กำลังใช้: ", L"ความทึบของภาพพื้นหลัง", L"ปรับความชัดเจนของภาพ/GIF (ค่าเริ่มต้น 85%)", L"ตำแหน่งและโหมดแสดงผล", L"กำหนดตำแหน่งเปิด Win + R และรูปแบบหน้าต่าง", L"ตำแหน่งหน้าต่าง", L"ปักหมุดตามมุมหน้าจอหรือใช้อัตโนมัติ", L"จำตำแหน่งหน้าต่างล่าสุด", L"เปิดซ้ำที่ตำแหน่งที่ลากไว้ล่าสุด (กด Ctrl + 0 เพื่อรีเซ็ต)", L"ขนาดอินเทอร์เฟซ", L"ปรับขนาดกล่อง Run โดยรวม", L"ประวัติและสิทธิ์การทำงาน", L"จัดการประวัติคำสั่ง ข้อความเริ่มต้น และสิทธิ์ผู้ดูแลระบบ", L"แสดงประวัติคำสั่ง", L"แสดงคำสั่งล่าสุดและรายการที่ปักหมุด", L"ล้างช่องพิมพ์เมื่อเปิด", L"ปิดเพื่อคงคำสั่งล่าสุดไว้เหมือน Run ดั้งเดิม", L"รันคำสั่งในฐานะผู้ดูแลระบบ", L"ยกระดับสิทธิ์อัตโนมัติ (ใช้ Ctrl + Shift + Enter ได้เสมอ)", L"ล้างประวัติทั้งหมด", L"ลบรายการล่าสุดออกจาก Windows RunMRU", L"ภาษาที่แสดง (21 ภาษา)", L"มีผลทันทีทั้งกล่อง Run และหน้าต่างตั้งค่า", L"เลือกสี", L"จานสีด่วน Fluent", L"ใช้งาน", L"ยกเลิก", L"เลือกรูปพื้นหลังหรือ GIF เคลื่อนไหว", L"เมื่อเปิดใช้งาน คำสั่งจะรันด้วยสิทธิ์ผู้ดูแลระบบ ต้องการอนุญาตหรือไม่?", L"คำเตือนสิทธิ์ผู้ดูแลระบบ" };
-    }
-    else if (lang == L"id") {
-        return { L"Pengaturan Modern Run", L"Personalisasi", L"Tata Letak & Posisi", L"Riwayat & Perilaku", L"Bahasa (21)", L"Aktif", L"Mati", L"Bawaan", L"Otomatis", L"Pilih warna...", L"Pilih...", L"Hapus", L"Hapus sekarang", L"Kustom", L"Windows 11 Blur (Bawaan)", L"Otomatis (Ikuti Windows)", L"Gelap", L"Terang", L"Kiri Bawah", L"Tengah Bawah", L"Kanan Bawah", L"Kiri Atas", L"Tengah Atas", L"Kanan Atas", L"Tengah Layar", L"Tema & Permukaan", L"Pilih tema bawaan (Windows 11 Blur & Liquid Glass telah dioptimalkan)", L"Preset Tema", L"Pilih dari 13 tema bawaan (bawaan Windows 11 Blur)", L"Mode Warna", L"Ikuti tema Windows atau pilih Gelap / Terang", L"Warna, Latar Belakang & Sudut Kustom", L"Sesuaikan warna, gambar/GIF animasi, dan radius sudut", L"Warna Latar", L"Biarkan Bawaan untuk mengikuti Tema", L"Warna Bingkai", L"Ubah warna garis tepi dialog & kartu riwayat", L"Radius Sudut", L"0 px = kotak, 14 px = Win11, 27 px = pil", L"Gambar Latar / GIF Animasi", L"Belum dipilih — mendukung PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Opasitas Latar Kustom", L"Atur kejelasan gambar/GIF (bawaan 85%)", L"Posisi & Mode Tampilan", L"Atur posisi buka Win + R dan gaya tata letak", L"Posisi Dialog", L"Sematkan ke tepi/tengah layar atau Otomatis", L"Ingat Posisi Jendela Terakhir", L"Buka kembali di posisi terakhir diseret (Ctrl + 0 untuk reset)", L"Skala Ukuran UI", L"Ubah ukuran keseluruhan dialog Run", L"Riwayat & Perilaku Eksekusi", L"Kelola riwayat perintah, input awal, dan hak Administrator", L"Tampilkan Riwayat Perintah", L"Tampilkan perintah terbaru & item disematkan", L"Kosongkan Input Saat Dibuka", L"Matikan untuk mempertahankan perintah terakhir", L"Jalankan sebagai Administrator", L"Jalankan dengan hak admin secara bawaan (Ctrl + Shift + Enter selalu aktif)", L"Hapus Semua Riwayat Tersimpan", L"Bersihkan riwayat terbaru dari Windows RunMRU", L"Bahasa Tampilan (21 Bahasa)", L"Langsung berlaku untuk dialog Run dan jendela Pengaturan", L"Pilih Warna", L"Palet Cepat Fluent", L"Terapkan", L"Batal", L"Pilih Gambar Latar atau GIF Animasi", L"Saat aktif, perintah akan dijalankan sebagai Administrator. Izinkan?", L"Peringatan Hak Administrator" };
-    }
-    else if (lang == L"ms") {
-        return { L"Tetapan Modern Run", L"Pemperibadian", L"Susun Atur & Kedudukan", L"Sejarah & Kelakuan", L"Bahasa (21)", L"Hidup", L"Mati", L"Lalai", L"Auto", L"Pilih warna...", L"Semak imbas...", L"Kosongkan", L"Kosongkan kini", L"Tersuai", L"Windows 11 Blur (Lalai)", L"Auto (Ikut Windows)", L"Gelap", L"Cerah", L"Bawah Kiri", L"Bawah Tengah", L"Bawah Kanan", L"Atas Kiri", L"Atas Tengah", L"Atas Kanan", L"Tengah Skrin", L"Tema & Permukaan", L"Pilih tema terbina dalam (Windows 11 Blur & Liquid Glass dioptimumkan)", L"Pratetap Tema", L"Pilih daripada 13 tema terbina (lalai Windows 11 Blur)", L"Mod Warna", L"Ikut Windows atau pilih Gelap / Cerah", L"Warna, Latar Belakang & Jejari Tersuai", L"Sesuaikan warna, imej/GIF animasi dan jejari bucu", L"Warna Latar Belakang", L"Biarkan Lalai untuk ikut Tema", L"Warna Sempadan", L"Tukar warna bingkai dialog & kad sejarah", L"Jejari Bucu", L"0 px = segi empat, 14 px = Win11, 27 px = pil", L"Imej Latar / GIF Animasi", L"Tiada dipilih — sokong PNG, JPG, WebP, GIF (maks 25 MB)", L"Aktif: ", L"Kelegapan Latar Tersuai", L"Laras kejelasan imej/GIF (lalai 85%)", L"Kedudukan & Mod Paparan", L"Tetapkan lokasi Win + R dan gaya susun atur", L"Kedudukan Dialog", L"Semat ke tepi/tengah skrin atau Auto", L"Ingat Kedudukan Tetingkap Terakhir", L"Buka semula di lokasi seretan terakhir (Ctrl + 0 untuk set semula)", L"Skala Saiz UI", L"Skalakan saiz keseluruhan dialog Run", L"Sejarah & Kelakuan Pelaksanaan", L"Urus sejarah arahan, input awal dan keistimewaan Pentadbir", L"Papar Sejarah Arahan", L"Papar arahan terkini dan item disemat", L"Kosongkan Input Apabila Dibuka", L"Matikan untuk kekalkan arahan terakhir", L"Jalankan sebagai Pentadbir", L"Jalankan dengan hak pentadbir secara lalai (Ctrl + Shift + Enter sentiasa aktif)", L"Padam Semua Sejarah Tersimpan", L"Kosongkan sejarah terkini dari Windows RunMRU", L"Bahasa Paparan (21 Bahasa)", L"Digunakan serta-merta pada dialog Run dan tetingkap Tetapan", L"Pilih Warna", L"Warna Pantas Fluent", L"Guna", L"Batal", L"Pilih Imej Latar atau GIF Animasi", L"Apabila diaktifkan, arahan akan dijalankan sebagai Pentadbir. Benarkan?", L"Amaran Keistimewaan Pentadbir" };
-    }
-    else if (lang == L"fr") {
-        return { L"Paramètres Modern Run", L"Personnalisation", L"Disposition et position", L"Historique et comportement", L"Langue (21)", L"Activé", L"Désactivé", L"Défaut", L"Auto", L"Couleur...", L"Parcourir...", L"Effacer", L"Effacer", L"Personnalisé", L"Windows 11 Blur (Défaut)", L"Auto (Suivre Windows)", L"Sombre", L"Clair", L"Bas gauche", L"Bas centre", L"Bas droite", L"Haut gauche", L"Haut centre", L"Haut droite", L"Centre de l'écran", L"Thème et surface", L"Choisissez un thème intégré (Windows 11 Blur et Liquid Glass optimisés)", L"Préréglage du thème", L"13 thèmes intégrés (Windows 11 Blur par défaut)", L"Mode de couleur", L"Suivre Windows ou fixer Sombre / Clair", L"Couleurs, fond et arrondi personnalisés", L"Personnalisez les couleurs, l'image/GIF animé et le rayon des coins", L"Couleur d'arrière-plan", L"Laisser par défaut pour suivre le thème", L"Couleur de bordure", L"Modifier la bordure de la barre et de l'historique", L"Rayon des coins", L"0 px = carré, 14 px = Win11, 27 px = pilule", L"Image de fond / GIF animé", L"Aucun fichier — PNG, JPG, WebP, GIF animé (max 25 Mo)", L"Actif : ", L"Opacité du fond personnalisé", L"Ajuster la visibilité de l'image/GIF (85 % par défaut)", L"Position et mode d'affichage", L"Configurez où Win + R s'ouvre et votre disposition", L"Position de la boîte", L"Épingler à un bord/centre ou Auto", L"Mémoriser la dernière position", L"Rouvrir au dernier emplacement déplacé (Ctrl + 0 pour réinitialiser)", L"Échelle de l'interface", L"Ajuster la taille globale de la boîte Run", L"Historique et exécution", L"Gérer l'historique, la saisie initiale et les droits Administrateur", L"Afficher l'historique", L"Afficher les commandes récentes et épinglées", L"Vider le champ à l'ouverture", L"Désactiver pour garder la dernière commande", L"Exécuter en administrateur", L"Élever par défaut (Ctrl + Maj + Entrée fonctionne toujours)", L"Effacer tout l'historique", L"Supprimer l'historique récent de Windows RunMRU", L"Langue d'affichage (21 langues)", L"S'applique immédiatement à Run et aux Paramètres", L"Choisir une couleur", L"Nuancier rapide Fluent", L"Appliquer", L"Annuler", L"Sélectionner une image de fond ou un GIF animé", L"Une fois activé, les commandes s'exécuteront en tant qu'administrateur. Autoriser ?", L"Avertissement Administrateur" };
-    }
-    else if (lang == L"de") {
-        return { L"Modern Run Einstellungen", L"Personalisierung", L"Layout & Position", L"Verlauf & Verhalten", L"Sprache (21)", L"Ein", L"Aus", L"Standard", L"Auto", L"Farbe...", L"Durchsuchen...", L"Löschen", L"Jetzt löschen", L"Benutzerdefiniert", L"Windows 11 Blur (Standard)", L"Auto (Windows folgen)", L"Dunkel", L"Hell", L"Unten links", L"Unten Mitte", L"Unten rechts", L"Oben links", L"Oben Mitte", L"Oben rechts", L"Bildschirmmitte", L"Design & Oberfläche", L"Integriertes Design wählen (Windows 11 Blur & Liquid Glass optimiert)", L"Design-Vorlage", L"Zwischen 13 Designs wechseln (Standard: Windows 11 Blur)", L"Farbmodus", L"Windows folgen oder Dunkel / Hell festlegen", L"Farben, Hintergrund & Eckenradius", L"Farben, Bild/animiertes GIF und Eckenradius anpassen", L"Hintergrundfarbe", L"Standard lassen, um dem Design zu folgen", L"Rahmenfarbe", L"Rahmenfarbe von Eingabeleiste & Verlauf ändern", L"Eckenradius", L"0 px = eckig, 14 px = Win11, 27 px = Pille", L"Hintergrundbild / Animiertes GIF", L"Keins gewählt — PNG, JPG, WebP, GIF (max. 25 MB)", L"Aktiv: ", L"Deckkraft des Hintergrunds", L"Sichtbarkeit von Bild/GIF anpassen (Standard 85 %)", L"Position & Anzeigemodus", L"Position von Win + R und Layout-Stil festlegen", L"Dialog-Position", L"An Bildschirmrand/-mitte anheften oder Auto", L"Letzte Fensterposition merken", L"An letzter Position öffnen (Strg + 0 zum Zurücksetzen)", L"UI-Skalierung", L"Gesamtgröße des Ausführen-Dialogs skalieren", L"Verlauf & Ausführungsverhalten", L"Befehlsverlauf, Eingabe und Administratorrechte verwalten", L"Befehlsverlauf anzeigen", L"Letzte Befehle und angeheftete Einträge anzeigen", L"Eingabefeld beim Öffnen leeren", L"Ausschalten, um letzten Befehl zu behalten", L"Als Administrator ausführen", L"Standardmäßig erhöht starten (Strg + Umschalt + Enter geht immer)", L"Gesamten Verlauf löschen", L"Verlauf aus Windows RunMRU entfernen", L"Anzeigesprache (21 Sprachen)", L"Gilt sofort für Run-Dialog und Einstellungen", L"Farbe wählen", L"Fluent-Schnellfarben", L"Anwenden", L"Abbrechen", L"Hintergrundbild oder animiertes GIF wählen", L"Wenn aktiviert, werden Befehle mit Administratorrechten gestartet. Zulassen?", L"Administrator-Warnung" };
-    }
-    else if (lang == L"es") {
-        return { L"Configuración de Modern Run", L"Personalización", L"Diseño y posición", L"Historial y comportamiento", L"Idioma (21)", L"Activado", L"Desactivado", L"Predet.", L"Auto", L"Elegir color...", L"Examinar...", L"Quitar", L"Borrar ahora", L"Personalizado", L"Windows 11 Blur (Predet.)", L"Auto (Seguir a Windows)", L"Oscuro", L"Claro", L"Abajo izquierda", L"Abajo centro", L"Abajo derecha", L"Arriba izquierda", L"Arriba centro", L"Arriba derecha", L"Centro de pantalla", L"Tema y superficie", L"Elige un tema integrado (Windows 11 Blur y Liquid Glass optimizados)", L"Tema predefinido", L"Cambia entre 13 temas integrados (predeterminado: Windows 11 Blur)", L"Modo de color", L"Seguir el tema de Windows o fijar Oscuro / Claro", L"Colores, fondo y esquinas personalizados", L"Personaliza colores, imagen/GIF animado y radio de esquinas", L"Color de fondo", L"Deja en Predet. para seguir el tema", L"Color del borde", L"Cambiar el color del borde de la barra e historial", L"Radio de esquinas", L"0 px = cuadrado, 14 px = Win11, 27 px = cápsula", L"Imagen de fondo / GIF animado", L"Sin archivo — admite PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Activo: ", L"Opacidad del fondo", L"Ajusta la visibilidad de la imagen/GIF (85 % por defecto)", L"Posición y modo de visualización", L"Configura dónde se abre Win + R y el estilo de diseño", L"Posición del diálogo", L"Fijar en un borde/centro o usar Auto", L"Recordar última posición", L"Reabrir en la última posición arrastrada (Ctrl + 0 para restablecer)", L"Escala de interfaz", L"Escalar el tamaño general del diálogo Run", L"Historial y ejecución", L"Controla el historial, el texto inicial y los permisos de Administrador", L"Mostrar historial de comandos", L"Mostrar comandos recientes y fijados", L"Vaciar campo al abrir", L"Desactívalo para mantener el último comando", L"Ejecutar como Administrador", L"Elevar por defecto (Ctrl + Mayús + Entrar siempre funciona)", L"Borrar todo el historial", L"Eliminar el historial reciente de Windows RunMRU", L"Idioma de visualización (21 idiomas)", L"Se aplica al instante al diálogo Run y a Configuración", L"Elegir color", L"Colores rápidos Fluent", L"Aplicar", L"Cancelar", L"Seleccionar imagen de fondo o GIF animado", L"Al activarlo, los comandos se ejecutarán como Administrador. ¿Permitir?", L"Aviso de Administrador" };
-    }
-    else if (lang == L"pt") {
-        return { L"Configurações do Modern Run", L"Personalização", L"Layout e posição", L"Histórico e comportamento", L"Idioma (21)", L"Ativado", L"Desativado", L"Padrão", L"Auto", L"Escolher cor...", L"Procurar...", L"Limpar", L"Limpar agora", L"Personalizado", L"Windows 11 Blur (Padrão)", L"Auto (Seguir Windows)", L"Escuro", L"Claro", L"Inferior esquerdo", L"Inferior centro", L"Inferior direito", L"Superior esquerdo", L"Superior centro", L"Superior direito", L"Centro da tela", L"Tema e superfície", L"Escolha um tema integrado (Windows 11 Blur e Liquid Glass otimizados)", L"Predefinição de tema", L"Alterne entre 13 temas (padrão: Windows 11 Blur)", L"Modo de cor", L"Seguir o Windows ou fixar Escuro / Claro", L"Cores, fundo e cantos personalizados", L"Personalize cores, imagem/GIF animado e raio dos cantos", L"Cor de fundo", L"Deixe em Padrão para seguir o tema", L"Cor da borda", L"Alterar a cor da borda da barra e do histórico", L"Raio dos cantos", L"0 px = quadrado, 14 px = Win11, 27 px = pílula", L"Imagem de fundo / GIF animado", L"Nenhum arquivo — PNG, JPG, WebP, GIF animado (máx. 25 MB)", L"Ativo: ", L"Opacidade do fundo", L"Ajuste a visibilidade da imagem/GIF (padrão 85%)", L"Posição e modo de exibição", L"Configure onde o Win + R abre e o estilo do layout", L"Posição da caixa", L"Fixar em uma borda/centro ou usar Auto", L"Lembrar última posição", L"Reabrir na última posição arrastada (Ctrl + 0 para redefinir)", L"Escala da interface", L"Redimensionar o tamanho geral da caixa Run", L"Histórico e execução", L"Gerencie histórico, entrada inicial e privilégios de Administrador", L"Mostrar histórico de comandos", L"Exibir comandos recentes e fixados", L"Limpar campo ao abrir", L"Desative para manter o último comando", L"Executar como Administrador", L"Elevar por padrão (Ctrl + Shift + Enter sempre funciona)", L"Limpar todo o histórico", L"Remover histórico recente do Windows RunMRU", L"Idioma de exibição (21 idiomas)", L"Aplica imediatamente na caixa Run e nas Configurações", L"Escolher cor", L"Paleta rápida Fluent", L"Aplicar", L"Cancelar", L"Selecionar imagem de fundo ou GIF animado", L"Quando ativado, os comandos serão executados como Administrador. Permitir?", L"Aviso de Administrador" };
-    }
-    else if (lang == L"it") {
-        return { L"Impostazioni Modern Run", L"Personalizzazione", L"Layout e posizione", L"Cronologia e comportamento", L"Lingua (21)", L"Attivo", L"Disattivo", L"Predef.", L"Auto", L"Scegli colore...", L"Sfoglia...", L"Rimuovi", L"Cancella ora", L"Personalizzato", L"Windows 11 Blur (Predef.)", L"Auto (Segui Windows)", L"Scuro", L"Chiaro", L"In basso a sinistra", L"In basso al centro", L"In basso a destra", L"In alto a sinistra", L"In alto al centro", L"In alto a destra", L"Centro schermo", L"Tema e superficie", L"Scegli un tema integrato (Windows 11 Blur e Liquid Glass ottimizzati)", L"Tema predefinito", L"Scegli tra 13 temi integrati (predefinito: Windows 11 Blur)", L"Modalità colore", L"Segui Windows o fissa Scuro / Chiaro", L"Colori, sfondo e angoli personalizzati", L"Personalizza colori, immagine/GIF animata e raggio angoli", L"Colore di sfondo", L"Lascia Predef. per seguire il tema", L"Colore del bordo", L"Modifica il bordo della barra e della cronologia", L"Raggio angoli", L"0 px = quadrato, 14 px = Win11, 27 px = pillola", L"Immagine di sfondo / GIF animata", L"Nessun file — PNG, JPG, WebP, GIF animata (max 25 MB)", L"Attivo: ", L"Opacità sfondo personalizzato", L"Regola la visibilità di immagine/GIF (predefinito 85%)", L"Posizione e modalità", L"Configura dove aprire Win + R e lo stile del layout", L"Posizione finestra", L"Fissa a un bordo/centro o usa Auto", L"Ricorda ultima posizione", L"Riapri nell'ultima posizione trascinata (Ctrl + 0 per ripristinare)", L"Scala interfaccia", L"Ridimensiona l'intera finestra Esegui", L"Cronologia ed esecuzione", L"Gestisci cronologia, input iniziale e privilegi Amministratore", L"Mostra cronologia comandi", L"Mostra comandi recenti ed elementi fissati", L"Svuota campo all'apertura", L"Disattiva per mantenere l'ultimo comando", L"Esegui come Amministratore", L"Avvia elevato per impostazione predefinita (Ctrl + Maiusc + Invio sempre attivo)", L"Cancella tutta la cronologia", L"Pulisci la cronologia recente da Windows RunMRU", L"Lingua interfaccia (21 lingue)", L"Applicata subito alla finestra Esegui e alle Impostazioni", L"Scegli un colore", L"Tavolozza rapida Fluent", L"Applica", L"Annulla", L"Seleziona immagine di sfondo o GIF animata", L"Se attivo, i comandi verranno eseguiti come Amministratore. Consentire?", L"Avviso Amministratore" };
-    }
-    else if (lang == L"ru") {
-        return { L"Настройки Modern Run", L"Персонализация", L"Макет и положение", L"История и поведение", L"Язык", L"Вкл", L"Выкл", L"Сброс", L"Авто", L"Выбрать", L"Обзор…", L"Удаление", L"Очистка", L"Собственная", L"Windows 11 Blur (по умолчанию)", L"Авто", L"Темный", L"Светлый", L"Внизу слева", L"Внизу по центру", L"Внизу справа", L"Вверху слева", L"Вверху по центру", L"Вверху справа", L"По центру экрана", L"Тема и иконки", L"", L"Тема", L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Соответствие настройкам Windows или выбор вручную", L"Цвета, фон и углы", L"", L"Цвет фона", L"Заменяет цвет фона из темы", L"Цвет рамок", L"Используется, когда для рамок окон выбрано значение по умолчанию", L"Радиус углов", L"От -1 до 28\u00A0px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ", L"Активно: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)", L"Макет и положение", L"", L"Положение окна", L"В автоматическом режиме определяется макетом", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение", L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие", L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке", L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Запуск от имени администратора", L"Повышать права по умолчанию (Ctrl + Shift + Enter работает всегда)", L"Очистка истории", L"Недавние команды перестают отображаться в истории мода", L"Язык интерфейса", L"Применяется к окну запуска и настройкам мода", L"Выбор цвета", L"Быстрая палитра Fluent", L"Применить", L"Отмена", L"Фоновое изображение", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора" };
-    }
-    else if (lang == L"uk") {
-        return { L"Налаштування Modern Run", L"Персоналізація", L"Макет і позиція", L"Історія та поведінка", L"Мова (21)", L"Увімк.", L"Вимк.", L"Скинути", L"Авто", L"Колір...", L"Огляд...", L"Прибрати", L"Очистити", L"Власна", L"Windows 11 Blur (За замовч.)", L"Авто (як у Windows)", L"Темна", L"Світла", L"Знизу зліва", L"Знизу по центру", L"Знизу справа", L"Зверху зліва", L"Зверху по центру", L"Зверху справа", L"По центру екрана", L"Тема та поверхня", L"Оберіть вбудовану тему (Windows 11 Blur і Liquid Glass оптимізовано)", L"Пресет теми", L"13 вбудованих тем (за замовчуванням Windows 11 Blur)", L"Режим кольору", L"Слідувати Windows або обрати Темний / Світлий", L"Власні кольори, фон і заокруглення", L"Налаштуйте кольори, зображення/GIF-фон і радіус кутів", L"Колір фону", L"Залиште за замовчуванням для кольору теми", L"Колір рамки", L"Змінити колір рамки панелі та історії", L"Радіус кутів", L"0 px = прямі, 14 px = Win11, 27 px = капсула", L"Фонове зображення / GIF", L"Не обрано — PNG, JPG, WebP, анім. GIF (до 25 МБ)", L"Активно: ", L"Непрозорість фону", L"Видимість зображення/GIF (за замовч. 85%)", L"Позиція та режим показу", L"Налаштуйте розташування Win + R і стиль макета", L"Позиція вікна", L"Закріпити біля краю/центру або Авто", L"Запам'ятовувати позицію вікна", L"Відкривати в останньому місці (Ctrl + 0 для скидання)", L"Масштаб інтерфейсу", L"Змінити загальний розмір вікна Виконати", L"Історія та виконання", L"Керування історією, початковим полем і правами адміністратора", L"Показувати історію команд", L"Показувати останні та закріплені команди", L"Очищати поле при відкритті", L"Вимкніть, щоб зберігати останню команду", L"Запуск від імені адміністратора", L"Підвищувати права за замовчуванням (Ctrl + Shift + Enter завжди працює)", L"Очистити всю історію", L"Видалити останні команди з Windows RunMRU", L"Мова інтерфейсу (21 мова)", L"Застосовується миттєво до вікна Виконати та Налаштувань", L"Вибір кольору", L"Швидка палітра Fluent", L"Застосувати", L"Скасувати", L"Оберіть фонове зображення або GIF", L"Якщо увімкнено, команди запускатимуться з правами адміністратора. Дозволити?", L"Попередження прав адміністратора" };
-    }
-    else if (lang == L"pl") {
-        return { L"Ustawienia Modern Run", L"Personalizacja", L"Układ i pozycja", L"Historia i działanie", L"Język (21)", L"Wł.", L"Wył.", L"Domyślne", L"Auto", L"Kolor...", L"Przeglądaj...", L"Usuń", L"Wyczyść teraz", L"Własny", L"Windows 11 Blur (Domyślny)", L"Auto (jak Windows)", L"Ciemny", L"Jasny", L"Dół lewo", L"Dół środek", L"Dół prawo", L"Góra lewo", L"Góra środek", L"Góra prawo", L"Środek ekranu", L"Motyw i powierzchnia", L"Wybierz wbudowany motyw (Windows 11 Blur i Liquid Glass zoptymalizowane)", L"Motyw", L"Wybierz spośród 13 motywów (domyślnie Windows 11 Blur)", L"Tryb kolorów", L"Zgodnie z Windows lub na stałe Ciemny / Jasny", L"Własne kolory, tło i zaokrąglenie", L"Dostosuj kolory, obraz/animowany GIF i promień narożników", L"Kolor tła", L"Pozostaw Domyślne, aby użyć koloru motywu", L"Kolor obramowania", L"Zmień kolor ramki paska i karty historii", L"Zaokrąglenie rogów", L"0 px = kąt prosty, 14 px = Win11, 27 px = kapsułka", L"Obraz tła / Animowany GIF", L"Nie wybrano — PNG, JPG, WebP, animowany GIF (maks. 25 MB)", L"Aktywny: ", L"Krycie własnego tła", L"Dostosuj widoczność obrazu/GIF (domyślnie 85%)", L"Pozycja i tryb widoku", L"Skonfiguruj miejsce otwierania Win + R i układ", L"Pozycja okna", L"Przypnij do krawędzi/środka ekranu lub Auto", L"Zapamiętaj ostatnią pozycję", L"Otwieraj w ostatnim miejscu (Ctrl + 0 resetuje)", L"Skala interfejsu", L"Skaluj ogólny rozmiar okna Uruchamianie", L"Historia i uruchamianie", L"Zarządzaj historią, polem początkowym i uprawnieniami Administratora", L"Pokaż historię poleceń", L"Wyświetlaj ostatnie i przypięte polecenia", L"Wyczyść pole przy otwarciu", L"Wyłącz, aby zachować ostatnie polecenie", L"Uruchamiaj jako Administrator", L"Domyślnie z podwyższonymi uprawnieniami (Ctrl + Shift + Enter działa zawsze)", L"Wyczyść całą historię", L"Usuń ostatnie wpisy z Windows RunMRU", L"Język wyświetlania (21 języków)", L"Działa natychmiast w oknie Uruchamianie i Ustawieniach", L"Wybierz kolor", L"Szybkie kolory Fluent", L"Zastosuj", L"Anuluj", L"Wybierz obraz tła lub animowany GIF", L"Po włączeniu polecenia będą uruchamiane jako Administrator. Zezwolić?", L"Ostrzeżenie Administratora" };
-    }
-    else if (lang == L"nl") {
-        return { L"Modern Run Instellingen", L"Personalisatie", L"Indeling en positie", L"Geschiedenis en gedrag", L"Taal (21)", L"Aan", L"Uit", L"Standaard", L"Auto", L"Kleur...", L"Bladeren...", L"Wissen", L"Nu wissen", L"Aangepast", L"Windows 11 Blur (Standaard)", L"Auto (Volg Windows)", L"Donker", L"Licht", L"Linksonder", L"Middenonder", L"Rechtsonder", L"Linksboven", L"Middenboven", L"Rechtsboven", L"Midden scherm", L"Thema en oppervlak", L"Kies een ingebouwd thema (Windows 11 Blur & Liquid Glass geoptimaliseerd)", L"Thema-voorinstelling", L"Kies uit 13 thema's (standaard Windows 11 Blur)", L"Kleurmodus", L"Volg Windows of kies vast Donker / Licht", L"Aangepaste kleuren, achtergrond & afronding", L"Pas kleuren, afbeelding/GIF en hoekradius aan", L"Achtergrondkleur", L"Laat op Standaard om het thema te volgen", L"Randkleur", L"Wijzig de randkleur van balk en geschiedeniskaart", L"Hoekradius", L"0 px = vierkant, 14 px = Win11, 27 px = pil", L"Achtergrondafbeelding / Geanimeerde GIF", L"Geen gekozen — PNG, JPG, WebP, GIF (max 25 MB)", L"Actief: ", L"Dekking achtergrond", L"Pas zichtbaarheid van afbeelding/GIF aan (standaard 85%)", L"Positie en weergavemodus", L"Bepaal waar Win + R opent en je indeling", L"Dialoogpositie", L"Vastzetten aan rand/midden of Auto", L"Laatste vensterpositie onthouden", L"Heropenen op laatst gesleepte positie (Ctrl + 0 om te resetten)", L"UI-schaal", L"Algemene grootte van het Uitvoeren-venster schalen", L"Geschiedenis en uitvoering", L"Beheer geschiedenis, begininvoer en Administratorrechten", L"Opdrachtgeschiedenis tonen", L"Recente en vastgezette opdrachten weergeven", L"Invoerveld legen bij openen", L"Uitschakelen om laatste opdracht te behouden", L"Uitvoeren als Administrator", L"Standaard verhoogd starten (Ctrl + Shift + Enter werkt altijd)", L"Alle geschiedenis wissen", L"Recente geschiedenis uit Windows RunMRU wissen", L"Weergavetaal (21 talen)", L"Direct van toepassing op Uitvoeren en Instellingen", L"Kleur kiezen", L"Snelle Fluent-kleuren", L"Toepassen", L"Annuleren", L"Kies een achtergrondafbeelding of geanimeerde GIF", L"Indien ingeschakeld starten opdrachten als Administrator. Toestaan?", L"Administrator-waarschuwing" };
-    }
-    else if (lang == L"tr") {
-        return { L"Modern Run Ayarları", L"Kişiselleştirme", L"Düzen ve Konum", L"Geçmiş ve Davranış", L"Dil (21)", L"Açık", L"Kapalı", L"Varsayılan", L"Otomatik", L"Renk seç...", L"Gözat...", L"Temizle", L"Şimdi temizle", L"Özel", L"Windows 11 Blur (Varsayılan)", L"Otomatik (Windows'u izle)", L"Koyu", L"Açık", L"Sol Alt", L"Orta Alt", L"Sağ Alt", L"Sol Üst", L"Orta Üst", L"Sağ Üst", L"Ekran Ortası", L"Tema ve Yüzey", L"Yerleşik bir tema seçin (Windows 11 Blur ve Liquid Glass optimize edildi)", L"Tema Ön Ayarı", L"13 yerleşik tema arasında geçiş yapın (varsayılan Windows 11 Blur)", L"Renk Modu", L"Windows temasını izle veya Koyu / Açık sabitle", L"Özel Renkler, Arka Plan ve Köşe", L"Renkleri, resim/hareketli GIF arka planını ve köşe yarıçapını özelleştirin", L"Arka Plan Rengi", L"Temayı izlemek için Varsayılan bırakın", L"Kenarlık Rengi", L"Giriş çubuğu ve geçmiş kartı kenarlığını değiştirin", L"Köşe Yarıçapı", L"0 px = kare, 14 px = Win11, 27 px = kapsül", L"Arka Plan Resmi / Hareketli GIF", L"Seçilmedi — PNG, JPG, WebP, GIF destekler (maks. 25 MB)", L"Etkin: ", L"Arka Plan Opaklığı", L"Resim/GIF görünürlüğünü ayarlayın (varsayılan %85)", L"Konum ve Görünüm Modu", L"Win + R açılış konumunu ve düzen stilini yapılandırın", L"Pencere Konumu", L"Ekran kenarına/ortasına sabitle veya Otomatik", L"Son Pencere Konumunu Hatırla", L"Son sürüklenen konumda aç (sıfırlamak için Ctrl + 0)", L"Arayüz Ölçeği", L"Çalıştır penceresinin genel boyutunu ölçeklendir", L"Geçmiş ve Çalıştırma", L"Komut geçmişi, başlangıç metni ve Yönetici izinlerini yönetin", L"Komut Geçmişini Göster", L"Son komutları ve sabitlenenleri göster", L"Açılışta Giriş Kutusunu Temizle", L"Son komutu korumak için kapatın", L"Yönetici Olarak Çalıştır", L"Varsayılan olarak yönetici izniyle aç (Ctrl + Shift + Enter her zaman çalışır)", L"Tüm Kayıtlı Geçmişi Sil", L"Windows RunMRU geçmişini temizle", L"Görüntüleme Dili (21 Dil)", L"Çalıştır penceresi ve Ayarlara anında uygulanır", L"Renk Seç", L"Hızlı Fluent Renkleri", L"Uygula", L"İptal", L"Arka Plan Resmi veya Hareketli GIF Seç", L"Etkinleştirildiğinde komutlar Yönetici ayrıcalıklarıyla çalışır. İzin veriyor musunuz?", L"Yönetici İzni Uyarısı" };
-    }
-    else if (lang == L"hi") {
-        return { L"Modern Run सेटिंग्स", L"वैयक्तिकरण", L"लेआउट और स्थिति", L"इतिहास और व्यवहार", L"भाषा (21)", L"चालू", L"बंद", L"डिफ़ॉल्ट", L"ऑटो", L"रंग चुनें...", L"ब्राउज़...", L"हटाएं", L"अभी साफ़ करें", L"कस्टम", L"Windows 11 Blur (डिफ़ॉल्ट)", L"ऑटो (Windows अनुसार)", L"डार्क", L"लाइट", L"नीचे बाएँ", L"नीचे मध्य", L"नीचे दाएँ", L"ऊपर बाएँ", L"ऊपर मध्य", L"ऊपर दाएँ", L"स्क्रीन मध्य", L"थीम और सतह", L"बिल्ट-इन थीम चुनें (Windows 11 Blur और Liquid Glass अनुकूलित हैं)", L"थीम प्रीसेट", L"13 बिल्ट-इन थीम में से चुनें (डिफ़ॉल्ट Windows 11 Blur)", L"रंग मोड", L"Windows थीम का पालन करें या डार्क / लाइट चुनें", L"कस्टम रंग, बैकग्राउंड और कोने", L"रंग, छवि/एनिमेटेड GIF बैकग्राउंड और कोनों की गोलाई बदलें", L"बैकग्राउंड रंग", L"थीम के अनुसार रखने के लिए डिफ़ॉल्ट छोड़ें", L"बॉर्डर रंग", L"डायलॉग और इतिहास कार्ड का बॉर्डर रंग बदलें", L"कॉर्नर रेडियस", L"0 px = चौकोर, 14 px = Win11, 27 px = पिल", L"बैकग्राउंड छवि / एनिमेटेड GIF", L"कोई फ़ाइल नहीं — PNG, JPG, WebP, GIF समर्थित (अधिकतम 25 MB)", L"सक्रिय: ", L"बैकग्राउंड अस्पष्टता", L"छवि/GIF की स्पष्टता बदलें (डिफ़ॉल्ट 85%)", L"स्थिति और डिस्प्ले मोड", L"Win + R की स्थिति और लेआउट शैली कॉन्फ़िगर करें", L"डायलॉग स्थिति", L"स्क्रीन के किनारे/मध्य में पिन करें या ऑटो चुनें", L"अंतिम विंडो स्थिति याद रखें", L"अंतिम खींची गई स्थिति पर खोलें (रीसेट के लिए Ctrl + 0)", L"UI आकार स्केल", L"Run डायलॉग का कुल आकार बदलें", L"इतिहास और निष्पादन", L"कमांड इतिहास, प्रारंभिक इनपुट और एडमिन अधिकार प्रबंधित करें", L"कमांड इतिहास दिखाएं", L"हाल की और पिन की गई कमांड दिखाएं", L"खुलने पर इनपुट खाली करें", L"पिछली कमांड बनाए रखने के लिए बंद करें", L"एडमिनिस्ट्रेटर के रूप में चलाएं", L"डिफ़ॉल्ट रूप से एडमिन अधिकार से चलाएं (Ctrl + Shift + Enter हमेशा काम करता है)", L"सभी सहेजा गया इतिहास मिटाएं", L"Windows RunMRU से हाल का इतिहास हटाएं", L"प्रदर्शन भाषा (21 भाषाएं)", L"Run डायलॉग और सेटिंग्स दोनों पर तुरंत लागू होता है", L"रंग चुनें", L"त्वरित Fluent रंग", L"लागू करें", L"रद्द करें", L"बैकग्राउंड छवि या एनिमेटेड GIF चुनें", L"सक्रिय होने पर कमांड एडमिनिस्ट्रेटर अधिकारों के साथ चलेंगी। अनुमति दें?", L"एडमिनिस्ट्रेटर चेतावनी" };
-    }
-    else if (lang == L"ar") {
-        return { L"إعدادات Modern Run", L"التخصيص", L"التخطيط والموضع", L"السجل والسلوك", L"اللغة (21)", L"تشغيل", L"إيقاف", L"افتراضي", L"تلقائي", L"اختر لوناً...", L"استعراض...", L"مسح", L"مسح الآن", L"مخصص", L"Windows 11 Blur (افتراضي)", L"تلقائي (حسب Windows)", L"داكن", L"فاتح", L"أسفل اليسار", L"أسفل الوسط", L"أسفل اليمين", L"أعلى اليسار", L"أعلى الوسط", L"أعلى اليمين", L"وسط الشاشة", L"السمة والمظهر", L"اختر سمة جاهزة (Windows 11 Blur و Liquid Glass مضبوطان تلقائياً)", L"السمة الجاهزة", L"اختر من بين 13 سمة مدمجة (الافتراضي Windows 11 Blur)", L"وضع الألوان", L"اتبع سمة Windows أو اختر داكن / فاتح", L"الألوان والخلفية والزوايا المخصصة", L"خصّص الألوان وصورة/GIF المتحركة واستدارة الزوايا", L"لون الخلفية", L"اتركه افتراضياً ليتبع السمة", L"لون الإطار", L"تغيير لون إطار مربع التشغيل وبطاقة السجل", L"استدارة الزوايا", L"0 px = مربع، 14 px = Win11، 27 px = كبسولة", L"صورة خلفية / GIF متحرك", L"لم يتم الاختيار — يدعم PNG و JPG و WebP و GIF (حد 25 MB)", L"نشط: ", L"شفافية الخلفية المخصصة", L"اضبط وضوح الصورة/GIF (الافتراضي 85%)", L"الموضع ووضع العرض", L"اضبط مكان فتح Win + R ونمط التخطيط", L"موضع النافذة", L"ثبّت عند حافة/وسط الشاشة أو تلقائي", L"تذكّر آخر موضع للنافذة", L"إعادة الفتح في آخر مكان سحب (Ctrl + 0 لإعادة الضبط)", L"مقياس الواجهة", L"تكبير أو تصغير حجم نافذة التشغيل", L"السجل وسلوك التشغيل", L"إدارة سجل الأوامر والإدخال الأولي وصلاحيات المسؤول", L"إظهار سجل الأوامر", L"عرض الأوامر الأخيرة والمثبتة", L"تفريغ مربع الإدخال عند الفتح", L"أوقفه للإبقاء على آخر أمر كما في Run الكلاسيكي", L"التشغيل كمسؤول (Admin)", L"التشغيل بصلاحيات المسؤول افتراضياً (Ctrl + Shift + Enter يعمل دائماً)", L"مسح كل السجل المحفوظ", L"حذف الأوامر الأخيرة من Windows RunMRU", L"لغة العرض (21 لغة)", L"تُطبّق فوراً على نافذة Run ونافذة الإعدادات", L"اختر لوناً", L"ألوان Fluent السريعة", L"تطبيق", L"إلغاء", L"اختر صورة خلفية أو GIF متحرك", L"عند التفعيل، ستعمل الأوامر بصلاحيات المسؤول. هل توافق؟", L"تحذير صلاحيات المسؤول" };
-    }
-    return { L"Modern Run Settings", L"Personalization", L"Layout & Position", L"History & Behavior", L"Language", L"On", L"Off", L"Default", L"Auto", L"Color…", L"Browse…", L"Remove", L"Clear", L"Custom", L"Windows 11 Blur (Default)", L"Auto", L"Dark", L"Light", L"Bottom Left", L"Bottom Center", L"Bottom Right", L"Top Left", L"Top Center", L"Top Right", L"Screen Center", L"Theme & Icons", L"", L"Theme", L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode", L"Colors, Background & Corners", L"", L"Background Color", L"Overrides the background color from the theme", L"Border Color", L"Used when the default border mode is selected", L"Border Radius", L"From -1 to 28\u00A0px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB", L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 12–100% (default 84%)", L"Layout & Position", L"", L"Window Position", L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it", L"UI Size Scale", L"Overall size of the window, controls, and text", L"History & Dismissal", L"", L"Show Command History", L"Recent and pinned commands in the list", L"Clear Input Box on Open", L"Empty input field when the window opens", L"Run Commands as Administrator", L"Launch elevated by default (Ctrl + Shift + Enter always works)", L"Clear History", L"Recent commands are hidden from the mod history", L"Display Language", L"Applies to Run and its settings", L"Pick a Color", L"Quick Fluent Swatches", L"Apply", L"Cancel", L"Background Image", L"Commands will run as administrator", L"Run as Administrator" };
+    const auto code = ResolveEffectiveLanguageCode(rawLang);
+    if (code == L"ru") return {
+        L"Настройки Modern Run", L"Персонализация", L"Макет и положение",
+        L"Язык интерфейса", L"Вкл.", L"Выкл.",
+        L"Сбросить", L"Авто", L"Выбрать",
+        L"Открыть", L"Удалить", L"Очистить",
+        L"Свои цвета и радиус углов", L"Windows 11 Blur", L"Авто",
+        L"Темный", L"Светлый", L"Снизу слева",
+        L"Снизу по центру", L"Снизу справа", L"Сверху слева",
+        L"Сверху по центру", L"Сверху справа", L"По центру экрана",
+        L"Тема и иконки", L"", L"Тема",
+        L"Готовое сочетание цветов, фона и скругления углов", L"Цветовой режим", L"Соответствие настройкам Windows или выбор вручную",
+        L"Цвета, фон и углы", L"", L"Цвет фона",
+        L"Цвет в формате #RRGGBB, например #1E1E24. Пустое значение использует цвет темы", L"Цвет рамок", L"Цвет рамок в режиме по умолчанию. Формат #RRGGBB, например #4C566A. Пустое значение использует цвет темы",
+        L"От -1 до 28 px; -1 — следование теме, 0 — прямые углы, 14 — стиль Windows, 27 — капсула", L"Фоновое изображение", L"PNG, JPG, BMP, WebP или GIF до 25 МБ",
+        L"Выбрано: ", L"Видимость фонового изображения", L"Непрозрачность изображения и фона окна, в том числе без изображения; 12–100% (по умолчанию 84%)",
+        L"Макет и положение", L"", L"Положение окна",
+        L"В автоматическом режиме определяется макетом", L"Запоминать положение окна", L"Открытие в последнем сохраненном месте, Ctrl + 0 сбрасывает положение",
+        L"Масштаб интерфейса", L"Общий размер окна, элементов управления и текста", L"История и закрытие",
+        L"", L"Показывать историю команд", L"Недавние и закрепленные команды в списке",
+        L"Очищать поле при открытии", L"Пустое поле ввода при открытии окна", L"Очистка истории",
+        L"Недавние команды удаляются из этого списка", L"Язык интерфейса", L"Выбор цвета",
+        L"Цвета Fluent", L"Применить", L"Отмена",
+        L"Выбор фонового изображения", L"Команды будут запускаться от имени администратора", L"Запуск от имени администратора",
+        L"Набор значков для окна и контекстного меню", L"По теме", L"Дата и время в истории",
+        L"Короткие форматы даты и времени в строках истории", L"Закрывать при нажатии вне окна", L"Нажатие за пределами окна закрывает его",
+        L"Автоматически", L"Файлы изображений", L"Все файлы"
+    };
+    if (code == L"vi") return {
+        L"Cài đặt Modern Run", L"Cá nhân hóa", L"Bố cục và vị trí",
+        L"Ngôn ngữ hiển thị", L"Bật", L"Tắt",
+        L"Đặt lại", L"Tự động (góc theo kiểu cổ điển hoặc giữa cạnh dưới)", L"Chọn",
+        L"Mở", L"Xóa", L"Xóa",
+        L"Tùy chỉnh màu và độ bo góc", L"Windows 11 Blur", L"Tự động",
+        L"Tối", L"Sáng", L"Góc dưới bên trái (kiểu Windows cổ điển)",
+        L"Giữa cạnh dưới", L"Góc dưới bên phải", L"Góc trên bên trái",
+        L"Giữa cạnh trên", L"Góc trên bên phải", L"Giữa màn hình (Spotlight)",
+        L"Chủ đề và biểu tượng", L"", L"Chủ đề",
+        L"Bộ màu, nền và bán kính bo góc có sẵn", L"Chế độ màu", L"Dùng chế độ màu của Windows hoặc chọn thủ công",
+        L"Màu, nền và bo góc", L"", L"Màu nền",
+        L"Nhập màu theo định dạng #RRGGBB, ví dụ #1E1E24. Để trống để dùng màu của chủ đề", L"Màu viền", L"Màu viền ở chế độ mặc định. Dùng định dạng #RRGGBB, ví dụ #4C566A. Để trống để dùng màu của chủ đề",
+        L"Từ -1 đến 28 px. -1 dùng theo chủ đề, 0 cho góc vuông, 14 bo góc theo kiểu Windows, 27 tạo dạng viên nang", L"Ảnh nền", L"PNG, JPG, BMP, WebP hoặc GIF, tối đa 25 MB",
+        L"Đang dùng: ", L"Độ mờ đục của ảnh nền", L"Độ mờ đục của ảnh và nền cửa sổ, kể cả khi không đặt ảnh nền. 12–100% (mặc định 84%)",
+        L"Bố cục và vị trí", L"", L"Vị trí cửa sổ",
+        L"Ở chế độ tự động, vị trí phụ thuộc vào bố cục", L"Nhớ vị trí cửa sổ", L"Mở tại vị trí đã lưu gần nhất. Nhấn Ctrl + 0 để đặt lại",
+        L"Tỷ lệ giao diện", L"Kích thước tổng thể của cửa sổ, các thành phần điều khiển và văn bản", L"Lịch sử và cách đóng cửa sổ",
+        L"", L"Hiển thị danh sách lịch sử lệnh", L"Danh sách gồm các lệnh gần đây và lệnh đã ghim",
+        L"Xóa nội dung ô nhập khi mở", L"Để trống ô nhập khi mở cửa sổ", L"Xóa lịch sử",
+        L"Các lệnh gần đây sẽ bị xóa khỏi danh sách này", L"Ngôn ngữ hiển thị", L"Chọn màu",
+        L"Bảng màu Fluent có sẵn", L"Áp dụng", L"Hủy",
+        L"Chọn ảnh nền", L"Các lệnh sẽ chạy với quyền quản trị viên", L"Chạy với quyền quản trị viên",
+        L"Bộ biểu tượng cho cửa sổ và menu ngữ cảnh", L"Theo chủ đề", L"Ngày và giờ trong lịch sử",
+        L"Ngày và giờ được hiển thị ở định dạng ngắn trong lịch sử", L"Đóng khi bấm ra ngoài", L"Bấm ra ngoài để đóng cửa sổ",
+        L"Tự động", L"Tệp ảnh", L"Tất cả tệp"
+    };
+    if (code == L"zh_cn") return {
+        L"Modern Run 设置", L"个性化", L"布局和位置",
+        L"显示语言", L"开启", L"关闭",
+        L"重置", L"自动（经典角落或底部居中）", L"选择",
+        L"打开", L"移除", L"清除",
+        L"自定义颜色和圆角半径", L"Windows 11 Blur", L"自动",
+        L"深色", L"浅色", L"左下角（经典 Windows）",
+        L"底部居中", L"右下角", L"左上角",
+        L"顶部居中", L"右上角", L"屏幕中央（Spotlight）",
+        L"主题和图标", L"", L"主题",
+        L"预设配色、背景与圆角半径", L"颜色模式", L"跟随 Windows 设置，也可手动选择模式",
+        L"颜色、背景和圆角", L"", L"背景色",
+        L"使用 #RRGGBB 格式，例如 #1E1E24。留空则使用主题颜色", L"边框颜色", L"默认模式下的边框颜色。使用 #RRGGBB 格式，例如 #4C566A。留空则使用主题颜色",
+        L"范围为 -1 至 28 px。-1 跟随主题，0 为直角，14 为 Windows 样式，27 为胶囊形", L"背景图像", L"支持 PNG、JPG、BMP、WebP 或 GIF，最大 25 MB",
+        L"当前： ", L"背景图像不透明度", L"图像和窗口背景的不透明度，未设置图像时也适用。12–100%（默认 84%）",
+        L"布局和位置", L"", L"窗口位置",
+        L"自动模式下的位置由布局决定", L"记住窗口位置", L"在上次保存的位置打开。按 Ctrl + 0 重置",
+        L"界面缩放比例", L"窗口、控件和文字的整体大小", L"历史记录和关闭方式",
+        L"", L"显示命令历史列表", L"列表显示近期命令和已固定的命令",
+        L"打开时清空输入框", L"打开窗口时输入框为空", L"清除历史记录",
+        L"从此列表中删除最近使用的命令", L"显示语言", L"选择颜色",
+        L"Fluent 预设色板", L"应用", L"取消",
+        L"选择背景图像", L"命令将以管理员身份运行", L"以管理员身份运行",
+        L"窗口和上下文菜单的图标组", L"主题默认值", L"历史记录中的日期和时间",
+        L"在历史记录中使用简短的日期和时间格式", L"单击窗口外部时关闭", L"单击窗口外部即可关闭窗口",
+        L"自动", L"图像文件", L"所有文件"
+    };
+    if (code == L"zh_tw") return {
+        L"Modern Run 設定", L"個人化", L"版面配置與位置",
+        L"顯示語言", L"開啟", L"關閉",
+        L"重設", L"自動（傳統角落或底部置中）", L"選取",
+        L"開啟", L"移除", L"清除",
+        L"自訂色彩與圓角半徑", L"Windows 11 Blur", L"自動",
+        L"深色", L"淺色", L"左下角（傳統 Windows）",
+        L"底部置中", L"右下角", L"左上角",
+        L"頂端置中", L"右上角", L"螢幕中央（Spotlight）",
+        L"佈景主題與圖示", L"", L"佈景主題",
+        L"預設的配色、背景與圓角半徑", L"色彩模式", L"依 Windows 設定，或手動選擇模式",
+        L"色彩、背景與圓角", L"", L"背景色彩",
+        L"使用 #RRGGBB 格式，例如 #1E1E24。留白時使用佈景主題的色彩", L"邊框色彩", L"預設模式的邊框色彩。使用 #RRGGBB 格式，例如 #4C566A。留白時使用佈景主題的色彩",
+        L"範圍為 -1 至 28 px。-1 依佈景主題，0 為直角，14 為 Windows 樣式，27 為膠囊形", L"背景圖片", L"支援 PNG、JPG、BMP、WebP 或 GIF，上限為 25 MB",
+        L"目前使用： ", L"背景圖片不透明度", L"圖片與視窗背景的不透明度，即使未設定圖片也適用。12–100%（預設 84%）",
+        L"版面配置與位置", L"", L"視窗位置",
+        L"自動模式下的位置由版面配置決定", L"記住視窗位置", L"在上次儲存的位置開啟。按 Ctrl + 0 重設",
+        L"介面縮放比例", L"視窗、控制項和文字的整體大小", L"歷程記錄與關閉方式",
+        L"", L"顯示指令歷史清單", L"清單會顯示近期命令與已釘選的命令",
+        L"開啟時清空輸入欄", L"開啟視窗時將輸入欄留白", L"清除歷程記錄",
+        L"移除此清單中的最近使用命令", L"顯示語言", L"選取色彩",
+        L"Fluent 預設色票", L"套用", L"取消",
+        L"選取背景圖片", L"命令將以系統管理員身分執行", L"以系統管理員身分執行",
+        L"視窗與快顯功能表使用的圖示組", L"佈景主題預設值", L"歷程記錄中的日期與時間",
+        L"在歷程記錄中使用簡短的日期與時間格式", L"按一下視窗外部時關閉", L"按一下視窗外的區域即可關閉視窗",
+        L"自動", L"圖片檔案", L"所有檔案"
+    };
+    if (code == L"ja") return {
+        L"Modern Run の設定", L"個人用設定", L"レイアウトと位置",
+        L"表示言語", L"オン", L"オフ",
+        L"リセット", L"自動 (クラシックの隅または下中央)", L"選択",
+        L"開く", L"削除", L"クリア",
+        L"色と角の丸みをカスタマイズ", L"Windows 11 Blur", L"自動",
+        L"ダーク", L"ライト", L"左下 (Windows クラシック)",
+        L"下中央", L"右下", L"左上",
+        L"上中央", L"右上", L"画面中央 (Spotlight)",
+        L"テーマとアイコン", L"", L"テーマ",
+        L"配色、背景、角の丸みをまとめたプリセット", L"カラーモード", L"Windows の設定に従うか、モードを手動で選択",
+        L"色、背景、角の丸み", L"", L"背景色",
+        L"#RRGGBB 形式で指定します (例: #1E1E24)。空欄の場合はテーマの色を使用します", L"枠線の色", L"既定モードの枠線の色です。#RRGGBB 形式で指定します (例: #4C566A)。空欄の場合はテーマの色を使用します",
+        L"範囲は -1 ～ 28 px。-1 はテーマに従い、0 は直角、14 は Windows 風の角、27 はカプセル型になります", L"背景画像", L"PNG、JPG、BMP、WebP、GIF に対応 (最大 25 MB)",
+        L"使用中: ", L"背景画像の不透明度", L"画像とウィンドウの背景の不透明度です。画像が未設定の場合にも適用されます。12～100% (既定値: 84%)",
+        L"レイアウトと位置", L"", L"ウィンドウの位置",
+        L"自動モードではレイアウトに応じて位置が決まります", L"ウィンドウの位置を記憶する", L"最後に保存した位置で開きます。Ctrl + 0 でリセットできます",
+        L"インターフェイスの拡大率", L"ウィンドウ、コントロール、テキスト全体のサイズ", L"履歴とウィンドウの閉じ方",
+        L"", L"コマンド履歴を表示", L"最近のコマンドとピン留めしたコマンドを一覧に表示します",
+        L"開いたときに入力欄を空にする", L"ウィンドウを開いたときに入力欄を空にします", L"履歴を消去",
+        L"この一覧から最近使ったコマンドを削除します", L"表示言語", L"色を選択",
+        L"Fluent の色見本", L"適用", L"キャンセル",
+        L"背景画像を選択", L"コマンドを管理者として実行します", L"管理者として実行",
+        L"ウィンドウとコンテキスト メニューで使用するアイコン", L"テーマの既定値", L"履歴の日付と時刻",
+        L"履歴の日時を短い形式で表示します", L"外側をクリックして閉じる", L"ウィンドウの外側をクリックすると閉じます",
+        L"自動", L"画像ファイル", L"すべてのファイル"
+    };
+    if (code == L"ko") return {
+        L"Modern Run 설정", L"개인 설정", L"레이아웃 및 위치",
+        L"표시 언어", L"켬", L"끔",
+        L"초기화", L"자동(클래식 모서리 또는 하단 가운데)", L"선택",
+        L"열기", L"제거", L"지우기",
+        L"사용자 지정 색상 및 모서리 반경", L"Windows 11 Blur", L"자동",
+        L"어둡게", L"밝게", L"왼쪽 아래(클래식 Windows)",
+        L"하단 가운데", L"오른쪽 아래", L"왼쪽 위",
+        L"상단 가운데", L"오른쪽 위", L"화면 가운데(Spotlight)",
+        L"테마 및 아이콘", L"", L"테마",
+        L"색상, 배경 및 모서리 반경을 미리 설정한 테마", L"색 모드", L"Windows 설정을 따르거나 모드를 직접 선택",
+        L"색상, 배경 및 모서리", L"", L"배경색",
+        L"#RRGGBB 형식으로 입력합니다(예: #1E1E24). 비워 두면 테마 색상을 사용합니다", L"테두리 색", L"기본 모드의 테두리 색입니다. #RRGGBB 형식으로 입력합니다(예: #4C566A). 비워 두면 테마 색상을 사용합니다",
+        L"범위는 -1~28 px입니다. -1은 테마 설정, 0은 직각, 14는 Windows 스타일, 27은 캡슐 모양입니다", L"배경 이미지", L"PNG, JPG, BMP, WebP 또는 GIF(최대 25 MB)",
+        L"사용 중: ", L"배경 이미지 불투명도", L"이미지와 창 배경의 불투명도입니다. 이미지를 설정하지 않은 경우에도 적용됩니다. 12~100%(기본값: 84%)",
+        L"레이아웃 및 위치", L"", L"창 위치",
+        L"자동 모드에서는 레이아웃에 따라 위치가 결정됩니다", L"창 위치 기억", L"마지막으로 저장한 위치에서 열립니다. Ctrl + 0으로 초기화할 수 있습니다",
+        L"인터페이스 배율", L"창, 컨트롤 및 텍스트의 전체 크기", L"기록 및 닫기",
+        L"", L"명령 기록 표시", L"최근 명령과 고정한 명령을 목록에 표시합니다",
+        L"열 때 입력란 비우기", L"창이 열릴 때 빈 입력란을 표시합니다", L"기록 지우기",
+        L"이 목록에서 최근 명령을 제거합니다", L"표시 언어", L"색 선택",
+        L"Fluent 색 견본", L"적용", L"취소",
+        L"배경 이미지 선택", L"명령이 관리자 권한으로 실행됩니다", L"관리자 권한으로 실행",
+        L"창과 상황에 맞는 메뉴에 사용할 아이콘 모음", L"테마 기본값", L"기록에 날짜 및 시간 표시",
+        L"기록에서 날짜와 시간을 간단한 형식으로 표시합니다", L"창 바깥을 클릭할 때 닫기", L"창 바깥을 클릭하면 창이 닫힙니다",
+        L"자동", L"이미지 파일", L"모든 파일"
+    };
+    if (code == L"th") return {
+        L"การตั้งค่า Modern Run", L"การตั้งค่าส่วนบุคคล", L"เค้าโครงและตำแหน่ง",
+        L"ภาษาที่แสดง", L"เปิด", L"ปิด",
+        L"รีเซ็ต", L"อัตโนมัติ (มุมแบบคลาสสิกหรือตรงกลางด้านล่าง)", L"เลือก",
+        L"เปิด", L"เอาออก", L"ล้าง",
+        L"กำหนดสีและรัศมีมุมเอง", L"Windows 11 Blur", L"อัตโนมัติ",
+        L"มืด", L"สว่าง", L"มุมซ้ายล่าง (Windows แบบคลาสสิก)",
+        L"ตรงกลางด้านล่าง", L"มุมขวาล่าง", L"มุมซ้ายบน",
+        L"ตรงกลางด้านบน", L"มุมขวาบน", L"กลางหน้าจอ (Spotlight)",
+        L"ธีมและไอคอน", L"", L"ธีม",
+        L"ชุดสี พื้นหลัง และรัศมีมุมที่กำหนดไว้ล่วงหน้า", L"โหมดสี", L"ใช้โหมดสีตาม Windows หรือเลือกโหมดเอง",
+        L"สี พื้นหลัง และมุม", L"", L"สีพื้นหลัง",
+        L"ระบุสีในรูปแบบ #RRGGBB เช่น #1E1E24 หากเว้นว่าง จะใช้สีของธีม", L"สีเส้นขอบ", L"สีเส้นขอบในโหมดเริ่มต้น ใช้รูปแบบ #RRGGBB เช่น #4C566A หากเว้นว่าง จะใช้สีของธีม",
+        L"ตั้งได้ตั้งแต่ -1 ถึง 28 px โดย -1 ใช้ค่าของธีม, 0 เป็นมุมฉาก, 14 เป็นมุมแบบ Windows และ 27 เป็นทรงแคปซูล", L"รูปภาพพื้นหลัง", L"รองรับ PNG, JPG, BMP, WebP หรือ GIF ขนาดไม่เกิน 25 MB",
+        L"กำลังใช้: ", L"ความทึบของรูปภาพพื้นหลัง", L"ปรับความทึบของรูปภาพและพื้นหลังหน้าต่าง แม้ไม่ได้ตั้งรูปภาพพื้นหลัง ตั้งได้ 12–100% (ค่าเริ่มต้น 84%)",
+        L"เค้าโครงและตำแหน่ง", L"", L"ตำแหน่งหน้าต่าง",
+        L"ในโหมดอัตโนมัติ เค้าโครงจะกำหนดตำแหน่งหน้าต่าง", L"จดจำตำแหน่งหน้าต่าง", L"เปิดที่ตำแหน่งที่บันทึกล่าสุด กด Ctrl + 0 เพื่อรีเซ็ตตำแหน่ง",
+        L"อัตราส่วนอินเทอร์เฟซ", L"ขนาดโดยรวมของหน้าต่าง ตัวควบคุม และข้อความ", L"ประวัติและการปิดหน้าต่าง",
+        L"", L"แสดงประวัติคำสั่ง", L"แสดงคำสั่งล่าสุดและคำสั่งที่ปักหมุดในรายการ",
+        L"ล้างช่องป้อนข้อมูลเมื่อเปิด", L"เว้นช่องป้อนข้อมูลให้ว่างเมื่อเปิดหน้าต่าง", L"ล้างประวัติ",
+        L"ล้างคำสั่งล่าสุดออกจากรายการนี้", L"ภาษาที่แสดง", L"เลือกสี",
+        L"ชุดสี Fluent สำเร็จรูป", L"นำไปใช้", L"ยกเลิก",
+        L"เลือกรูปภาพพื้นหลัง", L"คำสั่งจะเรียกใช้ในฐานะผู้ดูแลระบบ", L"เรียกใช้ในฐานะผู้ดูแลระบบ",
+        L"ชุดไอคอนสำหรับหน้าต่างและเมนูบริบท", L"ค่าเริ่มต้นของธีม", L"วันที่และเวลาในประวัติ",
+        L"แสดงวันที่และเวลาในประวัติด้วยรูปแบบสั้น", L"ปิดเมื่อคลิกด้านนอก", L"คลิกด้านนอกเพื่อปิดหน้าต่าง",
+        L"อัตโนมัติ", L"ไฟล์รูปภาพ", L"ไฟล์ทั้งหมด"
+    };
+    if (code == L"id") return {
+        L"Pengaturan Modern Run", L"Personalisasi", L"Tata letak dan posisi",
+        L"Bahasa tampilan", L"Aktif", L"Nonaktif",
+        L"Reset", L"Otomatis (sudut klasik atau tengah bawah)", L"Pilih",
+        L"Buka", L"Hapus", L"Hapus",
+        L"Warna dan radius sudut khusus", L"Windows 11 Blur", L"Otomatis",
+        L"Gelap", L"Terang", L"Kiri bawah (Windows klasik)",
+        L"Tengah bawah", L"Kanan bawah", L"Kiri atas",
+        L"Tengah atas", L"Kanan atas", L"Tengah layar (Spotlight)",
+        L"Tema dan ikon", L"", L"Tema",
+        L"Kombinasi siap pakai untuk warna, latar belakang, dan radius sudut", L"Mode warna", L"Mengikuti pengaturan Windows atau mode yang dipilih secara manual",
+        L"Warna, latar belakang, dan sudut", L"", L"Warna latar belakang",
+        L"Warna dalam format #RRGGBB, misalnya #1E1E24. Jika kosong, warna tema digunakan", L"Warna bingkai", L"Warna bingkai pada mode default. Gunakan format #RRGGBB, misalnya #4C566A. Jika kosong, warna tema digunakan",
+        L"Antara -1 dan 28 piksel. -1 mengikuti tema, 0 untuk sudut siku-siku, 14 untuk sudut gaya Windows, dan 27 untuk bentuk kapsul", L"Gambar latar belakang", L"PNG, JPG, BMP, WebP, atau GIF hingga 25 MB",
+        L"File aktif: ", L"Opasitas latar belakang", L"Opasitas gambar dan latar belakang jendela, termasuk saat gambar belum dipilih. 12–100% (default 84%)",
+        L"Tata letak dan posisi", L"", L"Posisi jendela",
+        L"Dalam mode otomatis, posisi ditentukan oleh tata letak", L"Ingat posisi jendela", L"Jendela dibuka pada posisi terakhir yang disimpan. Ctrl + 0 mereset posisi",
+        L"Skala antarmuka", L"Ukuran keseluruhan jendela, kontrol, dan teks", L"Riwayat dan penutupan jendela",
+        L"", L"Tampilkan Riwayat Perintah", L"Perintah terakhir dan yang disematkan dalam daftar",
+        L"Kosongkan input saat dibuka", L"Kolom input kosong saat jendela dibuka", L"Hapus riwayat",
+        L"Perintah terbaru dihapus dari daftar ini", L"Bahasa tampilan", L"Pilih warna",
+        L"Palet warna Fluent", L"Terapkan", L"Batal",
+        L"Pilih gambar latar belakang", L"Perintah akan dijalankan sebagai administrator", L"Jalankan sebagai administrator",
+        L"Set ikon untuk jendela dan menu konteks", L"Sesuai tema", L"Tanggal dan waktu dalam riwayat",
+        L"Format tanggal dan waktu singkat dalam riwayat", L"Tutup saat mengeklik di luar", L"Jendela ditutup saat area di luarnya diklik",
+        L"Otomatis", L"File gambar", L"Semua file"
+    };
+    if (code == L"ms") return {
+        L"Tetapan Modern Run", L"Pemperibadian", L"Susun atur dan kedudukan",
+        L"Bahasa paparan", L"Hidup", L"Mati",
+        L"Set semula", L"Automatik (sudut klasik atau tengah bawah)", L"Pilih",
+        L"Buka", L"Alih keluar", L"Kosongkan",
+        L"Warna dan jejari sudut tersuai", L"Windows 11 Blur", L"Automatik",
+        L"Gelap", L"Cerah", L"Kiri bawah (Windows klasik)",
+        L"Tengah bawah", L"Kanan bawah", L"Kiri atas",
+        L"Tengah atas", L"Kanan atas", L"Tengah skrin (Spotlight)",
+        L"Tema dan ikon", L"", L"Tema",
+        L"Gabungan warna, latar belakang dan jejari sudut yang telah ditetapkan", L"Mod warna", L"Mengikut tetapan Windows atau mod yang dipilih secara manual",
+        L"Warna, latar belakang dan sudut", L"", L"Warna latar belakang",
+        L"Warna dalam format #RRGGBB, contohnya #1E1E24. Jika kosong, warna tema digunakan", L"Warna sempadan", L"Warna sempadan dalam mod lalai. Gunakan format #RRGGBB, contohnya #4C566A. Jika kosong, warna tema digunakan",
+        L"Antara -1 hingga 28 piksel. -1 mengikut tema, 0 untuk sudut segi empat, 14 untuk sudut gaya Windows dan 27 untuk bentuk kapsul", L"Imej latar belakang", L"PNG, JPG, BMP, WebP atau GIF sehingga 25 MB",
+        L"Fail aktif: ", L"Kelegapan latar belakang", L"Kelegapan imej dan latar belakang tetingkap, walaupun tiada imej dipilih. 12–100% (lalai 84%)",
+        L"Susun atur dan kedudukan", L"", L"Kedudukan tetingkap",
+        L"Dalam mod automatik, kedudukan ditentukan oleh susun atur", L"Ingat kedudukan tetingkap", L"Tetingkap dibuka pada kedudukan terakhir yang disimpan. Ctrl + 0 menetapkan semula kedudukan",
+        L"Skala antara muka", L"Saiz keseluruhan tetingkap, kawalan dan teks", L"Sejarah dan penutupan tetingkap",
+        L"", L"Papar Sejarah Arahan", L"Arahan terbaru dan yang disematkan dalam senarai",
+        L"Kosongkan input apabila dibuka", L"Medan input kosong apabila tetingkap dibuka", L"Kosongkan sejarah",
+        L"Arahan terkini dialih keluar daripada senarai ini", L"Bahasa paparan", L"Pilih warna",
+        L"Palet warna Fluent", L"Guna", L"Batal",
+        L"Pilih imej latar belakang", L"Arahan akan dijalankan sebagai pentadbir", L"Jalankan sebagai pentadbir",
+        L"Set ikon untuk tetingkap dan menu konteks", L"Mengikut tema", L"Tarikh dan masa dalam sejarah",
+        L"Format tarikh dan masa ringkas dalam sejarah", L"Tutup apabila diklik di luar", L"Tetingkap ditutup apabila diklik di luar",
+        L"Automatik", L"Fail imej", L"Semua fail"
+    };
+    if (code == L"fr") return {
+        L"Paramètres de Modern Run", L"Personnalisation", L"Disposition et position",
+        L"Langue d’affichage", L"Activé", L"Désactivé",
+        L"Réinitialiser", L"Automatique (coin classique ou bas au centre)", L"Choisir",
+        L"Ouvrir", L"Supprimer", L"Effacer",
+        L"Couleurs et rayon des angles personnalisés", L"Windows 11 Blur", L"Automatique",
+        L"Mode sombre", L"Mode clair", L"En bas à gauche (Windows classique)",
+        L"En bas au centre", L"En bas à droite", L"En haut à gauche",
+        L"En haut au centre", L"En haut à droite", L"Au centre de l’écran (Spotlight)",
+        L"Thème et icônes", L"", L"Thème",
+        L"Ensemble prédéfini de couleurs, de fond et d’arrondis", L"Mode de couleur", L"Suit les paramètres de Windows ou utilise le mode sélectionné",
+        L"Couleurs, arrière-plan et angles", L"", L"Couleur d’arrière-plan",
+        L"Couleur au format #RRGGBB, par exemple #1E1E24. Si le champ est vide, utilise la couleur du thème", L"Couleur de bordure", L"Couleur de bordure dans le mode par défaut. Utilisez le format #RRGGBB, par exemple #4C566A. Si le champ est vide, utilise la couleur du thème",
+        L"De -1 à 28 px. -1 suit le thème, 0 donne des angles droits, 14 reprend le style Windows et 27 donne une forme de capsule", L"Image d’arrière-plan", L"PNG, JPG, BMP, WebP ou GIF, jusqu’à 25 Mo",
+        L"En cours : ", L"Opacité de l’arrière-plan", L"Opacité de l’image et du fond de la fenêtre, même sans image. 12–100 % (84 % par défaut)",
+        L"Disposition et position", L"", L"Position de la fenêtre",
+        L"En mode automatique, la disposition détermine la position", L"Mémoriser la position de la fenêtre", L"Rouvre la fenêtre à la dernière position enregistrée. Ctrl + 0 la réinitialise",
+        L"Échelle de l’interface", L"Taille de la fenêtre, des commandes et du texte", L"Historique et fermeture",
+        L"", L"Afficher l'historique", L"Commandes récentes et épinglées dans la liste",
+        L"Vider le champ de saisie à l’ouverture", L"Le champ de saisie est vide à l’ouverture", L"Effacer l’historique",
+        L"Supprime les commandes récentes de cette liste", L"Langue d’affichage", L"Choisir une couleur",
+        L"Palette Fluent", L"Appliquer", L"Annuler",
+        L"Sélectionner une image d’arrière-plan", L"Les commandes seront exécutées en tant qu’administrateur", L"Exécuter en tant qu’administrateur",
+        L"Jeu d’icônes de la fenêtre et du menu contextuel", L"Par défaut du thème", L"Date et heure dans l’historique",
+        L"Formats courts pour la date et l’heure dans l’historique", L"Fermer au clic en dehors", L"Un clic en dehors de la fenêtre la ferme",
+        L"Automatique", L"Fichiers image", L"Tous les fichiers"
+    };
+    if (code == L"de") return {
+        L"Modern Run-Einstellungen", L"Personalisierung", L"Layout und Position",
+        L"Anzeigesprache", L"Ein", L"Aus",
+        L"Zurücksetzen", L"Automatisch (klassische Ecke oder unten mittig)", L"Auswählen",
+        L"Öffnen", L"Entfernen", L"Löschen",
+        L"Benutzerdefinierte Farben und Eckenradien", L"Windows 11 Blur", L"Automatisch",
+        L"Dunkler Modus", L"Heller Modus", L"Unten links (klassisches Windows)",
+        L"Unten mittig", L"Unten rechts", L"Oben links",
+        L"Oben mittig", L"Oben rechts", L"Bildschirmmitte (Spotlight)",
+        L"Design und Symbole", L"", L"Design",
+        L"Voreinstellung für Farben, Hintergrund und Eckenradius", L"Farbmodus", L"Übernimmt die Windows-Einstellungen oder den ausgewählten Modus",
+        L"Farben, Hintergrund und Ecken", L"", L"Hintergrundfarbe",
+        L"Farbe im Format #RRGGBB, zum Beispiel #1E1E24. Ein leeres Feld übernimmt die Designfarbe", L"Rahmenfarbe", L"Rahmenfarbe im Standardmodus. Format #RRGGBB, zum Beispiel #4C566A. Ein leeres Feld übernimmt die Designfarbe",
+        L"Von -1 bis 28 px. -1 übernimmt das Design, 0 ergibt rechte Winkel, 14 entspricht dem Windows-Stil und 27 ergibt eine Kapselform", L"Hintergrundbild", L"PNG, JPG, BMP, WebP oder GIF bis 25 MB",
+        L"Aktiv: ", L"Deckkraft des Hintergrunds", L"Deckkraft von Bild und Fensterhintergrund, auch ohne Bild. 12–100 % (Standard: 84 %)",
+        L"Layout und Position", L"", L"Fensterposition",
+        L"Im automatischen Modus bestimmt das Layout die Position", L"Fensterposition speichern", L"Öffnet das Fenster an der zuletzt gespeicherten Position. Strg + 0 setzt sie zurück",
+        L"Skalierung der Oberfläche", L"Größe von Fenster, Steuerelementen und Text", L"Verlauf und Schließen",
+        L"", L"Befehlsverlauf anzeigen", L"Liste der zuletzt verwendeten und angehefteten Befehle",
+        L"Eingabefeld beim Öffnen leeren", L"Das Eingabefeld ist beim Öffnen leer", L"Verlauf löschen",
+        L"Entfernt kürzlich verwendete Befehle aus dieser Liste", L"Anzeigesprache", L"Farbe auswählen",
+        L"Fluent-Farbpalette", L"Übernehmen", L"Abbrechen",
+        L"Hintergrundbild auswählen", L"Befehle werden als Administrator ausgeführt", L"Als Administrator ausführen",
+        L"Symbolsatz für Fenster und Kontextmenü", L"Standard des Designs", L"Datum und Uhrzeit im Verlauf",
+        L"Kurzes Datums- und Uhrzeitformat im Verlauf", L"Bei Klick außerhalb schließen", L"Ein Klick außerhalb des Fensters schließt es",
+        L"Automatisch", L"Bilddateien", L"Alle Dateien"
+    };
+    if (code == L"es") return {
+        L"Configuración de Modern Run", L"Personalización", L"Distribución y posición",
+        L"Idioma de visualización", L"Activado", L"Desactivado",
+        L"Restablecer", L"Automático (esquina clásica o abajo en el centro)", L"Elegir",
+        L"Abrir", L"Quitar", L"Borrar",
+        L"Colores y redondeo personalizados", L"Windows 11 Blur", L"Automático",
+        L"Modo oscuro", L"Modo claro", L"Abajo a la izquierda (Windows clásico)",
+        L"Abajo en el centro", L"Abajo a la derecha", L"Arriba a la izquierda",
+        L"Arriba en el centro", L"Arriba a la derecha", L"Centro de la pantalla (Spotlight)",
+        L"Tema e iconos", L"", L"Tema",
+        L"Combinación predefinida de colores, fondo y redondeo de esquinas", L"Modo de color", L"Sigue la configuración de Windows o usa el modo seleccionado",
+        L"Colores, fondo y esquinas", L"", L"Color de fondo",
+        L"Color en formato #RRGGBB, por ejemplo #1E1E24. Si se deja vacío, se usa el color del tema", L"Color del borde", L"Color del borde en el modo predeterminado. Usa el formato #RRGGBB, por ejemplo #4C566A. Si se deja vacío, se usa el color del tema",
+        L"De -1 a 28 px. -1 sigue el tema, 0 da esquinas rectas, 14 usa el estilo de Windows y 27 da forma de cápsula", L"Imagen de fondo", L"PNG, JPG, BMP, WebP o GIF de hasta 25 MB",
+        L"Activo: ", L"Opacidad del fondo", L"Opacidad de la imagen y del fondo de la ventana, incluso si no se ha elegido una imagen. 12–100 % (84 % de forma predeterminada)",
+        L"Distribución y posición", L"", L"Posición de la ventana",
+        L"En el modo automático, la distribución determina la posición", L"Recordar la posición de la ventana", L"Abre la ventana en la última posición guardada. Ctrl + 0 la restablece",
+        L"Escala de la interfaz", L"Tamaño de la ventana, los controles y el texto", L"Historial y cierre",
+        L"", L"Mostrar historial de comandos", L"Comandos recientes y anclados en la lista",
+        L"Vaciar el campo de entrada al abrir", L"El campo de entrada aparece vacío al abrir la ventana", L"Borrar el historial",
+        L"Quita los comandos recientes de esta lista", L"Idioma de visualización", L"Elegir un color",
+        L"Paleta Fluent", L"Aplicar", L"Cancelar",
+        L"Seleccionar una imagen de fondo", L"Los comandos se ejecutarán como administrador", L"Ejecutar como administrador",
+        L"Conjunto de iconos de la ventana y del menú contextual", L"Valor predeterminado del tema", L"Fecha y hora en el historial",
+        L"Formatos cortos de fecha y hora en el historial", L"Cerrar al hacer clic fuera", L"Al hacer clic fuera de la ventana, se cierra",
+        L"Automático", L"Archivos de imagen", L"Todos los archivos"
+    };
+    if (code == L"pt") return {
+        L"Configurações do Modern Run", L"Personalização", L"Layout e posição",
+        L"Idioma de exibição", L"Ativado", L"Desativado",
+        L"Redefinir", L"Automático (canto clássico ou centro inferior)", L"Escolher",
+        L"Abrir", L"Remover", L"Limpar",
+        L"Cores e arredondamento personalizados", L"Windows 11 Blur", L"Automático",
+        L"Modo escuro", L"Modo claro", L"Inferior esquerdo (Windows clássico)",
+        L"Inferior central", L"Inferior direito", L"Superior esquerdo",
+        L"Superior central", L"Superior direito", L"Centro da tela (Spotlight)",
+        L"Tema e ícones", L"", L"Tema",
+        L"Combinação predefinida de cores, fundo e arredondamento dos cantos", L"Modo de cor", L"Segue as configurações do Windows ou usa o modo selecionado",
+        L"Cores, fundo e cantos", L"", L"Cor de fundo",
+        L"Cor no formato #RRGGBB, por exemplo #1E1E24. Se o campo estiver vazio, usa a cor do tema", L"Cor da borda", L"Cor da borda no modo padrão. Use o formato #RRGGBB, por exemplo #4C566A. Se o campo estiver vazio, usa a cor do tema",
+        L"De -1 a 28 px. -1 segue o tema, 0 deixa os cantos retos, 14 usa o estilo do Windows e 27 dá formato de cápsula", L"Imagem de fundo", L"PNG, JPG, BMP, WebP ou GIF de até 25 MB",
+        L"Em uso: ", L"Opacidade do fundo", L"Opacidade da imagem e do fundo da janela, mesmo sem imagem. 12–100% (padrão: 84%)",
+        L"Layout e posição", L"", L"Posição da janela",
+        L"No modo automático, o layout determina a posição", L"Lembrar a posição da janela", L"Abre a janela na última posição salva. Ctrl + 0 a redefine",
+        L"Escala da interface", L"Tamanho da janela, dos controles e do texto", L"Histórico e fechamento",
+        L"", L"Mostrar histórico de comandos", L"Comandos recentes e fixados na lista",
+        L"Limpar o campo de entrada ao abrir", L"O campo de entrada fica vazio ao abrir a janela", L"Limpar o histórico",
+        L"Remove os comandos recentes desta lista", L"Idioma de exibição", L"Escolher uma cor",
+        L"Paleta Fluent", L"Aplicar", L"Cancelar",
+        L"Selecionar uma imagem de fundo", L"Os comandos serão executados como administrador", L"Executar como administrador",
+        L"Conjunto de ícones da janela e do menu de contexto", L"Padrão do tema", L"Data e hora no histórico",
+        L"Formatos curtos de data e hora no histórico", L"Fechar ao clicar fora", L"A janela fecha ao clicar fora dela",
+        L"Automático", L"Arquivos de imagem", L"Todos os arquivos"
+    };
+    if (code == L"it") return {
+        L"Impostazioni di Modern Run", L"Personalizzazione", L"Layout e posizione",
+        L"Lingua di visualizzazione", L"Attivato", L"Disattivato",
+        L"Ripristina", L"Automatico (angolo classico o in basso al centro)", L"Scegli",
+        L"Apri", L"Rimuovi", L"Cancella",
+        L"Colori e arrotondamento personalizzati", L"Windows 11 Blur", L"Automatico",
+        L"Modalità scura", L"Modalità chiara", L"In basso a sinistra (Windows classico)",
+        L"In basso al centro", L"In basso a destra", L"In alto a sinistra",
+        L"In alto al centro", L"In alto a destra", L"Al centro dello schermo (Spotlight)",
+        L"Tema e icone", L"", L"Tema",
+        L"Combinazione predefinita di colori, sfondo e arrotondamento degli angoli", L"Modalità colore", L"Usa le impostazioni di Windows o la modalità selezionata",
+        L"Colori, sfondo e angoli", L"", L"Colore di sfondo",
+        L"Colore in formato #RRGGBB, ad esempio #1E1E24. Lasciare vuoto per usare il colore del tema", L"Colore del bordo", L"Colore del bordo nella modalità predefinita. Usare il formato #RRGGBB, ad esempio #4C566A. Lasciare vuoto per usare il colore del tema",
+        L"Da -1 a 28 px. -1 segue il tema, 0 lascia gli angoli retti, 14 usa lo stile di Windows e 27 crea una forma a capsula", L"Immagine di sfondo", L"PNG, JPG, BMP, WebP o GIF fino a 25 MB",
+        L"In uso: ", L"Opacità dello sfondo", L"Opacità dell’immagine e dello sfondo della finestra, anche senza immagine. 12–100% (84% per impostazione predefinita)",
+        L"Layout e posizione", L"", L"Posizione della finestra",
+        L"In modalità automatica, il layout determina la posizione", L"Memorizza la posizione della finestra", L"Apre la finestra nell’ultima posizione salvata. Ctrl + 0 la ripristina",
+        L"Ridimensionamento dell’interfaccia", L"Dimensione della finestra, dei controlli e del testo", L"Cronologia e chiusura",
+        L"", L"Mostra cronologia comandi", L"Comandi recenti e fissati nell’elenco",
+        L"Svuota il campo di immissione all’apertura", L"Il campo di immissione è vuoto all’apertura della finestra", L"Cancella cronologia",
+        L"Rimuove i comandi recenti da questo elenco", L"Lingua di visualizzazione", L"Scegli un colore",
+        L"Tavolozza Fluent", L"Applica", L"Annulla",
+        L"Seleziona un’immagine di sfondo", L"I comandi verranno eseguiti come amministratore", L"Esegui come amministratore",
+        L"Set di icone per la finestra e il menu di scelta rapida", L"Valore predefinito del tema", L"Data e ora nella cronologia",
+        L"Formati brevi per la data e l’ora nella cronologia", L"Chiudi con un clic all’esterno", L"Un clic all’esterno chiude la finestra",
+        L"Automatico", L"File di immagine", L"Tutti i file"
+    };
+    if (code == L"uk") return {
+        L"Параметри Modern Run", L"Персоналізація", L"Макет і розташування",
+        L"Мова інтерфейсу", L"Увімкнено", L"Вимкнено",
+        L"Скинути", L"Автоматично (класичний кут або знизу по центру)", L"Вибрати",
+        L"Відкрити", L"Видалити", L"Очистити",
+        L"Власні кольори й заокруглення", L"Windows 11 Blur", L"Автоматично",
+        L"Темний", L"Світлий", L"Знизу ліворуч (як у Windows)",
+        L"Знизу по центру", L"Знизу праворуч", L"Зверху ліворуч",
+        L"Зверху по центру", L"Зверху праворуч", L"У центрі екрана (Spotlight)",
+        L"Тема й піктограми", L"", L"Тема",
+        L"Готове поєднання кольорів, фону й заокруглення кутів", L"Колірний режим", L"За параметрами Windows або за вибором користувача",
+        L"Кольори, фон і кути", L"", L"Колір фону",
+        L"Колір у форматі #RRGGBB, наприклад #1E1E24. Якщо поле порожнє, використовується колір теми", L"Колір рамки", L"Колір рамки в режимі за замовчуванням. Формат #RRGGBB, наприклад #4C566A. Якщо поле порожнє, використовується колір теми",
+        L"Від -1 до 28 пкс. -1 — як у темі, 0 — прямі кути, 14 — як у Windows, 27 — капсула", L"Фонове зображення", L"PNG, JPG, BMP, WebP або GIF, до 25 МБ",
+        L"Поточний файл: ", L"Непрозорість фону", L"Непрозорість зображення й фону вікна, зокрема без зображення. 12–100% (за замовчуванням 84%)",
+        L"Макет і розташування", L"", L"Розташування вікна",
+        L"В автоматичному режимі розташування залежить від макета", L"Запам’ятовувати розташування вікна", L"Відкриває вікно в останньому збереженому місці. Ctrl + 0 скидає розташування",
+        L"Масштаб інтерфейсу", L"Загальний розмір вікна, елементів керування й тексту", L"Журнал і закриття вікна",
+        L"", L"Показувати історію команд", L"Останні й закріплені команди в списку",
+        L"Очищати поле під час відкриття", L"Порожнє поле введення під час відкриття вікна", L"Очистити журнал",
+        L"Нещодавні команди вилучаються з цього списку", L"Мова інтерфейсу", L"Вибір кольору",
+        L"Палітра Fluent", L"Застосувати", L"Скасувати",
+        L"Виберіть фонове зображення", L"Команди виконуватимуться від імені адміністратора", L"Запуск від імені адміністратора",
+        L"Набір піктограм для вікна й контекстного меню", L"За темою", L"Дата й час у журналі",
+        L"Скорочений формат дати й часу в журналі", L"Закривати після клацання поза вікном", L"Клацання за межами вікна закриває його",
+        L"Автоматично", L"Файли зображень", L"Усі файли"
+    };
+    if (code == L"pl") return {
+        L"Ustawienia Modern Run", L"Personalizacja", L"Układ i położenie",
+        L"Język wyświetlania", L"Wł.", L"Wył.",
+        L"Resetuj", L"Automatycznie (klasyczny róg lub na dole pośrodku)", L"Wybierz",
+        L"Otwórz", L"Usuń", L"Wyczyść",
+        L"Własne kolory i zaokrąglenia", L"Windows 11 Blur", L"Automatycznie",
+        L"Tryb ciemny", L"Tryb jasny", L"Lewy dolny róg (klasyczny Windows)",
+        L"Na dole pośrodku", L"Prawy dolny róg", L"Lewy górny róg",
+        L"U góry pośrodku", L"Prawy górny róg", L"Środek ekranu (Spotlight)",
+        L"Motyw i ikony", L"", L"Motyw",
+        L"Zestaw kolorów, tła i zaokrągleń narożników", L"Tryb kolorów", L"Zgodnie z ustawieniami systemu Windows lub wybranym trybem",
+        L"Kolory, tło i narożniki", L"", L"Kolor tła",
+        L"Kolor w formacie #RRGGBB, np. #1E1E24. Puste pole oznacza kolor motywu", L"Kolor obramowania", L"Kolor obramowania w trybie domyślnym. Format #RRGGBB, np. #4C566A. Puste pole oznacza kolor motywu",
+        L"Od -1 do 28 px. -1 używa ustawienia motywu, 0 daje ostre narożniki, 14 odpowiada stylowi systemu Windows, a 27 nadaje kształt kapsuły", L"Obraz tła", L"PNG, JPG, BMP, WebP lub GIF do 25 MB",
+        L"Aktywny plik: ", L"Krycie tła", L"Krycie obrazu i tła okna, także bez obrazu. 12–100% (domyślnie 84%)",
+        L"Układ i położenie", L"", L"Położenie okna",
+        L"W trybie automatycznym położenie zależy od układu", L"Zapamiętaj położenie okna", L"Otwiera okno w ostatnim zapisanym położeniu. Ctrl + 0 przywraca położenie domyślne",
+        L"Skala interfejsu", L"Rozmiar okna, elementów sterujących i tekstu", L"Historia i zamykanie",
+        L"", L"Pokaż historię poleceń", L"Ostatnie i przypięte polecenia na liście",
+        L"Wyczyść pole wprowadzania przy otwarciu", L"Pole wprowadzania jest puste po otwarciu okna", L"Wyczyść historię",
+        L"Usuwa ostatnie polecenia z tej listy", L"Język wyświetlania", L"Wybierz kolor",
+        L"Paleta kolorów Fluent", L"Zastosuj", L"Anuluj",
+        L"Wybierz obraz tła", L"Polecenia będą uruchamiane jako administrator", L"Uruchom jako administrator",
+        L"Zestaw ikon okna i menu kontekstowego", L"Wartość domyślna motywu", L"Data i godzina w historii",
+        L"Krótki format daty i godziny w historii", L"Zamknij po kliknięciu poza oknem", L"Kliknięcie poza oknem zamyka je",
+        L"Automatycznie", L"Pliki obrazów", L"Wszystkie pliki"
+    };
+    if (code == L"nl") return {
+        L"Instellingen van Modern Run", L"Persoonlijke instellingen", L"Indeling en positie",
+        L"Weergavetaal", L"Aan", L"Uit",
+        L"Opnieuw instellen", L"Automatisch (klassieke hoek of midden onder)", L"Kiezen",
+        L"Openen", L"Verwijderen", L"Wissen",
+        L"Aangepaste kleuren en hoekafronding", L"Windows 11 Blur", L"Automatisch",
+        L"Donkere modus", L"Lichte modus", L"Linksonder (klassiek Windows)",
+        L"Midden onder", L"Rechtsonder", L"Linksboven",
+        L"Midden boven", L"Rechtsboven", L"Midden van het scherm (Spotlight)",
+        L"Thema en pictogrammen", L"", L"Thema",
+        L"Voorinstelling voor kleuren, achtergrond en hoekafronding", L"Kleurmodus", L"Volgt de Windows-instellingen of gebruikt de gekozen modus",
+        L"Kleuren, achtergrond en hoeken", L"", L"Achtergrondkleur",
+        L"Kleur in de indeling #RRGGBB, bijvoorbeeld #1E1E24. Leeg gebruikt de themakleur", L"Randkleur", L"Randkleur in de standaardmodus. Gebruik #RRGGBB, bijvoorbeeld #4C566A. Leeg gebruikt de themakleur",
+        L"Van -1 tot 28 px. -1 volgt het thema, 0 geeft rechte hoeken, 14 gebruikt de Windows-stijl en 27 geeft een capsulevorm", L"Achtergrondafbeelding", L"PNG, JPG, BMP, WebP of GIF tot 25 MB",
+        L"Actief: ", L"Dekking van de achtergrond", L"Dekking van de afbeelding en de vensterachtergrond, ook zonder afbeelding. 12–100% (standaard 84%)",
+        L"Indeling en positie", L"", L"Vensterpositie",
+        L"In de automatische modus bepaalt de indeling de positie", L"Vensterpositie onthouden", L"Opent het venster op de laatst opgeslagen positie. Ctrl + 0 zet deze terug",
+        L"Schaal van de interface", L"Grootte van het venster, de bedieningselementen en de tekst", L"Geschiedenis en sluiten",
+        L"", L"Opdrachtgeschiedenis tonen", L"Recente en vastgemaakte opdrachten in de lijst",
+        L"Invoerveld wissen bij openen", L"Het invoerveld is leeg als het venster wordt geopend", L"Geschiedenis wissen",
+        L"Verwijdert recente opdrachten uit deze lijst", L"Weergavetaal", L"Een kleur kiezen",
+        L"Fluent-kleurenpalet", L"Toepassen", L"Annuleren",
+        L"Een achtergrondafbeelding selecteren", L"Opdrachten worden uitgevoerd als administrator", L"Als administrator uitvoeren",
+        L"Pictogrammenset voor het venster en het snelmenu", L"Themastandaard", L"Datum en tijd in de geschiedenis",
+        L"Korte notatie voor datum en tijd in de geschiedenis", L"Sluiten bij klikken buiten het venster", L"Een klik buiten het venster sluit het",
+        L"Automatisch", L"Afbeeldingsbestanden", L"Alle bestanden"
+    };
+    if (code == L"tr") return {
+        L"Modern Run ayarları", L"Kişiselleştirme", L"Düzen ve konum",
+        L"Görüntüleme dili", L"Açık", L"Kapalı",
+        L"Sıfırla", L"Otomatik (klasik köşe veya alt orta)", L"Seç",
+        L"Aç", L"Kaldır", L"Temizle",
+        L"Özel renkler ve köşe yarıçapı", L"Windows 11 Blur", L"Otomatik",
+        L"Koyu", L"Açık", L"Sol alt (klasik Windows)",
+        L"Alt orta", L"Sağ alt", L"Sol üst",
+        L"Üst orta", L"Sağ üst", L"Ekranın ortası (Spotlight)",
+        L"Tema ve simgeler", L"", L"Tema",
+        L"Renk, arka plan ve köşe yuvarlaklığı için hazır ayarlar", L"Renk modu", L"Windows ayarlarını veya elle seçilen modu kullanır",
+        L"Renkler, arka plan ve köşeler", L"", L"Arka plan rengi",
+        L"#RRGGBB biçiminde bir renk, örneğin #1E1E24. Boş bırakılırsa tema rengi kullanılır", L"Kenarlık rengi", L"Varsayılan moddaki kenarlık rengi. #RRGGBB biçimini kullanın, örneğin #4C566A. Boş bırakılırsa tema rengi kullanılır",
+        L"-1 ile 28 piksel arası. -1 temayı izler, 0 köşeleri dik bırakır, 14 Windows köşelerini kullanır, 27 kapsül şekli verir", L"Arka plan resmi", L"25 MB’a kadar PNG, JPG, BMP, WebP veya GIF",
+        L"Etkin dosya: ", L"Arka plan opaklığı", L"Resmin ve pencere arka planının opaklığı. Resim seçilmediğinde de geçerlidir. %12–100 (varsayılan %84)",
+        L"Düzen ve konum", L"", L"Pencere konumu",
+        L"Otomatik modda konumu pencere düzeni belirler", L"Pencere konumunu hatırla", L"Pencere son kaydedilen konumda açılır. Ctrl + 0 konumu sıfırlar",
+        L"Arayüz ölçeği", L"Pencerenin, denetimlerin ve metnin genel boyutu", L"Geçmiş ve pencereyi kapatma",
+        L"", L"Komut Geçmişini Göster", L"Listedeki son ve sabitlenmiş komutlar",
+        L"Açılışta giriş alanını temizle", L"Pencere açıldığında giriş alanı boş olur", L"Geçmişi temizle",
+        L"Son komutlar bu listeden kaldırılır", L"Görüntüleme dili", L"Renk seç",
+        L"Fluent renk paleti", L"Uygula", L"İptal",
+        L"Arka plan resmi seçin", L"Komutlar yönetici olarak çalıştırılacak", L"Yönetici olarak çalıştır",
+        L"Pencere ve bağlam menüsü simgeleri", L"Tema varsayılanı", L"Geçmişte tarih ve saat",
+        L"Geçmişte kısa tarih ve saat biçimi", L"Dışarı tıklandığında kapat", L"Pencerenin dışına tıklandığında pencere kapanır",
+        L"Otomatik", L"Resim dosyaları", L"Tüm dosyalar"
+    };
+    if (code == L"hi") return {
+        L"Modern Run की सेटिंग्स", L"वैयक्तिकरण", L"लेआउट और स्थान",
+        L"प्रदर्शन की भाषा", L"चालू", L"बंद",
+        L"रीसेट करें", L"अपने आप (क्लासिक कोना या नीचे बीच में)", L"चुनें",
+        L"खोलें", L"हटाएँ", L"साफ़ करें",
+        L"कस्टम रंग और कोनों की गोलाई", L"Windows 11 Blur", L"अपने आप",
+        L"गहरा", L"हल्का", L"नीचे बाईं ओर (क्लासिक Windows)",
+        L"नीचे बीच में", L"नीचे दाईं ओर", L"ऊपर बाईं ओर",
+        L"ऊपर बीच में", L"ऊपर दाईं ओर", L"स्क्रीन के बीच में (Spotlight)",
+        L"थीम और आइकन", L"", L"थीम",
+        L"रंग, पृष्ठभूमि और कोनों की गोलाई का तैयार संयोजन", L"रंग मोड", L"Windows की सेटिंग या मैन्युअल रूप से चुना गया मोड",
+        L"रंग, पृष्ठभूमि और कोने", L"", L"पृष्ठभूमि का रंग",
+        L"#RRGGBB फ़ॉर्मैट में रंग, जैसे #1E1E24। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा", L"बॉर्डर का रंग", L"डिफ़ॉल्ट मोड में बॉर्डर का रंग। #RRGGBB फ़ॉर्मैट इस्तेमाल करें, जैसे #4C566A। फ़ील्ड खाली होने पर थीम का रंग इस्तेमाल होगा",
+        L"-1 से 28 पिक्सेल। -1 थीम के अनुसार, 0 चौकोर कोने, 14 Windows जैसे कोने और 27 कैप्सूल का आकार", L"पृष्ठभूमि की छवि", L"25 MB तक की PNG, JPG, BMP, WebP या GIF फ़ाइल",
+        L"मौजूदा फ़ाइल: ", L"पृष्ठभूमि की अपारदर्शिता", L"छवि और विंडो की पृष्ठभूमि की अपारदर्शिता। छवि न चुने जाने पर भी लागू। 12–100% (डिफ़ॉल्ट 84%)",
+        L"लेआउट और स्थान", L"", L"विंडो का स्थान",
+        L"स्वचालित मोड में लेआउट से विंडो का स्थान तय होता है", L"विंडो का स्थान याद रखें", L"विंडो पिछली बार सहेजे गए स्थान पर खुलती है। Ctrl + 0 स्थान रीसेट करता है",
+        L"इंटरफ़ेस का स्केल", L"विंडो, नियंत्रणों और टेक्स्ट का कुल आकार", L"इतिहास और विंडो बंद करना",
+        L"", L"कमांड इतिहास दिखाएं", L"सूची में हाल की और पिन की गई कमांड",
+        L"खोलने पर इनपुट साफ़ करें", L"विंडो खोलने पर इनपुट फ़ील्ड खाली रहता है", L"इतिहास साफ़ करें",
+        L"इस सूची से हाल के कमांड हट जाते हैं", L"प्रदर्शन की भाषा", L"रंग चुनें",
+        L"Fluent रंगों का पैलेट", L"लागू करें", L"रद्द करें",
+        L"पृष्ठभूमि की छवि चुनें", L"कमांड व्यवस्थापक के रूप में चलाई जाएँगी", L"व्यवस्थापक के रूप में चलाएँ",
+        L"विंडो और संदर्भ मेनू के आइकन", L"थीम के अनुसार", L"इतिहास में तारीख और समय",
+        L"इतिहास में तारीख और समय के छोटे फ़ॉर्मैट", L"बाहर क्लिक करने पर बंद करें", L"विंडो के बाहर क्लिक करने पर विंडो बंद हो जाती है",
+        L"अपने आप", L"छवि फ़ाइलें", L"सभी फ़ाइलें"
+    };
+    if (code == L"ar") return {
+        L"إعدادات Modern Run", L"التخصيص", L"التخطيط والموضع",
+        L"لغة العرض", L"تشغيل", L"إيقاف",
+        L"إعادة تعيين", L"تلقائي (الزاوية الكلاسيكية أو منتصف الأسفل)", L"اختيار",
+        L"فتح", L"إزالة", L"مسح",
+        L"ألوان واستدارة زوايا مخصصة", L"Windows 11 Blur", L"تلقائي",
+        L"داكن", L"فاتح", L"أسفل اليسار (Windows الكلاسيكي)",
+        L"منتصف الأسفل", L"أسفل اليمين", L"أعلى اليسار",
+        L"منتصف الأعلى", L"أعلى اليمين", L"منتصف الشاشة (Spotlight)",
+        L"النسق والأيقونات", L"", L"النسق",
+        L"مجموعة جاهزة من الألوان والخلفية واستدارة الزوايا", L"وضع الألوان", L"يتبع إعدادات Windows أو الوضع المحدد يدويًا",
+        L"الألوان والخلفية والزوايا", L"", L"لون الخلفية",
+        L"لون بالتنسيق ‎#RRGGBB‎، مثل ‎#1E1E24‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا", L"لون الإطار", L"لون الإطار في الوضع الافتراضي. استخدم التنسيق ‎#RRGGBB‎، مثل ‎#4C566A‎. يُستخدم لون النسق إذا تُرك الحقل فارغًا",
+        L"من ‎-1‎ إلى 28 بكسل. ‎-1‎ لتطبيق إعداد النسق، و0 لزوايا مربعة، و14 لزوايا بنمط Windows، و27 لشكل كبسولة", L"صورة الخلفية", L"ملف PNG أو JPG أو BMP أو WebP أو GIF بحجم يصل إلى 25 ميغابايت",
+        L"الملف الحالي: ", L"عتامة الخلفية", L"عتامة الصورة وخلفية النافذة حتى عند عدم تعيين صورة. من 12٪ إلى 100٪ (الافتراضي 84٪)",
+        L"التخطيط والموضع", L"", L"موضع النافذة",
+        L"يحدد التخطيط موضع النافذة في الوضع التلقائي", L"تذكّر موضع النافذة", L"تُفتح النافذة في آخر موضع محفوظ. يعيد Ctrl + 0 تعيين الموضع",
+        L"مقياس الواجهة", L"الحجم الإجمالي للنافذة وعناصر التحكم والنص", L"السجل وإغلاق النافذة",
+        L"", L"إظهار سجل الأوامر", L"الأوامر الأخيرة والمثبّتة في القائمة",
+        L"مسح الإدخال عند الفتح", L"يظهر حقل الإدخال فارغًا عند فتح النافذة", L"مسح السجل",
+        L"تُزال الأوامر الأخيرة من هذه القائمة", L"لغة العرض", L"اختيار لون",
+        L"لوحة ألوان Fluent", L"تطبيق", L"إلغاء",
+        L"تحديد صورة الخلفية", L"ستُشغّل الأوامر بصلاحيات المسؤول", L"تشغيل كمسؤول",
+        L"مجموعة أيقونات النافذة وقائمة السياق", L"حسب النسق", L"التاريخ والوقت في السجل",
+        L"تنسيقات التاريخ والوقت المختصرة في السجل", L"الإغلاق عند النقر خارج النافذة", L"يؤدي النقر خارج النافذة إلى إغلاقها",
+        L"تلقائي", L"ملفات الصور", L"كل الملفات"
+    };
+    return {
+        L"Modern Run Settings", L"Personalization", L"Layout & Position",
+        L"Display language", L"On", L"Off",
+        L"Reset", L"Auto (Classic Corner / Bottom-Center)", L"Choose",
+        L"Open", L"Remove", L"Clear",
+        L"Custom Colors & Corner Radius", L"Windows 11 Blur", L"Auto",
+        L"Dark Mode", L"Light Mode", L"Bottom Left (Windows Classic)",
+        L"Bottom Center", L"Bottom Right", L"Top Left",
+        L"Top Center", L"Top Right", L"Screen Center (Spotlight)",
+        L"Theme & Icons", L"", L"Theme",
+        L"A preset of colors, background, and corner radius", L"Color Mode", L"Follows Windows settings or a manually selected mode",
+        L"Colors, Background & Corners", L"", L"Background Color",
+        L"Color in #RRGGBB format, for example #1E1E24. An empty value uses the theme color", L"Border Color", L"Border color in the default mode. Use #RRGGBB, for example #4C566A. An empty value uses the theme color",
+        L"From -1 to 28 px. -1 follows the theme, 0 gives square corners, 14 uses Windows-style corners, and 27 gives a pill shape", L"Background Image", L"PNG, JPG, BMP, WebP, or GIF up to 25 MB",
+        L"Active: ", L"Background Image Opacity", L"Opacity of the image and window background, including when no image is set. 12–100% (default 84%)",
+        L"Layout & Position", L"", L"Window Position",
+        L"The layout determines the position in Auto mode", L"Remember Window Position", L"Opens at the last saved position. Ctrl + 0 resets it",
+        L"Interface Scale", L"Overall size of the window, controls, and text", L"History & Dismissal",
+        L"", L"Show Command History", L"Recent and pinned commands in the list",
+        L"Clear Input on Open", L"Empty input field when the window opens", L"Clear history",
+        L"Recent commands are removed from this list", L"Display Language", L"Choose a color",
+        L"Quick Fluent swatches", L"Apply", L"Cancel",
+        L"Select a background image", L"Commands will run as administrator", L"Run as administrator",
+        L"Icon set for the window and context menu", L"Theme default", L"Date and Time in History",
+        L"Short date and time formats in history", L"Close on Click Outside", L"Clicking outside closes the window",
+        L"Automatically", L"Image files", L"All files"
+    };
 }
 
 enum class SettingsGroup : size_t {
@@ -12218,21 +14933,109 @@ struct AliasSettingsStrings {
 
 AliasSettingsStrings GetAliasSettingsStrings(const std::wstring& code) {
     if (code == L"ru") return {
-        L"Команды", L"Собственные команды для запуска программ и файлов по коротким именам",
-        L"Новая команда", L"Добавить", L"Редактировать команду", L"Сохранить", L"Команда с таким именем уже есть",
-        L"Запуск от имени администратора", L"Удалить", L"Короткое имя",
-        L"Команда или путь", L"Запуск от имени администратора"
+        L"Команды", L"Собственные команды для запуска программ и файлов по коротким именам", L"Новая команда", L"Добавить",
+        L"Редактировать команду", L"Сохранить", L"Команда с таким именем уже есть", L"Запуск от имени администратора",
+        L"Удалить", L"Короткое имя", L"Команда или путь", L"Запуск от имени администратора"
     };
     if (code == L"vi") return {
-        L"Bí danh lệnh tùy chỉnh", L"Khai báo từ khóa gõ tắt để mở nhanh tệp hoặc chạy quyền Admin",
-        L"Thêm bí danh mới", L"Thêm", L"Chỉnh sửa lệnh", L"Lưu", L"Tên này đã được sử dụng",
-        L"Chạy với quyền quản trị", L"Xóa", L"Lệnh tắt", L"Lệnh hoặc đường dẫn đích",
-        L"Chạy với quyền Quản trị viên (Admin)"
+        L"Lệnh", L"Thiết lập lệnh tùy chỉnh để mở chương trình và tệp bằng tên tắt", L"Lệnh mới", L"Thêm",
+        L"Sửa lệnh", L"Lưu", L"Đã có lệnh mang tên này", L"Chạy với quyền quản trị viên",
+        L"Xóa", L"Tên tắt", L"Lệnh hoặc đường dẫn", L"Chạy với quyền quản trị viên"
+    };
+    if (code == L"zh_cn") return {
+        L"命令", L"设置自定义命令，以便使用简称打开程序和文件", L"新建命令", L"添加",
+        L"编辑命令", L"保存", L"此命令名称已存在", L"以管理员身份运行",
+        L"移除", L"简称", L"命令或路径", L"以管理员身份运行"
+    };
+    if (code == L"zh_tw") return {
+        L"命令", L"設定自訂命令，使用簡稱來開啟程式與檔案", L"新增命令", L"新增",
+        L"編輯命令", L"儲存", L"已有相同名稱的命令", L"以系統管理員身分執行",
+        L"移除", L"簡稱", L"命令或路徑", L"以系統管理員身分執行"
+    };
+    if (code == L"ja") return {
+        L"コマンド", L"短縮名でプログラムやファイルを開くカスタム コマンドを設定します", L"新しいコマンド", L"追加",
+        L"コマンドの編集", L"保存", L"この名前のコマンドは既にあります", L"管理者として実行",
+        L"削除", L"短縮名", L"コマンドまたはパス", L"管理者として実行"
+    };
+    if (code == L"ko") return {
+        L"명령", L"짧은 이름으로 프로그램이나 파일을 열 수 있도록 사용자 지정 명령을 설정합니다", L"새 명령", L"추가",
+        L"명령 편집", L"저장", L"이 이름을 사용하는 명령이 이미 있습니다", L"관리자 권한으로 실행",
+        L"제거", L"짧은 이름", L"명령 또는 경로", L"관리자 권한으로 실행"
+    };
+    if (code == L"th") return {
+        L"คำสั่ง", L"ตั้งค่าคำสั่งแบบกำหนดเองเพื่อเปิดโปรแกรมและไฟล์ด้วยชื่อย่อ", L"คำสั่งใหม่", L"เพิ่ม",
+        L"แก้ไขคำสั่ง", L"บันทึก", L"มีคำสั่งชื่อนี้อยู่แล้ว", L"เรียกใช้ในฐานะผู้ดูแลระบบ",
+        L"เอาออก", L"ชื่อย่อ", L"คำสั่งหรือเส้นทาง", L"เรียกใช้ในฐานะผู้ดูแลระบบ"
+    };
+    if (code == L"id") return {
+        L"Perintah", L"Atur perintah khusus untuk menjalankan program dan membuka file dengan nama pendek", L"Perintah baru", L"Tambah",
+        L"Edit perintah", L"Simpan", L"Perintah dengan nama ini sudah ada", L"Jalankan sebagai administrator",
+        L"Hapus", L"Nama pendek", L"Perintah atau jalur", L"Jalankan sebagai administrator"
+    };
+    if (code == L"ms") return {
+        L"Arahan", L"Sediakan arahan tersuai untuk menjalankan program dan membuka fail dengan nama ringkas", L"Arahan baharu", L"Tambah",
+        L"Edit arahan", L"Simpan", L"Arahan dengan nama ini sudah wujud", L"Jalankan sebagai pentadbir",
+        L"Alih keluar", L"Nama ringkas", L"Arahan atau laluan", L"Jalankan sebagai pentadbir"
+    };
+    if (code == L"fr") return {
+        L"Commandes", L"Configurer des commandes personnalisées pour lancer des programmes et ouvrir des fichiers par nom court", L"Nouvelle commande", L"Ajouter",
+        L"Modifier la commande", L"Enregistrer", L"Une commande porte déjà ce nom", L"Exécuter en tant qu’administrateur",
+        L"Supprimer", L"Nom court", L"Commande ou chemin d’accès", L"Exécuter en tant qu’administrateur"
+    };
+    if (code == L"de") return {
+        L"Befehle", L"Benutzerdefinierte Befehle einrichten, um Programme und Dateien per Kurzname zu öffnen", L"Neuer Befehl", L"Hinzufügen",
+        L"Befehl bearbeiten", L"Speichern", L"Ein Befehl mit diesem Namen ist bereits vorhanden", L"Als Administrator ausführen",
+        L"Entfernen", L"Kurzname", L"Befehl oder Pfad", L"Als Administrator ausführen"
+    };
+    if (code == L"es") return {
+        L"Comandos", L"Configura comandos personalizados para abrir programas y archivos con un nombre corto", L"Nuevo comando", L"Agregar",
+        L"Editar comando", L"Guardar", L"Ya existe un comando con ese nombre", L"Ejecutar como administrador",
+        L"Quitar", L"Nombre corto", L"Comando o ruta de acceso", L"Ejecutar como administrador"
+    };
+    if (code == L"pt") return {
+        L"Comandos", L"Configure comandos personalizados para abrir programas e arquivos por nome curto", L"Novo comando", L"Adicionar",
+        L"Editar comando", L"Salvar", L"Já existe um comando com esse nome", L"Executar como administrador",
+        L"Remover", L"Nome curto", L"Comando ou caminho", L"Executar como administrador"
+    };
+    if (code == L"it") return {
+        L"Comandi", L"Configura comandi personalizzati per aprire programmi e file con un nome breve", L"Nuovo comando", L"Aggiungi",
+        L"Modifica comando", L"Salva", L"Esiste già un comando con questo nome", L"Esegui come amministratore",
+        L"Rimuovi", L"Nome breve", L"Comando o percorso", L"Esegui come amministratore"
+    };
+    if (code == L"uk") return {
+        L"Команди", L"Налаштування власних команд для запуску програм і відкриття файлів за коротким ім’ям", L"Нова команда", L"Додати",
+        L"Редагувати команду", L"Зберегти", L"Команда з таким ім’ям уже є", L"Запуск від імені адміністратора",
+        L"Видалити", L"Коротке ім’я", L"Команда або шлях", L"Запуск від імені адміністратора"
+    };
+    if (code == L"pl") return {
+        L"Polecenia", L"Skonfiguruj własne polecenia, aby otwierać programy i pliki za pomocą krótkich nazw", L"Nowe polecenie", L"Dodaj",
+        L"Edytuj polecenie", L"Zapisz", L"Polecenie o tej nazwie już istnieje", L"Uruchom jako administrator",
+        L"Usuń", L"Krótka nazwa", L"Polecenie lub ścieżka", L"Uruchom jako administrator"
+    };
+    if (code == L"nl") return {
+        L"Opdrachten", L"Stel aangepaste opdrachten in om programma’s en bestanden met een korte naam te openen", L"Nieuwe opdracht", L"Toevoegen",
+        L"Opdracht bewerken", L"Opslaan", L"Er bestaat al een opdracht met deze naam", L"Als administrator uitvoeren",
+        L"Verwijderen", L"Korte naam", L"Opdracht of pad", L"Als administrator uitvoeren"
+    };
+    if (code == L"tr") return {
+        L"Komutlar", L"Programları ve dosyaları kısa adlarla açmak için özel komutlar oluşturun", L"Yeni komut", L"Ekle",
+        L"Komutu düzenle", L"Kaydet", L"Bu adda bir komut zaten var", L"Yönetici olarak çalıştır",
+        L"Kaldır", L"Kısa ad", L"Komut veya yol", L"Yönetici olarak çalıştır"
+    };
+    if (code == L"hi") return {
+        L"कमांड", L"प्रोग्राम और फ़ाइलें छोटे नाम से खोलने के लिए अपनी कमांड सेट करें", L"नई कमांड", L"जोड़ें",
+        L"कमांड संपादित करें", L"सहेजें", L"इस नाम की कमांड पहले से मौजूद है", L"व्यवस्थापक के रूप में चलाएँ",
+        L"हटाएँ", L"छोटा नाम", L"कमांड या पाथ", L"व्यवस्थापक के रूप में चलाएँ"
+    };
+    if (code == L"ar") return {
+        L"الأوامر", L"إعداد أوامر مخصصة لتشغيل البرامج وفتح الملفات بأسماء مختصرة", L"أمر جديد", L"إضافة",
+        L"تحرير الأمر", L"حفظ", L"يوجد أمر بهذا الاسم بالفعل", L"تشغيل كمسؤول",
+        L"إزالة", L"الاسم المختصر", L"الأمر أو المسار", L"تشغيل كمسؤول"
     };
     return {
-        L"Commands", L"Set up custom commands to launch programs and files by short name",
-        L"New Command", L"Add", L"Edit Command", L"Save", L"A command with this name already exists",
-        L"Run as administrator", L"Remove", L"Short name", L"Command or path", L"Run as Administrator"
+        L"Commands", L"Set up custom commands to launch programs and files by short name", L"New command", L"Add",
+        L"Edit command", L"Save", L"A command with this name already exists", L"Run as administrator",
+        L"Remove", L"Short Name", L"Command or Path", L"Run as administrator"
     };
 }
 
@@ -12325,6 +15128,12 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
         winrt::com_ptr<IDWriteTextFormat> descriptionFormat;
         g_pDWriteFactory->CreateTextFormat(fontName, nullptr, DWRITE_FONT_WEIGHT_REGULAR,
             DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, S(SettingsStyle::descriptionSize), L"", descriptionFormat.put());
+        const bool rtl = IsRtlUiLanguage(st->settings.language);
+        if (rtl) {
+            for (auto* format : {pFmtHeader, pFmtNav, pFmtCtl, descriptionFormat.get()}) {
+                if (format) format->SetReadingDirection(DWRITE_READING_DIRECTION_RIGHT_TO_LEFT);
+            }
+        }
         winrt::com_ptr<IDWriteTextFormat> colorModeFormat;
         if (st->activeTab == 0 &&
             SUCCEEDED(g_pDWriteFactory->CreateTextFormat(L"Segoe UI Symbol", nullptr,
@@ -12357,7 +15166,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             return clipped;
         };
 
-        auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description) {
+        auto drawCardText = [&](const D2D1_RECT_F& bounds, std::wstring_view title, std::wstring_view description,
+                                bool fixedDescriptionOrder = false) {
             if (!pFmtNav || bounds.right <= bounds.left || bounds.bottom <= bounds.top ||
                 bounds.bottom <= 0.0f || bounds.top >= static_cast<float>(h)) return;
             const float titleHeight = S(SettingsStyle::titleBandHeight);
@@ -12366,8 +15176,13 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             DWRITE_TEXT_METRICS metrics{};
             if (descriptionFormat && !description.empty() && descriptionSpace > 0 &&
                 SUCCEEDED(g_pDWriteFactory->CreateTextLayout(description.data(), static_cast<UINT32>(description.size()),
-                    descriptionFormat.get(), bounds.right - bounds.left, descriptionSpace, descriptionLayout.put())) &&
-                SUCCEEDED(descriptionLayout->GetMetrics(&metrics))) {
+                    descriptionFormat.get(), bounds.right - bounds.left, descriptionSpace, descriptionLayout.put()))) {
+                if (rtl && fixedDescriptionOrder) {
+                    descriptionLayout->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
+                    descriptionLayout->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_TRAILING);
+                }
+            }
+            if (descriptionLayout && SUCCEEDED(descriptionLayout->GetMetrics(&metrics))) {
                 const float descriptionHeight = (std::min)(metrics.height, descriptionSpace);
                 const auto textBand = CenterVertically(bounds, titleHeight + descriptionHeight);
                 const auto titleBand = D2D1::RectF(textBand.left, textBand.top, textBand.right, textBand.top + titleHeight);
@@ -12399,13 +15214,11 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 drawSettingsGlyph(L"\uE756", rBadge, pBrAccent);
             }
             drawCardText(D2D1::RectF(S(64), rBadge.top, sideW - S(10), rBadge.bottom),
-                         L"Modern Run", kSettingsVersion);
+                         L"Modern Run", kSettingsVersion, true);
         }
 
         struct NavDef { int tab; const wchar_t* glyph; const wchar_t* label; };
         const auto languageCode = ResolveEffectiveLanguageCode(st->settings.language);
-        const bool isViNav = languageCode == L"vi";
-        const bool isRuNav = languageCode == L"ru";
         const auto aliases = GetAliasSettingsStrings(languageCode);
         NavDef kNavs[] = {
             { 0, L"\uE790", ls.nav0 },
@@ -12591,7 +15404,10 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
             drawControl(rcPlus, plusId);
             if (pFmtCtl) {
                 DrawCenteredText(pRT, L"−", 1, pFmtCtl, rcMin, pBrText);
+                const bool numeric = rtl && !valStr.empty() && valStr.front() >= L'0' && valStr.front() <= L'9';
+                if (numeric) pFmtCtl->SetReadingDirection(DWRITE_READING_DIRECTION_LEFT_TO_RIGHT);
                 DrawCenteredText(pRT, valStr.c_str(), (UINT32)valStr.size(), pFmtCtl, rcVal, pBrText);
+                if (numeric) pFmtCtl->SetReadingDirection(DWRITE_READING_DIRECTION_RIGHT_TO_LEFT);
                 DrawCenteredText(pRT, L"+", 1, pFmtCtl, rcPlus, pBrText);
             }
             addHit(minusId, rcMin);
@@ -12629,8 +15445,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     cmLbl);
                 const auto& icons = GetIconSetStrings(st->settings.language);
                 drawDropdownRowInGroup(g1, y1 + 2 * rH, rH, kIconSetControl, L"\uE8A9",
-                    icons.title, isRuNav ? L"Набор значков для окна и контекстного меню"
-                        : languageCode == L"en" ? L"Icon set for the window and context menu" : nullptr,
+                    icons.title, ls.iconSetSub,
                     st->settings.iconSet == IconSet::WindowsFluent ? kWindowsFluentMenuLabel : icons.modLabel);
             }
             // Group 2: Tùy chỉnh màu sắc, hình nền động & bo góc (Issue #7693 + v4 Custom Media)
@@ -12642,7 +15457,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     ls.bgColSub,
                     st->settings.customBgColor);
                 std::wstring crStr = (st->settings.customCornerRadius < 0)
-                    ? (isRuNav ? L"По теме" : languageCode == L"en" ? L"Theme default" : ls.defBtn)
+                    ? ls.themeDefault
                     : (std::to_wstring(st->settings.customCornerRadius) + L" px");
                 const auto cornerStrings = GetCornerRadiusStrings(st->settings.language);
                 drawStepperRowInGroup(g2, y2 + rH, rH, 2210, 2211, 2212, L"\uE744",
@@ -12668,8 +15483,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     const auto rcClear = controlRect(controls.right - controlHeight, controls.right, rowTop, rH);
                     const auto rcOpen = controlRect(controls.left, rcClear.left - controlGap, rowTop, rH);
                     drawControl(rcOpen, 2220);
-                    const wchar_t* openLabel = isRuNav ? L"Открыть" : isViNav ? L"Mở"
-                        : languageCode == L"en" ? L"Open" : ls.browse;
+                    const wchar_t* openLabel = ls.browse;
                     DrawCenteredText(pRT, openLabel, static_cast<UINT32>(wcslen(openLabel)), pFmtCtl, rcOpen, pBrText);
                     addHit(2220, rcOpen);
                     drawIconButton(rcClear, 2221, L"\uE894", ls.clear);
@@ -12738,10 +15552,8 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     L"\uE8B7", L"\uE751", L"\uE8BB", L"\uE713"
                 };
                 for (size_t i = 0; i < kRunActionCount; ++i) {
-                    wchar_t title[128]{};
-                    swprintf_s(title, actions.hidePattern, actions.labels[i]);
                     drawToggleRowInGroup(buttonGroup, rowY + rH * i, rH,
-                        kHideActionRowBase + static_cast<int>(i), glyphs[i], title, kActionShortcuts[i],
+                        kHideActionRowBase + static_cast<int>(i), glyphs[i], actions.hideLabels[i], actions.shortcuts[i],
                         st->settings.hiddenActions[i]);
                 }
             }
@@ -12755,18 +15567,14 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     ls.showHistSub,
                     st->settings.maxHistoryItems > 0);
                 drawToggleRowInGroup(g1, y1 + rH, rH, 2504, L"\uEC92",
-                    isViNav ? L"Hiển thị thời gian chạy lệnh" : isRuNav ? L"Дата и время в истории" : L"Date and Time in History",
-                    isViNav ? L"Hiện mốc giờ thực thi ở bên phải mỗi dòng lịch sử" : isRuNav
-                        ? L"Короткие форматы даты и времени в строках истории" : L"Short date and time formats in history",
+                    ls.timestampTitle, ls.timestampSub,
                     st->settings.showTimestamp);
                 drawToggleRowInGroup(g1, y1 + rH * 2, rH, 2502, L"\uE75C",
                     ls.clearInitTitle,
                     ls.clearInitSub,
                     st->settings.clearInitialInput);
                 drawToggleRowInGroup(g1, y1 + rH * 3, rH, 2505, L"\uE7C9",
-                    isViNav ? L"Tự động đóng khi bấm ra ngoài cửa sổ" : isRuNav ? L"Закрывать при нажатии вне окна" : L"Close on Click Outside",
-                    isViNav ? L"Tự ẩn hộp thoại Run khi click chuột ra ngoài vùng cửa sổ" : isRuNav
-                        ? L"Нажатие за пределами окна закрывает его" : L"Clicking outside closes the window",
+                    ls.closeOutsideTitle, ls.closeOutsideSub,
                     st->settings.closeOnClickOutside);
                 const auto taskbar = GetTaskbarIconStrings(st->settings.language);
                 drawDropdownRowInGroup(g1, y1 + rH * 4, rH, 2506, L"\uE90E",
@@ -12787,8 +15595,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 drawToggleRowInGroup(adminGroup, adminY, rH, 2503, L"\uEA18",
                     displaySettings.adminDefault, displaySettings.adminDefaultDescription, st->settings.runAsAdmin, true);
                 drawDropdownRowInGroup(adminGroup, adminY + rH, rH, 2507, L"\uE7EF",
-                    displaySettings.indicatorTitle, isRuNav ? L"Где отображается статус запуска от имени администратора"
-                        : languageCode == L"en" ? L"Where the administrator launch status appears" : nullptr,
+                    displaySettings.indicatorTitle, displaySettings.indicatorDescription,
                     st->settings.inlineAdminIndicator ? displaySettings.field : displaySettings.panel);
                 drawToggleRowInGroup(adminGroup, adminY + rH * 2, rH, 2508, L"\uEDA7",
                     displaySettings.shiftTitle, displaySettings.shiftDescription, st->settings.shiftEnterSwitchesPrivileges);
@@ -12820,7 +15627,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                 { 2603, L"zh_cn", L"简体中文" },        { 2604, L"zh_tw", L"繁體中文" },        { 2605, L"ja",    L"日本語" },
                 { 2606, L"ko",    L"한국어" },          { 2607, L"th",    L"ไทย" },            { 2608, L"id",    L"Bahasa Indonesia" },
                 { 2609, L"ms",    L"Bahasa Melayu" },  { 2610, L"fr",    L"Français" },       { 2611, L"de",    L"Deutsch" },
-                { 2612, L"es",    L"Español" },        { 2613, L"pt",    L"Português" },      { 2614, L"it",    L"Italiano" },
+                { 2612, L"es",    L"Español" },        { 2613, L"pt",    L"Português (Brasil)" }, { 2614, L"it",    L"Italiano" },
                 { 2615, L"ru",    L"Русский" },        { 2616, L"uk",    L"Українська" },     { 2617, L"pl",    L"Polski" },
                 { 2618, L"nl",    L"Nederlands" },     { 2619, L"tr",    L"Türkçe" },         { 2620, L"hi",    L"हिन्दी" },
                 { 2621, L"ar",    L"العربية" }
@@ -12843,9 +15650,7 @@ void PaintWin11SettingsWindow(HWND hWnd, Win11SettingsState* st) {
                     const auto rcChip = D2D1::RectF(left, top, left + cw, top + ch);
                     bool sel = (st->settings.language == kLangs[i].code);
                     drawControl(rcChip, kLangs[i].id, sel);
-                    const wchar_t* systemLanguageLabel = isRuNav ? L"Автоматически"
-                        : languageCode == L"en" ? L"Automatically" : ls.autoLbl;
-                    const wchar_t* label = kLangs[i].label ? kLangs[i].label : systemLanguageLabel;
+                    const wchar_t* label = kLangs[i].label ? kLangs[i].label : ls.automaticLanguage;
                     if (pFmtCtl) DrawCenteredText(pRT, label, static_cast<UINT32>(wcslen(label)), pFmtCtl, rcChip, sel ? pBrAccent : pBrText);
                     addHit(kLangs[i].id, rcChip, kLangs[i].code);
                 }
@@ -12910,6 +15715,7 @@ struct WinUI3ComboFlyoutSession {
     HWND hWnd = nullptr;
     UINT dpi = 96;
     bool isLight = false;
+    bool rtl = false;
     std::vector<std::pair<int, std::wstring>> items;
     int checkedId = 0;
     int hoveredIdx = -1;
@@ -12987,6 +15793,7 @@ static void PaintWinUI3ComboFlyout(HWND hWnd, WinUI3ComboFlyoutSession* s) {
         DWRITE_FONT_WEIGHT_REGULAR, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL,
         S(13.5f), L"", &pFmt);
     if (pFmt) {
+        if (s->rtl) pFmt->SetReadingDirection(DWRITE_READING_DIRECTION_RIGHT_TO_LEFT);
         pFmt->SetParagraphAlignment(DWRITE_PARAGRAPH_ALIGNMENT_CENTER);
         pFmt->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
     }
@@ -13134,7 +15941,7 @@ static LRESULT CALLBACK WinUI3ComboFlyoutWndProc(HWND hWnd, UINT uMsg, WPARAM wP
 }
 
 int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<std::pair<int, std::wstring>>& items,
-                          int checkedId, bool isLight, UINT dpi) {
+                          int checkedId, bool isLight, UINT dpi, bool rtl) {
     if (items.empty()) return 0;
     static constexpr const wchar_t* kComboClass = L"WindhawkModernRunWinUI3Combo_v6";
     WNDCLASSEXW wc = { sizeof(wc) };
@@ -13148,6 +15955,7 @@ int ShowWinUI3ComboFlyout(HWND hOwner, const RECT& rcCombo, const std::vector<st
     WinUI3ComboFlyoutSession session;
     session.dpi = dpi ? dpi : 96;
     session.isLight = isLight;
+    session.rtl = rtl;
     session.items = items;
     session.checkedId = checkedId;
 
@@ -13437,9 +16245,10 @@ static std::optional<CommandAlias> ShowCommandEditor(HWND owner, bool light, con
                        (std::max)(static_cast<int>(monitor.rcWork.top), static_cast<int>(monitor.rcWork.bottom) - windowHeight));
     }
 
+    const DWORD readingStyle = IsRtlUiLanguage(language) ? WS_EX_RTLREADING : 0;
     session.background = CreateSolidBrush(SettingsColorRef(session.palette.colBg));
     session.field = CreateSolidBrush(SettingsColorRef(session.palette.colCtlBg));
-    HWND dialog = CreateWindowExW(WS_EX_DLGMODALFRAME, windowClass, existing ? strings.edit : strings.newAlias,
+    HWND dialog = CreateWindowExW(WS_EX_DLGMODALFRAME | readingStyle, windowClass, existing ? strings.edit : strings.newAlias,
         style, x, y, windowWidth, windowHeight, owner, nullptr, GetModInstanceHandle(), &session);
     if (!dialog) {
         DeleteObject(session.field);
@@ -13457,7 +16266,8 @@ static std::optional<CommandAlias> ShowCommandEditor(HWND owner, bool light, con
     HFONT buttonFont = makeFont(SettingsStyle::controlTextSize);
     auto addControl = [&](const wchar_t* kind, const wchar_t* text, DWORD flags, int left, int top,
                           int w, int h, int id, HFONT font) {
-        HWND control = CreateWindowExW(0, kind, text, WS_CHILD | WS_VISIBLE | flags, scale(left), scale(top),
+        const DWORD exStyle = wcscmp(kind, L"EDIT") == 0 ? 0 : readingStyle;
+        HWND control = CreateWindowExW(exStyle, kind, text, WS_CHILD | WS_VISIBLE | flags, scale(left), scale(top),
             scale(w), scale(h), dialog, reinterpret_cast<HMENU>(static_cast<INT_PTR>(id)), GetModInstanceHandle(), nullptr);
         if (control && font) SendMessageW(control, WM_SETFONT, reinterpret_cast<WPARAM>(font), TRUE);
         return control;
@@ -13615,6 +16425,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
             if (!st) return 0;
             POINT pt = { (short)LOWORD(lParam), (short)HIWORD(lParam) };
             SettingsLocalizedStrings ls = GetSettingsLocalizedStrings(st->settings.language);
+            const bool rtl = IsRtlUiLanguage(st->settings.language);
             for (const auto hit : st->hits) {
                 if (!PtInRect(&hit.rc, pt)) continue;
                 int id = hit.id;
@@ -13642,7 +16453,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         opts.emplace_back(static_cast<int>(i + 1), label);
                     }
                     const int selected = static_cast<int>(GetThemePresetIndex(st->settings.themePreset) + 1);
-                    const int choice = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, selected, st->isLight, st->dpi);
+                    const int choice = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, selected, st->isLight, st->dpi, rtl);
                     if (choice >= 1 && choice <= static_cast<int>(std::size(kThemePresets))) {
                         const auto& preset = kThemePresets[choice - 1];
                         Wh_SetStringValue(GetUserOverrideKey(L"themePreset").c_str(), preset.key);
@@ -13660,7 +16471,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         { 3, ls.colorLight }
                     };
                     int curIdx = (st->settings.colorMode == ColorMode::Dark) ? 2 : ((st->settings.colorMode == ColorMode::Light) ? 3 : 1);
-                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, curIdx, st->isLight, st->dpi);
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, curIdx, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 3) {
                         static const wchar_t* kC[] = { L"", L"auto", L"dark", L"light" };
                         Wh_SetStringValue(GetUserOverrideKey(L"colorMode").c_str(), kC[sel]);
@@ -13672,7 +16483,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         {1, strings.modLabel}, {2, kWindowsFluentMenuLabel}
                     };
                     const int current = st->settings.iconSet == IconSet::WindowsFluent ? 2 : 1;
-                    const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
+                    const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi, rtl);
                     if (selected >= 1 && selected <= 2 && selected != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"iconSet").c_str(),
                                                    selected == 2 ? L"windows_fluent" : L"default");
@@ -13683,7 +16494,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         { 1, strings.modLabel }, { 2, kWindowsFluentMenuLabel }
                     };
                     int current = st->settings.contextMenuStyle == ContextMenuStyle::WindowsFluent ? 2 : 1;
-                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 2 && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"contextMenuStyle").c_str(),
                                                     sel == 2 ? L"windows_fluent" : L"standard");
@@ -13695,7 +16506,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         options.emplace_back(i + 1, strings.labels[i]);
                     }
                     const int current = static_cast<int>(st->settings.menuBorderMode) + 1;
-                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= static_cast<int>(kContextMenuBorderModeValues.size()) && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"menuBorderMode").c_str(),
                                                     kContextMenuBorderModeValues[sel - 1]);
@@ -13756,7 +16567,12 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     }
                     OPENFILENAMEW ofn = { sizeof(ofn) };
                     ofn.hwndOwner = hWnd;
-                    ofn.lpstrFilter = L"PNG, JPG, WebP, GIF (*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp)\0*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp\0*.*\0*.*\0\0";
+                    const auto formats = L"*.png;*.jpg;*.jpeg;*.gif;*.bmp;*.webp";
+                    std::wstring fileFilter;
+                    for (const auto* part : {ls.backgroundFiles, formats, ls.allFiles, L"*.*"}) {
+                        fileFilter.append(part).push_back(L'\0');
+                    }
+                    ofn.lpstrFilter = fileFilter.c_str();
                     ofn.lpstrFile = fileBuf;
                     ofn.nMaxFile = ARRAYSIZE(fileBuf);
                     ofn.lpstrInitialDir = initDir.empty() ? nullptr : initDir.c_str();
@@ -13782,7 +16598,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         options.emplace_back(i + 1, borders.labels[i]);
                     }
                     const int current = static_cast<int>(st->settings.windowBorderMode) + 1;
-                    const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi);
+                    const int selected = ShowWinUI3ComboFlyout(hWnd, hit.rc, options, current, st->isLight, st->dpi, rtl);
                     if (selected >= 1 && selected <= static_cast<int>(kWindowBorderModeValues.size()) && selected != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"windowBorderMode").c_str(),
                                                     kWindowBorderModeValues[selected - 1]);
@@ -13801,7 +16617,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     static const wchar_t* kP[] = { L"", L"auto", L"bottom_left", L"bottom_center", L"bottom_right", L"top_left", L"top_center", L"top_right", L"center" };
                     int curIdx = 1;
                     for (int k = 1; k <= 8; ++k) if (st->settings.dialogPosition == kP[k]) curIdx = k;
-                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, curIdx, st->isLight, st->dpi);
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, curIdx, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 8) {
                         Wh_SetStringValue(GetUserOverrideKey(L"dialogPosition").c_str(), kP[sel]);
                         Wh_SetIntValue(GetUserOverrideKey(L"hasSavedPos").c_str(), 0);
@@ -13815,7 +16631,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         { 3, layoutStrings.options[2] },
                     };
                     int current = static_cast<int>(st->settings.dialogLayout) + 1;
-                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 3 && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogLayout").c_str(), kDialogLayoutValues[sel - 1]);
                     }
@@ -13828,7 +16644,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                         {1, str.widthOptions0}, {2, str.widthOptions1}, {3, str.widthOptions2}
                     };
                     const int current = static_cast<int>(st->settings.dialogWidthPreset) + 1;
-                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 3 && sel != current) {
                         constexpr std::array keys{L"default", L"narrow", L"wide"};
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"dialogWidthPreset").c_str(), keys[sel - 1]);
@@ -13837,7 +16653,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     std::vector<std::pair<int, std::wstring>> opts = {
                         { 85, L"85%" }, { 90, L"90%" }, { 100, L"100%" }, { 110, L"110%" }, { 120, L"120%" }
                     };
-                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, st->settings.uiScalePercent, st->isLight, st->dpi);
+                    int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, st->settings.uiScalePercent, st->isLight, st->dpi, rtl);
                     if (sel >= 85 && sel <= 120) {
                         Wh_SetIntValue(GetUserOverrideKey(L"uiScalePercent").c_str(), sel);
                         changed = true;
@@ -13868,7 +16684,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     const auto& str = GetRunDisplaySettingStrings(st->settings.language);
                     const std::vector<std::pair<int, std::wstring>> opts{{1, str.panel}, {2, str.field}};
                     const int current = st->settings.inlineAdminIndicator ? 2 : 1;
-                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= 2 && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"adminIndicatorPlacement").c_str(),
                                                     sel == 2 ? L"field" : L"panel");
@@ -13888,7 +16704,7 @@ LRESULT CALLBACK Win11SettingsWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
                     const std::vector<std::pair<int, std::wstring>> opts{
                         {1, taskbar.options[0]}, {2, taskbar.options[1]}, {3, taskbar.options[2]}
                     };
-                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi);
+                    const int sel = ShowWinUI3ComboFlyout(hWnd, hit.rc, opts, current, st->isLight, st->dpi, rtl);
                     if (sel >= 1 && sel <= static_cast<int>(kTaskbarIconModeValues.size()) && sel != current) {
                         changed = Wh_SetStringValue(GetUserOverrideKey(L"taskbarClickAction").c_str(), kTaskbarIconModeValues[sel - 1]);
                     }
@@ -16639,7 +19455,7 @@ LRESULT CALLBACK RunDlgSubclassProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
                     item.id = kHiddenActionMenuBase + static_cast<UINT>(i);
                     item.label = actions.labels[i];
                     item.icon = kActionMenuIcons[i];
-                    item.shortcut = kActionShortcuts[i];
+                    item.shortcut = actions.shortcuts[i];
                     ctxItems.push_back(std::move(item));
                 }
             }
