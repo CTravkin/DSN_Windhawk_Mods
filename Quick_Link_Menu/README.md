@@ -22,6 +22,9 @@ right-clicking the Start button.
 - **Submenu controls.** Submenus open immediately on hover by default. Other options
   include delayed hover, hovering over the arrow, and clicking the arrow. A hand
   cursor marks areas that run a command. This indicator can be turned off.
+- **Quick launch keys.** Enable Windows letter shortcuts for supported Win+X
+  commands. In **All commands** mode, a letter can open a closed submenu and
+  focus the matching item.
 - **Terminal.** The main Terminal action can run as administrator.
 
 ### Menu sections

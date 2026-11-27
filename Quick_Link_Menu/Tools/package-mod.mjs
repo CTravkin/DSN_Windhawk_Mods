@@ -83,10 +83,10 @@ addOption('submenuHover', 'immediate',
     ['click', ['On arrow click', 'При нажатии на стрелку', 'Al hacer clic en la flecha', 'Beim Klicken auf den Pfeil', 'Ao clicar na seta', '单击箭头时打开']],
   ]);
 addOption('quickLaunchKeys', 'none',
-  ['Quick launch keys', 'Клавиши быстрого запуска', 'Teclas de inicio rápido', 'Schnellstarttasten', 'Teclas de inicialização rápida', '快速启动键'],
-  ['Underlines the letters assigned to commands in the standard Windows menu', 'Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows', 'Subraya las letras asignadas a los comandos en el menú estándar de Windows', 'Unterstreicht die Buchstaben, die Befehlen im Standardmenü von Windows zugeordnet sind', 'Sublinha as letras atribuídas a comandos no menu padrão do Windows', '为 Windows 标准菜单中已指定字母的命令显示下划线'], [
+  ['Quick launch keys', 'Клавиши быстрого запуска', 'Teclas de acceso', 'Zugriffstasten', 'Teclas de acesso', '菜单访问键'],
+  ['Underlines the letters assigned to commands in the standard Windows menu', 'Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows', 'Subraya las letras asignadas a los comandos en el menú estándar de Windows', 'Unterstreicht die Buchstaben, die Befehlen im Standardmenü von Windows zugeordnet sind', 'Sublinha as letras atribuídas a comandos no menu padrão do Windows', '在命令名称中用下划线标出 Windows 标准菜单为其分配的字母'], [
     ['none', ['None', 'Нет', 'Ninguna', 'Keine', 'Nenhuma', '无']],
-    ['visible', ['Visible only', 'Только видимые', 'Solo visibles', 'Nur sichtbare', 'Somente visíveis', '仅可见项']],
+    ['visible', ['Visible only', 'Только видимые', 'Solo elementos visibles', 'Nur sichtbare Einträge', 'Somente itens visíveis', '仅可见项']],
     ['all', ['All commands', 'Все команды', 'Todos los comandos', 'Alle Befehle', 'Todos os comandos', '所有命令']],
   ]);
 addOption('hideAdminCommands', false,

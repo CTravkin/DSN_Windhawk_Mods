@@ -7,7 +7,7 @@
 // @description:de-DE Das Win+X-Menü anpassen und um weitere Befehle ergänzen (Rechtsklick auf die Startschaltfläche)
 // @description:pt-BR Personalize o menu Win+X e adicione mais comandos (clique com o botão direito no botão Iniciar)
 // @description:zh-CN 自定义 Win+X 菜单并添加更多命令（右键单击“开始”按钮）
-// @version         1.2.0
+// @version         1.2.1
 // @author          CTravkin
 // @github          https://github.com/CTravkin
 // @homepage        https://ctravkin.ru
@@ -16,7 +16,7 @@
 // @architecture    x86-64
 // @compilerOptions -DWIN32_LEAN_AND_MEAN -lcomctl32 -lruntimeobject -lole32 -loleaut32 -lshell32 -lshlwapi -ladvapi32 -liphlpapi -luuid -ldwrite
 // ==/WindhawkMod==
-// Build: 48
+// Build: 49
 
 // ==WindhawkModReadme==
 /*
@@ -42,6 +42,9 @@ right-clicking the Start button.
   credentials or whose elevation is blocked. Commands that only need UAC consent stay visible.
 - **Submenu controls.** Open submenus on hover, after a delay, on arrow hover, or by
   clicking the arrow. A hand cursor can mark areas that run a command.
+- **Quick launch keys.** Enable Windows letter shortcuts for supported Win+X
+  commands. In **All commands** mode, a letter can open a closed submenu and
+  focus the matching item.
 - **Terminal.** The main Terminal action can run as administrator.
 
 ### Menu sections
@@ -157,16 +160,16 @@ and Terminal and power actions under **Command settings**.
   - quickLaunchKeys: none
     $name: "Quick launch keys"
     $name:ru-RU: "Клавиши быстрого запуска"
-    $name:es-ES: "Teclas de inicio rápido"
-    $name:de-DE: "Schnellstarttasten"
-    $name:pt-BR: "Teclas de inicialização rápida"
-    $name:zh-CN: "快速启动键"
+    $name:es-ES: "Teclas de acceso"
+    $name:de-DE: "Zugriffstasten"
+    $name:pt-BR: "Teclas de acesso"
+    $name:zh-CN: "菜单访问键"
     $description: "Underlines the letters assigned to commands in the standard Windows menu"
     $description:ru-RU: "Подчеркивает буквы для запуска команд, которым они назначены в штатном меню Windows"
     $description:es-ES: "Subraya las letras asignadas a los comandos en el menú estándar de Windows"
     $description:de-DE: "Unterstreicht die Buchstaben, die Befehlen im Standardmenü von Windows zugeordnet sind"
     $description:pt-BR: "Sublinha as letras atribuídas a comandos no menu padrão do Windows"
-    $description:zh-CN: "为 Windows 标准菜单中已指定字母的命令显示下划线"
+    $description:zh-CN: "在命令名称中用下划线标出 Windows 标准菜单为其分配的字母"
     $options:
       - none: "None"
       - visible: "Visible only"
@@ -177,15 +180,15 @@ and Terminal and power actions under **Command settings**.
       - all: "Все команды"
     $options:es-ES:
       - none: "Ninguna"
-      - visible: "Solo visibles"
+      - visible: "Solo elementos visibles"
       - all: "Todos los comandos"
     $options:de-DE:
       - none: "Keine"
-      - visible: "Nur sichtbare"
+      - visible: "Nur sichtbare Einträge"
       - all: "Alle Befehle"
     $options:pt-BR:
       - none: "Nenhuma"
-      - visible: "Somente visíveis"
+      - visible: "Somente itens visíveis"
       - all: "Todos os comandos"
     $options:zh-CN:
       - none: "无"
